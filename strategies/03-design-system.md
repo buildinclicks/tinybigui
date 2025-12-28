@@ -286,7 +286,6 @@ Users can customize theme in three ways:
 ```javascript
 // User's tailwind.config.js
 module.exports = {
-  presets: [require('tinybigui/tailwind.preset')],
   theme: {
     extend: {
       colors: {
@@ -387,7 +386,8 @@ export function useRipple() {
 Map to Tailwind:
 
 ```javascript
-// tailwind.preset.js
+// Tailwind v4 is CSS-first — spacing tokens are provided via CSS variables and
+// mapped in @tinybigui/tokens/tokens.css (via @theme / @utility where needed).
 spacing: {
   0: 'var(--md-sys-spacing-0)',
   1: 'var(--md-sys-spacing-1)',

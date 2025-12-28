@@ -33,7 +33,8 @@ This is a one-page summary of all strategic decisions for TinyBigUI. For detaile
 
 ## 📦 Package Details
 
-- **Package Name**: TBD (`tinybigui` or `@tinybigui/react`)
+- **Package Name**: `@tinybigui/react`
+- **Tokens Package**: `@tinybigui/tokens` (exports `tokens.css` only)
 - **Distribution**: Single NPM package
 - **Tree-Shaking**: Full support via `sideEffects: false`
 - **Formats**: ESM (primary) + CJS (compatibility)
@@ -260,23 +261,19 @@ Every component includes:
 
 ```bash
 # Install
-pnpm add tinybigui
+pnpm add @tinybigui/react
 
 # Import styles
-import 'tinybigui/styles.css'
+import "@tinybigui/react/styles.css"
 
 # Configure Tailwind
 // tailwind.config.js
 module.exports = {
-  presets: [require('tinybigui/tailwind.preset')],
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/tinybigui/dist/**/*.js',
-  ],
+  // TailwindCSS v4 is required; config is usually not needed (auto detection).
 }
 
 # Use components
-import { Button, TextField, Checkbox } from 'tinybigui'
+import { Button, TextField, Checkbox } from "@tinybigui/react"
 ```
 
 ---

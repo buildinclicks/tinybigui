@@ -62,22 +62,22 @@ This document outlines the development roadmap for TinyBigUI, including componen
 
 ---
 
-### Phase 1: Button Components (Week 3-4)
+### Phase 1a: Button Components (Week 3-4)
 
 **Goal**: Ship first usable components - **v0.1.0**
 
 #### Components
 
-| Component | Priority | Estimated Time | Status |
-|-----------|----------|----------------|--------|
-| **Button** | 🔴 Critical | 3 days | 🟡 Pending |
-| **Icon Button** | 🔴 Critical | 2 days | 🟡 Pending |
-| **FAB** | 🟡 High | 2 days | 🟡 Pending |
-| **Segmented Button** | 🟢 Medium | 3 days | 🟡 Pending |
+| Component       | Priority    | Estimated Time | Status     |
+| --------------- | ----------- | -------------- | ---------- |
+| **Button**      | 🔴 Critical | 3 days         | 🟡 Pending |
+| **Icon Button** | 🔴 Critical | 2 days         | 🟡 Pending |
+| **FAB**         | 🟡 High     | 2 days         | 🟡 Pending |
 
 #### Button Variants
 
 **Button**:
+
 - Filled (default)
 - Outlined
 - Text
@@ -85,24 +85,22 @@ This document outlines the development roadmap for TinyBigUI, including componen
 - Tonal
 
 **Icon Button**:
+
 - Filled
 - Filled Tonal
 - Outlined
 - Standard
 
 **FAB**:
+
 - Small
 - Medium (default)
 - Large
 - Extended
 
-**Segmented Button**:
-- Single-select
-- Multi-select
-
 #### Deliverables
 
-- ✅ All button components with full variants
+- ✅ Button components with full variants (3 components)
 - ✅ Headless + styled versions
 - ✅ Complete test coverage
 - ✅ Storybook stories
@@ -119,23 +117,24 @@ This document outlines the development roadmap for TinyBigUI, including componen
 
 ---
 
-### Phase 2: Input Components (Week 5-7)
+### Phase 1b: Input Components (Week 5-7)
 
 **Goal**: Core form inputs - **v0.2.0**
 
 #### Components
 
-| Component | Priority | Estimated Time | Status |
-|-----------|----------|----------------|--------|
-| **Text Field** | 🔴 Critical | 4 days | 🟡 Pending |
-| **Checkbox** | 🔴 Critical | 2 days | 🟡 Pending |
-| **Radio** | 🔴 Critical | 2 days | 🟡 Pending |
-| **Switch** | 🔴 Critical | 2 days | 🟡 Pending |
-| **Slider** | 🟡 High | 3 days | 🟡 Pending |
+| Component      | Priority    | Estimated Time | Status     |
+| -------------- | ----------- | -------------- | ---------- |
+| **Checkbox**   | 🔴 Critical | 2 days         | 🟡 Pending |
+| **Radio**      | 🔴 Critical | 2 days         | 🟡 Pending |
+| **Switch**     | 🔴 Critical | 2 days         | 🟡 Pending |
+| **Text Field** | 🔴 Critical | 4 days         | 🟡 Pending |
+| **Select**     | 🔴 Critical | 3 days         | 🟡 Pending |
 
 #### Features
 
 **Text Field**:
+
 - Filled variant
 - Outlined variant
 - Leading/trailing icons
@@ -145,28 +144,31 @@ This document outlines the development roadmap for TinyBigUI, including componen
 - Multiline (textarea)
 
 **Checkbox**:
+
 - Standard
 - Indeterminate state
 - Error state
 
 **Radio**:
+
 - Standard
 - Radio group
 - Error state
 
 **Switch**:
+
 - Standard
 - With icon
 
-**Slider**:
-- Continuous
-- Discrete (with steps)
-- Range slider
-- Value labels
+**Select**:
+
+- Single select
+- Filled variant
+- Outlined variant
 
 #### Deliverables
 
-- ✅ All input components
+- ✅ All primitive input components (5 components)
 - ✅ Form integration examples
 - ✅ Validation patterns
 - ✅ Comprehensive tests
@@ -174,41 +176,45 @@ This document outlines the development roadmap for TinyBigUI, including componen
 
 ---
 
-### Phase 3: Selection Components (Week 8-10)
+### Phase 2: Selection Components (Week 8-10)
 
 **Goal**: Selection and navigation - **v0.3.0**
 
 #### Components
 
-| Component | Priority | Estimated Time | Status |
-|-----------|----------|----------------|--------|
-| **Chip** | 🟡 High | 3 days | 🟡 Pending |
-| **Menu** | 🟡 High | 4 days | 🟡 Pending |
-| **Select** | 🟡 High | 3 days | 🟡 Pending |
-| **List** | 🟢 Medium | 3 days | 🟡 Pending |
+| Component  | Priority  | Estimated Time | Status     |
+| ---------- | --------- | -------------- | ---------- |
+| **Chip**   | 🟡 High   | 3 days         | 🟡 Pending |
+| **Menu**   | 🟡 High   | 4 days         | 🟡 Pending |
+| **List**   | 🟢 Medium | 3 days         | 🟡 Pending |
+| **Slider** | 🟡 High   | 3 days         | 🟡 Pending |
 
 #### Features
 
 **Chip**:
+
 - Assist chip
 - Filter chip
 - Input chip
 - Suggestion chip
 
 **Menu**:
+
 - Standard menu
 - Keyboard navigation
 - Nested menus (submenus)
 - Menu sections
 - Icons in menu items
 
-**Select**:
-- Single select
-- Multi select
-- Searchable
-- Grouped options
+**Slider**:
+
+- Continuous
+- Discrete (with steps)
+- Range slider
+- Value labels
 
 **List**:
+
 - One-line list
 - Two-line list
 - Three-line list
@@ -224,42 +230,47 @@ This document outlines the development roadmap for TinyBigUI, including componen
 
 ---
 
-### Phase 4: Feedback Components (Week 11-13)
+### Phase 3: Feedback Components (Week 11-13)
 
 **Goal**: User feedback mechanisms - **v0.4.0**
 
 #### Components
 
-| Component | Priority | Estimated Time | Status |
-|-----------|----------|----------------|--------|
-| **Progress Indicator** | 🟡 High | 2 days | 🟡 Pending |
-| **Snackbar** | 🟡 High | 3 days | 🟡 Pending |
-| **Tooltip** | 🟢 Medium | 2 days | 🟡 Pending |
-| **Badge** | 🟢 Medium | 2 days | 🟡 Pending |
-| **Dialog** | 🟡 High | 4 days | 🟡 Pending |
+| Component              | Priority  | Estimated Time | Status     |
+| ---------------------- | --------- | -------------- | ---------- |
+| **Progress Indicator** | 🟡 High   | 2 days         | 🟡 Pending |
+| **Snackbar**           | 🟡 High   | 3 days         | 🟡 Pending |
+| **Tooltip**            | 🟢 Medium | 2 days         | 🟡 Pending |
+| **Badge**              | 🟢 Medium | 2 days         | 🟡 Pending |
+| **Dialog**             | 🟡 High   | 4 days         | 🟡 Pending |
 
 #### Features
 
 **Progress Indicator**:
+
 - Linear (determinate/indeterminate)
 - Circular (determinate/indeterminate)
 
 **Snackbar**:
+
 - Standard
 - With action
 - With close button
 - Queue management
 
 **Tooltip**:
+
 - Plain tooltip
 - Rich tooltip (with title)
 - Positioning
 
 **Badge**:
+
 - Small badge
 - Large badge (with count)
 
 **Dialog**:
+
 - Basic dialog
 - Alert dialog
 - Full-screen dialog
@@ -275,12 +286,13 @@ This document outlines the development roadmap for TinyBigUI, including componen
 
 ---
 
-### Phase 5: Polish & Refinement (Week 14-16)
+### Phase 4: Polish & Refinement (Week 14-16)
 
 **Goal**: Production readiness - **v0.5.0+**
 
 #### Tasks
 
+- [ ] **Add Playwright** for E2E testing
 - [ ] Performance optimization
 - [ ] Bundle size analysis and optimization
 - [ ] Comprehensive documentation review
@@ -302,7 +314,7 @@ This document outlines the development roadmap for TinyBigUI, including componen
 
 ---
 
-### Phase 6: 1.0.0 Release (Week 17-18)
+### Phase 5: 1.0.0 Release (Week 17-18)
 
 **Goal**: Official stable release
 
@@ -359,14 +371,14 @@ Build higher-level components:
 
 ## 📊 Milestones
 
-| Milestone | Target Date | Components | Status |
-|-----------|-------------|------------|--------|
-| **v0.1.0** - Button Components | Week 4 | 4 button types | 🟡 Pending |
-| **v0.2.0** - Input Components | Week 7 | 5 input types | 🟡 Pending |
-| **v0.3.0** - Selection Components | Week 10 | 4 selection types | 🟡 Pending |
-| **v0.4.0** - Feedback Components | Week 13 | 5 feedback types | 🟡 Pending |
-| **v0.9.0** - Release Candidate | Week 16 | Polish & docs | 🟡 Pending |
-| **v1.0.0** - Stable Release | Week 18 | Production ready | 🟡 Pending |
+| Milestone                         | Target Date | Components                                 | Status     |
+| --------------------------------- | ----------- | ------------------------------------------ | ---------- |
+| **v0.1.0** - Button Components    | Week 4      | Button, IconButton, FAB                    | 🟡 Pending |
+| **v0.2.0** - Input Components     | Week 7      | Checkbox, Radio, Switch, TextField, Select | 🟡 Pending |
+| **v0.3.0** - Selection Components | Week 10     | Chip, Menu, List, Slider                   | 🟡 Pending |
+| **v0.4.0** - Feedback Components  | Week 13     | Progress, Snackbar, Tooltip, Badge, Dialog | 🟡 Pending |
+| **v0.9.0** - Release Candidate    | Week 16     | Polish, Playwright, docs                   | 🟡 Pending |
+| **v1.0.0** - Stable Release       | Week 18     | Production ready                           | 🟡 Pending |
 
 ---
 
@@ -404,15 +416,15 @@ Build higher-level components:
 
 ### Potential Risks
 
-| Risk | Impact | Mitigation |
-|------|--------|-----------|
-| **Scope Creep** | High | Strict primitive-only focus for v1.0 |
-| **React Aria Breaking Changes** | Medium | Pin versions, monitor releases |
-| **MD3 Spec Changes** | Low | MD3 is stable, changes are rare |
-| **Browser Compatibility Issues** | Medium | Extensive testing, polyfills if needed |
-| **Accessibility Bugs** | High | Automated + manual testing, community feedback |
-| **Performance Issues** | Medium | Regular profiling, bundle size monitoring |
-| **Lack of Adoption** | High | Marketing, content creation, community building |
+| Risk                             | Impact | Mitigation                                      |
+| -------------------------------- | ------ | ----------------------------------------------- |
+| **Scope Creep**                  | High   | Strict primitive-only focus for v1.0            |
+| **React Aria Breaking Changes**  | Medium | Pin versions, monitor releases                  |
+| **MD3 Spec Changes**             | Low    | MD3 is stable, changes are rare                 |
+| **Browser Compatibility Issues** | Medium | Extensive testing, polyfills if needed          |
+| **Accessibility Bugs**           | High   | Automated + manual testing, community feedback  |
+| **Performance Issues**           | Medium | Regular profiling, bundle size monitoring       |
+| **Lack of Adoption**             | High   | Marketing, content creation, community building |
 
 ---
 
@@ -479,21 +491,25 @@ Track progress in GitHub Projects:
 ### For Each Component
 
 1. **Research** (1 day)
+
    - Study MD3 specs
    - Review React Aria hooks
    - Check existing implementations
 
 2. **Development** (2-3 days)
+
    - Build headless primitive
    - Add MD3 styled layer
    - Implement all variants
 
 3. **Testing** (1 day)
+
    - Unit tests
    - Accessibility tests
    - Interaction tests
 
 4. **Documentation** (1 day)
+
    - Storybook stories
    - API documentation
    - Usage examples
@@ -546,4 +562,3 @@ Track progress in GitHub Projects:
 - [Open Source Project Management](https://opensource.guide/best-practices/)
 - [Semantic Versioning](https://semver.org/)
 - [Material Design Components](https://m3.material.io/components)
-

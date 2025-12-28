@@ -15,15 +15,17 @@ This document outlines how TinyBigUI will be packaged, published, and consumed b
 
 **Decision**: Distribute as a single NPM package with excellent tree-shaking support.
 
-**Package Name**: TBD (see Open Questions)
-- Option A: `tinybigui` (simple, memorable)
-- Option B: `@tinybigui/react` (scoped, allows future expansion)
+**Package Name**: `@tinybigui/react` (scoped, allows future expansion)
+
+**Additional Packages**:
+
+- `@tinybigui/tokens` - Design tokens (CSS variables, Tailwind preset)
 
 ### Package Exports
 
 ```json
 {
-  "name": "tinybigui",
+  "name": "@tinybigui/react",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -36,20 +38,15 @@ This document outlines how TinyBigUI will be packaged, published, and consumed b
       "require": "./dist/index.cjs"
     },
     "./styles.css": "./dist/styles.css",
-    "./tailwind.preset": "./tailwind.preset.js",
     "./package.json": "./package.json"
   },
-  "files": [
-    "dist",
-    "tailwind.preset.js",
-    "README.md",
-    "LICENSE"
-  ],
+  "files": ["dist", "README.md", "LICENSE"],
   "sideEffects": false
 }
 ```
 
 **Key Features**:
+
 - ✅ **Dual ESM/CJS** for maximum compatibility
 - ✅ **`sideEffects: false`** for aggressive tree-shaking
 - ✅ **TypeScript declarations** included
@@ -65,7 +62,7 @@ Users import only what they need:
 
 ```typescript
 // User imports 2 components
-import { Button, TextField } from 'tinybigui'
+import { Button, TextField } from "@tinybigui/react";
 
 // Bundler includes ONLY:
 // ✅ Button component + dependencies
@@ -86,11 +83,11 @@ import { Button, TextField } from 'tinybigui'
 
 ### Bundle Size Expectations
 
-| Import | Expected Gzipped Size |
-|--------|----------------------|
-| Single Button | ~8-12 KB |
-| 5 components | ~25-30 KB |
-| All components | ~45-50 KB |
+| Import         | Expected Gzipped Size |
+| -------------- | --------------------- |
+| Single Button  | ~8-12 KB              |
+| 5 components   | ~25-30 KB             |
+| All components | ~45-50 KB             |
 
 **Target**: Keep full library under 50KB gzipped.
 
@@ -104,11 +101,12 @@ import { Button, TextField } from 'tinybigui'
 
 ```typescript
 // User's app entry point (main.tsx, _app.tsx, etc.)
-import 'tinybigui/styles.css'
-import { Button, TextField } from 'tinybigui'
+import "@tinybigui/react/styles.css";
+import { Button, TextField } from "@tinybigui/react";
 ```
 
 **Rationale**:
+
 - Explicit control over when styles load
 - Works with SSR/SSG frameworks
 - No magic auto-importing
@@ -116,22 +114,26 @@ import { Button, TextField } from 'tinybigui'
 
 ### Tailwind Preset
 
-**For Tailwind users**:
+**TailwindCSS v4 is required**.
+
+We do **not** ship a JS Tailwind preset as the primary integration (CSS-first strategy).
+
+**For Tailwind users (recommended happy path)**:
+- Ensure Tailwind v4 is installed and working in your app (via your framework's Tailwind setup)
+- Import `@tinybigui/react/styles.css`
+
+**Troubleshooting (if styles are missing)**:
+In some monorepo / library scenarios, Tailwind may not scan external sources automatically. Ensure Tailwind is configured to include `@tinybigui/react` sources per Tailwind v4 guidance for adding external sources to scanning.
 
 ```javascript
 // User's tailwind.config.js
 module.exports = {
-  presets: [
-    require('tinybigui/tailwind.preset')
-  ],
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/tinybigui/dist/**/*.js', // Include library for Tailwind
-  ],
-}
+  // Tailwind v4 generally auto-detects sources; only add config if needed
+};
 ```
 
 **Preset includes**:
+
 - MD3 design tokens as Tailwind theme
 - Custom utilities for MD3 components
 - Animation keyframes
@@ -144,14 +146,14 @@ module.exports = {
 ### Installation
 
 ```bash
-# npm
-npm install tinybigui
+# pnpm (enforced for contributors, recommended for users)
+pnpm add @tinybigui/react
 
-# pnpm (recommended)
-pnpm add tinybigui
+# npm
+npm install @tinybigui/react
 
 # yarn
-yarn add tinybigui
+yarn add @tinybigui/react
 ```
 
 ### Peer Dependencies
@@ -163,24 +165,27 @@ Users must have:
   "peerDependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "tailwindcss": "^3.4.0"
-  }
+    "tailwindcss": "^4.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
 }
 ```
+
+**Note**: `packageManager` field enforces pnpm for consistency across contributors.
 
 ### Setup Guide
 
 #### Step 1: Install Dependencies
 
 ```bash
-pnpm add tinybigui react react-dom tailwindcss
+pnpm add @tinybigui/react react react-dom tailwindcss
 ```
 
 #### Step 2: Import Styles
 
 ```typescript
 // src/main.tsx or src/index.tsx
-import 'tinybigui/styles.css'
+import "@tinybigui/react/styles.css";
 ```
 
 #### Step 3: Configure Tailwind
@@ -188,33 +193,25 @@ import 'tinybigui/styles.css'
 ```javascript
 // tailwind.config.js
 module.exports = {
-  presets: [require('tinybigui/tailwind.preset')],
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/tinybigui/dist/**/*.js',
-  ],
-}
+  // Tailwind v4 generally auto-detects sources; only add config if needed
+};
 ```
 
 #### Step 4: (Optional) Theme Provider
 
 ```typescript
 // src/App.tsx
-import { ThemeProvider } from 'tinybigui'
+import { ThemeProvider } from "@tinybigui/react";
 
 function App() {
-  return (
-    <ThemeProvider defaultMode="light">
-      {/* Your app */}
-    </ThemeProvider>
-  )
+  return <ThemeProvider defaultMode="light">{/* Your app */}</ThemeProvider>;
 }
 ```
 
 #### Step 5: Start Using
 
 ```typescript
-import { Button, TextField, Checkbox } from 'tinybigui'
+import { Button, TextField, Checkbox } from "@tinybigui/react";
 
 function MyComponent() {
   return (
@@ -223,7 +220,7 @@ function MyComponent() {
       <TextField label="Email" type="email" />
       <Checkbox>I agree</Checkbox>
     </>
-  )
+  );
 }
 ```
 
@@ -234,6 +231,7 @@ function MyComponent() {
 ### React 18+ (Primary Target)
 
 Full support for:
+
 - ✅ Create React App (CRA)
 - ✅ Vite
 - ✅ Next.js 13+ (App Router)
@@ -246,20 +244,20 @@ Full support for:
 ```typescript
 // next.config.js
 module.exports = {
-  transpilePackages: ['tinybigui'], // If needed
-}
+  transpilePackages: ["@tinybigui/react"], // If needed
+};
 ```
 
 ```typescript
 // app/layout.tsx (App Router)
-import 'tinybigui/styles.css'
+import "@tinybigui/react/styles.css";
 
 export default function RootLayout({ children }) {
   return (
     <html>
       <body>{children}</body>
     </html>
-  )
+  );
 }
 ```
 
@@ -269,10 +267,10 @@ Components are marked appropriately:
 
 ```typescript
 // Client components have 'use client' directive
-import { Button } from 'tinybigui'  // Client component
+import { Button } from "@tinybigui/react"; // Client component
 
 // Headless variants are RSC-compatible (no directive)
-import { ButtonHeadless } from 'tinybigui'  // Can use in Server Components
+import { ButtonHeadless } from "@tinybigui/react"; // Can use in Server Components
 ```
 
 ---
@@ -290,6 +288,7 @@ Strict adherence to semver:
 ### Breaking Changes
 
 We'll minimize breaking changes:
+
 1. Deprecation warnings for 1 minor version before removal
 2. Clear migration guides for major versions
 3. Codemods for automated migrations (if feasible)
@@ -302,16 +301,20 @@ Maintain a detailed `CHANGELOG.md`:
 ## [0.2.0] - 2025-01-15
 
 ### Added
+
 - Chip component with all MD3 variants
 - Menu component with keyboard navigation
 
 ### Changed
+
 - Button: Improved ripple animation performance
 
 ### Fixed
+
 - TextField: Focus ring now respects border radius
 
 ### Deprecated
+
 - `Button.variant="legacy"` (will be removed in v0.3.0)
 ```
 
@@ -325,7 +328,7 @@ Provide bundle analysis tools:
 
 ```bash
 # Check what you're importing
-npx tinybigui analyze
+npx @tinybigui/cli analyze
 
 # Output:
 # Components: Button (8.2 KB), TextField (12.5 KB)
@@ -401,7 +404,7 @@ CI/CD includes bundle size checks:
 npm publish --tag next
 
 # Install beta
-npm install tinybigui@next
+npm install @tinybigui/react@next
 ```
 
 ---
@@ -411,6 +414,7 @@ npm install tinybigui@next
 **Decision**: No tracking by default (privacy-first)
 
 If we add analytics:
+
 - ✅ Opt-in only
 - ✅ Anonymous
 - ✅ Open source the analytics code
@@ -449,7 +453,7 @@ For rapid prototyping:
 ```html
 <!-- Not for production, but useful for demos -->
 <script type="module">
-  import { Button } from 'https://esm.sh/tinybigui'
+  import { Button } from "https://esm.sh/@tinybigui/react";
 </script>
 ```
 
@@ -460,19 +464,11 @@ For rapid prototyping:
 ## 🔗 Package Links
 
 Will be available at:
-- NPM: `https://npmjs.com/package/tinybigui`
-- Bundlephobia: `https://bundlephobia.com/package/tinybigui`
+
+- NPM: `https://npmjs.com/package/@tinybigui/react`
+- Bundlephobia: `https://bundlephobia.com/package/@tinybigui/react`
 - npm.runkit: Interactive playground
 - JSR (Deno registry): If Deno adoption grows
-
----
-
-## 📋 Open Questions
-
-- [ ] Exact package name (`tinybigui` vs `@tinybigui/react`)
-- [ ] Should we support CSS modules variant?
-- [ ] Should we publish separate headless-only package?
-- [ ] Beta program structure
 
 ---
 
@@ -482,4 +478,3 @@ Will be available at:
 - [Tree Shaking Guide](https://webpack.js.org/guides/tree-shaking/)
 - [Package Exports](https://nodejs.org/api/packages.html#exports)
 - [Semantic Versioning](https://semver.org/)
-

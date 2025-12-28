@@ -13,15 +13,15 @@ This document outlines all technology decisions for TinyBigUI, including core de
 
 ### Required Dependencies
 
-| Package | Version | Purpose | Rationale |
-|---------|---------|---------|-----------|
-| **react** | ^18.0.0 | UI framework | Peer dependency - React 18+ only |
-| **react-dom** | ^18.0.0 | React rendering | Peer dependency |
-| **react-aria** | latest | Accessibility primitives | World-class accessibility from Adobe |
-| **react-aria-components** | latest | Pre-built accessible components | Higher-level React Aria abstractions |
-| **clsx** | ^2.0.0 | Conditional className utility | Lightweight, well-maintained |
-| **class-variance-authority** | ^0.7.0 | Variant management | Perfect for component variants with Tailwind |
-| **tailwind-merge** | ^2.0.0 | Tailwind class merging | Prevents className conflicts |
+| Package                      | Version | Purpose                         | Rationale                                    |
+| ---------------------------- | ------- | ------------------------------- | -------------------------------------------- |
+| **react**                    | ^18.0.0 | UI framework                    | Peer dependency - React 18+ only             |
+| **react-dom**                | ^18.0.0 | React rendering                 | Peer dependency                              |
+| **react-aria**               | latest  | Accessibility primitives        | World-class accessibility from Adobe         |
+| **react-aria-components**    | latest  | Pre-built accessible components | Higher-level React Aria abstractions         |
+| **clsx**                     | ^2.0.0  | Conditional className utility   | Lightweight, well-maintained                 |
+| **class-variance-authority** | ^0.7.0  | Variant management              | Perfect for component variants with Tailwind |
+| **tailwind-merge**           | ^2.0.0  | Tailwind class merging          | Prevents className conflicts                 |
 
 ### Peer Dependencies
 
@@ -29,7 +29,7 @@ This document outlines all technology decisions for TinyBigUI, including core de
 {
   "react": "^18.0.0",
   "react-dom": "^18.0.0",
-  "tailwindcss": "^3.4.0"
+  "tailwindcss": "^4.0.0"
 }
 ```
 
@@ -41,43 +41,47 @@ This document outlines all technology decisions for TinyBigUI, including core de
 
 ### Build Tools
 
-| Tool | Purpose | Rationale |
-|------|---------|-----------|
-| **tsup** | Build tool | Fast, zero-config TypeScript bundler with multiple output formats |
-| **typescript** | Type system | ^5.3.0 - Latest stable features |
-| **@types/react** | React types | Type definitions for React |
-| **@types/react-dom** | React DOM types | Type definitions for React DOM |
+| Tool                 | Purpose         | Rationale                                                         |
+| -------------------- | --------------- | ----------------------------------------------------------------- |
+| **tsup**             | Build tool      | Fast, zero-config TypeScript bundler with multiple output formats |
+| **typescript**       | Type system     | ^5.3.0 - Latest stable features                                   |
+| **@types/react**     | React types     | Type definitions for React                                        |
+| **@types/react-dom** | React DOM types | Type definitions for React DOM                                    |
 
 ### Testing
 
-| Tool | Purpose | Rationale |
-|------|---------|-----------|
-| **vitest** | Test runner | Fast, modern, Vite-powered testing |
-| **@testing-library/react** | React testing utilities | Industry standard for React testing |
-| **@testing-library/jest-dom** | DOM matchers | Better assertions for DOM testing |
-| **@testing-library/user-event** | User interaction simulation | Realistic user event simulation |
-| **happy-dom** | DOM implementation | Fast DOM for unit tests |
-| **@axe-core/react** | Accessibility testing | Automated a11y testing in tests |
+| Tool                            | Purpose                     | Rationale                                    |
+| ------------------------------- | --------------------------- | -------------------------------------------- |
+| **vitest**                      | Test runner                 | Fast, modern, Vite-powered testing           |
+| **@testing-library/react**      | React testing utilities     | Industry standard for React testing          |
+| **@testing-library/jest-dom**   | DOM matchers                | Better assertions for DOM testing            |
+| **@testing-library/user-event** | User interaction simulation | Realistic user event simulation              |
+| **happy-dom**                   | DOM implementation          | Fast DOM for unit tests                      |
+| **@axe-core/react**             | Accessibility testing       | Automated a11y testing in tests              |
+| **playwright**                  | E2E testing                 | Added in Phase 5 for comprehensive E2E tests |
 
 ### Code Quality
 
-| Tool | Purpose | Configuration |
-|------|---------|---------------|
-| **eslint** | Linting | React + TypeScript + A11y rules |
-| **@typescript-eslint/\*** | TypeScript linting | Strict rules |
-| **eslint-plugin-jsx-a11y** | Accessibility linting | Catch a11y issues early |
-| **prettier** | Code formatting | Opinionated formatting |
-| **prettier-plugin-tailwindcss** | Tailwind class sorting | Official Tailwind plugin |
+| Tool                                | Purpose                | Configuration                   |
+| ----------------------------------- | ---------------------- | ------------------------------- |
+| **eslint**                          | Linting                | React + TypeScript + A11y rules |
+| **@typescript-eslint/\***           | TypeScript linting     | Strict rules                    |
+| **eslint-plugin-jsx-a11y**          | Accessibility linting  | Catch a11y issues early         |
+| **prettier**                        | Code formatting        | Opinionated formatting          |
+| **prettier-plugin-tailwindcss**     | Tailwind class sorting | Official Tailwind plugin        |
+| **husky**                           | Git hooks              | Pre-commit/pre-push hooks       |
+| **commitlint**                      | Commit conventions     | Enforce conventional commits    |
+| **@commitlint/config-conventional** | Commit rules           | Standard commit format          |
 
 ### Storybook
 
-| Package | Purpose |
-|---------|---------|
-| **@storybook/react-vite** | Storybook for React with Vite |
-| **@storybook/addon-essentials** | Core Storybook addons |
-| **@storybook/addon-a11y** | Accessibility addon |
-| **@storybook/addon-interactions** | Interaction testing |
-| **@storybook/test** | Testing utilities |
+| Package                           | Purpose                       |
+| --------------------------------- | ----------------------------- |
+| **@storybook/react-vite**         | Storybook for React with Vite |
+| **@storybook/addon-essentials**   | Core Storybook addons         |
+| **@storybook/addon-a11y**         | Accessibility addon           |
+| **@storybook/addon-interactions** | Interaction testing           |
+| **@storybook/test**               | Testing utilities             |
 
 ---
 
@@ -88,21 +92,21 @@ This document outlines all technology decisions for TinyBigUI, including core de
 ```typescript
 // tsup.config.ts
 export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['esm', 'cjs'], // ESM + CommonJS
+  entry: ["src/index.ts"],
+  format: ["esm", "cjs"], // ESM + CommonJS
   dts: true, // Generate .d.ts files
   splitting: true, // Code splitting for tree-shaking
   clean: true,
-  external: ['react', 'react-dom'],
+  external: ["react", "react-dom"],
   treeshake: true,
-})
+});
 ```
 
 ### Package.json Exports
 
 ```json
 {
-  "name": "tinybigui",
+  "name": "@tinybigui/react",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -120,6 +124,7 @@ export default defineConfig({
 ```
 
 **Key Points**:
+
 - `"type": "module"` for ESM-first
 - `sideEffects: false` enables aggressive tree-shaking
 - Dual CJS/ESM exports for maximum compatibility
@@ -130,16 +135,13 @@ export default defineConfig({
 
 ### Tailwind Configuration
 
-The library will ship with:
+TailwindCSS is **required** for TinyBigUI styled components.
 
-1. **Preset Configuration** (`tailwind.preset.js`)
-   - MD3 design tokens as Tailwind theme
-   - Custom utilities for MD3 components
-   - Animation keyframes for MD3 motion
+We use a **Tailwind v4 CSS-first** approach via `@tinybigui/tokens`:
 
-2. **Plugin** (optional `tailwind.plugin.js`)
-   - Component-specific utilities
-   - MD3 color system utilities
+- `@tinybigui/tokens/tokens.css` defines MD3 tokens as **CSS variables**
+- `@tinybigui/tokens/tokens.css` also contains Tailwind v4 **`@theme` / `@utility`** mappings where needed (CSS-first)
+- `@tinybigui/react/styles.css` internally includes tokens (so users only import one CSS file for the happy path)
 
 ### CSS Architecture
 
@@ -180,6 +182,7 @@ src/
 ```
 
 **Key Points**:
+
 - Maximum strictness for type safety
 - JSX transform for React 18+
 - Declaration maps for better IDE experience
@@ -191,6 +194,7 @@ src/
 ### Strategy
 
 All interactive components will:
+
 1. Be explicitly marked with `'use client'` directive
 2. Export both headless (RSC-safe) and styled (client) versions where applicable
 3. Use proper TypeScript types for RSC compatibility
@@ -230,15 +234,28 @@ export function Button({ ... }) {
 
 ## 📊 Decision Matrix
 
-| Decision | Options Considered | Choice | Reason |
-|----------|-------------------|--------|--------|
-| Build Tool | Rollup, tsup, unbuild | **tsup** | Zero-config, fast, great DX |
-| Test Runner | Jest, Vitest | **Vitest** | Modern, fast, better DX |
-| Accessibility | Radix, React Aria, From scratch | **React Aria** | Best-in-class, Adobe-backed, active |
-| CSS Framework | Tailwind, CSS-in-JS, Vanilla | **Tailwind + CVA** | Performance + DX + flexibility |
-| Package Manager | npm, yarn, pnpm | **pnpm** (recommended) | Fast, disk efficient, strict |
+| Decision        | Options Considered              | Choice                      | Reason                              |
+| --------------- | ------------------------------- | --------------------------- | ----------------------------------- |
+| Build Tool      | Rollup, tsup, unbuild           | **tsup**                    | Zero-config, fast, great DX         |
+| Test Runner     | Jest, Vitest                    | **Vitest**                  | Modern, fast, better DX             |
+| E2E Testing     | Cypress, Playwright, none       | **Playwright** (Phase 5)    | Modern, fast, multi-browser         |
+| Accessibility   | Radix, React Aria, From scratch | **React Aria**              | Best-in-class, Adobe-backed, active |
+| CSS Framework   | Tailwind, CSS-in-JS, Vanilla    | **Tailwind + CVA**          | Performance + DX + flexibility      |
+| Package Manager | npm, yarn, pnpm                 | **pnpm** (enforced)         | Fast, disk efficient, strict        |
+| Commit Format   | Free-form, Conventional         | **Conventional** (enforced) | Clean changelogs, semantic releases |
 
 ---
+
+## 🌐 Browser Support Baseline
+
+Because we require **TailwindCSS v4**, we also align to a **modern browser baseline**.
+
+**Supported baseline**:
+- **Safari**: 16.4+
+- **Chrome / Edge**: 111+
+- **Firefox**: 128+
+
+If you need older browser support, TinyBigUI is not the right fit (by design).
 
 ## 🔄 Versioning Strategy
 
@@ -256,4 +273,3 @@ export function Button({ ... }) {
 - [Tailwind CSS](https://tailwindcss.com/)
 - [tsup](https://tsup.egoist.dev/)
 - [Vitest](https://vitest.dev/)
-

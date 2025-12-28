@@ -90,15 +90,16 @@ TinyBigUI aims to be a **Material Design 3 compliant** React component library b
 ## 🤔 Remaining Questions
 
 ### Package Details
-- [ ] NPM package name (`tinybigui` vs `@tinybigui/react`)
-- [ ] Specific initial primitive set for Phase 1
+- ✅ NPM package name: `@tinybigui/react`
+- ✅ Tokens package: `@tinybigui/tokens` (exports `tokens.css` only)
+- ✅ Initial primitives: Phase 1a (Button, IconButton, FAB) + Phase 1b (Checkbox, Radio, Switch, TextField, Select)
 
 ### Project Structure
-- [ ] Monorepo vs single repo structure
-- [ ] Testing framework preference
+- ✅ Monorepo structure: `packages/react` + `packages/tokens`
+- ✅ Testing: Vitest + RTL (Playwright in Phase 4)
 
 ### Theming
-- [ ] CSS variables strategy for design token customization
+- ✅ CSS variables define MD3 tokens; Tailwind v4 maps utilities to tokens (CSS-first)
 
 ---
 
