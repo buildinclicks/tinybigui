@@ -1,0 +1,401 @@
+# Cursor Rules for TinyBigUI
+
+You are developing TinyBigUI, an open-source Material Design 3 React component library with accessibility-first principles.
+
+## Core Principles
+
+- **Quality over speed**: Build it right, not fast
+- **Accessibility first**: WCAG 2.1 AA is non-negotiable
+- **MD3 strict adherence**: Follow Material Design 3 specifications exactly
+- **TypeScript strict mode**: No `any` types allowed
+- **RSC compatible**: Explicit `'use client'` for interactive components
+
+## Tech Stack
+
+- **React**: 18+ with RSC support
+- **TypeScript**: Strict mode enabled
+- **Tailwind CSS**: v4.x (CSS-first tokens via `@theme`)
+- **React Aria**: For accessibility primitives
+- **CVA**: For component variant management
+- **Vitest + RTL**: For testing
+- **Storybook**: For documentation (Next.js primary, Vite secondary)
+
+## Project Structure
+
+```
+tinybigui/
+├── packages/
+│   ├── react/          # @tinybigui/react - Components
+│   └── tokens/         # @tinybigui/tokens - Design tokens (CSS)
+```
+
+**Component file structure** (REQUIRED for every component):
+
+```
+component-name/
+├── component-name.tsx              # Main styled component
+├── component-name-headless.tsx     # Headless primitive
+├── component-name.variants.ts      # CVA variants
+├── component-name.types.ts         # TypeScript types
+├── component-name.test.tsx         # Tests
+├── component-name.stories.tsx      # Storybook
+└── index.ts                        # Public exports
+```
+
+## Code Style
+
+### TypeScript
+
+- ✅ MUST use strict mode (no `any`)
+- ✅ MUST use explicit types for all props/functions
+- ✅ MUST use JSDoc for all public APIs (include @default, @example)
+- ✅ MUST use `forwardRef` for components accepting refs
+- ✅ MUST use `const` assertions for literal arrays
+- ❌ NEVER use default exports
+- ❌ NEVER skip type annotations
+
+### React
+
+- ✅ MUST add `'use client'` to all interactive components
+- ✅ MUST use Tailwind CSS (never inline styles or CSS-in-JS)
+- ✅ MUST use `cn()` utility for className merging
+- ✅ MUST destructure props
+- ❌ NEVER use default exports
+- ❌ NEVER use inline styles
+
+### React Aria Integration
+
+- ✅ MUST use React Aria hooks for all interactive components
+- ✅ MUST let React Aria handle accessibility (ARIA, keyboard, focus)
+- ❌ NEVER implement keyboard/ARIA logic manually
+- ❌ NEVER skip React Aria hooks
+
+Example:
+```typescript
+'use client'
+import { useButton } from 'react-aria'
+import { forwardRef, useRef } from 'react'
+
+function ButtonHeadless(props: ButtonProps) {
+  const ref = useRef(null)
+  const { buttonProps } = useButton(props, ref)
+  return <button {...buttonProps} ref={ref} />
+}
+```
+
+### CVA (Class Variance Authority)
+
+- ✅ MUST use CVA for all component variants
+- ✅ MUST define variants in separate `.variants.ts` file
+- ✅ MUST export `VariantProps` type
+- ✅ MUST provide `defaultVariants`
+- ❌ NEVER handle variants with conditional className logic
+
+Example:
+```typescript
+// button.variants.ts
+import { cva, type VariantProps } from 'class-variance-authority'
+
+export const buttonVariants = cva(
+  'base-classes',
+  {
+    variants: {
+      variant: {
+        filled: 'bg-primary text-on-primary',
+        outlined: 'border-2 border-outline',
+      },
+      size: {
+        small: 'h-10 px-4',
+        medium: 'h-12 px-6',
+      },
+    },
+    defaultVariants: {
+      variant: 'filled',
+      size: 'medium',
+    },
+  }
+)
+
+export type ButtonVariants = VariantProps<typeof buttonVariants>
+```
+
+## Material Design 3 Rules
+
+### Design Tokens
+
+- ✅ MUST use MD3 design tokens via Tailwind classes (`bg-primary`, `text-on-primary`)
+- ✅ MUST follow MD3 specifications exactly
+- ✅ MUST use MD3 elevation classes (`shadow-elevation-1`)
+- ✅ MUST use MD3 typography classes (`text-headline-large`)
+- ❌ NEVER use arbitrary color values (`bg-[#6750a4]`)
+- ❌ NEVER deviate from MD3 specs
+
+### Component Variants
+
+- ✅ MUST implement ALL MD3 variants for each component
+- ✅ MUST use MD3 naming (e.g., 'filled', 'outlined' NOT 'solid', 'bordered')
+- ❌ NEVER create custom variants not in MD3 spec
+- ❌ NEVER skip MD3 variants
+
+### Interactions
+
+- ✅ MUST implement MD3 state layers
+- ✅ MUST use MD3 motion tokens (`transition-all duration-short2 ease-standard`)
+- ✅ MUST implement ripple effect where specified
+- ❌ NEVER use custom animations not in MD3
+
+## Accessibility Rules (WCAG 2.1 AA)
+
+- ✅ MUST meet WCAG 2.1 AA minimum (aim for AAA where feasible)
+- ✅ MUST ensure 4.5:1 contrast for text, 3:1 for UI components
+- ✅ MUST provide accessible labels for all interactive elements
+- ✅ MUST support keyboard navigation (Tab, Enter, Space)
+- ✅ MUST show visible focus indicators (never remove)
+- ✅ MUST let React Aria handle ARIA attributes
+- ✅ MUST add `aria-label` for icon-only components
+- ✅ MUST use semantic HTML when possible
+- ❌ NEVER skip accessibility attributes
+- ❌ NEVER rely on color alone for information
+- ❌ NEVER create keyboard traps
+- ❌ NEVER add redundant ARIA (React Aria handles it)
+
+## Testing Rules
+
+### Required Tests
+
+Every component MUST have:
+1. Rendering tests (default props, all variants)
+2. Interaction tests (click, keyboard)
+3. Accessibility tests (axe violations)
+4. Customization tests (className merging)
+
+Example structure:
+```typescript
+describe('Button', () => {
+  describe('Rendering', () => {
+    it('renders with default props', () => { })
+    it('renders all variants', () => { })
+  })
+  
+  describe('Interactions', () => {
+    it('handles click events', async () => { })
+    it('handles keyboard navigation', async () => { })
+  })
+  
+  describe('Accessibility', () => {
+    it('has no violations', async () => {
+      const { container } = render(<Button>Click</Button>)
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+  })
+  
+  describe('Customization', () => {
+    it('merges custom className', () => { })
+  })
+})
+```
+
+- ✅ MUST write tests for every component
+- ✅ MUST include axe accessibility tests
+- ✅ MUST achieve >90% code coverage
+- ✅ MUST test edge cases and error states
+- ❌ NEVER skip tests (even for "simple" components)
+- ❌ NEVER skip accessibility tests
+
+## Documentation Rules
+
+### Storybook Stories
+
+Every component MUST have:
+- `Default` story
+- `Variants` story (all MD3 variants)
+- `Sizes` story (if applicable)
+- `States` story (hover, focus, disabled)
+- `WithIcons` story (if applicable)
+- `Accessibility` story
+- `Interactive` story with play function
+
+- ✅ MUST create all standard stories
+- ✅ MUST include accessibility story
+- ✅ MUST include interactive tests (play function)
+- ❌ NEVER skip Storybook documentation
+
+### JSDoc
+
+```typescript
+interface ButtonProps {
+  /**
+   * The visual style of the button
+   * @default 'filled'
+   */
+  variant?: 'filled' | 'outlined'
+  
+  /**
+   * Handler called when button is pressed
+   */
+  onPress?: () => void
+}
+```
+
+- ✅ MUST add JSDoc to all public APIs
+- ✅ MUST document @default values
+- ✅ MUST include @example where helpful
+- ❌ NEVER skip JSDoc for public APIs
+
+## Import/Export Rules
+
+### Import Order
+
+```typescript
+// 1. React imports
+import { forwardRef } from 'react'
+
+// 2. External libraries
+import { useButton } from 'react-aria'
+import { cva } from 'class-variance-authority'
+
+// 3. Internal components
+import { Icon } from '../icon'
+
+// 4. Internal utilities
+import { cn } from '../../utils/cn'
+
+// 5. Types (use `import type`)
+import type { ButtonProps } from './button.types'
+```
+
+### Exports
+
+- ✅ MUST use named exports only
+- ✅ MUST use `export type` for types
+- ✅ MUST re-export from `index.ts`
+- ❌ NEVER use default exports
+- ❌ NEVER export implementation details
+
+## Commit Rules (Conventional Commits)
+
+Format: `type(scope): description`
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
+
+Examples:
+```bash
+feat(button): add loading state
+fix(textfield): resolve focus ring color
+docs(readme): update installation steps
+test(checkbox): add keyboard navigation tests
+```
+
+- ✅ MUST use conventional commit format
+- ✅ MUST include component scope
+- ✅ MUST write descriptive messages
+- ❌ NEVER use generic messages ("fixes", "update stuff", "wip")
+
+## Forbidden Patterns (NEVER DO)
+
+```typescript
+// ❌ Default exports
+export default Button
+
+// ❌ any type
+function Button(props: any) { }
+
+// ❌ Inline styles
+<button style={{ color: 'red' }} />
+
+// ❌ Manual accessibility
+<button onClick={() => {}} onKeyDown={(e) => { }} />
+
+// ❌ Arbitrary values for MD3 tokens
+<button className="bg-[#6750a4]" />
+
+// ❌ Missing 'use client' for interactive components
+export function Button() { } // Missing directive
+
+// ❌ Non-MD3 variants
+<Button variant="fancy" /> // Not in MD3 spec
+
+// ❌ Skip tests
+// "This component is too simple to test"
+
+// ❌ Skip accessibility
+// "We'll add a11y later"
+```
+
+## Required Patterns (ALWAYS DO)
+
+```typescript
+// ✅ Named exports
+export { Button } from './button'
+
+// ✅ Explicit types
+interface ButtonProps extends AriaButtonProps { }
+
+// ✅ 'use client' for interactive components
+'use client'
+export function Button() { }
+
+// ✅ React Aria
+const { buttonProps } = useButton(props, ref)
+
+// ✅ CVA for variants
+const buttonVariants = cva(...)
+
+// ✅ MD3 design tokens
+<button className="bg-primary text-on-primary" />
+
+// ✅ Write tests
+describe('Button', () => { })
+
+// ✅ Write Storybook stories
+export const Default: Story = { }
+
+// ✅ JSDoc documentation
+/** Button component following MD3 */
+
+// ✅ Accessibility first
+it('has no a11y violations', async () => { })
+```
+
+## Pre-Change Checklist
+
+Before suggesting ANY code change, verify:
+
+1. ✅ Follows monorepo structure?
+2. ✅ Uses TypeScript strict mode?
+3. ✅ Follows naming conventions (kebab-case files)?
+4. ✅ Uses React Aria for accessibility?
+5. ✅ Uses CVA for variants?
+6. ✅ Follows MD3 specifications?
+7. ✅ Includes `'use client'` if needed?
+8. ✅ Includes tests (unit + accessibility)?
+9. ✅ Includes Storybook stories?
+10. ✅ Includes JSDoc?
+11. ✅ Follows import/export rules?
+12. ✅ Is accessible (WCAG 2.1 AA)?
+
+**If answer is "No" to any → Don't suggest it!**
+
+## Reference Priority
+
+When answering questions, consult in this order:
+
+1. Strategy docs (`strategies/` folder)
+2. Material Design 3 specs (m3.material.io)
+3. React Aria docs (react-spectrum.adobe.com/react-aria)
+4. WCAG guidelines (w3.org/WAI/WCAG21)
+5. General best practices
+
+## Core Philosophy
+
+**When in doubt, prioritize: Accessibility > Consistency > Convenience**
+
+All code must be:
+- ✅ Consistent across the project
+- ✅ Meeting quality standards
+- ✅ Accessible (never compromised)
+- ✅ Following MD3 specifications
+- ✅ Providing excellent DX
+- ✅ Maintainable long-term
+

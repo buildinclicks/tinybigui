@@ -15,22 +15,32 @@ This document outlines our documentation strategy, including Storybook setup, co
 
 **Primary Purpose**: Interactive component development and testing
 
-**Target Audience**: 
+**Target Audience**:
+
 - Developers using the library
 - Contributors developing components
 - Designers reviewing implementations
 
 **URL**: `https://tinybigui-storybook.vercel.app` (or similar)
 
+**Build Setup**: Vite-based (using `@storybook/react-vite`)
+
 ### 2. README.md (Quick Start)
 
 **Primary Purpose**: Get users started in <5 minutes
 
 **Contents**:
+
 - Installation instructions
-- Basic usage example
+- Basic usage example (Next.js App Router as primary, Vite as secondary)
 - Link to full documentation
 - Link to Storybook
+
+**Framework Focus**:
+
+- **Primary ("golden path")**: **Next.js (App Router)** — Most common RSC environment, best for production apps
+- **Secondary**: **Vite (React)** — Fast development, ideal for demos and non-Next.js setups
+- **Other frameworks**: Brief mention with link to Tailwind v4 setup guides
 
 ### 3. API Documentation (In-code)
 
@@ -46,43 +56,43 @@ This document outlines our documentation strategy, including Storybook setup, co
 
 ```typescript
 // .storybook/main.ts
-import type { StorybookConfig } from '@storybook/react-vite'
+import type { StorybookConfig } from "@storybook/react-vite";
 
 const config: StorybookConfig = {
-  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
+  stories: ["../src/**/*.stories.@(js|jsx|ts|tsx|mdx)"],
   addons: [
-    '@storybook/addon-essentials',      // Docs, controls, actions, etc.
-    '@storybook/addon-a11y',            // Accessibility testing
-    '@storybook/addon-interactions',    // Interaction testing
-    '@storybook/addon-links',           // Link between stories
-    '@storybook/addon-themes',          // Theme switcher
+    "@storybook/addon-essentials", // Docs, controls, actions, etc.
+    "@storybook/addon-a11y", // Accessibility testing
+    "@storybook/addon-interactions", // Interaction testing
+    "@storybook/addon-links", // Link between stories
+    "@storybook/addon-themes", // Theme switcher
   ],
   framework: {
-    name: '@storybook/react-vite',
+    name: "@storybook/react-vite",
     options: {},
   },
   core: {
-    disableTelemetry: true,             // Privacy-first
+    disableTelemetry: true, // Privacy-first
   },
   docs: {
-    autodocs: 'tag',                    // Auto-generate docs
+    autodocs: "tag", // Auto-generate docs
   },
-}
+};
 
-export default config
+export default config;
 ```
 
 ### Theme Configuration
 
 ```typescript
 // .storybook/preview.tsx
-import { Preview } from '@storybook/react'
-import { ThemeProvider } from '../src'
-import '../src/styles/globals.css'
+import { Preview } from "@storybook/react";
+import { ThemeProvider } from "../src";
+import "../src/styles/globals.css";
 
 const preview: Preview = {
   parameters: {
-    actions: { argTypesRegex: '^on[A-Z].*' },
+    actions: { argTypesRegex: "^on[A-Z].*" },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -90,10 +100,10 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: 'light',
+      default: "light",
       values: [
-        { name: 'light', value: '#ffffff' },
-        { name: 'dark', value: '#1c1b1f' },
+        { name: "light", value: "#ffffff" },
+        { name: "dark", value: "#1c1b1f" },
       ],
     },
   },
@@ -104,9 +114,9 @@ const preview: Preview = {
       </ThemeProvider>
     ),
   ],
-}
+};
 
-export default preview
+export default preview;
 ```
 
 ---
@@ -117,47 +127,47 @@ Every component follows this story structure:
 
 ```typescript
 // button.stories.tsx
-import type { Meta, StoryObj } from '@storybook/react'
-import { Button } from './button'
+import type { Meta, StoryObj } from "@storybook/react";
+import { Button } from "./button";
 
 const meta = {
-  title: 'Components/Button',
+  title: "Components/Button",
   component: Button,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['filled', 'outlined', 'text', 'elevated', 'tonal'],
-      description: 'The visual style of the button',
+      control: "select",
+      options: ["filled", "outlined", "text", "elevated", "tonal"],
+      description: "The visual style of the button",
       table: {
-        type: { summary: 'string' },
-        defaultValue: { summary: 'filled' },
+        type: { summary: "string" },
+        defaultValue: { summary: "filled" },
       },
     },
     size: {
-      control: 'select',
-      options: ['small', 'medium', 'large'],
+      control: "select",
+      options: ["small", "medium", "large"],
     },
     disabled: {
-      control: 'boolean',
+      control: "boolean",
     },
-    onPress: { action: 'pressed' },
+    onPress: { action: "pressed" },
   },
-} satisfies Meta<typeof Button>
+} satisfies Meta<typeof Button>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 // Default story
 export const Default: Story = {
   args: {
-    children: 'Button',
-    variant: 'filled',
+    children: "Button",
+    variant: "filled",
   },
-}
+};
 
 // All variants
 export const Variants: Story = {
@@ -170,7 +180,7 @@ export const Variants: Story = {
       <Button variant="tonal">Tonal</Button>
     </div>
   ),
-}
+};
 
 // All sizes
 export const Sizes: Story = {
@@ -181,7 +191,7 @@ export const Sizes: Story = {
       <Button size="large">Large</Button>
     </div>
   ),
-}
+};
 
 // States
 export const States: Story = {
@@ -191,7 +201,7 @@ export const States: Story = {
       <Button isDisabled>Disabled</Button>
     </div>
   ),
-}
+};
 
 // With icons
 export const WithIcons: Story = {
@@ -201,7 +211,7 @@ export const WithIcons: Story = {
       <Button endIcon={<ArrowIcon />}>Next</Button>
     </div>
   ),
-}
+};
 
 // Accessibility
 export const Accessibility: Story = {
@@ -213,25 +223,25 @@ export const Accessibility: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Icon-only buttons must have an accessible label',
+        story: "Icon-only buttons must have an accessible label",
       },
     },
   },
-}
+};
 
 // Interactions (for testing)
 export const Interactive: Story = {
   args: {
-    children: 'Click me',
+    children: "Click me",
   },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const button = canvas.getByRole('button')
-    
-    await userEvent.click(button)
-    await expect(button).toHaveFocus()
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole("button");
+
+    await userEvent.click(button);
+    await expect(button).toHaveFocus();
   },
-}
+};
 ```
 
 ---
@@ -246,7 +256,7 @@ Every component's story should include:
 
 ```typescript
 const meta = {
-  title: 'Components/Button',
+  title: "Components/Button",
   component: Button,
   parameters: {
     docs: {
@@ -264,7 +274,7 @@ Material Design 3 provides 5 button types:
       },
     },
   },
-}
+};
 ```
 
 #### 2. Props Table
@@ -277,24 +287,24 @@ interface ButtonProps {
    * The visual style of the button
    * @default 'filled'
    */
-  variant?: 'filled' | 'outlined' | 'text' | 'elevated' | 'tonal'
-  
+  variant?: "filled" | "outlined" | "text" | "elevated" | "tonal";
+
   /**
    * The size of the button
    * @default 'medium'
    */
-  size?: 'small' | 'medium' | 'large'
-  
+  size?: "small" | "medium" | "large";
+
   /**
    * Whether the button is disabled
    * @default false
    */
-  disabled?: boolean
-  
+  disabled?: boolean;
+
   /**
    * Handler called when the button is pressed
    */
-  onPress?: () => void
+  onPress?: () => void;
 }
 ```
 
@@ -305,8 +315,8 @@ interface ButtonProps {
 
 ### Keyboard Support
 
-| Key | Action |
-|-----|--------|
+| Key   | Action               |
+| ----- | -------------------- |
 | Enter | Activates the button |
 | Space | Activates the button |
 
@@ -338,7 +348,7 @@ export const BasicUsage: Story = {
       },
     },
   },
-}
+};
 
 // Advanced usage
 export const FormSubmit: Story = {
@@ -348,7 +358,7 @@ export const FormSubmit: Story = {
       <Button type="submit">Submit</Button>
     </form>
   ),
-}
+};
 ```
 
 #### 5. Do's and Don'ts
@@ -357,11 +367,13 @@ export const FormSubmit: Story = {
 ## Best Practices
 
 ### ✅ Do
+
 - Use filled buttons for the primary action
 - Provide accessible labels for icon-only buttons
 - Limit to 1-2 buttons per section
 
 ### ❌ Don't
+
 - Use multiple filled buttons in the same view
 - Make buttons smaller than 48px touch target
 - Remove focus indicators
@@ -377,8 +389,9 @@ Use Storybook's MDX for visual diagrams:
 
 ```mdx
 <!-- button.stories.mdx -->
-import { Canvas, Meta } from '@storybook/blocks'
-import { Button } from './button'
+
+import { Canvas, Meta } from "@storybook/blocks";
+import { Button } from "./button";
 
 <Meta title="Components/Button/Anatomy" />
 
@@ -408,17 +421,21 @@ Document which tokens each component uses:
 ## Design Tokens
 
 ### Colors
+
 - Background: `--md-sys-color-primary`
 - Text: `--md-sys-color-on-primary`
 - Outline: `--md-sys-color-outline`
 
 ### Typography
+
 - Font: `--md-sys-typescale-label-large`
 
 ### Shape
+
 - Border radius: `--md-sys-shape-corner-full`
 
 ### Elevation
+
 - Elevated variant: `--md-sys-elevation-level1`
 ```
 
@@ -431,23 +448,24 @@ Document which tokens each component uses:
 ```typescript
 export const InteractionTest: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    
+    const canvas = within(canvasElement);
+
     // Test keyboard navigation
-    const button = canvas.getByRole('button')
-    await userEvent.tab()
-    await expect(button).toHaveFocus()
-    
+    const button = canvas.getByRole("button");
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+
     // Test activation
-    await userEvent.keyboard('{Enter}')
-    await expect(button).toHaveBeenCalled()
+    await userEvent.keyboard("{Enter}");
+    await expect(button).toHaveBeenCalled();
   },
-}
+};
 ```
 
 ### Accessibility Testing
 
 Storybook A11y addon shows:
+
 - ARIA violations
 - Color contrast issues
 - Keyboard navigation problems
@@ -463,13 +481,19 @@ export const Responsive: Story = {
   parameters: {
     viewport: {
       viewports: {
-        mobile: { name: 'Mobile', styles: { width: '375px', height: '667px' } },
-        tablet: { name: 'Tablet', styles: { width: '768px', height: '1024px' } },
-        desktop: { name: 'Desktop', styles: { width: '1440px', height: '900px' } },
+        mobile: { name: "Mobile", styles: { width: "375px", height: "667px" } },
+        tablet: {
+          name: "Tablet",
+          styles: { width: "768px", height: "1024px" },
+        },
+        desktop: {
+          name: "Desktop",
+          styles: { width: "1440px", height: "900px" },
+        },
       },
     },
   },
-}
+};
 ```
 
 ---
@@ -509,7 +533,10 @@ Foundations/
 └── Motion
 
 Guides/
-├── Installation
+├── Installation/
+│   ├── Next.js (App Router) — Primary
+│   ├── Vite — Secondary
+│   └── Other Frameworks — Brief guidance
 ├── Theming
 ├── Accessibility
 └── Migration
@@ -570,6 +597,28 @@ Track documentation quality:
 - [ ] All props documented with JSDoc
 - [ ] Usage examples for common scenarios
 
+### Framework-Specific Examples
+
+Provide framework-specific setup guides in this priority order:
+
+1. **Next.js (App Router)** — Primary golden path
+
+   - Installation with App Router
+   - Importing styles in `app/layout.tsx`
+   - Using components in Server + Client components
+   - RSC considerations
+
+2. **Vite (React)** — Secondary path
+
+   - Installation with Vite
+   - Importing styles in entry point
+   - Standard React usage
+
+3. **Other Frameworks** — Brief mention
+   - Remix, Astro, Gatsby
+   - Link to Tailwind v4 + React setup guides
+   - Note: "Any React 18+ environment with Tailwind v4 support"
+
 ---
 
 ## ✅ Documentation Checklist
@@ -577,6 +626,7 @@ Track documentation quality:
 Before releasing a component:
 
 ### Storybook Stories
+
 - [ ] Default story
 - [ ] All variants demonstrated
 - [ ] States (hover, focus, disabled)
@@ -587,6 +637,7 @@ Before releasing a component:
 - [ ] Interaction tests
 
 ### Documentation
+
 - [ ] Component description
 - [ ] Props table with descriptions
 - [ ] Accessibility section
@@ -596,6 +647,7 @@ Before releasing a component:
 - [ ] Design token reference
 
 ### Code Quality
+
 - [ ] TypeScript types exported
 - [ ] JSDoc comments on all public APIs
 - [ ] Examples in JSDoc
@@ -609,4 +661,3 @@ Before releasing a component:
 - [Component Story Format](https://storybook.js.org/docs/react/api/csf)
 - [Storybook Best Practices](https://storybook.js.org/docs/react/writing-stories/introduction#best-practices)
 - [MDX in Storybook](https://storybook.js.org/docs/react/writing-docs/mdx)
-

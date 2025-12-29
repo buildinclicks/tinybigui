@@ -74,6 +74,21 @@ Open source guidelines:
 
 **Read this for a quick overview** of the entire strategy.
 
+### 🤖 [Cursor Rules](./10-cursor-rules.md)
+Cursor AI coding guidelines:
+- TypeScript and React patterns
+- Material Design 3 implementation rules
+- Component development checklist
+- Forbidden and required patterns
+
+### 🔄 [Tailwind v4 Migration](./11-tailwind-v4-migration.md)
+Comprehensive summary of Tailwind v4 decisions:
+- What changed from v3 to v4
+- Token strategy (CSS-first approach)
+- Updated package structure
+- User setup examples
+- Browser baseline requirements
+
 ---
 
 ## 🚀 Quick Start
@@ -95,6 +110,8 @@ Open source guidelines:
 - **How do we document components?** → [Documentation](./06-documentation.md)
 - **What's the timeline?** → [Roadmap](./07-roadmap.md)
 - **How do I contribute?** → [Contribution](./08-contribution.md)
+- **What changed with Tailwind v4?** → [Tailwind v4 Migration](./11-tailwind-v4-migration.md)
+- **What are the AI coding rules?** → [Cursor Rules](./10-cursor-rules.md)
 
 ---
 
@@ -104,12 +121,12 @@ Open source guidelines:
 |----------|--------|----------|
 | **Design System** | Material Design 3 (strict) | [Design System](./03-design-system.md) |
 | **Framework** | React 18+ with RSC support | [Tech Stack](./01-tech-stack.md) |
-| **Styling** | Tailwind + CVA | [Tech Stack](./01-tech-stack.md) |
+| **Styling** | Tailwind v4 + CVA | [Tech Stack](./01-tech-stack.md) |
 | **Accessibility** | React Aria foundation | [Accessibility](./04-accessibility.md) |
 | **Architecture** | Headless + Styled layers | [Architecture](./02-architecture.md) |
-| **Distribution** | Single NPM package | [Distribution](./05-distribution.md) |
-| **Documentation** | Storybook | [Documentation](./06-documentation.md) |
-| **Testing** | Vitest + RTL + axe | [Tech Stack](./01-tech-stack.md) |
+| **Distribution** | `@tinybigui/react` + `@tinybigui/tokens` | [Distribution](./05-distribution.md) |
+| **Documentation** | Storybook (Next.js primary) | [Documentation](./06-documentation.md) |
+| **Testing** | Vitest + RTL + Playwright | [Tech Stack](./01-tech-stack.md) |
 | **License** | MIT | [Contribution](./08-contribution.md) |
 | **Target Audience** | Enterprise + Indie devs | [Overview](./00-overview.md) |
 
