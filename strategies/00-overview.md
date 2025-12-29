@@ -107,14 +107,36 @@ TinyBigUI aims to be a **Material Design 3 compliant** React component library b
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2024-12-24 | Project initiated | Starting strategy planning phase |
-| 2024-12-24 | React 18+ only, with RSC support | Future-proof without legacy burden |
-| 2024-12-24 | React Aria for accessibility | Best-in-class, Adobe-backed solution |
-| 2024-12-24 | Tailwind + CVA for styling | Performance + DX + flexibility |
-| 2024-12-24 | Single package with tree-shaking | Easier maintenance, modern bundlers optimize well |
-| 2024-12-24 | Headless + Styled dual architecture | Maximum flexibility for all users |
-| 2024-12-24 | Strict MD3 adherence | Clear design system, professional appearance |
-| 2024-12-24 | Storybook for documentation | Industry standard for component libraries |
+| 2025-12-24 | Project initiated | Starting strategy planning phase |
+| 2025-12-24 | React 18+ only, with RSC support | Future-proof without legacy burden |
+| 2025-12-24 | React Aria for accessibility | Best-in-class, Adobe-backed solution |
+| 2025-12-24 | Tailwind + CVA for styling | Performance + DX + flexibility |
+| 2025-12-24 | Single package with tree-shaking | Easier maintenance, modern bundlers optimize well |
+| 2025-12-24 | Headless + Styled dual architecture | Maximum flexibility for all users |
+| 2025-12-24 | Strict MD3 adherence | Clear design system, professional appearance |
+| 2025-12-24 | Storybook for documentation | Industry standard for component libraries |
+| 2025-12-29 | Tailwind v4 only (`^4.0.0`) | Modern CSS-first approach, no v3 legacy |
+| 2025-12-29 | Package naming: `@tinybigui/react` + `@tinybigui/tokens` | Scoped naming for future expansion |
+| 2025-12-29 | Brand identity: black & white theme | Clean, minimal, professional appearance |
+| 2025-12-29 | Storybook deployment: Vercel + Chromatic (free tier) | Open-source friendly, cost-effective |
+| 2025-12-29 | Segmented Button in Phase 1a | Complete button family from launch |
+
+---
+
+## 🎨 Brand Identity
+
+### Logo
+- **Style**: Default generated logo (to be created during Phase 0)
+- **Format**: SVG for scalability
+
+### Theme Colors
+- **Primary palette**: Black & white based
+- **Approach**: Clean, minimal, professional
+- **Documentation theme**: Dark mode primary, light mode secondary
+
+### Typography (Brand)
+- Use MD3 typography scale for all documentation
+- Roboto or system fonts for body text
 
 ---
 

@@ -548,14 +548,20 @@ Guides/
 
 ### Hosting
 
-**Storybook**: Deploy to Vercel, Netlify, or GitHub Pages
+**Decision**: **Vercel** (free tier for open-source) + **Chromatic** (free tier for visual regression)
+
+- **Storybook hosting**: Vercel (unlimited for open-source projects)
+- **Visual regression testing**: Chromatic (5,000 snapshots/month free for open-source)
+
+**URL**: `https://tinybigui-storybook.vercel.app` (or similar)
 
 ```json
 {
   "scripts": {
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "deploy-storybook": "storybook build && vercel --prod"
+    "deploy-storybook": "storybook build && vercel --prod",
+    "chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   }
 }
 ```
