@@ -119,39 +119,40 @@ Users can customize via:
 
 ## 📋 Component Roadmap
 
-### Phase 1: Buttons (v0.1.0) - Week 3-4
-- Button (5 variants)
+### Phase 1a: Buttons (v0.1.0) - Week 3-4
+- Button (5 variants: filled, outlined, text, elevated, tonal)
 - Icon Button (4 variants)
 - FAB (4 sizes)
-- Segmented Button (2 modes)
+- Segmented Button (2 modes: single-select, multi-select)
 
-### Phase 2: Inputs (v0.2.0) - Week 5-7
-- Text Field
+### Phase 1b: Inputs (v0.2.0) - Week 5-7
 - Checkbox
 - Radio
 - Switch
-- Slider
+- Text Field
+- Select
 
-### Phase 3: Selection (v0.3.0) - Week 8-10
+### Phase 2: Selection (v0.3.0) - Week 8-10
 - Chip (4 types)
 - Menu
-- Select
 - List
+- Slider
 
-### Phase 4: Feedback (v0.4.0) - Week 11-13
+### Phase 3: Feedback (v0.4.0) - Week 11-13
 - Progress Indicator
 - Snackbar
 - Tooltip
 - Badge
 - Dialog
 
-### Phase 5: Polish (v0.5-0.9) - Week 14-16
+### Phase 4: Polish (v0.5-0.9) - Week 14-16
+- Add Playwright for E2E testing
 - Optimization
 - Documentation
 - Examples
 - Real-world testing
 
-### Phase 6: Launch (v1.0.0) - Week 17-18
+### Phase 5: Launch (v1.0.0) - Week 17-18
 - Stable release
 - Marketing
 - Community building
@@ -306,15 +307,21 @@ Welcoming, transparent, collaborative.
 
 ---
 
-## 📝 Remaining Decisions
+## ✅ Finalized Decisions
 
-Before starting development, we need to finalize:
+All major decisions have been made:
 
-1. **Package name**: `tinybigui` vs `@tinybigui/react`
-2. **Initial component set**: Which 4-5 components first?
-3. **Testing framework specifics**: Any additional testing tools?
-4. **Repository name**: GitHub repo name
-5. **Brand identity**: Logo, colors, documentation theme
+| Decision | Choice |
+|----------|--------|
+| **Package name** | `@tinybigui/react` + `@tinybigui/tokens` |
+| **Repository name** | `tinybigui` |
+| **Initial components** | Phase 1a: Button, IconButton, FAB, Segmented Button |
+| **Testing framework** | Vitest + RTL + Playwright (Phase 4) |
+| **Storybook deployment** | Vercel + Chromatic (free tier) |
+| **Brand identity** | Default generated logo, black & white theme |
+| **Tailwind version** | v4 only (`^4.0.0`) |
+| **Package manager** | pnpm (enforced via `packageManager` field) |
+| **Commit format** | Conventional commits (enforced via commitlint + husky) |
 
 ---
 
@@ -323,12 +330,12 @@ Before starting development, we need to finalize:
 | Phase | Duration | Deliverable |
 |-------|----------|-------------|
 | **Phase 0** | Week 1-2 | Infrastructure setup |
-| **Phase 1** | Week 3-4 | Button components (v0.1.0) |
-| **Phase 2** | Week 5-7 | Input components (v0.2.0) |
-| **Phase 3** | Week 8-10 | Selection components (v0.3.0) |
-| **Phase 4** | Week 11-13 | Feedback components (v0.4.0) |
-| **Phase 5** | Week 14-16 | Polish & refinement (v0.9.0) |
-| **Phase 6** | Week 17-18 | **1.0.0 Launch** 🚀 |
+| **Phase 1a** | Week 3-4 | Button components (v0.1.0) |
+| **Phase 1b** | Week 5-7 | Input components (v0.2.0) |
+| **Phase 2** | Week 8-10 | Selection components (v0.3.0) |
+| **Phase 3** | Week 11-13 | Feedback components (v0.4.0) |
+| **Phase 4** | Week 14-16 | Polish, Playwright, refinement (v0.9.0) |
+| **Phase 5** | Week 17-18 | **1.0.0 Launch** 🚀 |
 
 **Total**: ~18 weeks to stable release
 
