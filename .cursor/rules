@@ -20,6 +20,33 @@ You are developing TinyBigUI, an open-source Material Design 3 React component l
 - **Vitest + RTL**: For testing
 - **Storybook**: For documentation (Next.js primary, Vite secondary)
 
+## 🌐 Tailwind CSS v4 Handling (CRITICAL)
+
+**IMPORTANT**: AI training data is from April 2024 (before Tailwind v4 stable release).
+
+**MANDATORY RULE for ANY Tailwind CSS related task**:
+
+1. 🔍 **ALWAYS search the web first** for current Tailwind CSS v4 documentation
+2. ✅ Use latest official docs from tailwindcss.com
+3. ✅ Verify syntax, configuration, and best practices are v4-compatible
+4. ✅ Check for breaking changes from v3 → v4
+5. ❌ NEVER rely solely on training data for Tailwind v4 specifics
+
+**Tasks requiring web search**:
+- Installation and setup
+- Configuration (CSS `@theme`, PostCSS, etc.)
+- CSS-first token integration
+- Framework-specific integration (Next.js, Vite, etc.)
+- Any `@import`, `@theme`, `@apply` syntax
+- Browser requirements and compatibility
+- Plugin usage and configuration
+- Content scanning/detection mechanisms
+
+**Search terms to use**:
+- "Tailwind CSS v4 [specific feature] documentation"
+- "Tailwind CSS v4 [framework] setup guide"
+- "Tailwind CSS v4 migration from v3"
+
 ## Project Structure
 
 ```
