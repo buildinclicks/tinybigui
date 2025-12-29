@@ -68,11 +68,12 @@ This document outlines the development roadmap for TinyBigUI, including componen
 
 #### Components
 
-| Component       | Priority    | Estimated Time | Status     |
-| --------------- | ----------- | -------------- | ---------- |
-| **Button**      | 🔴 Critical | 3 days         | 🟡 Pending |
-| **Icon Button** | 🔴 Critical | 2 days         | 🟡 Pending |
-| **FAB**         | 🟡 High     | 2 days         | 🟡 Pending |
+| Component            | Priority    | Estimated Time | Status     |
+| -------------------- | ----------- | -------------- | ---------- |
+| **Button**           | 🔴 Critical | 3 days         | 🟡 Pending |
+| **Icon Button**      | 🔴 Critical | 2 days         | 🟡 Pending |
+| **FAB**              | 🟡 High     | 2 days         | 🟡 Pending |
+| **Segmented Button** | 🟢 Medium   | 2 days         | 🟡 Pending |
 
 #### Button Variants
 
@@ -98,9 +99,14 @@ This document outlines the development roadmap for TinyBigUI, including componen
 - Large
 - Extended
 
+**Segmented Button**:
+
+- Single-select
+- Multi-select
+
 #### Deliverables
 
-- ✅ Button components with full variants (3 components)
+- ✅ Button components with full variants (4 components)
 - ✅ Headless + styled versions
 - ✅ Complete test coverage
 - ✅ Storybook stories
@@ -373,7 +379,7 @@ Build higher-level components:
 
 | Milestone                         | Target Date | Components                                 | Status     |
 | --------------------------------- | ----------- | ------------------------------------------ | ---------- |
-| **v0.1.0** - Button Components    | Week 4      | Button, IconButton, FAB                    | 🟡 Pending |
+| **v0.1.0** - Button Components    | Week 4      | Button, IconButton, FAB, Segmented Button  | 🟡 Pending |
 | **v0.2.0** - Input Components     | Week 7      | Checkbox, Radio, Switch, TextField, Select | 🟡 Pending |
 | **v0.3.0** - Selection Components | Week 10     | Chip, Menu, List, Slider                   | 🟡 Pending |
 | **v0.4.0** - Feedback Components  | Week 13     | Progress, Snackbar, Tooltip, Badge, Dialog | 🟡 Pending |
