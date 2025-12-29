@@ -1,0 +1,44 @@
+{
+  "name": "@tinybigui/tokens",
+  "version": "0.0.0",
+  "description": "Material Design 3 design tokens as CSS variables",
+  "keywords": [
+    "material-design",
+    "material-design-3",
+    "design-tokens",
+    "css-variables",
+    "theming",
+    "md3"
+  ],
+  "homepage": "https://github.com/buildinclicks/tinybigui#readme",
+  "bugs": {
+    "url": "https://github.com/buildinclicks/tinybigui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/buildinclicks/tinybigui.git",
+    "directory": "packages/tokens"
+  },
+  "license": "MIT",
+  "author": "buildinclicks",
+  "sideEffects": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./dist/tokens.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "node scripts/build.js --watch",
+    "clean": "rm -rf dist"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
+
