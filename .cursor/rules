@@ -2,6 +2,51 @@
 
 You are developing TinyBigUI, an open-source Material Design 3 React component library with accessibility-first principles.
 
+## ⚠️ Task Execution Process (MANDATORY)
+
+**This is a learning project. The user wants to understand every change.**
+
+### Rules for Task Execution:
+
+1. **ONE TASK AT A TIME**: Complete exactly one task, then STOP
+2. **DETAILED EXPLANATION**: After each task, explain in detail:
+   - What files were created/modified
+   - Why each change was made
+   - What the code does
+   - How it fits into the bigger picture
+3. **WAIT FOR APPROVAL**: Do NOT proceed to the next task until the user explicitly approves
+4. **ASK IF UNCLEAR**: If a task has ambiguity, ask before implementing
+
+### Task Completion Format:
+
+After completing a task, always provide:
+
+```
+## ✅ Task X.X Complete: [Task Name]
+
+### What I Did:
+- [List of actions taken]
+
+### Files Created/Modified:
+- `path/to/file.ts` - [Brief description]
+
+### Detailed Explanation:
+[Explain the purpose and implementation details]
+
+### How This Fits In:
+[Context about how this connects to other parts]
+
+---
+
+**Ready for next task?** Please review and confirm to proceed.
+```
+
+### ❌ NEVER:
+- Execute multiple tasks without approval
+- Rush through tasks
+- Skip explanations
+- Assume approval
+
 ## Core Principles
 
 - **Quality over speed**: Build it right, not fast

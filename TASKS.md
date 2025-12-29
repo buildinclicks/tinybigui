@@ -27,7 +27,7 @@
 | ------ | --- | ---------------------------- | --------------------------------------------- | ------------------------------------ |
 | ✅     | 0.1 | **Create GitHub repository** | Create `tinybigui` repo (public, no template) | Created at `buildinclicks/tinybigui` |
 | ✅     | 0.2 | **Branch protection**        | Settings → Rules → Rulesets                   | Created `main-protection` ruleset    |
-| 🟡     | 0.3 | **Add repository topics**    | About → ⚙️ → Topics                           | Pending: add topics after push       |
+| ✅     | 0.3 | **Add repository topics**    | About → ⚙️ → Topics                           | Topics added ✓                       |
 
 ---
 
@@ -246,14 +246,14 @@
 
 ### Current Status
 
-- **Phase 0 Progress**: 2/44 tasks completed
-- **Current Task**: 0.3 (Add repository topics)
+- **Phase 0 Progress**: 3/44 tasks completed (Part A done)
+- **Current Task**: 1.1 (Root workspace setup)
 - **Blockers**: None
 
 ### Next Steps
 
-1. 👤 You: Complete Task 0.3 (Add topics on GitHub)
-2. 🤖 Me: Start Part B (Project Initialization)
+1. 🤖 Me: Start Task 1.1 (one task at a time)
+2. 👤 You: Review, understand, and approve before next task
 
 ---
 
