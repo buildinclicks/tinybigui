@@ -20,6 +20,149 @@
 
 ---
 
+## ⚠️ Important: When to Use These Utilities
+
+### **Tailwind Classes = Primary Method (90% of cases)**
+
+**Use Tailwind classes for static, template-based typography:**
+
+```tsx
+// ✅ PREFERRED - Use Tailwind classes
+<button className="text-label-large font-medium">
+  Click Me
+</button>
+
+<h1 className="text-display-large">
+  Welcome
+</h1>
+
+<p className="text-body-large">
+  Lorem ipsum dolor sit amet...
+</p>
+```
+
+**Why Tailwind First:**
+- ✅ Better performance (no runtime computation)
+- ✅ Smaller bundle size
+- ✅ Better tree-shaking
+- ✅ Familiar syntax
+- ✅ Works with IntelliSense
+- ✅ Zero runtime cost
+
+---
+
+### **Typography Utilities = Special Cases (10% of cases)**
+
+**Use these utilities ONLY when:**
+
+#### 1. **Multi-line Text Truncation** (No Tailwind equivalent)
+```tsx
+// ✅ Use truncateText() - Tailwind can't do multi-line
+<p 
+  className="text-body-medium"
+  style={truncateText(3)} // Truncate after 3 lines
+>
+  Long text here...
+</p>
+```
+
+#### 2. **Runtime/Dynamic Typography**
+```tsx
+// ✅ Typography determined at runtime
+function DynamicHeading({ level }: { level: 1 | 2 | 3 }) {
+  const style = getTypographyForElement(`h${level}`);
+  const Tag = `h${level}` as const;
+  
+  return <Tag className={getTypographyClassName(style)}>...</Tag>;
+}
+```
+
+#### 3. **User Customization**
+```tsx
+// ✅ User-controlled font sizes
+function CustomText({ userFontSizePx }: { userFontSizePx: number }) {
+  return (
+    <div 
+      className="text-body-large"
+      style={{ fontSize: pxToRem(userFontSizePx) }}
+    >
+      Customizable text
+    </div>
+  );
+}
+```
+
+#### 4. **JavaScript Calculations**
+```tsx
+// ✅ Need actual pixel values for layout calculations
+function CanvasText() {
+  const headingSize = remToPx(getTypographyToken('display-large', 'size'));
+  
+  return <canvas height={headingSize * 2}>...</canvas>;
+}
+```
+
+#### 5. **Third-Party Library Integration**
+```tsx
+// ✅ Libraries that require inline styles
+import RichTextEditor from 'some-library';
+
+function Editor() {
+  return <RichTextEditor style={getTypographyStyle('body-large')} />;
+}
+```
+
+#### 6. **Testing & Documentation**
+```tsx
+// ✅ Verify components use correct tokens
+test('Button uses label-large typography', () => {
+  const expectedStyle = getTypographyStyle('label-large');
+  expect(button).toHaveStyle(expectedStyle);
+});
+```
+
+---
+
+### **Quick Decision Guide**
+
+| Question | Answer | Method |
+|----------|--------|--------|
+| Is the typography static in the template? | Yes | **Use Tailwind** |
+| Is the typography computed at runtime? | Yes | **Use Utilities** |
+| Need multi-line text truncation? | Yes | **Use `truncateText()`** |
+| Need pixel values for calculations? | Yes | **Use `remToPx()`** |
+| Styling third-party components? | Yes | **Use Utilities** |
+| Writing unit tests? | Yes | **Use Utilities** |
+| Building Storybook docs? | Yes | **Use Utilities** |
+| Everything else? | - | **Use Tailwind** |
+
+---
+
+### **What We'll Actually Build**
+
+In Phase 1 components, you'll see:
+
+```tsx
+// Button component - 95% Tailwind, 5% utilities
+const Button = ({ children, customSize }) => {
+  // Tailwind classes for static styling (preferred)
+  const baseClasses = "text-label-large font-medium";
+  
+  // Utilities only for dynamic overrides (rare)
+  const dynamicStyles = customSize ? { fontSize: pxToRem(customSize) } : {};
+  
+  return (
+    <button className={baseClasses} style={dynamicStyles}>
+      {children}
+    </button>
+  );
+};
+```
+
+**Key Takeaway:** These utilities are **supplementary tools** for edge cases, not the primary styling method. Always prefer Tailwind classes when possible.
+
+---
+
 ## 🎯 What Was Done
 
 ### 1. Created Typography Utilities File ✅
@@ -764,6 +907,17 @@ Strong typing provides:
 - **IntelliSense** shows available properties
 - **Better refactoring** across codebase
 
+### 8. Tailwind vs Utilities Strategy ⭐
+**Critical understanding for component development:**
+- **Tailwind classes**: Primary method for all static, template-based typography (90% of cases)
+- **Typography utilities**: Only for dynamic scenarios, runtime computation, and edge cases (10%)
+- **Performance**: Tailwind classes have zero runtime cost; utilities compute at runtime
+- **Bundle size**: Unused Tailwind classes tree-shake out; utilities always ship
+- **Best practice**: Default to Tailwind, reach for utilities only when necessary
+- **Examples**: Use utilities for multi-line truncation, user customization, JS calculations, testing
+
+**Remember:** These utilities are **tools for edge cases**, not the primary styling method.
+
 ---
 
 ## 🔗 Related Tasks
@@ -795,18 +949,37 @@ Consider adding later:
 - **Typography presets** for common component patterns
 - **Text wrapping utilities** (balance, pretty)
 
-### Component Integration
-Typography utilities will be heavily used in:
-- **Text components** - Dedicated Typography component
-- **Headings** - H1-H6 with proper scales
-- **Buttons** - Label typography
-- **TextField** - Input and label typography
-- **All components** - Consistent text styling
+### Component Integration ⭐
+**Important: Tailwind-First Approach**
+
+In Phase 1 components, we'll primarily use **Tailwind classes**:
+```tsx
+// ✅ PREFERRED - Button with Tailwind
+<button className="text-label-large font-medium">Click Me</button>
+
+// ✅ PREFERRED - Heading with Tailwind
+<h1 className="text-display-large">Welcome</h1>
+```
+
+**Typography utilities will be used sparingly for:**
+- **Text truncation** - Multi-line ellipsis (`truncateText()`)
+- **Dynamic styling** - Runtime-computed styles
+- **User customization** - Prop-based font sizes
+- **Testing** - Verify correct token usage
+- **Calculations** - Canvas, SVG, layout math
+
+**Component Guidelines:**
+- Default to Tailwind classes in component templates
+- Use utilities only for dynamic or computed scenarios
+- Document when and why utilities are used
+- Prefer static Tailwind for better performance
 
 ### Documentation Needs
 When creating user-facing docs:
+- **Tailwind classes reference** - Primary method (emphasize this!)
 - Typography scale reference table
 - When to use each scale
+- When to use utilities vs Tailwind (critical section)
 - Responsive typography guide
 - Accessibility considerations
 - Custom font integration guide
