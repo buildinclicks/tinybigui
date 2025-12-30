@@ -1,8 +1,8 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  // Entry point
-  entry: ['src/index.ts'],
+  // Entry points
+  entry: ['src/index.ts', 'src/styles.css'],
 
   // Output formats
   format: ['esm', 'cjs'],

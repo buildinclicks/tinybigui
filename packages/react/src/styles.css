@@ -1,0 +1,27 @@
+/**
+ * @tinybigui/react
+ * Main stylesheet - includes tokens and component styles
+ * 
+ * Import this file in your app to use TinyBigUI components:
+ * import "@tinybigui/react/styles.css";
+ */
+
+/* ==========================================================================
+   DESIGN TOKENS
+   Imports Material Design 3 tokens and Tailwind v4 integration
+   ========================================================================== */
+
+@import "@tinybigui/tokens/tokens.css";
+
+/* ==========================================================================
+   COMPONENT STYLES
+   Base styles for all components (future)
+   ========================================================================== */
+
+/* TODO: Component-specific styles will be added here as we build components:
+ * - State layers (hover, press, focus states)
+ * - Ripple effects
+ * - Elevation transitions
+ * - Component-specific overrides
+ */
+
