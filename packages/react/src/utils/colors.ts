@@ -9,7 +9,6 @@
 import {
   argbFromHex,
   themeFromSourceColor,
-  hexFromArgb,
   type Theme,
 } from '@material/material-color-utilities';
 
