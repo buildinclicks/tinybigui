@@ -141,7 +141,8 @@
   --md-sys-typescale-label-small-tracking: 0.5px;
 
   /* ==========================================================================
-     SHAPE TOKENS (Placeholder)
+     SHAPE TOKENS
+     Material Design 3 corner radius system
      ========================================================================== */
   
   --md-sys-shape-corner-none: 0;
@@ -153,7 +154,8 @@
   --md-sys-shape-corner-full: 624.9375rem;
 
   /* ==========================================================================
-     ELEVATION TOKENS (Placeholder)
+     ELEVATION TOKENS
+     Material Design 3 elevation system (box shadows)
      ========================================================================== */
   
   --md-sys-elevation-level0: none;
@@ -164,7 +166,8 @@
   --md-sys-elevation-level5: 0 4px 4px 0 rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
 
   /* ==========================================================================
-     MOTION TOKENS (Placeholder)
+     MOTION TOKENS
+     Material Design 3 motion system (duration and easing)
      ========================================================================== */
   
   --md-sys-motion-duration-short1: 50ms;
