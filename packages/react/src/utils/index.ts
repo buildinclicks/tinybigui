@@ -1,13 +1,15 @@
 /**
- * @tinybigui/react
- * Material Design 3 components for React
+ * @tinybigui/react - Utilities
+ * 
+ * Barrel export for all utility functions.
+ * Provides a single import point for utilities used throughout the library.
  */
 
-// Utilities
+// Class name utilities
+export { cn } from './cn';
+
+// Color utilities
 export {
-  // Class name utilities
-  cn,
-  // Color utilities
   getColorValue,
   getMD3Color,
   withOpacity,
@@ -18,7 +20,12 @@ export {
   STATE_LAYER_OPACITY,
   argbFromHex,
   hexFromArgb,
-  // Typography utilities
+  type MD3ColorRole,
+  type Theme,
+} from './colors';
+
+// Typography utilities
+export {
   getTypographyToken,
   getTypographyStyle,
   getFontFamily,
@@ -30,16 +37,10 @@ export {
   truncateText,
   TYPOGRAPHY_ELEMENT_MAP,
   TYPOGRAPHY_USAGE,
-  // Types
-  type MD3ColorRole,
-  type Theme,
   type MD3TypographyScale,
   type MD3TypographySize,
   type MD3TypographyStyle,
   type TypographyProperty,
   type TypographyStyleObject,
-} from './utils';
-
-// Components will be exported here as they're built
-// export { Button } from './components/Button';
+} from './typography';
 
