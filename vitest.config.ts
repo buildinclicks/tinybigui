@@ -35,7 +35,7 @@ export default defineConfig({
 
     // Setup files: Run before any tests start
     // This file will set up React Testing Library and other test utilities
-    setupFiles: ['./packages/react/test/setup.ts'],
+    setupFiles: ['./test/setup.ts'],
 
     // CSS handling: Mock CSS imports in tests
     // Tests don't need actual styles, so we mock them for speed
@@ -57,7 +57,7 @@ export default defineConfig({
 
     // Include: Which files to consider as tests
     // Any file with .test.ts, .test.tsx, .spec.ts, .spec.tsx is a test
-    include: ['packages/**/*.{test,spec}.{ts,tsx}'],
+    include: ['**/*.{test,spec}.{ts,tsx}'],
 
     // Exclude: Which files/folders to ignore
     exclude: [
