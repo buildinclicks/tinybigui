@@ -47,6 +47,59 @@ After completing a task, always provide:
 - Skip explanations
 - Assume approval
 
+## 🔍 Package Version Checking (CRITICAL)
+
+**ALWAYS check for latest stable package versions via web search, NOT training data.**
+
+### When Adding Dependencies:
+
+1. **NEVER use versions from training data (April 2024) by default**
+2. **ALWAYS search web for latest stable versions**:
+   ```
+   Search: "[package-name] latest stable version npm 2025"
+   Example: "vitest latest stable version npm 2025"
+   ```
+3. **Check official sources**:
+   - npm registry (site:npmjs.com)
+   - Official documentation
+   - GitHub releases
+4. **Document version decisions**:
+   - Why this version was chosen
+   - Any breaking changes noted
+   - Compatibility requirements
+
+### Example Process:
+
+```
+Task: Add Vitest for testing
+
+❌ BAD: Use "vitest": "^2.1.8" (from training data)
+
+✅ GOOD:
+1. Search: "vitest latest stable version December 2025"
+2. Find: Vitest 4.0.16 is latest
+3. Check: Breaking changes from 2.x to 4.x
+4. Use: "vitest": "^4.0.16"
+5. Document: "Using Vitest 4.x for browser mode, visual regression features"
+```
+
+### Critical Packages to Always Check:
+
+- Testing tools: vitest, @testing-library/*, jsdom
+- Build tools: vite, tsup, esbuild
+- Framework: react, react-dom
+- Styling: tailwindcss, @tailwindcss/*
+- Type definitions: @types/*
+
+### If Version Info Unavailable:
+
+1. Explicitly tell user you cannot verify latest version
+2. Suggest user runs: `pnpm outdated` or `npm outdated`
+3. Use conservative version with caret (^) for flexibility
+4. Add TODO comment to check version after install
+
+**Remember:** Fresh projects should use latest stable versions unless there's a specific technical reason not to.
+
 ## Core Principles
 
 - **Quality over speed**: Build it right, not fast

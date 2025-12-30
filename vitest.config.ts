@@ -1,8 +1,14 @@
 /**
- * Vitest Configuration
+ * Vitest Configuration (v4.0.16+)
  * 
  * This file tells Vitest how to run tests for our component library.
  * Vitest is our testing tool - it runs tests and reports results.
+ * 
+ * Version: Vitest 4.x
+ * New features available:
+ * - Stable Browser Mode (run tests in real browsers)
+ * - Visual Regression Testing (toMatchScreenshot)
+ * - Playwright Traces integration
  */
 
 import { defineConfig } from 'vitest/config';
