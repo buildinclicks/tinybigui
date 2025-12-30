@@ -304,21 +304,29 @@ global.ResizeObserver = class ResizeObserver { ... }
 
 ### 3. Added Testing Dependencies ✅
 
-**Root package.json:** Added testing tools
+**Root package.json:** Added testing tools (Latest versions as of Dec 30, 2025)
 
 ```json
 {
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.3",      // DOM matchers
-    "@testing-library/react": "^16.1.0",         // React testing utilities
-    "@testing-library/user-event": "^14.5.2",    // Simulate user interactions
+    "@testing-library/jest-dom": "^6.9.1",       // DOM matchers (updated from 6.6.3)
+    "@testing-library/react": "^16.3.0",         // React testing utilities (updated from 16.1.0)
+    "@testing-library/user-event": "^14.6.1",    // Simulate user interactions (updated from 14.5.2)
     "@vitejs/plugin-react": "^4.3.4",            // React support for Vitest
-    "@vitest/coverage-v8": "^2.1.8",             // Code coverage reports
-    "jsdom": "^25.0.1",                           // Browser environment simulation
-    "vitest": "^2.1.8"                            // Testing framework
+    "@vitest/coverage-v8": "^4.0.16",            // Code coverage reports (updated from 2.1.8)
+    "jsdom": "^26.1.0",                          // Browser environment simulation (updated from 25.0.1)
+    "vitest": "^4.0.16"                          // Testing framework (updated from 2.1.8)
   }
 }
 ```
+
+**⚠️ Version Update Note:**
+- Initially used older versions from training data (April 2024)
+- Updated to latest stable versions (Dec 2025) for:
+  - **Vitest 4.0.16**: New features - browser mode, visual regression, Playwright traces
+  - **jsdom 26.1.0**: Improved DOM simulation
+  - **Testing Library packages**: Latest bug fixes and features
+- **Always check for latest versions** when adding dependencies to new projects!
 
 **What each dependency does:**
 
@@ -722,6 +730,50 @@ test('calculator works', () => {
 - 80-90% coverage for business logic
 - 60-70% coverage for UI components
 - Focus on critical paths first
+
+### 7. Always Check for Latest Package Versions ⭐
+
+**Critical Learning: Don't trust training data for package versions!**
+
+This task originally used older versions (April 2024 training data):
+- ❌ Vitest 2.1.8 (outdated)
+- ❌ jsdom 25.0.1 (outdated)  
+- ❌ @testing-library/* packages (outdated)
+
+**Updated to latest stable (Dec 2025):**
+- ✅ Vitest 4.0.16 (browser mode, visual regression!)
+- ✅ jsdom 26.1.0 (better DOM simulation)
+- ✅ Latest Testing Library packages
+
+**Why this matters:**
+- **New projects should use latest stable** versions
+- Latest versions have bug fixes, security patches, new features
+- No legacy code to worry about breaking
+- Better TypeScript support
+- More active community support
+
+**How to check versions:**
+1. **Web search:** "[package] latest stable version 2025"
+2. **Run:** `pnpm outdated` after installing
+3. **Check:** Official docs, npm registry, GitHub releases
+4. **Update:** package.json before first install
+
+**Example search:**
+```
+"vitest latest stable version December 2025"
+```
+
+**Red flags (don't just use training data):**
+- Training data can be 6-12+ months old
+- Major versions may have been released
+- Security vulnerabilities may be fixed
+- Breaking changes may be documented
+
+**Best practice:**
+- Always verify latest versions for new projects
+- Use caret (^) for flexibility: `"vitest": "^4.0.16"`
+- Document why you chose specific versions
+- Check changelogs for breaking changes
 
 ---
 
