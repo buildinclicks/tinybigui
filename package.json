@@ -36,6 +36,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "commitlint": "commitlint --edit",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:watch": "pnpm -r test:watch",
@@ -43,6 +44,8 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
