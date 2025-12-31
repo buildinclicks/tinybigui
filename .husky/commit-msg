@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate commit message format (will be configured in Task 9.4)
+# For now, this is a placeholder that will be updated
+echo "📝 Validating commit message..."
+
+# This will be replaced with: pnpm commitlint --edit $1
+# Once we set up commitlint in Task 9.4
+
