@@ -39,7 +39,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:watch": "pnpm -r test:watch",
-    "clean": "pnpm -r clean && rm -rf node_modules"
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -54,6 +55,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.1.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
