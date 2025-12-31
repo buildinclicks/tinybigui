@@ -119,6 +119,7 @@ import { Button, TextField } from "@tinybigui/react";
 We do **not** ship a JS Tailwind preset as the primary integration (CSS-first strategy).
 
 **For Tailwind users (recommended happy path)**:
+
 - Ensure Tailwind v4 is installed and working in your app (via your framework's Tailwind setup)
 - Import `@tinybigui/react/styles.css`
 

@@ -25,25 +25,25 @@ This task created the build configuration for the `@tinybigui/react` package usi
 This configuration tells tsup how to build our library for distribution on NPM.
 
 ```typescript
-import { defineConfig } from 'tsup';
+import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['esm', 'cjs'],
+  entry: ["src/index.ts"],
+  format: ["esm", "cjs"],
   dts: true,
   splitting: true,
   sourcemap: true,
   clean: true,
   minify: false,
-  external: ['react', 'react-dom', 'react/jsx-runtime'],
+  external: ["react", "react-dom", "react/jsx-runtime"],
   treeshake: true,
   bundle: true,
-  target: 'es2022',
-  platform: 'neutral',
-  jsx: 'automatic',
-  outExtension({ format }: { format: 'esm' | 'cjs' }) {
+  target: "es2022",
+  platform: "neutral",
+  jsx: "automatic",
+  outExtension({ format }: { format: "esm" | "cjs" }) {
     return {
-      js: format === 'cjs' ? '.cjs' : '.js',
+      js: format === "cjs" ? ".cjs" : ".js",
     };
   },
 });
@@ -56,17 +56,19 @@ export default defineConfig({
 ### 1. Entry Point
 
 ```typescript
-entry: ['src/index.ts']
+entry: ["src/index.ts"];
 ```
 
 **Where the build starts.**
 
 **How it works:**
+
 1. tsup reads `src/index.ts`
 2. Follows all imports recursively
 3. Bundles everything into output files
 
 **Build flow:**
+
 ```
 src/index.ts
   ↓ imports
@@ -81,11 +83,12 @@ dist/index.js (ESM) + dist/index.cjs (CommonJS)
 ```
 
 **Multiple entry points (future):**
+
 ```typescript
 entry: [
-  'src/index.ts',           // Main package
-  'src/server.ts',          // Server-only components
-]
+  "src/index.ts", // Main package
+  "src/server.ts", // Server-only components
+];
 ```
 
 ---
@@ -93,7 +96,7 @@ entry: [
 ### 2. Output Formats
 
 ```typescript
-format: ['esm', 'cjs']
+format: ["esm", "cjs"];
 ```
 
 **Generates two module formats for maximum compatibility.**
@@ -101,9 +104,10 @@ format: ['esm', 'cjs']
 #### ESM (ES Modules) - `dist/index.js`
 
 **Modern JavaScript standard:**
+
 ```javascript
 // User code
-import { Button } from '@tinybigui/react';
+import { Button } from "@tinybigui/react";
 
 // Works with:
 // - Modern bundlers (Vite, Webpack 5+, Rollup)
@@ -112,6 +116,7 @@ import { Button } from '@tinybigui/react';
 ```
 
 **Benefits:**
+
 - ✅ Tree-shaking (unused code removed)
 - ✅ Static analysis by bundlers
 - ✅ Smaller bundles
@@ -120,9 +125,10 @@ import { Button } from '@tinybigui/react';
 #### CJS (CommonJS) - `dist/index.cjs`
 
 **Legacy Node.js format:**
+
 ```javascript
 // User code
-const { Button } = require('@tinybigui/react');
+const { Button } = require("@tinybigui/react");
 
 // Works with:
 // - Node.js default (no "type": "module")
@@ -132,17 +138,19 @@ const { Button } = require('@tinybigui/react');
 ```
 
 **Why still support CJS?**
+
 - Many projects haven't migrated to ESM
 - Some tools default to CJS
 - Backward compatibility
 
 **Package.json alignment:**
+
 ```json
 {
   "exports": {
     ".": {
-      "import": "./dist/index.js",   // ESM users get this
-      "require": "./dist/index.cjs"  // CJS users get this
+      "import": "./dist/index.js", // ESM users get this
+      "require": "./dist/index.cjs" // CJS users get this
     }
   }
 }
@@ -153,20 +161,22 @@ const { Button } = require('@tinybigui/react');
 ### 3. Type Definitions
 
 ```typescript
-dts: true
+dts: true;
 ```
 
 **Generates TypeScript declaration files.**
 
 **Output files:**
+
 - `dist/index.d.ts` - ESM type definitions
 - `dist/index.d.cts` - CJS type definitions
 - `dist/index.d.ts.map` - Source maps for types
 
 **What users get:**
+
 ```typescript
-import { Button } from '@tinybigui/react';
-//       ^^^^^^ 
+import { Button } from "@tinybigui/react";
+//       ^^^^^^
 // VS Code shows:
 // - All props with types
 // - JSDoc documentation
@@ -176,6 +186,7 @@ import { Button } from '@tinybigui/react';
 
 **How it works:**
 tsup uses TypeScript compiler under the hood:
+
 ```
 src/index.ts
   ↓ TypeScript compiler
@@ -183,12 +194,13 @@ dist/index.d.ts (type definitions)
 ```
 
 **Example output:**
+
 ```typescript
 // src/utils/cn.ts
 export function cn(...inputs: ClassValue[]): string;
 
 // dist/index.d.ts (generated)
-import { ClassValue } from 'clsx';
+import { ClassValue } from "clsx";
 export declare function cn(...inputs: ClassValue[]): string;
 ```
 
@@ -197,18 +209,20 @@ export declare function cn(...inputs: ClassValue[]): string;
 ### 4. Code Splitting
 
 ```typescript
-splitting: true
+splitting: true;
 ```
 
 **Splits code into chunks for better optimization.**
 
 **Without splitting:**
+
 ```
 dist/
 └── index.js (entire library, 500 KB)
 ```
 
 **With splitting:**
+
 ```
 dist/
 ├── index.js (main entry)
@@ -220,6 +234,7 @@ dist/
 **Benefits:**
 
 **1. Shared code deduplication:**
+
 ```typescript
 // Button.tsx and Checkbox.tsx both use cn()
 // Without splitting: cn() code duplicated in both
@@ -227,9 +242,10 @@ dist/
 ```
 
 **2. Better tree-shaking:**
+
 ```typescript
 // User imports only Button
-import { Button } from '@tinybigui/react';
+import { Button } from "@tinybigui/react";
 
 // Loaded:
 // ✅ index.js (main)
@@ -239,6 +255,7 @@ import { Button } from '@tinybigui/react';
 ```
 
 **3. Browser caching:**
+
 ```
 User upgrades library:
 - index.js changed ❌ (re-download)
@@ -254,16 +271,18 @@ Modern bundlers can load chunks in parallel.
 ### 5. Source Maps
 
 ```typescript
-sourcemap: true
+sourcemap: true;
 ```
 
 **Generates `.map` files for debugging.**
 
 **Output:**
+
 - `dist/index.js.map`
 - `dist/index.cjs.map`
 
 **Without source maps:**
+
 ```javascript
 // Browser DevTools shows:
 dist/index.js:1523
@@ -276,6 +295,7 @@ Error: Invalid prop
 ```
 
 **With source maps:**
+
 ```typescript
 // Browser DevTools shows:
 src/components/Button.tsx:42
@@ -288,16 +308,18 @@ Error: Invalid prop
 ```
 
 **How it works:**
+
 ```json
 // dist/index.js.map
 {
-  "mappings": "AAAA,OAAO...",  // Maps compiled → source
+  "mappings": "AAAA,OAAO...", // Maps compiled → source
   "sources": ["../src/index.ts"],
   "sourcesContent": ["export { cn } from './utils/cn';"]
 }
 ```
 
 **Browser loads:**
+
 1. `dist/index.js` (compiled code)
 2. `dist/index.js.map` (mapping)
 3. Shows original TypeScript in DevTools
@@ -307,7 +329,7 @@ Error: Invalid prop
 ### 6. Clean Output
 
 ```typescript
-clean: true
+clean: true;
 ```
 
 **Deletes `dist/` directory before each build.**
@@ -315,6 +337,7 @@ clean: true
 **Why needed?**
 
 **Scenario without `clean`:**
+
 ```bash
 # Build 1: Create Button component
 pnpm build
@@ -331,6 +354,7 @@ pnpm build
 ```
 
 **With `clean: true`:**
+
 ```bash
 # Build 2: With clean
 pnpm build
@@ -340,6 +364,7 @@ pnpm build
 ```
 
 **Also prevents:**
+
 - Outdated type definitions
 - Renamed chunk files
 - Deleted component exports
@@ -349,18 +374,20 @@ pnpm build
 ### 7. Minification
 
 ```typescript
-minify: false
+minify: false;
 ```
 
 **Currently disabled for better debugging.**
 
 **Why `false` during development:**
+
 - ✅ Readable output for debugging
 - ✅ Clearer error messages
 - ✅ Faster builds (no minification step)
 - ✅ Better source maps
 
 **Example unminified output:**
+
 ```javascript
 // dist/index.js (readable)
 export function cn(...inputs) {
@@ -369,21 +396,26 @@ export function cn(...inputs) {
 ```
 
 **When to enable:**
+
 ```typescript
 // Before NPM release
-minify: true
+minify: true;
 
 // Or per-environment
-minify: process.env.NODE_ENV === 'production'
+minify: process.env.NODE_ENV === "production";
 ```
 
 **Minified output:**
+
 ```javascript
 // dist/index.js (minified)
-export function cn(...e){return twMerge(clsx(e))}
+export function cn(...e) {
+  return twMerge(clsx(e));
+}
 ```
 
 **Bundle size impact:**
+
 - Unminified: ~50 KB
 - Minified: ~20 KB (60% smaller)
 
@@ -392,11 +424,7 @@ export function cn(...e){return twMerge(clsx(e))}
 ### 8. External Dependencies
 
 ```typescript
-external: [
-  'react',
-  'react-dom',
-  'react/jsx-runtime',
-]
+external: ["react", "react-dom", "react/jsx-runtime"];
 ```
 
 **These dependencies are NOT bundled into our library.**
@@ -404,6 +432,7 @@ external: [
 **Why mark as external?**
 
 **Problem if bundled:**
+
 ```javascript
 // Our library bundles React (100 KB)
 // User's app also has React (100 KB)
@@ -415,9 +444,10 @@ const [state, setState] = useState(0);
 ```
 
 **Solution - external:**
+
 ```javascript
 // dist/index.js
-import { useState } from 'react';  // Import statement, not bundled
+import { useState } from "react"; // Import statement, not bundled
 
 // User's bundler resolves this to their React
 // Total bundle: 100 KB
@@ -427,25 +457,30 @@ import { useState } from 'react';  // Import statement, not bundled
 **How it works:**
 
 **Our output:**
+
 ```javascript
 // dist/index.js
-import * as React from 'react';
-export function Button() { /* ... */ }
+import * as React from "react";
+export function Button() {
+  /* ... */
+}
 ```
 
 **User's bundler sees:**
+
 ```javascript
 // User's app
-import { Button } from '@tinybigui/react';
+import { Button } from "@tinybigui/react";
 // Bundler: "@tinybigui/react imports 'react'"
 // Bundler: "I'll use the user's React dependency"
 ```
 
 **Package.json alignment:**
+
 ```json
 {
   "peerDependencies": {
-    "react": "^18.0.0 || ^19.0.0"  // User must provide
+    "react": "^18.0.0 || ^19.0.0" // User must provide
   }
 }
 ```
@@ -455,7 +490,7 @@ import { Button } from '@tinybigui/react';
 ### 9. Tree-Shaking
 
 ```typescript
-treeshake: true
+treeshake: true;
 ```
 
 **Removes unused code from output.**
@@ -463,23 +498,26 @@ treeshake: true
 **Example:**
 
 **Library exports:**
+
 ```typescript
 // src/index.ts
-export { Button } from './components/Button';
-export { Checkbox } from './components/Checkbox';
-export { Radio } from './components/Radio';
-export { Switch } from './components/Switch';
-export { cn } from './utils/cn';
+export { Button } from "./components/Button";
+export { Checkbox } from "./components/Checkbox";
+export { Radio } from "./components/Radio";
+export { Switch } from "./components/Switch";
+export { cn } from "./utils/cn";
 ```
 
 **User imports:**
+
 ```typescript
 // User's app
-import { Button, cn } from '@tinybigui/react';
+import { Button, cn } from "@tinybigui/react";
 // Only uses Button and cn
 ```
 
 **Without tree-shaking:**
+
 ```
 User's bundle includes:
 - Button ✅ (used)
@@ -491,6 +529,7 @@ Bundle size: ~150 KB
 ```
 
 **With tree-shaking:**
+
 ```
 User's bundle includes:
 - Button ✅ (used)
@@ -499,18 +538,20 @@ Bundle size: ~30 KB (80% smaller!)
 ```
 
 **Requirements for tree-shaking:**
+
 1. ESM format (not CJS)
 2. `sideEffects: false` or `["**/*.css"]` in package.json
 3. Named exports (not default exports)
 
 **Why named exports?**
+
 ```typescript
 // ❌ Default exports (harder to tree-shake)
 export default { Button, Checkbox, Radio };
 
 // ✅ Named exports (easy to tree-shake)
-export { Button } from './Button';
-export { Checkbox } from './Checkbox';
+export { Button } from "./Button";
+export { Checkbox } from "./Checkbox";
 ```
 
 ---
@@ -518,29 +559,32 @@ export { Checkbox } from './Checkbox';
 ### 10. Bundle Dependencies
 
 ```typescript
-bundle: true
+bundle: true;
 ```
 
 **Bundles our regular dependencies into the output.**
 
 **What gets bundled:**
+
 ```json
 // package.json dependencies
 {
   "dependencies": {
-    "clsx": "^2.1.1",              // ✅ Bundled
-    "tailwind-merge": "^2.6.0",    // ✅ Bundled
-    "class-variance-authority": "^0.7.1"  // ✅ Bundled
+    "clsx": "^2.1.1", // ✅ Bundled
+    "tailwind-merge": "^2.6.0", // ✅ Bundled
+    "class-variance-authority": "^0.7.1" // ✅ Bundled
   }
 }
 ```
 
 **Why bundle these?**
+
 - User doesn't need to install them separately
 - Single import for users
 - Version control (we control the versions)
 
 **User experience:**
+
 ```bash
 # User only installs our package
 pnpm add @tinybigui/react
@@ -550,6 +594,7 @@ pnpm add @tinybigui/react
 ```
 
 **Output:**
+
 ```javascript
 // dist/index.js includes:
 // - Our code
@@ -559,6 +604,7 @@ pnpm add @tinybigui/react
 ```
 
 **Bundle size:**
+
 - clsx: ~1 KB
 - tailwind-merge: ~8 KB
 - CVA: ~3 KB
@@ -569,17 +615,19 @@ pnpm add @tinybigui/react
 ### 11. Target Environment
 
 ```typescript
-target: 'es2022'
+target: "es2022";
 ```
 
 **Compiles to ES2022 JavaScript.**
 
 **Alignment:**
+
 - ✅ Matches TypeScript config (`target: "ES2022"`)
 - ✅ Matches browser baseline (Safari 16.4+, Chrome 111+, Firefox 128+)
 - ✅ Matches Node.js 18+ requirement
 
 **Features used:**
+
 ```javascript
 // ES2022 features in output
 obj?.prop                    // Optional chaining
@@ -590,16 +638,18 @@ arr.at(-1)                   // Array.at()
 ```
 
 **Not transpiled to ES5:**
+
 ```javascript
 // We DON'T output:
 var _a;
-(_a = obj) === null || _a === void 0 ? void 0 : _a.prop;  // ES5 optional chaining
+(_a = obj) === null || _a === void 0 ? void 0 : _a.prop; // ES5 optional chaining
 
 // We output:
-obj?.prop;  // Native ES2022
+obj?.prop; // Native ES2022
 ```
 
 **Why ES2022?**
+
 - ✅ Modern browsers support it natively
 - ✅ Smaller output (no polyfills)
 - ✅ Better performance (native features)
@@ -609,26 +659,28 @@ obj?.prop;  // Native ES2022
 ### 12. Platform
 
 ```typescript
-platform: 'neutral'
+platform: "neutral";
 ```
 
 **Code works in both Node.js and browser.**
 
 **Options:**
 
-| Platform | Use Case | Environment |
-|----------|----------|-------------|
+| Platform  | Use Case       | Environment       |
+| --------- | -------------- | ----------------- |
 | `neutral` | Universal code | Browser + Node.js |
-| `browser` | Browser-only | Browser |
-| `node` | Server-only | Node.js |
+| `browser` | Browser-only   | Browser           |
+| `node`    | Server-only    | Node.js           |
 
 **Why `neutral` for React components?**
+
 - ✅ Browser rendering (client-side)
 - ✅ SSR (server-side rendering in Node.js)
 - ✅ Next.js App Router (React Server Components)
 - ✅ Remix (server + client)
 
 **What it means:**
+
 ```javascript
 // Neutral platform means:
 // - No Node.js-specific APIs (fs, path)
@@ -637,6 +689,7 @@ platform: 'neutral'
 ```
 
 **Example:**
+
 ```typescript
 // ✅ Good (neutral)
 export function Button() {
@@ -655,12 +708,13 @@ export function Button() { /* ... */ }
 ### 13. JSX Handling
 
 ```typescript
-jsx: 'automatic'
+jsx: "automatic";
 ```
 
 **Uses modern JSX transform (React 17+).**
 
 **Input (our code):**
+
 ```tsx
 export function Button() {
   return <button>Click me</button>;
@@ -668,29 +722,32 @@ export function Button() {
 ```
 
 **Output (compiled):**
+
 ```javascript
-import { jsx as _jsx } from 'react/jsx-runtime';
+import { jsx as _jsx } from "react/jsx-runtime";
 
 export function Button() {
-  return _jsx('button', { children: 'Click me' });
+  return _jsx("button", { children: "Click me" });
 }
 ```
 
 **Benefits:**
+
 - ✅ No `React` import needed in source
 - ✅ Smaller output
 - ✅ Faster runtime
 - ✅ Better tree-shaking
 
 **vs Classic JSX:**
+
 ```javascript
 // Classic (React 16)
-import React from 'react';
-return React.createElement('button', null, 'Click me');
+import React from "react";
+return React.createElement("button", null, "Click me");
 
 // Automatic (React 17+)
-import { jsx } from 'react/jsx-runtime';
-return jsx('button', { children: 'Click me' });
+import { jsx } from "react/jsx-runtime";
+return jsx("button", { children: "Click me" });
 ```
 
 ---
@@ -708,36 +765,40 @@ outExtension({ format }: { format: 'esm' | 'cjs' }) {
 **Custom file extensions per format.**
 
 **Output:**
+
 - ESM → `dist/index.js`
 - CJS → `dist/index.cjs`
 
 **Why `.cjs` for CommonJS?**
 
 **Problem with `.js` for both:**
+
 ```json
 // package.json
 {
-  "type": "module",  // .js files are ESM
+  "type": "module", // .js files are ESM
   "exports": {
-    "require": "./dist/index.js"  // ❌ CJS code with .js extension
+    "require": "./dist/index.js" // ❌ CJS code with .js extension
   }
 }
 // Node.js: "Error: require() of ES Module"
 ```
 
 **Solution with `.cjs`:**
+
 ```json
 {
   "type": "module",
   "exports": {
-    "import": "./dist/index.js",   // ✅ ESM (.js)
-    "require": "./dist/index.cjs"  // ✅ CJS (.cjs)
+    "import": "./dist/index.js", // ✅ ESM (.js)
+    "require": "./dist/index.cjs" // ✅ CJS (.cjs)
   }
 }
 // Node.js: Correctly identifies both formats
 ```
 
 **Node.js resolution:**
+
 - `.cjs` → Always CommonJS
 - `.mjs` → Always ES Module
 - `.js` → Depends on package.json `type` field
@@ -756,7 +817,7 @@ outExtension({ format }: { format: 'esm' | 'cjs' }) {
 ✅ **Tree-shakeable** - Users only bundle what they use  
 ✅ **Modern output** - ES2022, native features  
 ✅ **Universal** - SSR + client-side compatible  
-✅ **Fast builds** - Powered by esbuild (10-100x faster than tsc)  
+✅ **Fast builds** - Powered by esbuild (10-100x faster than tsc)
 
 ---
 
@@ -766,15 +827,16 @@ outExtension({ format }: { format: 'esm' | 'cjs' }) {
 
 **Comparison:**
 
-| Tool | Speed | Config | Output | Type Defs |
-|------|-------|--------|--------|-----------|
-| `tsc` | Slow | Simple | Good | Native |
-| `webpack` | Slow | Complex | Great | Via plugin |
-| `rollup` | Medium | Complex | Great | Via plugin |
+| Tool       | Speed    | Config     | Output    | Type Defs  |
+| ---------- | -------- | ---------- | --------- | ---------- |
+| `tsc`      | Slow     | Simple     | Good      | Native     |
+| `webpack`  | Slow     | Complex    | Great     | Via plugin |
+| `rollup`   | Medium   | Complex    | Great     | Via plugin |
 | **`tsup`** | **Fast** | **Simple** | **Great** | **Native** |
-| `esbuild` | Fastest | Manual | Good | Manual |
+| `esbuild`  | Fastest  | Manual     | Good      | Manual     |
 
 **Why tsup?**
+
 - ✅ esbuild speed with better DX
 - ✅ Zero-config TypeScript
 - ✅ Automatic `.d.ts` generation
@@ -801,6 +863,7 @@ packages/react/dist/
 ```
 
 **Size estimates:**
+
 - ESM: ~15 KB
 - CJS: ~16 KB (slightly larger)
 - Types: ~2 KB
@@ -811,6 +874,7 @@ packages/react/dist/
 ### Development Workflow
 
 **Local development:**
+
 ```bash
 # Watch mode (rebuilds on file change)
 cd packages/react
@@ -823,6 +887,7 @@ pnpm dev
 ```
 
 **Building for release:**
+
 ```bash
 # One-time build
 pnpm build
@@ -862,12 +927,14 @@ packages/react/
 To verify this task was completed correctly:
 
 1. **Check config exists:**
+
    ```bash
    cat packages/react/tsup.config.ts
    # Should show defineConfig with all options
    ```
 
 2. **Validate TypeScript:**
+
    ```bash
    cd packages/react
    npx tsc --noEmit tsup.config.ts
@@ -875,6 +942,7 @@ To verify this task was completed correctly:
    ```
 
 3. **Test build (after pnpm install):**
+
    ```bash
    cd packages/react
    pnpm install
@@ -883,6 +951,7 @@ To verify this task was completed correctly:
    ```
 
 4. **Check output structure:**
+
    ```bash
    ls -la packages/react/dist/
    # Should show index.js, index.cjs, index.d.ts, etc.
@@ -907,17 +976,17 @@ To verify this task was completed correctly:
 
 ## 🤔 Decisions Made
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Build tool | tsup | Fast, simple, great defaults |
-| Output formats | ESM + CJS | Maximum compatibility |
-| Code splitting | Enabled | Better tree-shaking, caching |
-| Minification | Disabled (dev) | Readable output, faster builds |
-| External deps | React, React-DOM | Peer dependencies, no conflicts |
-| Bundle deps | clsx, tailwind-merge, CVA | Convenience, version control |
-| Source maps | Enabled | Better debugging |
-| Target | ES2022 | Modern, aligns with strategy |
-| Platform | Neutral | SSR + client compatible |
+| Decision       | Choice                    | Rationale                       |
+| -------------- | ------------------------- | ------------------------------- |
+| Build tool     | tsup                      | Fast, simple, great defaults    |
+| Output formats | ESM + CJS                 | Maximum compatibility           |
+| Code splitting | Enabled                   | Better tree-shaking, caching    |
+| Minification   | Disabled (dev)            | Readable output, faster builds  |
+| External deps  | React, React-DOM          | Peer dependencies, no conflicts |
+| Bundle deps    | clsx, tailwind-merge, CVA | Convenience, version control    |
+| Source maps    | Enabled                   | Better debugging                |
+| Target         | ES2022                    | Modern, aligns with strategy    |
+| Platform       | Neutral                   | SSR + client compatible         |
 
 ---
 
@@ -928,4 +997,3 @@ To verify this task was completed correctly:
 - [Package Exports](https://nodejs.org/api/packages.html#exports)
 - [Tree Shaking Guide](https://webpack.js.org/guides/tree-shaking/)
 - [Source Maps Explained](https://web.dev/source-maps/)
-

@@ -251,6 +251,7 @@ export function Button({ ... }) {
 Because we require **TailwindCSS v4**, we also align to a **modern browser baseline**.
 
 **Supported baseline**:
+
 - **Safari**: 16.4+
 - **Chrome / Edge**: 111+
 - **Firefox**: 128+

@@ -39,12 +39,7 @@ export function isKeyboardAccessible(element: Element): boolean {
   // Element is keyboard accessible if:
   // - It's a native interactive element (button, link, input)
   // - Or it has tabindex >= 0
-  return (
-    isButton ||
-    isLink ||
-    isInput ||
-    (tabIndex !== null && parseInt(tabIndex) >= 0)
-  );
+  return isButton || isLink || isInput || (tabIndex !== null && parseInt(tabIndex) >= 0);
 }
 
 /**
@@ -307,10 +302,7 @@ export function waitForFocus(element: Element, timeout = 1000): Promise<void> {
  * });
  * ```
  */
-export function getContrastRatio(
-  foreground: string,
-  background: string
-): number {
+export function getContrastRatio(foreground: string, background: string): number {
   const getLuminance = (rgb: string): number => {
     const match = rgb.match(/\d+/g);
     if (!match || match.length < 3) return 0;
@@ -359,10 +351,7 @@ export function getContrastRatio(
  * });
  * ```
  */
-export function renderAndGetByRole(
-  ui: ReactElement,
-  role: string
-): [Element, RenderResult] {
+export function renderAndGetByRole(ui: ReactElement, role: string): [Element, RenderResult] {
   const result = render(ui);
   const element = result.getByRole(role);
   return [element, result];
@@ -413,10 +402,7 @@ export function isInTabOrder(element: Element): boolean {
  * });
  * ```
  */
-export function getContrastViolations(
-  container: Element,
-  minRatio = 4.5
-): Element[] {
+export function getContrastViolations(container: Element, minRatio = 4.5): Element[] {
   const violations: Element[] = [];
   const elements = container.querySelectorAll("*");
 

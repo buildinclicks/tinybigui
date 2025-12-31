@@ -1,12 +1,12 @@
 /**
  * @tinybigui/react - Utilities
- * 
+ *
  * Barrel export for all utility functions.
  * Provides a single import point for utilities used throughout the library.
  */
 
 // Class name utilities
-export { cn } from './cn';
+export { cn } from "./cn";
 
 // Color utilities
 export {
@@ -22,7 +22,7 @@ export {
   hexFromArgb,
   type MD3ColorRole,
   type Theme,
-} from './colors';
+} from "./colors";
 
 // Typography utilities
 export {
@@ -42,5 +42,4 @@ export {
   type MD3TypographyStyle,
   type TypographyProperty,
   type TypographyStyleObject,
-} from './typography';
-
+} from "./typography";

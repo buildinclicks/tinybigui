@@ -15,12 +15,14 @@ This task verified the complete Material Design 3 token system, ensured all toke
 ## 📄 Files Verified
 
 ### Main Token File
+
 - **File**: `packages/tokens/src/tokens.css`
 - **Total Lines**: 288 lines
 - **Size**: ~11 KB (unminified)
 - **Status**: ✅ Production-ready
 
 ### Supporting Files
+
 - `packages/tokens/package.json` - Build configuration
 - `packages/tokens/scripts/build.js` - Build script
 - `packages/tokens/tsconfig.json` - TypeScript config
@@ -35,6 +37,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 #### 1. Color Tokens (18 roles)
 
 **Light Mode + Dark Mode**:
+
 - Primary (4): primary, on-primary, primary-container, on-primary-container
 - Secondary (4): secondary, on-secondary, secondary-container, on-secondary-container
 - Tertiary (4): tertiary, on-tertiary, tertiary-container, on-tertiary-container
@@ -52,6 +55,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 #### 2. Typography Tokens (15 styles × 4 properties)
 
 **Type Scale**:
+
 - Display: Large, Medium, Small (3)
 - Headline: Large, Medium, Small (3)
 - Title: Large, Medium, Small (3)
@@ -59,6 +63,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 - Label: Large, Medium, Small (3)
 
 **Properties per style**:
+
 - size (rem)
 - line-height (rem)
 - weight (400 or 500)
@@ -73,6 +78,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 #### 3. Shape Tokens (7 corner radii)
 
 **Values**:
+
 - none (0)
 - extra-small (4px)
 - small (8px)
@@ -90,6 +96,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 #### 4. Elevation Tokens (6 levels)
 
 **Values**:
+
 - level0 (no shadow)
 - level1 (subtle shadow)
 - level2 (moderate shadow)
@@ -106,11 +113,13 @@ This task verified the complete Material Design 3 token system, ensured all toke
 #### 5. Motion Tokens (16 values)
 
 **Duration Tokens (12)**:
+
 - Short: short1, short2, short3, short4 (50ms - 200ms)
 - Medium: medium1, medium2, medium3, medium4 (250ms - 400ms)
 - Long: long1, long2, long3, long4 (450ms - 600ms)
 
 **Easing Tokens (4)**:
+
 - standard
 - emphasized
 - emphasized-decelerate
@@ -125,8 +134,9 @@ This task verified the complete Material Design 3 token system, ensured all toke
 #### 6. Tailwind Integration (18 color mappings)
 
 **@theme Directive**:
+
 - Maps all 18 MD3 color roles to Tailwind utilities
-- Generates ~54 utilities (bg-*, text-*, border-*)
+- Generates ~54 utilities (bg-_, text-_, border-\*)
 - Automatic dark mode support
 
 **Status**: ✅ Complete and verified
@@ -135,15 +145,15 @@ This task verified the complete Material Design 3 token system, ensured all toke
 
 ### Summary: Complete Token Inventory
 
-| Category | Count | Status |
-|----------|-------|--------|
-| Color Tokens | 36 (18 light + 18 dark) | ✅ |
-| Typography Tokens | 62 (15 styles × 4 + 2 fonts) | ✅ |
-| Shape Tokens | 7 | ✅ |
-| Elevation Tokens | 6 | ✅ |
-| Motion Tokens | 16 (12 duration + 4 easing) | ✅ |
-| Tailwind Mappings | 18 | ✅ |
-| **Total** | **145 tokens** | ✅ |
+| Category          | Count                        | Status |
+| ----------------- | ---------------------------- | ------ |
+| Color Tokens      | 36 (18 light + 18 dark)      | ✅     |
+| Typography Tokens | 62 (15 styles × 4 + 2 fonts) | ✅     |
+| Shape Tokens      | 7                            | ✅     |
+| Elevation Tokens  | 6                            | ✅     |
+| Motion Tokens     | 16 (12 duration + 4 easing)  | ✅     |
+| Tailwind Mappings | 18                           | ✅     |
+| **Total**         | **145 tokens**               | ✅     |
 
 ---
 
@@ -154,12 +164,14 @@ This task verified the complete Material Design 3 token system, ensured all toke
 **Command**: `pnpm build` (in packages/tokens)
 
 **Process**:
+
 1. Node.js script runs (`scripts/build.js`)
 2. Creates `dist/` directory
 3. Copies `src/tokens.css` → `dist/tokens.css`
 4. Preserves all CSS content (CSS variables, @theme, @media queries)
 
 **Expected Output**:
+
 ```
 🏗️  Building @tinybigui/tokens...
 ✅ Created dist/ directory
@@ -178,6 +190,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 **File**: `packages/tokens/dist/tokens.css`
 
 **Contents**:
+
 - ✅ All CSS variables preserved
 - ✅ @theme directive intact
 - ✅ @media queries for dark mode
@@ -185,6 +198,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 - ✅ No minification (readable output)
 
 **File Size**:
+
 - Unminified: ~11 KB
 - Gzipped: ~2 KB (typical CDN delivery)
 
@@ -206,6 +220,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 ```
 
 **Verification**:
+
 - ✅ Tokens accessible via `@tinybigui/tokens/tokens.css`
 - ✅ Package metadata accessible
 - ✅ No unintended exports
@@ -217,17 +232,15 @@ This task verified the complete Material Design 3 token system, ensured all toke
 ### NPM Package Contents
 
 **Files included in publish**:
+
 ```json
 {
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ]
+  "files": ["dist", "README.md", "LICENSE"]
 }
 ```
 
 **Verification**:
+
 - ✅ Only dist/ is published (not src/)
 - ✅ Package is small (~11 KB)
 - ✅ No unnecessary files
@@ -247,6 +260,7 @@ This task verified the complete Material Design 3 token system, ensured all toke
 ```
 
 **Verification**:
+
 - ✅ Import path correct
 - ✅ Will resolve in user's build
 - ✅ Bundlers will inline or copy CSS
@@ -258,11 +272,13 @@ This task verified the complete Material Design 3 token system, ensured all toke
 ### User Import Path
 
 **Expected user code**:
+
 ```typescript
 import "@tinybigui/react/styles.css";
 ```
 
 **Resolution chain**:
+
 1. Imports `@tinybigui/react/styles.css`
 2. Which imports `@tinybigui/tokens/tokens.css`
 3. Both packages installed in user's `node_modules`
@@ -282,16 +298,16 @@ import "@tinybigui/react/styles.css";
 :root {
   /* 1. Color Tokens (Light Mode) */
   --md-sys-color-*
-  
+
   /* 2. Typography Tokens */
   --md-sys-typescale-*
-  
+
   /* 3. Shape Tokens */
   --md-sys-shape-corner-*
-  
+
   /* 4. Elevation Tokens */
   --md-sys-elevation-level*
-  
+
   /* 5. Motion Tokens */
   --md-sys-motion-duration-*
   --md-sys-motion-easing-*
@@ -321,6 +337,7 @@ import "@tinybigui/react/styles.css";
 **Pattern**: `--md-sys-{category}-{name}-{variant}`
 
 **Examples**:
+
 - `--md-sys-color-primary`
 - `--md-sys-typescale-body-large-size`
 - `--md-sys-shape-corner-medium`
@@ -328,6 +345,7 @@ import "@tinybigui/react/styles.css";
 - `--md-sys-motion-duration-short2`
 
 **Verification**:
+
 - ✅ All tokens follow MD3 naming convention
 - ✅ Consistent prefix (`--md-sys-`)
 - ✅ Category clear (color, typescale, shape, etc.)
@@ -342,26 +360,31 @@ import "@tinybigui/react/styles.css";
 ### Specification Alignment
 
 **Color System**:
+
 - ✅ All 18 MD3 color roles present
 - ✅ Light and dark mode pairings correct
 - ✅ Contrast ratios meet WCAG AA minimum
 
 **Typography**:
+
 - ✅ Complete MD3 type scale (5 categories, 3 sizes each)
 - ✅ Size, line-height, weight, tracking specified
 - ✅ Values match MD3 specifications
 
 **Shape**:
+
 - ✅ All 7 MD3 corner sizes
 - ✅ Component mapping documented
 - ✅ Values match MD3 specifications
 
 **Elevation**:
+
 - ✅ 6 elevation levels (0-5)
 - ✅ Two-shadow system (key + ambient)
 - ✅ Shadow values match MD3
 
 **Motion**:
+
 - ✅ Duration scale (short, medium, long)
 - ✅ Easing curves match MD3
 - ✅ Values appropriate for each category
@@ -375,14 +398,17 @@ import "@tinybigui/react/styles.css";
 ### CSS Features Used
 
 **CSS Variables (Custom Properties)**:
+
 - Support: All modern browsers
 - IE11: ❌ Not supported (as intended)
 
 **@media (prefers-color-scheme)**:
+
 - Support: Safari 12.1+, Chrome 76+, Firefox 67+
 - Automatic dark mode detection
 
 **@theme Directive (Tailwind v4)**:
+
 - Requires Tailwind CSS v4
 - Processed at build time
 - No browser requirement
@@ -419,16 +445,19 @@ import "@tinybigui/react/styles.css";
 ### File Size Analysis
 
 **Source File** (`src/tokens.css`):
+
 - Unminified: ~11 KB
 - Lines: 288
 - Well-commented
 
 **Output File** (`dist/tokens.css`):
+
 - Identical to source (no processing)
 - Unminified: ~11 KB
 - Gzipped: ~2 KB
 
 **Impact on User's Bundle**:
+
 - Small footprint (2 KB gzipped)
 - One-time load (cached by browser)
 - No JavaScript overhead (pure CSS)
@@ -442,6 +471,7 @@ import "@tinybigui/react/styles.css";
 **Build Time**: ~50ms (milliseconds!)
 
 **Why so fast?**
+
 - Simple file copy operation
 - No compilation needed
 - No minification (yet)
@@ -459,7 +489,7 @@ import "@tinybigui/react/styles.css";
 
 ```javascript
 // Future: scripts/generate-tokens.js
-import { argbFromHex, themeFromSourceColor } from '@material/material-color-utilities';
+import { argbFromHex, themeFromSourceColor } from "@material/material-color-utilities";
 
 function generateTokens(seedColor) {
   const theme = themeFromSourceColor(argbFromHex(seedColor));
@@ -469,6 +499,7 @@ function generateTokens(seedColor) {
 ```
 
 **Benefits**:
+
 - Users can customize with single color
 - Guaranteed accessible contrast
 - Perfect light/dark pairings
@@ -481,8 +512,8 @@ function generateTokens(seedColor) {
 
 ```javascript
 // Future: Use PostCSS + cssnano
-import postcss from 'postcss';
-import cssnano from 'cssnano';
+import postcss from "postcss";
+import cssnano from "cssnano";
 
 async function minify(css) {
   const result = await postcss([cssnano]).process(css);
@@ -491,6 +522,7 @@ async function minify(css) {
 ```
 
 **Benefits**:
+
 - Smaller file size (~7 KB → ~5 KB)
 - Faster downloads
 - Production-optimized
@@ -512,6 +544,7 @@ async function minify(css) {
 ```
 
 **Usage**:
+
 ```typescript
 // User chooses theme
 import "@tinybigui/tokens/themes/blue.css";
@@ -525,15 +558,14 @@ import "@tinybigui/tokens/themes/blue.css";
 
 ```typescript
 // Future: dist/index.d.ts
-export type MDColorToken = 
-  | 'md-sys-color-primary'
-  | 'md-sys-color-secondary'
-  // ... all tokens
+export type MDColorToken = "md-sys-color-primary" | "md-sys-color-secondary";
+// ... all tokens
 
 export function getToken(token: MDColorToken): string;
 ```
 
 **Benefits**:
+
 - TypeScript autocomplete
 - Compile-time checks
 - Better DX
@@ -585,6 +617,7 @@ export function getToken(token: MDColorToken): string;
 ## 🎉 Part F Complete!
 
 **All Design Token Tasks Completed**:
+
 - ✅ Task 5.1 - Color tokens
 - ✅ Task 5.2 - Typography tokens
 - ✅ Task 5.3 - Elevation, shape, motion tokens
@@ -596,6 +629,7 @@ export function getToken(token: MDColorToken): string;
 ## 📊 Final Statistics
 
 **Total Tokens**: 145
+
 - 36 Color tokens (18 light + 18 dark)
 - 62 Typography tokens
 - 7 Shape tokens
@@ -628,4 +662,3 @@ The complete Material Design 3 token system is verified, tested, and production-
 **What's Next**: Part G - Core Utilities (Tasks 6.1-6.3)
 
 All design tokens are now ready to power our component library! 🚀
-

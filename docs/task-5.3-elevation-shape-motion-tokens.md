@@ -17,6 +17,7 @@ This task reviewed, validated, and documented the remaining Material Design 3 to
 ### File Modified: `packages/tokens/src/tokens.css`
 
 **Changes:**
+
 - Updated comments from "Placeholder" to proper descriptions
 - Verified all token values match MD3 specifications
 - No token values changed (already correct)
@@ -32,28 +33,28 @@ Material Design 3 uses 7 corner radius values to create consistent, harmonious s
 ### All Shape Tokens
 
 ```css
---md-sys-shape-corner-none: 0;                  /* 0px - Sharp corners */
---md-sys-shape-corner-extra-small: 0.25rem;     /* 4px */
---md-sys-shape-corner-small: 0.5rem;            /* 8px */
---md-sys-shape-corner-medium: 0.75rem;          /* 12px */
---md-sys-shape-corner-large: 1rem;              /* 16px */
---md-sys-shape-corner-extra-large: 1.75rem;     /* 28px */
---md-sys-shape-corner-full: 624.9375rem;        /* ~9999px - Fully rounded */
+--md-sys-shape-corner-none: 0; /* 0px - Sharp corners */
+--md-sys-shape-corner-extra-small: 0.25rem; /* 4px */
+--md-sys-shape-corner-small: 0.5rem; /* 8px */
+--md-sys-shape-corner-medium: 0.75rem; /* 12px */
+--md-sys-shape-corner-large: 1rem; /* 16px */
+--md-sys-shape-corner-extra-large: 1.75rem; /* 28px */
+--md-sys-shape-corner-full: 624.9375rem; /* ~9999px - Fully rounded */
 ```
 
 ---
 
 ### Shape Scale Reference
 
-| Token | Size | Rem | Use Cases |
-|-------|------|-----|-----------|
-| **None** | 0px | 0 | Text fields, dividers, alerts |
-| **Extra Small** | 4px | 0.25rem | Small chips, badges |
-| **Small** | 8px | 0.5rem | Buttons, chips, cards (default) |
-| **Medium** | 12px | 0.75rem | Cards, dialogs, sheets |
-| **Large** | 16px | 1rem | FABs, navigation elements |
-| **Extra Large** | 28px | 1.75rem | Large dialogs, bottom sheets |
-| **Full** | ~9999px | 624.9375rem | Pills, fully rounded elements |
+| Token           | Size    | Rem         | Use Cases                       |
+| --------------- | ------- | ----------- | ------------------------------- |
+| **None**        | 0px     | 0           | Text fields, dividers, alerts   |
+| **Extra Small** | 4px     | 0.25rem     | Small chips, badges             |
+| **Small**       | 8px     | 0.5rem      | Buttons, chips, cards (default) |
+| **Medium**      | 12px    | 0.75rem     | Cards, dialogs, sheets          |
+| **Large**       | 16px    | 1rem        | FABs, navigation elements       |
+| **Extra Large** | 28px    | 1.75rem     | Large dialogs, bottom sheets    |
+| **Full**        | ~9999px | 624.9375rem | Pills, fully rounded elements   |
 
 ---
 
@@ -62,11 +63,13 @@ Material Design 3 uses 7 corner radius values to create consistent, harmonious s
 **MD3 specifies which corner radius to use for each component:**
 
 #### Extra Small (4px)
+
 - Small badges
 - Tiny chips
 - Compact elements
 
 #### Small (8px) - Most Common
+
 - Filled buttons
 - Outlined buttons
 - Text buttons
@@ -75,6 +78,7 @@ Material Design 3 uses 7 corner radius values to create consistent, harmonious s
 - Snackbars
 
 #### Medium (12px)
+
 - Cards
 - Elevated cards
 - Outlined cards
@@ -82,18 +86,21 @@ Material Design 3 uses 7 corner radius values to create consistent, harmonious s
 - Bottom navigation
 
 #### Large (16px)
+
 - FABs (Floating Action Buttons)
 - Extended FABs
 - Navigation drawer
 - Navigation rail
 
 #### Extra Large (28px)
+
 - Modal dialogs
 - Full-screen dialogs
 - Bottom sheets
 - Side sheets
 
 #### Full (Pill shape)
+
 - Filter chips (selected state)
 - Suggestion chips
 - Toggle buttons (pill style)
@@ -107,19 +114,19 @@ Material Design 3 uses 7 corner radius values to create consistent, harmonious s
 
 ```css
 .button {
-  border-radius: var(--md-sys-shape-corner-small);  /* 8px */
+  border-radius: var(--md-sys-shape-corner-small); /* 8px */
 }
 
 .card {
-  border-radius: var(--md-sys-shape-corner-medium);  /* 12px */
+  border-radius: var(--md-sys-shape-corner-medium); /* 12px */
 }
 
 .fab {
-  border-radius: var(--md-sys-shape-corner-large);  /* 16px */
+  border-radius: var(--md-sys-shape-corner-large); /* 16px */
 }
 
 .chip {
-  border-radius: var(--md-sys-shape-corner-full);  /* Pill shape */
+  border-radius: var(--md-sys-shape-corner-full); /* Pill shape */
 }
 ```
 
@@ -153,23 +160,25 @@ Material Design 3 uses 7 corner radius values to create consistent, harmonious s
 4. **Compatibility:** Works reliably across browsers
 
 **How it works:**
+
 ```css
 /* Element with width: 56px, height: 56px */
-border-radius: 624.9375rem;  /* = 9999px */
+border-radius: 624.9375rem; /* = 9999px */
 /* Result: Perfect circle (radius exceeds half the element size) */
 ```
 
 **Why not 50%?**
+
 ```css
 /* 50% only works for perfect squares */
 width: 56px;
 height: 56px;
-border-radius: 50%;  /* ✅ Circle */
+border-radius: 50%; /* ✅ Circle */
 
 /* Breaks for rectangles */
 width: 100px;
 height: 40px;
-border-radius: 50%;  /* ❌ Ellipse, not pill */
+border-radius: 50%; /* ❌ Ellipse, not pill */
 ```
 
 ---
@@ -185,39 +194,29 @@ Material Design 3 uses 6 elevation levels (0-5) to create depth and hierarchy th
 ```css
 --md-sys-elevation-level0: none;
 
---md-sys-elevation-level1: 
-  0 1px 2px 0 rgba(0, 0, 0, 0.3),
-  0 1px 3px 1px rgba(0, 0, 0, 0.15);
+--md-sys-elevation-level1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
 
---md-sys-elevation-level2: 
-  0 1px 2px 0 rgba(0, 0, 0, 0.3),
-  0 2px 6px 2px rgba(0, 0, 0, 0.15);
+--md-sys-elevation-level2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
 
---md-sys-elevation-level3: 
-  0 1px 3px 0 rgba(0, 0, 0, 0.3),
-  0 4px 8px 3px rgba(0, 0, 0, 0.15);
+--md-sys-elevation-level3: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
 
---md-sys-elevation-level4: 
-  0 2px 3px 0 rgba(0, 0, 0, 0.3),
-  0 6px 10px 4px rgba(0, 0, 0, 0.15);
+--md-sys-elevation-level4: 0 2px 3px 0 rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
 
---md-sys-elevation-level5: 
-  0 4px 4px 0 rgba(0, 0, 0, 0.3),
-  0 8px 12px 6px rgba(0, 0, 0, 0.15);
+--md-sys-elevation-level5: 0 4px 4px 0 rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
 ```
 
 ---
 
 ### Elevation Scale Reference
 
-| Level | Shadow Depth | Use Cases |
-|-------|-------------|-----------|
-| **Level 0** | None | Filled buttons, app bars, surfaces flush with background |
-| **Level 1** | Subtle | Cards at rest, contained buttons (hover) |
-| **Level 2** | Moderate | Hovered cards, search bars |
-| **Level 3** | Elevated | FABs at rest, dropdown menus, tooltips |
-| **Level 4** | High | Navigation drawer, side sheets |
-| **Level 5** | Highest | Modal dialogs, bottom sheets (max elevation) |
+| Level       | Shadow Depth | Use Cases                                                |
+| ----------- | ------------ | -------------------------------------------------------- |
+| **Level 0** | None         | Filled buttons, app bars, surfaces flush with background |
+| **Level 1** | Subtle       | Cards at rest, contained buttons (hover)                 |
+| **Level 2** | Moderate     | Hovered cards, search bars                               |
+| **Level 3** | Elevated     | FABs at rest, dropdown menus, tooltips                   |
+| **Level 4** | High         | Navigation drawer, side sheets                           |
+| **Level 5** | Highest      | Modal dialogs, bottom sheets (max elevation)             |
 
 ---
 
@@ -236,15 +235,16 @@ Each elevation (except 0) uses **two shadows**:
    - Simulates scattered light
 
 **Example (Level 1):**
+
 ```css
 box-shadow:
   /* Key light */
   0 1px 2px 0 rgba(0, 0, 0, 0.3),
-  /* Ambient light */
-  0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  /* Ambient light */ 0 1px 3px 1px rgba(0, 0, 0, 0.15);
 ```
 
 **Why two shadows?**
+
 - ✅ More realistic depth perception
 - ✅ Matches physical lighting
 - ✅ Better visual hierarchy
@@ -254,34 +254,40 @@ box-shadow:
 ### Component Elevation Mapping
 
 #### Level 0 (No Shadow)
+
 - Filled buttons (surface level)
 - Top app bar
 - Bottom app bar
 - Background surfaces
 
 #### Level 1 (Subtle)
+
 - Elevated buttons (rest state)
 - Cards (rest state)
 - Chips
 - Outlined text fields
 
 #### Level 2 (Moderate)
+
 - Cards (hover state)
 - Contained buttons (hover state)
 - Dropdown menus (closed)
 
 #### Level 3 (Elevated)
+
 - FAB (rest state)
 - Dropdown menus (open)
 - Tooltips
 - Autocomplete suggestions
 
 #### Level 4 (High)
+
 - Navigation drawer (permanent)
 - Modal navigation drawer
 - Standard side sheet
 
 #### Level 5 (Highest)
+
 - Modal dialog
 - Modal bottom sheet
 - Snackbar (temporary)
@@ -348,16 +354,19 @@ function Card({ elevation = 1, children }) {
 ### Elevation Best Practices
 
 **1. Hierarchy**
+
 - Higher elevation = closer to user
 - Use sparingly (max 2-3 levels per screen)
 - Modals should always be highest
 
 **2. Interactions**
+
 - Increase elevation on hover/focus
 - Decrease on press (feels like pushing down)
 - Animate transitions smoothly
 
 **3. Accessibility**
+
 - Don't rely solely on shadows for information
 - Use color, borders, or other cues too
 - Some users have low contrast vision
@@ -415,7 +424,9 @@ Material Design 3 defines standardized durations and easing curves for consisten
 ### Duration Guidelines
 
 #### Short (50-200ms)
+
 **Use for:**
+
 - Icon state changes
 - Checkbox/radio toggles
 - Small scale changes
@@ -423,22 +434,26 @@ Material Design 3 defines standardized durations and easing curves for consisten
 - Opacity fades (subtle)
 
 **Why short?**
+
 - Instant feedback
 - Doesn't slow interaction
 - User barely perceives animation
 
 **Example:**
+
 ```css
 .icon {
   transition: transform var(--md-sys-motion-duration-short2);
 }
 .icon:hover {
-  transform: scale(1.1);  /* Quick scale */
+  transform: scale(1.1); /* Quick scale */
 }
 ```
 
 #### Medium (250-400ms)
+
 **Use for:**
+
 - Component state changes
 - Elevation changes
 - Expanding/collapsing content
@@ -446,21 +461,25 @@ Material Design 3 defines standardized durations and easing curves for consisten
 - Focus indicators
 
 **Why medium?**
+
 - Polished feel
 - Clear visual feedback
 - Not too slow or fast
 
 **Example:**
+
 ```css
 .button {
-  transition: 
+  transition:
     box-shadow var(--md-sys-motion-duration-medium2),
     background-color var(--md-sys-motion-duration-medium1);
 }
 ```
 
 #### Long (450-600ms)
+
 **Use for:**
+
 - Page transitions
 - Complex animations
 - Multiple property changes
@@ -468,14 +487,16 @@ Material Design 3 defines standardized durations and easing curves for consisten
 - Modal appearances
 
 **Why long?**
+
 - Time for user to follow motion
 - Complex choreography
 - Theatrical effect
 
 **Example:**
+
 ```css
 .dialog {
-  transition: 
+  transition:
     opacity var(--md-sys-motion-duration-long2),
     transform var(--md-sys-motion-duration-long2);
 }
@@ -486,21 +507,25 @@ Material Design 3 defines standardized durations and easing curves for consisten
 ### Easing Curves Explained
 
 #### Standard Easing
+
 ```css
 cubic-bezier(0.2, 0, 0, 1)
 ```
 
 **Characteristics:**
+
 - Starts slow, ends fast
 - Most common curve
 - Natural, comfortable
 
 **Use for:**
+
 - 90% of transitions
 - General purpose
 - Hover states, color changes, opacity
 
 **Example:**
+
 ```css
 .card {
   transition: background-color 250ms var(--md-sys-motion-easing-standard);
@@ -508,6 +533,7 @@ cubic-bezier(0.2, 0, 0, 1)
 ```
 
 #### Emphasized Easing
+
 ```css
 cubic-bezier(0.2, 0, 0, 1)
 ```
@@ -515,37 +541,44 @@ cubic-bezier(0.2, 0, 0, 1)
 **Note:** Same as standard in our implementation.
 
 **MD3 Intent:**
+
 - Important transitions
 - Draw attention
 - Expressive motion
 
 **Use for:**
+
 - Key interactions
 - Primary actions
 - Important state changes
 
 #### Emphasized Decelerate
+
 ```css
 cubic-bezier(0.05, 0.7, 0.1, 1)
 ```
 
 **Characteristics:**
+
 - Starts very fast
 - Ends slowly (decelerates)
 - Element "settles in"
 
 **Use for:**
+
 - Elements **entering** the screen
 - Dialogs appearing
 - Sheets sliding in
 - Menus expanding
 
 **Why?**
+
 - Draws attention immediately
 - Smooth landing
 - Natural settle
 
 **Example:**
+
 ```css
 .modal-enter {
   animation: slideIn 300ms var(--md-sys-motion-easing-emphasized-decelerate);
@@ -564,27 +597,32 @@ cubic-bezier(0.05, 0.7, 0.1, 1)
 ```
 
 #### Emphasized Accelerate
+
 ```css
 cubic-bezier(0.3, 0, 0.8, 0.15)
 ```
 
 **Characteristics:**
+
 - Starts slowly
 - Ends very fast (accelerates)
 - Element "shoots away"
 
 **Use for:**
+
 - Elements **leaving** the screen
 - Dialogs dismissing
 - Sheets sliding out
 - Menus collapsing
 
 **Why?**
+
 - Quick exit
 - Doesn't linger
 - Efficient feel
 
 **Example:**
+
 ```css
 .modal-exit {
   animation: slideOut 200ms var(--md-sys-motion-easing-emphasized-accelerate);
@@ -613,11 +651,10 @@ cubic-bezier(0.3, 0, 0.8, 0.15)
   background-color: var(--md-sys-color-primary);
   box-shadow: var(--md-sys-elevation-level1);
   border-radius: var(--md-sys-shape-corner-small);
-  
+
   transition-property: background-color, box-shadow, transform;
-  transition-duration: 
-    var(--md-sys-motion-duration-short2),
-    var(--md-sys-motion-duration-medium1),
+  transition-duration:
+    var(--md-sys-motion-duration-short2), var(--md-sys-motion-duration-medium1),
     var(--md-sys-motion-duration-short2);
   transition-timing-function: var(--md-sys-motion-easing-standard);
 }
@@ -637,7 +674,7 @@ cubic-bezier(0.3, 0, 0.8, 0.15)
 
 ```tsx
 // React component with Framer Motion
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 function Modal({ isOpen, onClose, children }) {
   return (
@@ -650,45 +687,45 @@ function Modal({ isOpen, onClose, children }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{
-              duration: 0.3,  // 300ms
-              ease: [0.2, 0, 0, 1],  // Standard easing
+              duration: 0.3, // 300ms
+              ease: [0.2, 0, 0, 1], // Standard easing
             }}
             onClick={onClose}
             style={{
-              position: 'fixed',
+              position: "fixed",
               inset: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
             }}
           />
-          
+
           {/* Dialog */}
           <motion.div
-            initial={{ 
-              opacity: 0, 
+            initial={{
+              opacity: 0,
               scale: 0.8,
               y: 50,
             }}
-            animate={{ 
-              opacity: 1, 
+            animate={{
+              opacity: 1,
               scale: 1,
               y: 0,
             }}
-            exit={{ 
-              opacity: 0, 
+            exit={{
+              opacity: 0,
               scale: 0.8,
               y: 50,
             }}
             transition={{
-              duration: 0.3,  // 300ms
-              ease: [0.05, 0.7, 0.1, 1],  // Emphasized decelerate (enter)
+              duration: 0.3, // 300ms
+              ease: [0.05, 0.7, 0.1, 1], // Emphasized decelerate (enter)
             }}
             style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              boxShadow: 'var(--md-sys-elevation-level5)',
-              borderRadius: 'var(--md-sys-shape-corner-extra-large)',
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              boxShadow: "var(--md-sys-elevation-level5)",
+              borderRadius: "var(--md-sys-shape-corner-extra-large)",
             }}
           >
             {children}
@@ -705,14 +742,17 @@ function Modal({ isOpen, onClose, children }) {
 ## 🎯 Complete Token Summary
 
 ### Shape Tokens: 7 values
+
 - Corner radius from none (0) to full (pill)
 - Consistent component mapping
 
 ### Elevation Tokens: 6 levels
+
 - Box shadows for depth (0-5)
 - Two-shadow system (key + ambient)
 
 ### Motion Tokens: 16 values
+
 - 12 durations (short, medium, long)
 - 4 easing curves (standard, emphasized variants)
 
@@ -728,7 +768,7 @@ function Modal({ isOpen, onClose, children }) {
 ✅ **MD3 compliant** - All values match specifications  
 ✅ **Production-ready** - Can be used immediately  
 ✅ **Well-documented** - Usage examples and guidelines  
-✅ **Accessible** - Follows best practices  
+✅ **Accessible** - Follows best practices
 
 ---
 
@@ -755,8 +795,8 @@ function Modal({ isOpen, onClose, children }) {
 Shape, elevation, and motion tokens are verified, documented, and ready for use! 🎨
 
 **Summary:**
+
 - **Verified**: All 29 tokens match MD3 specifications
 - **Updated**: Comments from "Placeholder" to proper descriptions
 - **Documented**: Complete usage guide with examples
 - **File Modified**: `packages/tokens/src/tokens.css` (comments only)
-

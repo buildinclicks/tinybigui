@@ -5,19 +5,24 @@ Welcome to the TinyBigUI strategy documentation! This folder contains all strate
 ## 📚 Documents Overview
 
 ### 🎯 [Overview](./00-overview.md)
+
 High-level overview of the project vision, principles, and decisions made.
 
 **Read this first** to understand the project's goals and philosophy.
 
 ### 🛠️ [Tech Stack](./01-tech-stack.md)
+
 Complete technology decisions including:
+
 - Core dependencies (React Aria, CVA, Tailwind)
 - Development tools (tsup, Vitest, Storybook)
 - Build configuration
 - Performance considerations
 
 ### 🏗️ [Architecture](./02-architecture.md)
+
 Code organization and patterns:
+
 - Three-layer architecture (Styled → Headless → React Aria)
 - Project structure
 - Component templates
@@ -25,14 +30,18 @@ Code organization and patterns:
 - Tree-shaking strategy
 
 ### 🎨 [Design System](./03-design-system.md)
+
 Material Design 3 implementation:
+
 - Design tokens (color, typography, elevation, shape, motion)
 - Component roadmap by phase
 - Theming strategy
 - MD3 interactions (state layers, ripple)
 
 ### ♿ [Accessibility](./04-accessibility.md)
+
 Accessibility-first approach:
+
 - WCAG 2.1 AA compliance
 - React Aria integration
 - Keyboard navigation
@@ -40,7 +49,9 @@ Accessibility-first approach:
 - Testing strategy
 
 ### 📦 [Distribution](./05-distribution.md)
+
 Packaging and publishing:
+
 - Single package with tree-shaking
 - NPM configuration
 - Installation guide
@@ -48,21 +59,27 @@ Packaging and publishing:
 - Versioning strategy
 
 ### 📖 [Documentation](./06-documentation.md)
+
 Documentation approach:
+
 - Storybook setup
 - Component documentation standards
 - Story templates
 - Visual design documentation
 
 ### 📅 [Roadmap](./07-roadmap.md)
+
 Development timeline:
+
 - 6 phases from foundation to v1.0.0
 - Component priorities
 - Milestone targets
 - 18-week timeline
 
 ### 🤝 [Contribution](./08-contribution.md)
+
 Open source guidelines:
+
 - How to contribute
 - Coding standards
 - Code review process
@@ -70,19 +87,24 @@ Open source guidelines:
 - MIT license
 
 ### ⚡ [Quick Reference](./09-quick-reference.md)
+
 **One-page summary** of all decisions.
 
 **Read this for a quick overview** of the entire strategy.
 
 ### 🤖 [Cursor Rules](./10-cursor-rules.md)
+
 Cursor AI coding guidelines:
+
 - TypeScript and React patterns
 - Material Design 3 implementation rules
 - Component development checklist
 - Forbidden and required patterns
 
 ### 🔄 [Tailwind v4 Migration](./11-tailwind-v4-migration.md)
+
 Comprehensive summary of Tailwind v4 decisions:
+
 - What changed from v3 to v4
 - Token strategy (CSS-first approach)
 - Updated package structure
@@ -117,18 +139,18 @@ Comprehensive summary of Tailwind v4 decisions:
 
 ## 🎯 Core Decisions Summary
 
-| Decision | Choice | Document |
-|----------|--------|----------|
-| **Design System** | Material Design 3 (strict) | [Design System](./03-design-system.md) |
-| **Framework** | React 18+ with RSC support | [Tech Stack](./01-tech-stack.md) |
-| **Styling** | Tailwind v4 + CVA | [Tech Stack](./01-tech-stack.md) |
-| **Accessibility** | React Aria foundation | [Accessibility](./04-accessibility.md) |
-| **Architecture** | Headless + Styled layers | [Architecture](./02-architecture.md) |
-| **Distribution** | `@tinybigui/react` + `@tinybigui/tokens` | [Distribution](./05-distribution.md) |
-| **Documentation** | Storybook (Next.js primary) | [Documentation](./06-documentation.md) |
-| **Testing** | Vitest + RTL + Playwright | [Tech Stack](./01-tech-stack.md) |
-| **License** | MIT | [Contribution](./08-contribution.md) |
-| **Target Audience** | Enterprise + Indie devs | [Overview](./00-overview.md) |
+| Decision            | Choice                                   | Document                               |
+| ------------------- | ---------------------------------------- | -------------------------------------- |
+| **Design System**   | Material Design 3 (strict)               | [Design System](./03-design-system.md) |
+| **Framework**       | React 18+ with RSC support               | [Tech Stack](./01-tech-stack.md)       |
+| **Styling**         | Tailwind v4 + CVA                        | [Tech Stack](./01-tech-stack.md)       |
+| **Accessibility**   | React Aria foundation                    | [Accessibility](./04-accessibility.md) |
+| **Architecture**    | Headless + Styled layers                 | [Architecture](./02-architecture.md)   |
+| **Distribution**    | `@tinybigui/react` + `@tinybigui/tokens` | [Distribution](./05-distribution.md)   |
+| **Documentation**   | Storybook (Next.js primary)              | [Documentation](./06-documentation.md) |
+| **Testing**         | Vitest + RTL + Playwright                | [Tech Stack](./01-tech-stack.md)       |
+| **License**         | MIT                                      | [Contribution](./08-contribution.md)   |
+| **Target Audience** | Enterprise + Indie devs                  | [Overview](./00-overview.md)           |
 
 ---
 
@@ -200,4 +222,3 @@ If anything is unclear:
 - Ask in our community channels (coming soon)
 
 Let's build something amazing! 🎨✨
-

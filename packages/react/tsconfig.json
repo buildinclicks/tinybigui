@@ -4,12 +4,18 @@
     /* Output */
     "outDir": "./dist",
     "rootDir": "./src",
-    
+
     /* Emit */
     "emitDeclarationOnly": false,
     "declarationDir": "./dist"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
 }
-

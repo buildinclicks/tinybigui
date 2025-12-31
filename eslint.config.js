@@ -206,12 +206,7 @@ export default [
 
   // Test files
   {
-    files: [
-      "**/*.test.{ts,tsx}",
-      "**/*.spec.{ts,tsx}",
-      "**/test/**/*.{ts,tsx}",
-      "**/test/**/*.ts",
-    ],
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/test/**/*.{ts,tsx}", "**/test/**/*.ts"],
     rules: {
       // Allow non-null assertions in tests
       "@typescript-eslint/no-non-null-assertion": "off",

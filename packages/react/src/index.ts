@@ -38,8 +38,7 @@ export {
   type MD3TypographyStyle,
   type TypographyProperty,
   type TypographyStyleObject,
-} from './utils';
+} from "./utils";
 
 // Components will be exported here as they're built
 // export { Button } from './components/Button';
-

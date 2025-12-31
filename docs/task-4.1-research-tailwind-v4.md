@@ -18,9 +18,10 @@ This task involved researching Tailwind CSS v4 to understand its new features, b
 
 **Current Version**: Tailwind CSS v4.1.18 (as of December 2025)  
 **Status**: Stable release  
-**Release Date**: 2024 (official v4.0)  
+**Release Date**: 2024 (official v4.0)
 
 **Major changes from v3:**
+
 - Complete rewrite with new engine (Lightning CSS / Oxide)
 - CSS-first configuration approach
 - Better performance
@@ -36,22 +37,24 @@ This task involved researching Tailwind CSS v4 to understand its new features, b
 **Biggest paradigm shift from v3.**
 
 #### Tailwind v3 Approach (JavaScript-based):
+
 ```javascript
 // tailwind.config.js
 module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#6750a4',
-        secondary: '#625b71',
-      }
-    }
+        primary: "#6750a4",
+        secondary: "#625b71",
+      },
+    },
   },
-  content: ['./src/**/*.{js,ts,jsx,tsx}'],
-}
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+};
 ```
 
 #### Tailwind v4 Approach (CSS-based):
+
 ```css
 /* app.css */
 @import "tailwindcss";
@@ -63,6 +66,7 @@ module.exports = {
 ```
 
 **Benefits of CSS-first:**
+
 - ✅ No build-time JavaScript configuration
 - ✅ Direct CSS variable integration
 - ✅ Runtime theme switching possible
@@ -77,6 +81,7 @@ module.exports = {
 **New way to customize Tailwind's design system.**
 
 **Syntax:**
+
 ```css
 @theme {
   /* Define custom design tokens */
@@ -88,6 +93,7 @@ module.exports = {
 ```
 
 **Example with our MD3 tokens:**
+
 ```css
 @theme {
   /* Map MD3 color tokens to Tailwind utilities */
@@ -95,13 +101,14 @@ module.exports = {
   --color-on-primary: var(--md-sys-color-on-primary);
   --color-secondary: var(--md-sys-color-secondary);
   --color-surface: var(--md-sys-color-surface);
-  
+
   /* Make them available as Tailwind classes */
   /* Now users can use: bg-primary, text-on-primary, etc. */
 }
 ```
 
 **How it works:**
+
 1. Define CSS variables in `:root` (our MD3 tokens)
 2. Reference them in `@theme` directive
 3. Tailwind generates utility classes
@@ -114,17 +121,19 @@ module.exports = {
 **v4 auto-detects source files in most setups.**
 
 #### Tailwind v3:
+
 ```javascript
 // Required manual configuration
 module.exports = {
   content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/some-library/**/*.js',  // Manual!
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/some-library/**/*.js", // Manual!
   ],
-}
+};
 ```
 
 #### Tailwind v4:
+
 ```css
 /* No content configuration needed in most cases */
 @import "tailwindcss";
@@ -137,11 +146,13 @@ module.exports = {
 ```
 
 **When manual config is still needed:**
+
 - Monorepo with custom structure
 - Non-standard file locations
 - Externally-linked packages
 
 **Our approach:**
+
 - Document the happy path (no manual config)
 - Provide troubleshooting for edge cases
 - Don't prescribe specific `content:` patterns
@@ -153,18 +164,21 @@ module.exports = {
 **Complete rewrite of Tailwind's core.**
 
 **Performance improvements:**
+
 - ⚡ **10-20x faster** than v3
 - ⚡ Rust-based compilation
 - ⚡ Better caching
 - ⚡ Incremental builds
 
 **Example build times:**
+
 ```
 Tailwind v3: 2.5s
 Tailwind v4: 200ms (12.5x faster!)
 ```
 
 **For our library:**
+
 - Users get faster builds
 - Development experience improves
 - Hot reload is snappier
@@ -176,6 +190,7 @@ Tailwind v4: 200ms (12.5x faster!)
 **v4 leverages cutting-edge CSS.**
 
 **Features used:**
+
 - Container queries
 - CSS cascade layers
 - Native CSS nesting
@@ -191,6 +206,7 @@ Tailwind v4: 200ms (12.5x faster!)
 | Edge | 111+ |
 
 **Impact:**
+
 - ✅ Better performance (native features)
 - ✅ Smaller bundles (no polyfills)
 - ✅ Cleaner generated CSS
@@ -203,6 +219,7 @@ Tailwind v4: 200ms (12.5x faster!)
 **v4 streamlines the PostCSS integration.**
 
 #### Tailwind v3:
+
 ```javascript
 // postcss.config.js
 module.exports = {
@@ -210,17 +227,18 @@ module.exports = {
     tailwindcss: {},
     autoprefixer: {},
   },
-}
+};
 ```
 
 #### Tailwind v4:
+
 ```javascript
 // postcss.config.js (optional)
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},  // Single plugin!
+    "@tailwindcss/postcss": {}, // Single plugin!
   },
-}
+};
 ```
 
 **Or even simpler - many frameworks auto-detect!**
@@ -232,11 +250,13 @@ module.exports = {
 ### 1. No More JavaScript Config (by default)
 
 **What changed:**
+
 - `tailwind.config.js` is optional
 - Most configuration now in CSS
 - JavaScript config only for advanced cases
 
 **Impact on our library:**
+
 - ✅ We don't ship `tailwind.preset.js`
 - ✅ We use CSS-first tokens instead
 - ✅ Users have less configuration
@@ -248,6 +268,7 @@ module.exports = {
 **v3 plugins don't work in v4 without updates.**
 
 **For us:**
+
 - We're not creating Tailwind plugins (yet)
 - If we do, we'll use v4 plugin API
 - Not a blocking issue
@@ -259,11 +280,13 @@ module.exports = {
 **Minor naming/behavior changes.**
 
 **Examples:**
+
 - Some color modifiers changed
 - Arbitrary value syntax refined
 - Container queries added
 
 **For us:**
+
 - Test thoroughly
 - Document any gotchas
 - Provide migration guide if needed
@@ -277,21 +300,25 @@ module.exports = {
 **Rationale:**
 
 **1. Clean Slate**
+
 - ✅ New project, no legacy burden
 - ✅ No need to support v3 + v4 simultaneously
 - ✅ Simpler codebase
 
 **2. Modern Approach**
+
 - ✅ CSS-first aligns with our token strategy
 - ✅ Material Design 3 uses CSS variables
 - ✅ Better integration
 
 **3. Better DX**
+
 - ✅ Faster builds for users
 - ✅ Simpler setup
 - ✅ Less configuration
 
 **4. Future-Proof**
+
 - ✅ v4 is the future of Tailwind
 - ✅ Community will move to v4
 - ✅ We're ahead of the curve
@@ -324,6 +351,7 @@ module.exports = {
 ```
 
 **Result for users:**
+
 ```tsx
 // They can use Tailwind utilities with MD3 semantics!
 <button className="bg-primary text-on-primary">
@@ -355,6 +383,7 @@ module.exports = {
 ```
 
 **User imports:**
+
 ```typescript
 // Single import gets everything:
 import "@tinybigui/react/styles.css";
@@ -377,16 +406,18 @@ import "@tinybigui/react/styles.css";
 ```
 
 **Why `^4.0.0` (not `^4.1.0`):**
+
 - ✅ Support all v4.x versions
 - ✅ No breaking changes expected in minor versions
 - ✅ Users can use latest (4.1.18+)
 
 **No dual support:**
+
 ```json
 // We DON'T do this:
 {
   "peerDependencies": {
-    "tailwindcss": "^3.4.0 || ^4.0.0"  // ❌ Too complex
+    "tailwindcss": "^3.4.0 || ^4.0.0" // ❌ Too complex
   }
 }
 ```
@@ -397,14 +428,15 @@ import "@tinybigui/react/styles.css";
 
 **Tailwind v4's modern baseline:**
 
-| Browser | Minimum Version | Released | Market Share |
-|---------|----------------|----------|--------------|
-| Safari | 16.4+ | March 2023 | ~90% of Safari users |
-| Chrome | 111+ | March 2023 | ~95% of Chrome users |
-| Firefox | 128+ | July 2024 | ~90% of Firefox users |
-| Edge | 111+ | March 2023 | ~95% of Edge users |
+| Browser | Minimum Version | Released   | Market Share          |
+| ------- | --------------- | ---------- | --------------------- |
+| Safari  | 16.4+           | March 2023 | ~90% of Safari users  |
+| Chrome  | 111+            | March 2023 | ~95% of Chrome users  |
+| Firefox | 128+            | July 2024  | ~90% of Firefox users |
+| Edge    | 111+            | March 2023 | ~95% of Edge users    |
 
 **What this means:**
+
 - ✅ Modern CSS features work natively
 - ✅ Better performance (no polyfills)
 - ✅ Smaller bundles
@@ -412,6 +444,7 @@ import "@tinybigui/react/styles.css";
 - ❌ IE11 not supported (already dead)
 
 **For our library:**
+
 - Aligns with our ES2022 target
 - Matches our Node 18+ requirement
 - Consistent modern baseline
@@ -425,12 +458,14 @@ import "@tinybigui/react/styles.css";
 ### Primary: Next.js (App Router)
 
 **Why:**
+
 - Most popular React framework
 - Best RSC (React Server Components) support
 - Tailwind v4 works great with App Router
 - Most users will use this
 
 **Example we'll document:**
+
 ```typescript
 // app/layout.tsx
 import "@tinybigui/react/styles.css";
@@ -443,12 +478,14 @@ export default function RootLayout({ children }) {
 ### Secondary: Vite (React)
 
 **Why:**
+
 - Fast development
 - Popular for SPAs
 - Great Tailwind v4 support
 - Simpler than Next.js
 
 **Example we'll document:**
+
 ```typescript
 // src/main.tsx
 import "@tinybigui/react/styles.css";
@@ -465,12 +502,14 @@ createRoot(document.getElementById("root")!).render(<App />);
 Based on this research, we need to:
 
 ### ✅ Already Done:
+
 - [x] Updated strategy docs for v4
 - [x] Decided on CSS-first approach
 - [x] Set `tailwindcss: ^4.0.0` as peer dependency
 - [x] Defined browser baseline
 
 ### ⬜ Next Steps (Task 4.2):
+
 - [ ] Create Tailwind v4 configuration
 - [ ] Integrate `@theme` directive in tokens package
 - [ ] Map MD3 tokens to Tailwind utilities
@@ -484,15 +523,15 @@ Based on this research, we need to:
 
 ### Quick Comparison Table
 
-| Aspect | Tailwind v3 | Tailwind v4 |
-|--------|-------------|-------------|
-| **Configuration** | JavaScript | CSS-first |
-| **Theme** | `theme.extend` in JS | `@theme` directive |
-| **Content** | Manual config | Auto-detected |
-| **Engine** | JavaScript | Lightning CSS (Rust) |
-| **Speed** | Baseline | 10-20x faster |
-| **PostCSS** | Multiple plugins | Single plugin |
-| **CSS Variables** | Optional | First-class |
+| Aspect              | Tailwind v3            | Tailwind v4          |
+| ------------------- | ---------------------- | -------------------- |
+| **Configuration**   | JavaScript             | CSS-first            |
+| **Theme**           | `theme.extend` in JS   | `@theme` directive   |
+| **Content**         | Manual config          | Auto-detected        |
+| **Engine**          | JavaScript             | Lightning CSS (Rust) |
+| **Speed**           | Baseline               | 10-20x faster        |
+| **PostCSS**         | Multiple plugins       | Single plugin        |
+| **CSS Variables**   | Optional               | First-class          |
 | **Browser Support** | IE11+ (with polyfills) | Modern browsers only |
 
 ---
@@ -502,6 +541,7 @@ Based on this research, we need to:
 ### 1. CSS-First is the Future
 
 Tailwind v4's CSS-first approach is a game-changer:
+
 - Simpler for users
 - Better runtime flexibility
 - Natural fit for design tokens
@@ -510,6 +550,7 @@ Tailwind v4's CSS-first approach is a game-changer:
 ### 2. Performance Matters
 
 The 10-20x speed improvement is significant:
+
 - Better developer experience
 - Faster CI/CD pipelines
 - Happier users
@@ -517,6 +558,7 @@ The 10-20x speed improvement is significant:
 ### 3. Modern Web is Here
 
 v4's modern baseline is the right call:
+
 - Old browsers are dying
 - Modern features are better
 - No need for legacy support
@@ -585,6 +627,7 @@ v4's modern baseline is the right call:
 Research findings documented and ready for implementation in Task 4.2!
 
 **Key Takeaways:**
+
 1. Tailwind v4 is stable and production-ready
 2. CSS-first approach aligns perfectly with our token strategy
 3. Auto-detection simplifies user setup
@@ -592,4 +635,3 @@ Research findings documented and ready for implementation in Task 4.2!
 5. 10-20x performance improvement benefits everyone
 
 **Ready to proceed with Task 4.2**: Configure Tailwind v4 in our packages! 🚀
-

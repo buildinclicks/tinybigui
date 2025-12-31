@@ -17,12 +17,14 @@ This task completed the Material Design 3 typography system by implementing all 
 ### File Modified: `packages/tokens/src/tokens.css`
 
 **Before (4 placeholder styles):**
+
 - Display Large
 - Headline Large
 - Body Large
 - Label Large
 
 **After (15 complete styles):**
+
 - Display: Large, Medium, Small
 - Headline: Large, Medium, Small
 - Title: Large, Medium, Small
@@ -37,14 +39,14 @@ This task completed the Material Design 3 typography system by implementing all 
 
 MD3 organizes typography into **5 categories**, each with **3 sizes** (Large, Medium, Small):
 
-| Category | Purpose | Sizes | Total |
-|----------|---------|-------|-------|
-| **Display** | Large, expressive text | L, M, S | 3 |
-| **Headline** | High-emphasis text | L, M, S | 3 |
-| **Title** | Medium-emphasis text | L, M, S | 3 |
-| **Body** | Plain body text | L, M, S | 3 |
-| **Label** | UI labels, buttons | L, M, S | 3 |
-| **Total** | | | **15** |
+| Category     | Purpose                | Sizes   | Total  |
+| ------------ | ---------------------- | ------- | ------ |
+| **Display**  | Large, expressive text | L, M, S | 3      |
+| **Headline** | High-emphasis text     | L, M, S | 3      |
+| **Title**    | Medium-emphasis text   | L, M, S | 3      |
+| **Body**     | Plain body text        | L, M, S | 3      |
+| **Label**    | UI labels, buttons     | L, M, S | 3      |
+| **Total**    |                        |         | **15** |
 
 ---
 
@@ -55,23 +57,26 @@ MD3 organizes typography into **5 categories**, each with **3 sizes** (Large, Me
 **Purpose**: Large, expressive text for marketing or hero sections.
 
 **Characteristics:**
+
 - Largest type sizes
 - Light weight (400)
 - Wide line-height for readability
 - Negative letter-spacing on large size
 
 **Use cases:**
+
 - Hero headlines
 - Marketing headers
 - Landing page titles
 - Splash screens
 
 **Example:**
+
 ```css
---md-sys-typescale-display-large-size: 3.5625rem;        /* 57px */
---md-sys-typescale-display-large-line-height: 4rem;       /* 64px */
+--md-sys-typescale-display-large-size: 3.5625rem; /* 57px */
+--md-sys-typescale-display-large-line-height: 4rem; /* 64px */
 --md-sys-typescale-display-large-weight: 400;
---md-sys-typescale-display-large-tracking: -0.25px;       /* Tighter spacing */
+--md-sys-typescale-display-large-tracking: -0.25px; /* Tighter spacing */
 ```
 
 ---
@@ -81,21 +86,24 @@ MD3 organizes typography into **5 categories**, each with **3 sizes** (Large, Me
 **Purpose**: High-emphasis text for important sections.
 
 **Characteristics:**
+
 - Prominent but not oversized
 - Regular weight (400)
 - Good for hierarchical structure
 - Zero letter-spacing
 
 **Use cases:**
+
 - Page titles
 - Section headings
 - Dialog titles
 - Card headers
 
 **Example:**
+
 ```css
---md-sys-typescale-headline-large-size: 2rem;            /* 32px */
---md-sys-typescale-headline-large-line-height: 2.5rem;    /* 40px */
+--md-sys-typescale-headline-large-size: 2rem; /* 32px */
+--md-sys-typescale-headline-large-line-height: 2.5rem; /* 40px */
 --md-sys-typescale-headline-large-weight: 400;
 --md-sys-typescale-headline-large-tracking: 0;
 ```
@@ -107,23 +115,26 @@ MD3 organizes typography into **5 categories**, each with **3 sizes** (Large, Me
 **Purpose**: Medium-emphasis text for subtitles and labels.
 
 **Characteristics:**
+
 - Smaller than headlines
 - Medium weight (500) for emphasis
 - Slight letter-spacing for readability
 - Distinct from body text
 
 **Use cases:**
+
 - App bar titles
 - List item titles
 - Card subtitles
 - Tab labels
 
 **Example:**
+
 ```css
---md-sys-typescale-title-medium-size: 1rem;              /* 16px */
---md-sys-typescale-title-medium-line-height: 1.5rem;      /* 24px */
---md-sys-typescale-title-medium-weight: 500;              /* Medium */
---md-sys-typescale-title-medium-tracking: 0.15px;         /* Slight spacing */
+--md-sys-typescale-title-medium-size: 1rem; /* 16px */
+--md-sys-typescale-title-medium-line-height: 1.5rem; /* 24px */
+--md-sys-typescale-title-medium-weight: 500; /* Medium */
+--md-sys-typescale-title-medium-tracking: 0.15px; /* Slight spacing */
 ```
 
 ---
@@ -133,23 +144,26 @@ MD3 organizes typography into **5 categories**, each with **3 sizes** (Large, Me
 **Purpose**: Plain body text for paragraphs and content.
 
 **Characteristics:**
+
 - Most readable sizes
 - Regular weight (400)
 - Generous line-height
 - Moderate letter-spacing
 
 **Use cases:**
+
 - Paragraph text
 - Descriptions
 - Content blocks
 - Long-form reading
 
 **Example:**
+
 ```css
---md-sys-typescale-body-large-size: 1rem;                /* 16px */
---md-sys-typescale-body-large-line-height: 1.5rem;        /* 24px */
+--md-sys-typescale-body-large-size: 1rem; /* 16px */
+--md-sys-typescale-body-large-line-height: 1.5rem; /* 24px */
 --md-sys-typescale-body-large-weight: 400;
---md-sys-typescale-body-large-tracking: 0.5px;            /* Loose for readability */
+--md-sys-typescale-body-large-tracking: 0.5px; /* Loose for readability */
 ```
 
 ---
@@ -159,12 +173,14 @@ MD3 organizes typography into **5 categories**, each with **3 sizes** (Large, Me
 **Purpose**: UI labels, button text, and small annotations.
 
 **Characteristics:**
+
 - Small but readable
 - Medium weight (500) for emphasis
 - Higher letter-spacing
 - Optimized for UI elements
 
 **Use cases:**
+
 - Button labels
 - Input labels
 - Chips
@@ -172,10 +188,11 @@ MD3 organizes typography into **5 categories**, each with **3 sizes** (Large, Me
 - Captions
 
 **Example:**
+
 ```css
---md-sys-typescale-label-large-size: 0.875rem;           /* 14px */
---md-sys-typescale-label-large-line-height: 1.25rem;      /* 20px */
---md-sys-typescale-label-large-weight: 500;               /* Medium */
+--md-sys-typescale-label-large-size: 0.875rem; /* 14px */
+--md-sys-typescale-label-large-line-height: 1.25rem; /* 20px */
+--md-sys-typescale-label-large-weight: 500; /* Medium */
 --md-sys-typescale-label-large-tracking: 0.1px;
 ```
 
@@ -199,8 +216,8 @@ Each type style has **4 properties**:
 ### Example (Title Medium):
 
 ```css
---md-sys-typescale-title-medium-size: 1rem;              /* 16px */
---md-sys-typescale-title-medium-line-height: 1.5rem;      /* 24px */
+--md-sys-typescale-title-medium-size: 1rem; /* 16px */
+--md-sys-typescale-title-medium-line-height: 1.5rem; /* 24px */
 --md-sys-typescale-title-medium-weight: 500;
 --md-sys-typescale-title-medium-tracking: 0.15px;
 ```
@@ -295,22 +312,22 @@ Label Small       11px (0.6875rem)
 
 ```tsx
 // Headline component
-function Headline({ size = 'large', children }) {
+function Headline({ size = "large", children }) {
   const sizeStyles = {
     large: {
-      fontSize: 'var(--md-sys-typescale-headline-large-size)',
-      lineHeight: 'var(--md-sys-typescale-headline-large-line-height)',
-      fontWeight: 'var(--md-sys-typescale-headline-large-weight)',
-      letterSpacing: 'var(--md-sys-typescale-headline-large-tracking)',
+      fontSize: "var(--md-sys-typescale-headline-large-size)",
+      lineHeight: "var(--md-sys-typescale-headline-large-line-height)",
+      fontWeight: "var(--md-sys-typescale-headline-large-weight)",
+      letterSpacing: "var(--md-sys-typescale-headline-large-tracking)",
     },
     // ... medium, small
   };
-  
+
   return <h2 style={sizeStyles[size]}>{children}</h2>;
 }
 
 // Usage
-<Headline size="large">Welcome to TinyBigUI</Headline>
+<Headline size="large">Welcome to TinyBigUI</Headline>;
 ```
 
 ---
@@ -322,25 +339,28 @@ function Headline({ size = 'large', children }) {
 **Two families defined:**
 
 ```css
---md-sys-typescale-font-family-plain: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+--md-sys-typescale-font-family-plain: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 --md-sys-typescale-font-family-brand: var(--md-sys-typescale-font-family-plain);
 ```
 
 **Why system fonts?**
+
 - ✅ No loading time (already on device)
 - ✅ Excellent rendering
 - ✅ Matches OS aesthetics
 - ✅ Zero cost (no web fonts)
 
 **Brand vs Plain:**
+
 - Currently the same
 - Users can customize `brand` for headers
 - `plain` for body text
 
 **Example customization:**
+
 ```css
 :root {
-  --md-sys-typescale-font-family-brand: 'Inter', system-ui, sans-serif;
+  --md-sys-typescale-font-family-brand: "Inter", system-ui, sans-serif;
   /* plain stays system-ui */
 }
 ```
@@ -350,18 +370,21 @@ function Headline({ size = 'large', children }) {
 ### 2. Rem Units (Not Pixels)
 
 **Why rem?**
+
 - ✅ Respects user's browser font size settings
 - ✅ Accessible (users with visual impairments)
 - ✅ Scales proportionally
 - ✅ Better than fixed pixels
 
 **Conversion:**
+
 ```
 1rem = 16px (browser default)
 User increases browser font → everything scales
 ```
 
 **Example:**
+
 - Default: `1rem = 16px`
 - User sets 20px base: `1rem = 20px` (everything 25% larger)
 
@@ -371,15 +394,16 @@ User increases browser font → everything scales
 
 **Strategic spacing for readability:**
 
-| Size | Tracking | Why |
-|------|----------|-----|
-| Display Large | -0.25px | Tighter (large text looks spaced out) |
-| Headline | 0px | Neutral |
-| Title | 0.1-0.15px | Slight spacing (medium weight needs it) |
-| Body | 0.25-0.5px | Looser (improves readability) |
-| Label | 0.1-0.5px | Varies by size (small text needs more) |
+| Size          | Tracking   | Why                                     |
+| ------------- | ---------- | --------------------------------------- |
+| Display Large | -0.25px    | Tighter (large text looks spaced out)   |
+| Headline      | 0px        | Neutral                                 |
+| Title         | 0.1-0.15px | Slight spacing (medium weight needs it) |
+| Body          | 0.25-0.5px | Looser (improves readability)           |
+| Label         | 0.1-0.5px  | Varies by size (small text needs more)  |
 
 **General rule:**
+
 - Larger text → tighter spacing
 - Smaller text → looser spacing
 - Heavier weight → more spacing
@@ -391,25 +415,28 @@ User increases browser font → everything scales
 **Generous spacing for readability:**
 
 **Formula (approximate):**
+
 - Large text: 1.12-1.15x font size
 - Medium text: 1.25-1.5x font size
 - Small text: 1.33-1.5x font size
 
 **Why important?**
+
 - ✅ Comfortable reading
 - ✅ Prevents lines from running together
 - ✅ Better for multi-line text
 
 **Example:**
+
 ```css
 /* Body Large */
-font-size: 1rem;           /* 16px */
-line-height: 1.5rem;       /* 24px = 1.5× */
+font-size: 1rem; /* 16px */
+line-height: 1.5rem; /* 24px = 1.5× */
 /* ↑ Good for paragraphs */
 
 /* Display Large */
-font-size: 3.5625rem;      /* 57px */
-line-height: 4rem;         /* 64px = 1.12× */
+font-size: 3.5625rem; /* 57px */
+line-height: 4rem; /* 64px = 1.12× */
 /* ↑ Tighter for short headlines */
 ```
 
@@ -423,6 +450,7 @@ line-height: 4rem;         /* 64px = 1.12× */
 - **500 (Medium)**: Title, Label
 
 **Why not more?**
+
 - ✅ System fonts may not have all weights
 - ✅ Simpler, more consistent
 - ✅ Medium weight gives enough emphasis
@@ -440,18 +468,19 @@ line-height: 4rem;         /* 64px = 1.12× */
 /* Future: Responsive Display Large */
 @media (max-width: 640px) {
   :root {
-    --md-sys-typescale-display-large-size: 2.25rem;  /* 36px on mobile */
+    --md-sys-typescale-display-large-size: 2.25rem; /* 36px on mobile */
   }
 }
 
 @media (min-width: 641px) {
   :root {
-    --md-sys-typescale-display-large-size: 3.5625rem;  /* 57px on desktop */
+    --md-sys-typescale-display-large-size: 3.5625rem; /* 57px on desktop */
   }
 }
 ```
 
 **Why wait?**
+
 - Current sizes work well on all devices
 - MD3 doesn't mandate responsive sizes
 - Can be added based on user feedback
@@ -466,7 +495,7 @@ line-height: 4rem;         /* 64px = 1.12× */
 ✅ **Accessible** - Rem units, good line-height  
 ✅ **System fonts** - Fast, native, zero cost  
 ✅ **Ready for components** - Can be used immediately  
-✅ **Customizable** - Users can override via CSS variables  
+✅ **Customizable** - Users can override via CSS variables
 
 ---
 
@@ -492,6 +521,7 @@ line-height: 4rem;         /* 64px = 1.12× */
 Typography system is now complete with all 15 MD3 type styles! 📝
 
 **Summary of Changes:**
+
 - **Added**: 11 new type styles (from 4 → 15 total)
 - **Added**: Letter-spacing (tracking) tokens
 - **Added**: Brand and plain font family tokens
@@ -499,4 +529,3 @@ Typography system is now complete with all 15 MD3 type styles! 📝
 - **File Modified**: `packages/tokens/src/tokens.css`
 
 Ready for component development with complete typography support! 🎨
-
