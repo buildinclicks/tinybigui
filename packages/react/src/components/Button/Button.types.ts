@@ -1,0 +1,108 @@
+import type React from "react";
+
+/**
+ * Button variant types
+ */
+export type ButtonVariant = "filled" | "outlined" | "tonal" | "elevated" | "text";
+
+/**
+ * Button color schemes
+ */
+export type ButtonColor = "primary" | "secondary" | "tertiary" | "error";
+
+/**
+ * Button sizes
+ */
+export type ButtonSize = "small" | "medium" | "large";
+
+/**
+ * Material Design 3 Button Component Props
+ *
+ * Supports 5 variants: filled, outlined, tonal, elevated, text
+ * Implementation uses Tailwind CSS classes mapped to MD3 tokens.
+ *
+ * @example
+ * ```tsx
+ * // Filled button (default)
+ * <Button variant="filled" color="primary">
+ *   Click me
+ * </Button>
+ *
+ * // With icon
+ * <Button variant="tonal" icon={<IconAdd />}>
+ *   Add Item
+ * </Button>
+ *
+ * // Loading state
+ * <Button variant="elevated" loading>
+ *   Saving...
+ * </Button>
+ *
+ * // Disabled
+ * <Button variant="outlined" disabled>
+ *   Disabled
+ * </Button>
+ * ```
+ */
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /**
+   * Button variant
+   * @default 'filled'
+   */
+  variant?: ButtonVariant;
+
+  /**
+   * Color scheme
+   * @default 'primary'
+   */
+  color?: ButtonColor;
+
+  /**
+   * Size variant
+   * @default 'medium'
+   */
+  size?: ButtonSize;
+
+  /**
+   * Leading icon (before text)
+   */
+  icon?: React.ReactNode;
+
+  /**
+   * Trailing icon (after text)
+   */
+  trailingIcon?: React.ReactNode;
+
+  /**
+   * Button content (text)
+   */
+  children: React.ReactNode;
+
+  /**
+   * Full width button (spans container)
+   * @default false
+   */
+  fullWidth?: boolean;
+
+  /**
+   * Loading state - shows spinner, disables interaction
+   * @default false
+   */
+  loading?: boolean;
+
+  /**
+   * Disable ripple effect
+   * @default false
+   */
+  disableRipple?: boolean;
+
+  /**
+   * Additional CSS classes (Tailwind)
+   */
+  className?: string;
+
+  /**
+   * Click handler
+   */
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
