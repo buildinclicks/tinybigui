@@ -18,6 +18,8 @@ export default [
       "**/.cache/**",
       "**/pnpm-lock.yaml",
       "eslint.config.js", // Ignore ESLint config itself
+      "docs/**", // Documentation folder
+      "strategies/**", // Strategy documentation folder
     ],
   },
 

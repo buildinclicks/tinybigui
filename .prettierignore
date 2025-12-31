@@ -1,3 +1,7 @@
+# Documentation (don't format)
+docs
+strategies
+
 # Dependencies
 node_modules
 .pnpm-store
