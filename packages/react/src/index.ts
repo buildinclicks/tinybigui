@@ -40,5 +40,6 @@ export {
   type TypographyStyleObject,
 } from "./utils";
 
-// Components will be exported here as they're built
-// export { Button } from './components/Button';
+// Components
+export { Button } from "./components/Button";
+export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./components/Button";
