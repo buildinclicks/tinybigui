@@ -143,7 +143,7 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } {
  * ```
  */
 export function rgbToHex(r: number, g: number, b: number): string {
-  const toHex = (n: number) => {
+  const toHex = (n: number): string => {
     const hex = Math.max(0, Math.min(255, Math.round(n))).toString(16);
     return hex.padStart(2, '0');
   };

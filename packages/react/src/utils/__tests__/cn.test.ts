@@ -37,7 +37,8 @@ describe("cn utility", () => {
 
   test("handles conditional classes", () => {
     // Test that false/undefined/null values are filtered out
-    const result = cn("button", false && "hidden", undefined, null, "active");
+    const shouldHide = false;
+    const result = cn("button", shouldHide && "hidden", undefined, null, "active");
 
     expect(result).toBe("button active");
   });
