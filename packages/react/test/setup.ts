@@ -7,6 +7,9 @@
  * Think of this as "preparing the stage" before the show (tests) begin.
  */
 
+// Import Vitest utilities for mocking
+import { vi } from 'vitest';
+
 // Import testing utilities from React Testing Library
 // These help us test React components
 import '@testing-library/jest-dom';
