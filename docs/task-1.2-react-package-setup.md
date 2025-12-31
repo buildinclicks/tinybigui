@@ -29,6 +29,7 @@ This is the **publishable NPM package** that users will install via `npm install
 #### Key Sections:
 
 **1. Package Identity**
+
 ```json
 {
   "name": "@tinybigui/react",
@@ -36,21 +37,25 @@ This is the **publishable NPM package** that users will install via `npm install
   "description": "Material Design 3 React components built with Tailwind CSS"
 }
 ```
+
 - **Scoped package** (`@tinybigui/`) - Allows publishing under organization namespace
 - Version starts at `0.0.0` (Changesets will manage versioning)
 - Clear, SEO-friendly description
 
 **2. Module Type**
+
 ```json
 {
   "type": "module"
 }
 ```
+
 - Sets package as **ES Module** by default
 - Modern JavaScript standard
 - Better tree-shaking support
 
 **3. Exports (Modern Package Entry Points)**
+
 ```json
 {
   "exports": {
@@ -73,23 +78,28 @@ This is the **publishable NPM package** that users will install via `npm install
 **What this means:**
 
 **`.` (main entry):**
+
 - `import { Button } from '@tinybigui/react'` → Uses ESM (`index.js`)
 - `require('@tinybigui/react')` → Uses CommonJS (`index.cjs`)
 - TypeScript gets correct types for each format
 
 **`./styles.css` (CSS export):**
+
 ```javascript
-import '@tinybigui/react/styles.css';
+import "@tinybigui/react/styles.css";
 ```
+
 - Optional CSS import
 - Contains component styles
 - Separate from JS bundle
 
 **`./package.json` (metadata export):**
+
 - Allows importing package metadata
 - Useful for version checking
 
 **4. Side Effects**
+
 ```json
 {
   "sideEffects": ["**/*.css"]
@@ -97,32 +107,34 @@ import '@tinybigui/react/styles.css';
 ```
 
 **Critical for tree-shaking:**
+
 - Tells bundlers that **only CSS files** have side effects
 - JavaScript files are **pure** (can be removed if unused)
 
 **Example:**
+
 ```javascript
-import { Button, Checkbox } from '@tinybigui/react';
+import { Button, Checkbox } from "@tinybigui/react";
 // Only Button is used
 ```
+
 → Bundler removes Checkbox code (tree-shaking) ✅  
 → CSS is always included (side effect) ⚠️
 
 **5. Files to Publish**
+
 ```json
 {
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ]
+  "files": ["dist", "README.md", "LICENSE"]
 }
 ```
+
 - Only these files/folders are published to NPM
 - Excludes `src/`, tests, configs
 - Keeps package size small
 
 **6. Scripts**
+
 ```json
 {
   "scripts": {
@@ -137,6 +149,7 @@ import { Button, Checkbox } from '@tinybigui/react';
 ```
 
 **Script purposes:**
+
 - **`build`** - Compile TypeScript to JavaScript (production)
 - **`dev`** - Watch mode (rebuilds on file changes)
 - **`typecheck`** - Type checking only (no output)
@@ -147,6 +160,7 @@ import { Button, Checkbox } from '@tinybigui/react';
 **7. Dependencies**
 
 **Regular dependencies** (shipped with package):
+
 ```json
 {
   "dependencies": {
@@ -158,27 +172,29 @@ import { Button, Checkbox } from '@tinybigui/react';
 ```
 
 **Why these?**
+
 - **`class-variance-authority` (CVA)** - Component variants
   ```typescript
-  const button = cva('base-styles', {
+  const button = cva("base-styles", {
     variants: {
       color: {
-        primary: 'bg-primary',
-        secondary: 'bg-secondary'
-      }
-    }
+        primary: "bg-primary",
+        secondary: "bg-secondary",
+      },
+    },
   });
   ```
 - **`clsx`** - Conditional class names
   ```typescript
-  clsx('btn', isActive && 'active', { disabled: !enabled })
+  clsx("btn", isActive && "active", { disabled: !enabled });
   ```
 - **`tailwind-merge`** - Merge Tailwind classes correctly
   ```typescript
-  twMerge('px-2', 'px-4') // => 'px-4' (no conflicts)
+  twMerge("px-2", "px-4"); // => 'px-4' (no conflicts)
   ```
 
 **Peer dependencies** (required by user):
+
 ```json
 {
   "peerDependencies": {
@@ -190,11 +206,13 @@ import { Button, Checkbox } from '@tinybigui/react';
 ```
 
 **Why peer dependencies?**
+
 - ✅ User controls React version (no version conflicts)
 - ✅ Smaller bundle (React not included twice)
 - ✅ Supports both React 18 and 19
 
 **Dev dependencies** (only for development):
+
 ```json
 {
   "devDependencies": {
@@ -206,10 +224,12 @@ import { Button, Checkbox } from '@tinybigui/react';
   }
 }
 ```
+
 - React installed as devDependency for building
 - Not included in published package
 
 **8. Publish Configuration**
+
 ```json
 {
   "publishConfig": {
@@ -217,6 +237,7 @@ import { Button, Checkbox } from '@tinybigui/react';
   }
 }
 ```
+
 - Makes package **publicly accessible** on NPM
 - Required for scoped packages (default is private)
 
@@ -233,27 +254,30 @@ The **main entry point** - barrel export file.
  */
 
 // Utilities
-export { cn } from './utils/cn';
+export { cn } from "./utils/cn";
 
 // Components will be exported here as they're built
 // export { Button } from './components/Button';
 ```
 
 **Current exports:**
+
 - Only `cn` utility (needed immediately)
 
 **Future exports:**
+
 ```typescript
 // Phase 1a components
-export { Button } from './components/Button';
-export { IconButton } from './components/IconButton';
-export { FAB } from './components/FAB';
-export { Checkbox } from './components/Checkbox';
-export { Radio } from './components/Radio';
-export { Switch } from './components/Switch';
+export { Button } from "./components/Button";
+export { IconButton } from "./components/IconButton";
+export { FAB } from "./components/FAB";
+export { Checkbox } from "./components/Checkbox";
+export { Radio } from "./components/Radio";
+export { Switch } from "./components/Switch";
 ```
 
 **Why barrel exports?**
+
 - ✅ Clean API: `import { Button } from '@tinybigui/react'`
 - ✅ Single source of truth
 - ✅ Easy to see what's public vs internal
@@ -265,8 +289,8 @@ export { Switch } from './components/Switch';
 A **critical utility** for Tailwind CSS class management.
 
 ```typescript
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 /**
  * Combines and merges Tailwind CSS classes efficiently.
@@ -279,25 +303,28 @@ export function cn(...inputs: ClassValue[]): string {
 **What it does:**
 
 **1. Conditional classes** (via `clsx`):
+
 ```typescript
-cn('px-2 py-1', condition && 'bg-blue-500', { 'text-white': isActive })
+cn("px-2 py-1", condition && "bg-blue-500", { "text-white": isActive });
 // => 'px-2 py-1 bg-blue-500 text-white' (if both true)
 ```
 
 **2. Resolve conflicts** (via `tailwind-merge`):
+
 ```typescript
-cn('px-2', 'px-4')  // Without twMerge: 'px-2 px-4' ❌
+cn("px-2", "px-4"); // Without twMerge: 'px-2 px-4' ❌
 // => 'px-4'        // With twMerge: last wins ✅
 ```
 
 **Why both libraries?**
 
-| Library | Purpose | Example |
-|---------|---------|---------|
-| `clsx` | Join conditional classes | `clsx('btn', isActive && 'active')` |
-| `tailwind-merge` | Resolve Tailwind conflicts | `twMerge('px-2', 'px-4')` |
+| Library          | Purpose                    | Example                             |
+| ---------------- | -------------------------- | ----------------------------------- |
+| `clsx`           | Join conditional classes   | `clsx('btn', isActive && 'active')` |
+| `tailwind-merge` | Resolve Tailwind conflicts | `twMerge('px-2', 'px-4')`           |
 
 **Real-world usage in components:**
+
 ```typescript
 export function Button({ className, variant, size, ...props }) {
   return (
@@ -315,6 +342,7 @@ export function Button({ className, variant, size, ...props }) {
 ```
 
 **Why this pattern?**
+
 - ✅ User can override styles safely
 - ✅ No class conflicts
 - ✅ Clean, readable code
@@ -330,7 +358,7 @@ export function Button({ className, variant, size, ...props }) {
 ✅ **Peer dependencies** - No React version conflicts  
 ✅ **Scoped name** - `@tinybigui/react` prevents NPM name collisions  
 ✅ **Modern exports** - Conditional exports for optimal bundling  
-✅ **Utility foundation** - `cn` utility ready for all components  
+✅ **Utility foundation** - `cn` utility ready for all components
 
 ---
 
@@ -339,16 +367,19 @@ export function Button({ className, variant, size, ...props }) {
 ### Modern Package Entry Points
 
 **Old way** (legacy):
+
 ```json
 {
   "main": "./dist/index.js"
 }
 ```
+
 - Single entry point
 - No ESM/CJS distinction
 - Limited bundler optimization
 
 **New way** (modern):
+
 ```json
 {
   "exports": {
@@ -359,6 +390,7 @@ export function Button({ className, variant, size, ...props }) {
   }
 }
 ```
+
 - ✅ Multiple entry points
 - ✅ Format-specific files
 - ✅ Better tree-shaking
@@ -367,18 +399,23 @@ export function Button({ className, variant, size, ...props }) {
 ### Tree-Shaking Explained
 
 **Without tree-shaking:**
+
 ```javascript
-import { Button } from '@tinybigui/react';
+import { Button } from "@tinybigui/react";
 ```
+
 → Entire library bundled (500 KB) ❌
 
 **With tree-shaking:**
+
 ```javascript
-import { Button } from '@tinybigui/react';
+import { Button } from "@tinybigui/react";
 ```
+
 → Only Button code bundled (20 KB) ✅
 
 **Requirements for tree-shaking:**
+
 1. ESM format (`"type": "module"`)
 2. No side effects (`"sideEffects": false` or specific)
 3. Named exports (not default exports)
@@ -386,16 +423,19 @@ import { Button } from '@tinybigui/react';
 ### Peer Dependencies vs Dependencies
 
 **When to use peerDependencies:**
+
 - ✅ Framework libraries (React, Vue)
 - ✅ Build tools (Tailwind CSS)
 - ✅ Large dependencies with versions
 
 **When to use dependencies:**
+
 - ✅ Utilities (clsx, date-fns)
 - ✅ Small libraries
 - ✅ No version conflicts expected
 
 **Example conflict scenario:**
+
 ```
 User's app: React 18.2.0
 Component lib (if bundling React): React 18.3.1
@@ -434,12 +474,14 @@ packages/react/
 To verify this task was completed correctly:
 
 1. **Check package name:**
+
    ```bash
    cat packages/react/package.json | grep '"name"'
    # Should show: "@tinybigui/react"
    ```
 
 2. **Verify exports:**
+
    ```bash
    cat packages/react/package.json | grep -A5 '"exports"'
    # Should show exports for ".", "./styles.css"
@@ -466,6 +508,7 @@ To verify this task was completed correctly:
 
 **Commit message**: `chore: setup monorepo structure and react package`  
 **Files in commit**:
+
 - `packages/react/package.json`
 - `packages/react/src/index.ts`
 - `packages/react/src/utils/cn.ts`
@@ -474,14 +517,14 @@ To verify this task was completed correctly:
 
 ## 🤔 Decisions Made
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Module format | ESM + CJS | Maximum compatibility |
-| Build tool | tsup | Fast, zero-config, dual output |
-| Class utility | clsx + tailwind-merge | Industry standard, proven |
-| React versions | 18 and 19 | Current + future support |
-| Tailwind version | v4 only | Modern, CSS-first approach |
-| Package scope | @tinybigui | Organization namespace |
+| Decision         | Choice                | Rationale                      |
+| ---------------- | --------------------- | ------------------------------ |
+| Module format    | ESM + CJS             | Maximum compatibility          |
+| Build tool       | tsup                  | Fast, zero-config, dual output |
+| Class utility    | clsx + tailwind-merge | Industry standard, proven      |
+| React versions   | 18 and 19             | Current + future support       |
+| Tailwind version | v4 only               | Modern, CSS-first approach     |
+| Package scope    | @tinybigui            | Organization namespace         |
 
 ---
 
@@ -492,4 +535,3 @@ To verify this task was completed correctly:
 - [clsx on npm](https://www.npmjs.com/package/clsx)
 - [tailwind-merge on npm](https://www.npmjs.com/package/tailwind-merge)
 - [Tree Shaking Guide](https://webpack.js.org/guides/tree-shaking/)
-

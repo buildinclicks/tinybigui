@@ -33,12 +33,14 @@ We pledge to make participation in our project a harassment-free experience for 
 ## Our Standards
 
 **Positive behavior**:
+
 - Using welcoming and inclusive language
 - Being respectful of differing viewpoints
 - Gracefully accepting constructive criticism
 - Focusing on what is best for the community
 
 **Unacceptable behavior**:
+
 - Harassment, trolling, or derogatory comments
 - Publishing others' private information
 - Unprofessional conduct
@@ -54,16 +56,16 @@ Report violations to [maintainers@tinybigui.dev]. All complaints will be reviewe
 
 ### Types of Contributions
 
-| Contribution | Skill Level | Impact |
-|--------------|-------------|--------|
-| **Report bugs** | Beginner | High |
-| **Improve docs** | Beginner | High |
-| **Write tests** | Intermediate | High |
-| **Fix bugs** | Intermediate | High |
-| **Add components** | Advanced | High |
+| Contribution                   | Skill Level  | Impact    |
+| ------------------------------ | ------------ | --------- |
+| **Report bugs**                | Beginner     | High      |
+| **Improve docs**               | Beginner     | High      |
+| **Write tests**                | Intermediate | High      |
+| **Fix bugs**                   | Intermediate | High      |
+| **Add components**             | Advanced     | High      |
 | **Accessibility improvements** | Intermediate | Very High |
-| **Performance optimization** | Advanced | Medium |
-| **Design tokens** | Intermediate | Medium |
+| **Performance optimization**   | Advanced     | Medium    |
+| **Design tokens**              | Intermediate | Medium    |
 
 ### Getting Started
 
@@ -87,6 +89,7 @@ pnpm storybook
 #### Step 2: Find an Issue
 
 Look for issues labeled:
+
 - `good first issue` - Great for beginners
 - `help wanted` - Need community help
 - `bug` - Bug fixes needed
@@ -117,11 +120,11 @@ All changes must include tests:
 
 ```typescript
 // Component tests
-describe('Button', () => {
-  it('renders correctly', () => { })
-  it('handles click events', () => { })
-  it('has no a11y violations', () => { })
-})
+describe("Button", () => {
+  it("renders correctly", () => {});
+  it("handles click events", () => {});
+  it("has no a11y violations", () => {});
+});
 ```
 
 #### Step 7: Update Documentation
@@ -134,25 +137,30 @@ describe('Button', () => {
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Tests pass locally
 - [ ] Added new tests
 - [ ] Tested in Storybook
 
 ## Accessibility
+
 - [ ] No a11y violations
 - [ ] Keyboard navigation works
 - [ ] Screen reader tested
 
 ## Checklist
+
 - [ ] Code follows style guide
 - [ ] Self-reviewed code
 - [ ] Commented complex code
@@ -168,16 +176,16 @@ Brief description of changes
 ```typescript
 // ✅ Do: Use explicit types
 export interface ButtonProps extends AriaButtonProps {
-  variant?: 'filled' | 'outlined'
+  variant?: "filled" | "outlined";
 }
 
 // ❌ Don't: Use any
 export interface ButtonProps {
-  props: any
+  props: any;
 }
 
 // ✅ Do: Use const assertions
-const variants = ['filled', 'outlined'] as const
+const variants = ["filled", "outlined"] as const;
 
 // ✅ Do: Document with JSDoc
 /**
@@ -185,7 +193,7 @@ const variants = ['filled', 'outlined'] as const
  * @example
  * <Button variant="filled">Click me</Button>
  */
-export function Button(props: ButtonProps) { }
+export function Button(props: ButtonProps) {}
 ```
 
 ### React
@@ -214,23 +222,23 @@ function Button({ variant, size, children, ...rest }) { }
 
 ```typescript
 // Components: PascalCase
-export function Button() { }
-export function TextField() { }
+export function Button() {}
+export function TextField() {}
 
 // Hooks: camelCase with 'use' prefix
-export function useTheme() { }
-export function useRipple() { }
+export function useTheme() {}
+export function useRipple() {}
 
 // Utilities: camelCase
-export function cn() { }
-export function generateColorScheme() { }
+export function cn() {}
+export function generateColorScheme() {}
 
 // Constants: UPPER_SNAKE_CASE
-export const MAX_RETRY_ATTEMPTS = 3
+export const MAX_RETRY_ATTEMPTS = 3;
 
 // Types/Interfaces: PascalCase
-export interface ButtonProps { }
-export type ButtonVariant = 'filled' | 'outlined'
+export interface ButtonProps {}
+export type ButtonVariant = "filled" | "outlined";
 ```
 
 ### File Structure
@@ -250,23 +258,23 @@ component-name/
 
 ```typescript
 // 1. React imports
-import { forwardRef } from 'react'
+import { forwardRef } from "react";
 
 // 2. External libraries
-import { useButton } from 'react-aria'
-import { cva } from 'class-variance-authority'
+import { useButton } from "react-aria";
+import { cva } from "class-variance-authority";
 
 // 3. Internal components
-import { Icon } from '../icon'
+import { Icon } from "../icon";
 
 // 4. Internal utilities
-import { cn } from '../../utils/cn'
+import { cn } from "../../utils/cn";
 
 // 5. Types
-import type { ButtonProps } from './button.types'
+import type { ButtonProps } from "./button.types";
 
 // 6. Styles (if any)
-import './button.css'
+import "./button.css";
 ```
 
 ### Testing Standards
@@ -278,11 +286,11 @@ describe('Component', () => {
     it('renders with default props', () => { })
     it('renders all variants', () => { })
   })
-  
+
   describe('Interactions', () => {
     it('handles user events', () => { })
   })
-  
+
   describe('Accessibility', () => {
     it('has no violations', async () => {
       const { container } = render(<Component />)
@@ -290,7 +298,7 @@ describe('Component', () => {
       expect(results).toHaveNoViolations()
     })
   })
-  
+
   describe('Customization', () => {
     it('accepts custom className', () => { })
   })
@@ -304,6 +312,7 @@ describe('Component', () => {
 ### For Contributors
 
 Your PR will be reviewed for:
+
 1. **Functionality**: Does it work as intended?
 2. **Tests**: Are there adequate tests?
 3. **Accessibility**: Any a11y issues?
@@ -412,6 +421,7 @@ Thanks to these wonderful people:
 ### Discord/Slack (Optional)
 
 If community grows:
+
 - `#general` - General chat
 - `#help` - Get help using the library
 - `#contributors` - Contributor coordination
@@ -554,6 +564,7 @@ Thanks for your interest! Here's how to get started:
 ### First Issue Assignment
 
 When someone comments "I'd like to work on this":
+
 1. Assign issue to them
 2. Welcome them
 3. Point to contributing guide
@@ -604,6 +615,7 @@ furnished to do so, subject to the following conditions:
 ```
 
 **Why MIT?**
+
 - Most permissive open source license
 - Business-friendly
 - Used by React, Next.js, Tailwind
@@ -635,4 +647,3 @@ Before making repository public:
 - [Semantic Versioning](https://semver.org/)
 - [Keep a Changelog](https://keepachangelog.com/)
 - [All Contributors](https://allcontributors.org/)
-

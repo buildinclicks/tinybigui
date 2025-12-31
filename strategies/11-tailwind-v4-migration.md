@@ -5,16 +5,16 @@
 
 ## 🎯 Key Decisions Made
 
-| Decision | Value | Rationale |
-|----------|-------|-----------|
-| **Minimum Tailwind version** | `^4.0.0` | Latest stable (4.1.18 as of Dec 2025) |
-| **Support Tailwind v3?** | ❌ No | New project, no legacy burden |
-| **Token integration** | CSS-first (`@theme` directives) | Aligns with Tailwind v4 best practices |
-| **Configuration approach** | CSS-based tokens + minimal JS config | Modern, performant, native CSS features |
-| **Package naming** | `@tinybigui/react` + `@tinybigui/tokens` | Consistent throughout all docs |
-| **Primary framework docs** | Next.js (App Router) | Most common RSC environment |
-| **Secondary framework docs** | Vite (React) | Fast development, popular |
-| **Browser baseline** | Safari 16.4+, Chrome 111+, Firefox 128+ | Matches Tailwind v4 requirements |
+| Decision                     | Value                                    | Rationale                               |
+| ---------------------------- | ---------------------------------------- | --------------------------------------- |
+| **Minimum Tailwind version** | `^4.0.0`                                 | Latest stable (4.1.18 as of Dec 2025)   |
+| **Support Tailwind v3?**     | ❌ No                                    | New project, no legacy burden           |
+| **Token integration**        | CSS-first (`@theme` directives)          | Aligns with Tailwind v4 best practices  |
+| **Configuration approach**   | CSS-based tokens + minimal JS config     | Modern, performant, native CSS features |
+| **Package naming**           | `@tinybigui/react` + `@tinybigui/tokens` | Consistent throughout all docs          |
+| **Primary framework docs**   | Next.js (App Router)                     | Most common RSC environment             |
+| **Secondary framework docs** | Vite (React)                             | Fast development, popular               |
+| **Browser baseline**         | Safari 16.4+, Chrome 111+, Firefox 128+  | Matches Tailwind v4 requirements        |
 
 ---
 
@@ -76,12 +76,9 @@
 ```javascript
 // User's tailwind.config.js
 module.exports = {
-  presets: [require('tinybigui/tailwind.preset')],
-  content: [
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/tinybigui/dist/**/*.js',
-  ],
-}
+  presets: [require("tinybigui/tailwind.preset")],
+  content: ["./src/**/*.{js,ts,jsx,tsx}", "./node_modules/tinybigui/dist/**/*.js"],
+};
 ```
 
 ### After (Tailwind v4)
@@ -140,6 +137,7 @@ Exports **`tokens.css`** containing:
 ```
 
 **Users only need to import**:
+
 ```typescript
 import "@tinybigui/react/styles.css";
 ```
@@ -150,12 +148,12 @@ import "@tinybigui/react/styles.css";
 
 ### Baseline (Aligned with Tailwind v4)
 
-| Browser | Minimum Version | Notes |
-|---------|----------------|-------|
-| **Safari** | 16.4+ | iOS 16.4+ |
-| **Chrome** | 111+ | Android Chrome 111+ |
-| **Edge** | 111+ | Chromium-based |
-| **Firefox** | 128+ | |
+| Browser     | Minimum Version | Notes               |
+| ----------- | --------------- | ------------------- |
+| **Safari**  | 16.4+           | iOS 16.4+           |
+| **Chrome**  | 111+            | Android Chrome 111+ |
+| **Edge**    | 111+            | Chromium-based      |
+| **Firefox** | 128+            |                     |
 
 **Rationale**: Tailwind v4 leverages modern CSS features (container queries, cascade layers, etc.) that require these baseline versions.
 
@@ -185,6 +183,7 @@ import "@tinybigui/react/styles.css";
 ```
 
 **What it contains**:
+
 - MD3 design tokens as CSS variables
 - Tailwind v4 `@theme` directives mapping tokens to utilities
 - No JavaScript configuration
@@ -305,12 +304,12 @@ If Tailwind classes aren't working with `@tinybigui/react` components:
 
 ### Why These Were Removed
 
-| Removed | Reason |
-|---------|--------|
-| **JS preset** | Tailwind v4 is CSS-first; CSS variables + `@theme` is the modern approach |
-| **`content: [...]`** | Tailwind v4 auto-detects sources in most setups |
-| **v3 support** | Clean slate for modern stack, no legacy burden |
-| **Unscoped package** | Decided on scoped `@tinybigui/*` naming |
+| Removed              | Reason                                                                    |
+| -------------------- | ------------------------------------------------------------------------- |
+| **JS preset**        | Tailwind v4 is CSS-first; CSS variables + `@theme` is the modern approach |
+| **`content: [...]`** | Tailwind v4 auto-detects sources in most setups                           |
+| **v3 support**       | Clean slate for modern stack, no legacy burden                            |
+| **Unscoped package** | Decided on scoped `@tinybigui/*` naming                                   |
 
 ---
 
@@ -343,12 +342,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: 'var(--md-sys-color-primary)',
+        primary: "var(--md-sys-color-primary)",
         // ... token mappings
       },
     },
   },
-}
+};
 ```
 
 **Decision**: Wait for community feedback before adding this. Start CSS-first.
@@ -366,4 +365,3 @@ module.exports = {
 ## ✅ All Changes Complete
 
 The strategy is now **fully aligned with Tailwind CSS v4** and ready for implementation!
-

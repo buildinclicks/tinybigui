@@ -17,17 +17,17 @@ This is a one-page summary of all strategic decisions for TinyBigUI. For detaile
 
 ## 🎨 Core Technology Stack
 
-| Category | Technology | Why |
-|----------|-----------|-----|
-| **UI Framework** | React 18+ | RSC support, modern features |
-| **Type System** | TypeScript 5.3+ | Strict mode, excellent DX |
-| **Styling** | Tailwind + CVA | Performance + variant management |
-| **Accessibility** | React Aria | Best-in-class a11y primitives |
-| **Build Tool** | tsup | Fast, zero-config |
-| **Test Runner** | Vitest | Modern, fast |
-| **Testing** | React Testing Library + axe | Industry standard |
-| **Documentation** | Storybook | Component playground |
-| **Design System** | Material Design 3 | Strict adherence |
+| Category          | Technology                  | Why                              |
+| ----------------- | --------------------------- | -------------------------------- |
+| **UI Framework**  | React 18+                   | RSC support, modern features     |
+| **Type System**   | TypeScript 5.3+             | Strict mode, excellent DX        |
+| **Styling**       | Tailwind + CVA              | Performance + variant management |
+| **Accessibility** | React Aria                  | Best-in-class a11y primitives    |
+| **Build Tool**    | tsup                        | Fast, zero-config                |
+| **Test Runner**   | Vitest                      | Modern, fast                     |
+| **Testing**       | React Testing Library + axe | Industry standard                |
+| **Documentation** | Storybook                   | Component playground             |
+| **Design System** | Material Design 3           | Strict adherence                 |
 
 ---
 
@@ -103,6 +103,7 @@ All MD3 tokens implemented as CSS variables:
 ### Theming
 
 Users can customize via:
+
 1. CSS variables override
 2. Tailwind config extension
 3. ThemeProvider component
@@ -120,12 +121,14 @@ Users can customize via:
 ## 📋 Component Roadmap
 
 ### Phase 1a: Buttons (v0.1.0) - Week 3-4
+
 - Button (5 variants: filled, outlined, text, elevated, tonal)
 - Icon Button (4 variants)
 - FAB (4 sizes)
 - Segmented Button (2 modes: single-select, multi-select)
 
 ### Phase 1b: Inputs (v0.2.0) - Week 5-7
+
 - Checkbox
 - Radio
 - Switch
@@ -133,12 +136,14 @@ Users can customize via:
 - Select
 
 ### Phase 2: Selection (v0.3.0) - Week 8-10
+
 - Chip (4 types)
 - Menu
 - List
 - Slider
 
 ### Phase 3: Feedback (v0.4.0) - Week 11-13
+
 - Progress Indicator
 - Snackbar
 - Tooltip
@@ -146,6 +151,7 @@ Users can customize via:
 - Dialog
 
 ### Phase 4: Polish (v0.5-0.9) - Week 14-16
+
 - Add Playwright for E2E testing
 - Optimization
 - Documentation
@@ -153,6 +159,7 @@ Users can customize via:
 - Real-world testing
 
 ### Phase 5: Launch (v1.0.0) - Week 17-18
+
 - Stable release
 - Marketing
 - Community building
@@ -182,6 +189,7 @@ Users can customize via:
 ### Storybook
 
 Every component includes:
+
 - Default story
 - All variants
 - All sizes/states
@@ -282,27 +290,35 @@ import { Button, TextField, Checkbox } from "@tinybigui/react"
 ## 🎯 Key Principles
 
 ### 1. Quality Over Speed
+
 Build it right, not fast. Every component production-ready.
 
 ### 2. Accessibility First
+
 WCAG 2.1 AA compliance is non-negotiable.
 
 ### 3. Developer Experience
+
 Intuitive API, excellent TypeScript support, great documentation.
 
 ### 4. Material Design 3
+
 Strict adherence to MD3 specs. No compromises.
 
 ### 5. Modularity
+
 Components work independently. True LEGO blocks.
 
 ### 6. Performance
+
 Small bundle size, runtime efficiency, tree-shakeable.
 
 ### 7. Customization
+
 Easy theming, CSS variables, Tailwind integration.
 
 ### 8. Community
+
 Welcoming, transparent, collaborative.
 
 ---
@@ -311,31 +327,31 @@ Welcoming, transparent, collaborative.
 
 All major decisions have been made:
 
-| Decision | Choice |
-|----------|--------|
-| **Package name** | `@tinybigui/react` + `@tinybigui/tokens` |
-| **Repository name** | `tinybigui` |
-| **Initial components** | Phase 1a: Button, IconButton, FAB, Segmented Button |
-| **Testing framework** | Vitest + RTL + Playwright (Phase 4) |
-| **Storybook deployment** | Vercel + Chromatic (free tier) |
-| **Brand identity** | Default generated logo, black & white theme |
-| **Tailwind version** | v4 only (`^4.0.0`) |
-| **Package manager** | pnpm (enforced via `packageManager` field) |
-| **Commit format** | Conventional commits (enforced via commitlint + husky) |
+| Decision                 | Choice                                                 |
+| ------------------------ | ------------------------------------------------------ |
+| **Package name**         | `@tinybigui/react` + `@tinybigui/tokens`               |
+| **Repository name**      | `tinybigui`                                            |
+| **Initial components**   | Phase 1a: Button, IconButton, FAB, Segmented Button    |
+| **Testing framework**    | Vitest + RTL + Playwright (Phase 4)                    |
+| **Storybook deployment** | Vercel + Chromatic (free tier)                         |
+| **Brand identity**       | Default generated logo, black & white theme            |
+| **Tailwind version**     | v4 only (`^4.0.0`)                                     |
+| **Package manager**      | pnpm (enforced via `packageManager` field)             |
+| **Commit format**        | Conventional commits (enforced via commitlint + husky) |
 
 ---
 
 ## 📅 Timeline
 
-| Phase | Duration | Deliverable |
-|-------|----------|-------------|
-| **Phase 0** | Week 1-2 | Infrastructure setup |
-| **Phase 1a** | Week 3-4 | Button components (v0.1.0) |
-| **Phase 1b** | Week 5-7 | Input components (v0.2.0) |
-| **Phase 2** | Week 8-10 | Selection components (v0.3.0) |
-| **Phase 3** | Week 11-13 | Feedback components (v0.4.0) |
-| **Phase 4** | Week 14-16 | Polish, Playwright, refinement (v0.9.0) |
-| **Phase 5** | Week 17-18 | **1.0.0 Launch** 🚀 |
+| Phase        | Duration   | Deliverable                             |
+| ------------ | ---------- | --------------------------------------- |
+| **Phase 0**  | Week 1-2   | Infrastructure setup                    |
+| **Phase 1a** | Week 3-4   | Button components (v0.1.0)              |
+| **Phase 1b** | Week 5-7   | Input components (v0.2.0)               |
+| **Phase 2**  | Week 8-10  | Selection components (v0.3.0)           |
+| **Phase 3**  | Week 11-13 | Feedback components (v0.4.0)            |
+| **Phase 4**  | Week 14-16 | Polish, Playwright, refinement (v0.9.0) |
+| **Phase 5**  | Week 17-18 | **1.0.0 Launch** 🚀                     |
 
 **Total**: ~18 weeks to stable release
 
@@ -390,4 +406,3 @@ This strategy is a living document. If you have questions, suggestions, or feedb
 - Comment on this PR
 
 Let's build something amazing together! 🎨✨
-

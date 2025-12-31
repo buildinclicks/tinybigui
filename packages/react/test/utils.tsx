@@ -10,11 +10,7 @@
  * - Make tests easier to read and maintain
  */
 
-import {
-  render,
-  type RenderOptions,
-  type RenderResult,
-} from "@testing-library/react";
+import { render, type RenderOptions, type RenderResult } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { vi, type Mock } from "vitest";
 

@@ -30,6 +30,7 @@ This is the **monorepo root** configuration that manages all child packages.
 #### Key Sections:
 
 **1. Package Identity**
+
 ```json
 {
   "name": "@tinybigui/monorepo",
@@ -37,20 +38,24 @@ This is the **monorepo root** configuration that manages all child packages.
   "private": true
 }
 ```
+
 - **`"private": true`** - Prevents accidentally publishing the root workspace to NPM
 - Only child packages (`@tinybigui/react`, `@tinybigui/tokens`) will be published
 
 **2. Package Manager Enforcement**
+
 ```json
 {
   "packageManager": "pnpm@9.15.0"
 }
 ```
+
 - Enforces that everyone uses the same pnpm version
 - Prevents "works on my machine" issues
 - Corepack (Node.js) automatically installs the correct version
 
 **3. Engine Requirements**
+
 ```json
 {
   "engines": {
@@ -59,11 +64,13 @@ This is the **monorepo root** configuration that manages all child packages.
   }
 }
 ```
+
 - Requires Node.js 18+ and pnpm 9+
 - Aligns with our modern tooling strategy
 - Enforced by `.npmrc` with `engine-strict=true`
 
 **4. Workspace Scripts**
+
 ```json
 {
   "scripts": {
@@ -77,11 +84,13 @@ This is the **monorepo root** configuration that manages all child packages.
   }
 }
 ```
+
 - **`-r`** flag = "recursive" (runs in all workspace packages)
 - **`--parallel`** = Runs simultaneously for faster dev mode
 - Single command executes across entire monorepo
 
 **5. Shared Dev Dependencies**
+
 ```json
 {
   "devDependencies": {
@@ -93,6 +102,7 @@ This is the **monorepo root** configuration that manages all child packages.
   }
 }
 ```
+
 - Installed at root level
 - All packages use the same versions
 - Ensures consistent code quality standards
@@ -105,15 +115,17 @@ Defines the monorepo workspace structure.
 
 ```yaml
 packages:
-  - 'packages/*'
+  - "packages/*"
 ```
 
 **What it means:**
+
 - Any folder in `packages/` is treated as a separate package
 - Examples: `packages/react/`, `packages/tokens/`
 - pnpm links these packages together internally
 
 **Benefits:**
+
 - ✅ Fast installs (deduplicated dependencies)
 - ✅ Internal package linking (no need to publish locally)
 - ✅ Consistent dependency resolution
@@ -141,11 +153,13 @@ strict-peer-dependencies=false
 **Configuration breakdown:**
 
 **1. `engine-strict=true`**
+
 - Enforces Node/pnpm version requirements from `package.json`
 - Installation fails if using wrong versions
 - Prevents runtime errors from version mismatches
 
 **2. `shamefully-hoist=true`**
+
 - Hoists dependencies to root `node_modules/`
 - Creates a flatter node_modules structure
 - **Why needed:**
@@ -154,11 +168,13 @@ strict-peer-dependencies=false
   - Reduces nested dependency issues
 
 **3. `auto-install-peers=true`**
+
 - Automatically installs peer dependencies (React, Tailwind)
 - Reduces manual installation steps
 - pnpm 7+ feature
 
 **4. `strict-peer-dependencies=false`**
+
 - Allows minor peer dependency mismatches
 - Warns but doesn't fail
 - Useful for supporting React 18 and 19 simultaneously
@@ -200,26 +216,31 @@ info.txt
 **Categories:**
 
 **1. Dependencies** (`node_modules/`)
+
 - Can be reinstalled via `pnpm install`
 - Huge directory (100+ MB typically)
 - Changes constantly
 
 **2. Build outputs** (`dist/`, `build/`)
+
 - Generated from source code
 - Should be reproducible
 - Different on each machine
 
 **3. Environment files** (`.env*`)
+
 - May contain secrets (API keys, tokens)
 - Machine-specific configuration
 - Security risk if committed
 
 **4. IDE files** (`.vscode/`, `.DS_Store`)
+
 - Personal preferences
 - Different for each developer
 - Not relevant to project
 
 **5. Logs** (`*.log`)
+
 - Debug information
 - Temporary data
 - Not needed in repository
@@ -233,7 +254,7 @@ info.txt
 ✅ **Clean Git history** - Only source code tracked  
 ✅ **Modern standards** - Node 18+, pnpm 9+, strict engines  
 ✅ **Shared dependencies** - ESLint, Prettier, TypeScript at root  
-✅ **Workspace scripts** - Single commands for all packages  
+✅ **Workspace scripts** - Single commands for all packages
 
 ---
 
@@ -242,6 +263,7 @@ info.txt
 ### Why Monorepo?
 
 **Advantages:**
+
 - 📦 Single source of truth
 - 🔄 Atomic commits across packages
 - 🔗 Easy cross-package refactoring
@@ -249,17 +271,20 @@ info.txt
 - 📚 Shared tooling configuration
 
 **Alternatives considered:**
+
 - Multi-repo: Each package separate (harder to maintain)
 - Monolith: Everything in one package (less modular)
 
 ### Why pnpm?
 
 **vs npm:**
+
 - ⚡ 2-3x faster installs
 - 💾 Saves disk space (content-addressable storage)
 - 🔒 Stricter dependency resolution
 
 **vs yarn:**
+
 - 📦 Better workspace support
 - 🎯 More intuitive CLI
 - 🚀 Active development
@@ -271,6 +296,7 @@ info.txt
 ```
 
 This uses **Corepack** (built into Node.js 16+):
+
 - Automatically downloads correct pnpm version
 - No need for global install
 - Team uses exact same version
@@ -298,12 +324,14 @@ tinybigui/
 To verify this task was completed correctly:
 
 1. **Check workspace structure:**
+
    ```bash
    cat pnpm-workspace.yaml
    # Should show: packages: - 'packages/*'
    ```
 
 2. **Verify package manager:**
+
    ```bash
    cat package.json | grep packageManager
    # Should show: "packageManager": "pnpm@9.15.0"
@@ -330,6 +358,7 @@ To verify this task was completed correctly:
 
 **Commit message**: `chore: setup monorepo structure and react package`  
 **Files in commit**:
+
 - `package.json`
 - `pnpm-workspace.yaml`
 - `.npmrc`
@@ -339,13 +368,13 @@ To verify this task was completed correctly:
 
 ## 🤔 Decisions Made
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Package manager | pnpm 9+ | Fast, efficient, modern workspace support |
-| Node version | 18+ | Modern features, long-term support |
-| Monorepo tool | pnpm workspaces | Built-in, no extra tools needed |
-| Hoisting | Enabled | Storybook compatibility |
-| Engine enforcement | Strict | Prevent version mismatch issues |
+| Decision           | Choice          | Rationale                                 |
+| ------------------ | --------------- | ----------------------------------------- |
+| Package manager    | pnpm 9+         | Fast, efficient, modern workspace support |
+| Node version       | 18+             | Modern features, long-term support        |
+| Monorepo tool      | pnpm workspaces | Built-in, no extra tools needed           |
+| Hoisting           | Enabled         | Storybook compatibility                   |
+| Engine enforcement | Strict          | Prevent version mismatch issues           |
 
 ---
 
@@ -355,4 +384,3 @@ To verify this task was completed correctly:
 - [pnpm Configuration](https://pnpm.io/npmrc)
 - [Node.js Corepack](https://nodejs.org/api/corepack.html)
 - [Git Ignore Patterns](https://git-scm.com/docs/gitignore)
-

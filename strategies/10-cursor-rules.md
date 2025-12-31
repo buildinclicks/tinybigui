@@ -25,6 +25,7 @@ Before making any suggestions or changes, Cursor AI must be aware of:
 ### Key Principles
 
 Always adhere to:
+
 - ✅ Quality over speed
 - ✅ Accessibility first (WCAG 2.1 AA minimum)
 - ✅ Material Design 3 strict adherence
@@ -45,6 +46,7 @@ tinybigui/
 ```
 
 **Rules**:
+
 - ✅ Always place React components in `packages/react/`
 - ✅ Design tokens go in `packages/tokens/`
 - ❌ Never create files outside of packages
@@ -66,6 +68,7 @@ component-name/
 ```
 
 **Rules**:
+
 - ✅ MUST create all files for each component
 - ✅ MUST follow kebab-case for file names
 - ❌ NEVER skip any required files
@@ -80,16 +83,16 @@ component-name/
 ```typescript
 // ✅ DO: Explicit types
 interface ButtonProps extends AriaButtonProps {
-  variant?: 'filled' | 'outlined'
+  variant?: "filled" | "outlined";
 }
 
 // ❌ DON'T: Use any
 interface ButtonProps {
-  props: any
+  props: any;
 }
 
 // ✅ DO: const assertions
-const variants = ['filled', 'outlined'] as const
+const variants = ["filled", "outlined"] as const;
 
 // ✅ DO: JSDoc documentation
 /**
@@ -99,12 +102,11 @@ const variants = ['filled', 'outlined'] as const
  */
 
 // ✅ DO: forwardRef for refs
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (props, ref) => { }
-)
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {});
 ```
 
 **Rules**:
+
 - ✅ MUST use TypeScript strict mode
 - ✅ MUST provide JSDoc for all public APIs
 - ✅ MUST use `forwardRef` for components accepting refs
@@ -133,6 +135,7 @@ function Button({ variant, size, children, ...rest }) { }
 ```
 
 **Rules**:
+
 - ✅ MUST add `'use client'` to all interactive components
 - ✅ MUST use Tailwind CSS (never inline styles)
 - ✅ MUST use `cn()` utility for className merging
@@ -165,6 +168,7 @@ function ButtonHeadless(props) {
 ```
 
 **Rules**:
+
 - ✅ MUST use React Aria hooks for all interactive components
 - ✅ MUST let React Aria handle accessibility
 - ❌ NEVER implement keyboard/ARIA logic manually
@@ -174,33 +178,31 @@ function ButtonHeadless(props) {
 
 ```typescript
 // ✅ DO: Use CVA for variants
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva, type VariantProps } from "class-variance-authority";
 
-export const buttonVariants = cva(
-  'base-classes',
-  {
-    variants: {
-      variant: {
-        filled: 'bg-primary text-on-primary',
-        outlined: 'border-2 border-outline',
-      },
-      size: {
-        small: 'h-10 px-4',
-        medium: 'h-12 px-6',
-      },
+export const buttonVariants = cva("base-classes", {
+  variants: {
+    variant: {
+      filled: "bg-primary text-on-primary",
+      outlined: "border-2 border-outline",
     },
-    defaultVariants: {
-      variant: 'filled',
-      size: 'medium',
+    size: {
+      small: "h-10 px-4",
+      medium: "h-12 px-6",
     },
-  }
-)
+  },
+  defaultVariants: {
+    variant: "filled",
+    size: "medium",
+  },
+});
 
 // ✅ DO: Export VariantProps type
-export type ButtonVariants = VariantProps<typeof buttonVariants>
+export type ButtonVariants = VariantProps<typeof buttonVariants>;
 ```
 
 **Rules**:
+
 - ✅ MUST use CVA for component variants
 - ✅ MUST define variants in separate `.variants.ts` file
 - ✅ MUST export VariantProps type
@@ -228,6 +230,7 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
 ```
 
 **Rules**:
+
 - ✅ MUST use MD3 design tokens (via CSS variables)
 - ✅ MUST follow MD3 specifications exactly
 - ❌ NEVER use arbitrary color values
@@ -236,6 +239,7 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
 ### Component Variants
 
 **Rules**:
+
 - ✅ MUST implement ALL MD3 variants for each component
 - ✅ MUST follow MD3 naming (e.g., 'filled', 'outlined', not 'solid', 'bordered')
 - ❌ NEVER create custom variants not in MD3 spec
@@ -255,6 +259,7 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
 ```
 
 **Rules**:
+
 - ✅ MUST implement MD3 state layers
 - ✅ MUST use MD3 motion tokens
 - ✅ MUST implement ripple effect (where specified)
@@ -267,6 +272,7 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
 ### WCAG Compliance
 
 **Rules**:
+
 - ✅ MUST meet WCAG 2.1 AA minimum
 - ✅ MUST ensure 4.5:1 contrast for text
 - ✅ MUST ensure 3:1 contrast for UI components
@@ -277,6 +283,7 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
 ### Keyboard Navigation
 
 **Rules**:
+
 - ✅ MUST support Tab/Shift+Tab navigation
 - ✅ MUST support Enter/Space for activation
 - ✅ MUST show visible focus indicators
@@ -302,6 +309,7 @@ const { buttonProps } = useButton(props, ref)
 ```
 
 **Rules**:
+
 - ✅ MUST let React Aria handle ARIA attributes
 - ✅ MUST provide `aria-label` for icon-only components
 - ✅ MUST use semantic HTML when possible
@@ -321,12 +329,12 @@ describe('Button', () => {
     it('renders with default props', () => { })
     it('renders all variants', () => { })
   })
-  
+
   describe('Interactions', () => {
     it('handles click events', async () => { })
     it('handles keyboard navigation', async () => { })
   })
-  
+
   describe('Accessibility', () => {
     it('has no violations', async () => {
       const { container } = render(<Button>Click</Button>)
@@ -334,7 +342,7 @@ describe('Button', () => {
       expect(results).toHaveNoViolations()
     })
   })
-  
+
   describe('Customization', () => {
     it('merges custom className', () => { })
   })
@@ -342,6 +350,7 @@ describe('Button', () => {
 ```
 
 **Rules**:
+
 - ✅ MUST write tests for every component
 - ✅ MUST include accessibility tests (axe)
 - ✅ MUST test all variants and states
@@ -352,6 +361,7 @@ describe('Button', () => {
 ### Test Coverage
 
 **Rules**:
+
 - ✅ MUST achieve >90% code coverage
 - ✅ MUST test edge cases
 - ✅ MUST test error states
@@ -365,16 +375,17 @@ describe('Button', () => {
 
 ```typescript
 // ✅ DO: Include all standard stories
-export const Default: Story = { }
-export const Variants: Story = { }
-export const Sizes: Story = { }
-export const States: Story = { }
-export const WithIcons: Story = { }
-export const Accessibility: Story = { }
-export const Interactive: Story = { } // with play function
+export const Default: Story = {};
+export const Variants: Story = {};
+export const Sizes: Story = {};
+export const States: Story = {};
+export const WithIcons: Story = {};
+export const Accessibility: Story = {};
+export const Interactive: Story = {}; // with play function
 ```
 
 **Rules**:
+
 - ✅ MUST create Storybook stories for every component
 - ✅ MUST include all variants in stories
 - ✅ MUST include accessibility story
@@ -390,16 +401,17 @@ interface ButtonProps {
    * The visual style of the button
    * @default 'filled'
    */
-  variant?: 'filled' | 'outlined'
-  
+  variant?: "filled" | "outlined";
+
   /**
    * Handler called when button is pressed
    */
-  onPress?: () => void
+  onPress?: () => void;
 }
 ```
 
 **Rules**:
+
 - ✅ MUST add JSDoc to all public APIs
 - ✅ MUST document @default values
 - ✅ MUST include @example where helpful
@@ -413,23 +425,24 @@ interface ButtonProps {
 
 ```typescript
 // 1. React imports
-import { forwardRef } from 'react'
+import { forwardRef } from "react";
 
 // 2. External libraries
-import { useButton } from 'react-aria'
-import { cva } from 'class-variance-authority'
+import { useButton } from "react-aria";
+import { cva } from "class-variance-authority";
 
 // 3. Internal components
-import { Icon } from '../icon'
+import { Icon } from "../icon";
 
 // 4. Internal utilities
-import { cn } from '../../utils/cn'
+import { cn } from "../../utils/cn";
 
 // 5. Types
-import type { ButtonProps } from './button.types'
+import type { ButtonProps } from "./button.types";
 ```
 
 **Rules**:
+
 - ✅ MUST follow this import order
 - ✅ MUST use type imports for types (`import type`)
 - ✅ MUST use relative imports within packages
@@ -440,16 +453,17 @@ import type { ButtonProps } from './button.types'
 
 ```typescript
 // ✅ DO: Named exports only
-export { Button } from './button'
-export { ButtonHeadless } from './button-headless'
-export { buttonVariants } from './button.variants'
-export type { ButtonProps } from './button.types'
+export { Button } from "./button";
+export { ButtonHeadless } from "./button-headless";
+export { buttonVariants } from "./button.variants";
+export type { ButtonProps } from "./button.types";
 
 // ❌ DON'T: Default exports
-export default Button
+export default Button;
 ```
 
 **Rules**:
+
 - ✅ MUST use named exports only
 - ✅ MUST export types separately (`export type`)
 - ✅ MUST re-export from index.ts
@@ -478,6 +492,7 @@ git commit -m "wip"
 ```
 
 **Commit Types**:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation only
@@ -488,6 +503,7 @@ git commit -m "wip"
 - `chore`: Maintenance (deps, config, etc.)
 
 **Rules**:
+
 - ✅ MUST use conventional commit format
 - ✅ MUST include component scope (e.g., `feat(button)`)
 - ✅ MUST write descriptive commit messages
@@ -608,6 +624,7 @@ When answering questions, consult in this order:
 ## 🔄 Updates
 
 This document will evolve as:
+
 - New patterns emerge
 - Strategy changes
 - Best practices improve
@@ -619,6 +636,7 @@ Always check the "Last Updated" date at the top.
 ## 🎉 Goal
 
 These rules ensure that:
+
 - ✅ Code is consistent across the project
 - ✅ Quality standards are maintained
 - ✅ Accessibility is never compromised
@@ -627,4 +645,3 @@ These rules ensure that:
 - ✅ Codebase is maintainable long-term
 
 **When in doubt, prioritize: Accessibility > Consistency > Convenience**
-

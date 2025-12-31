@@ -24,51 +24,51 @@ Accessibility is a **first-class citizen** in TinyBigUI. Every component must me
 
 ### Why React Aria?
 
-| Feature | Benefit |
-|---------|---------|
-| **Battle-tested** | Used by Adobe in production products |
-| **Comprehensive** | Covers all ARIA patterns |
-| **Keyboard navigation** | Built-in and spec-compliant |
-| **Screen reader support** | Tested with JAWS, NVDA, VoiceOver |
-| **Focus management** | Automatic focus handling |
-| **Mobile touch** | Touch-friendly interactions |
-| **Internationalization** | Built-in i18n support |
+| Feature                   | Benefit                              |
+| ------------------------- | ------------------------------------ |
+| **Battle-tested**         | Used by Adobe in production products |
+| **Comprehensive**         | Covers all ARIA patterns             |
+| **Keyboard navigation**   | Built-in and spec-compliant          |
+| **Screen reader support** | Tested with JAWS, NVDA, VoiceOver    |
+| **Focus management**      | Automatic focus handling             |
+| **Mobile touch**          | Touch-friendly interactions          |
+| **Internationalization**  | Built-in i18n support                |
 
 ### React Aria Hooks We'll Use
 
 #### For Button Components
 
 ```typescript
-import { 
-  useButton,           // Button interactions
-  useFocusRing,       // Focus indicators
-  useHover,           // Hover states
-  usePress            // Press interactions
-} from 'react-aria'
+import {
+  useButton, // Button interactions
+  useFocusRing, // Focus indicators
+  useHover, // Hover states
+  usePress, // Press interactions
+} from "react-aria";
 ```
 
 #### For Input Components
 
 ```typescript
 import {
-  useTextField,       // Text inputs
-  useCheckbox,        // Checkboxes
-  useRadio,           // Radio buttons
-  useSwitch,          // Switches
-  useSlider,          // Sliders
-  useNumberField      // Number inputs
-} from 'react-aria'
+  useTextField, // Text inputs
+  useCheckbox, // Checkboxes
+  useRadio, // Radio buttons
+  useSwitch, // Switches
+  useSlider, // Sliders
+  useNumberField, // Number inputs
+} from "react-aria";
 ```
 
 #### For Selection Components
 
 ```typescript
 import {
-  useSelect,          // Dropdowns
-  useMenu,            // Menus
-  useComboBox,        // Autocomplete
-  useListBox          // List selections
-} from 'react-aria'
+  useSelect, // Dropdowns
+  useMenu, // Menus
+  useComboBox, // Autocomplete
+  useListBox, // List selections
+} from "react-aria";
 ```
 
 ---
@@ -79,14 +79,14 @@ import {
 
 All interactive components must support:
 
-| Key | Action |
-|-----|--------|
-| `Tab` | Move focus forward |
-| `Shift + Tab` | Move focus backward |
-| `Enter` | Activate focused element |
-| `Space` | Toggle/activate (where applicable) |
-| `Escape` | Close/cancel (for modals, menus) |
-| `Arrow keys` | Navigate within component (lists, menus) |
+| Key           | Action                                   |
+| ------------- | ---------------------------------------- |
+| `Tab`         | Move focus forward                       |
+| `Shift + Tab` | Move focus backward                      |
+| `Enter`       | Activate focused element                 |
+| `Space`       | Toggle/activate (where applicable)       |
+| `Escape`      | Close/cancel (for modals, menus)         |
+| `Arrow keys`  | Navigate within component (lists, menus) |
 
 ### Component-Specific Patterns
 
@@ -144,7 +144,7 @@ import { useFocusRing } from 'react-aria'
 
 function Button(props) {
   const { isFocusVisible, focusProps } = useFocusRing()
-  
+
   return (
     <button
       {...focusProps}
@@ -164,10 +164,10 @@ function Button(props) {
 For modals and dialogs:
 
 ```typescript
-import { useDialog } from 'react-aria'
+import { useDialog } from "react-aria";
 
 function Dialog(props) {
-  const { dialogProps } = useDialog(props, ref)
+  const { dialogProps } = useDialog(props, ref);
   // React Aria handles focus trapping automatically
 }
 ```
@@ -203,8 +203,8 @@ For dynamic content updates:
 
 ```typescript
 // Snackbar/Toast
-<div 
-  role="status" 
+<div
+  role="status"
   aria-live="polite"
   aria-atomic="true"
 >
@@ -212,7 +212,7 @@ For dynamic content updates:
 </div>
 
 // Error message
-<div 
+<div
   role="alert"
   aria-live="assertive"
 >
@@ -249,13 +249,13 @@ import { useButton } from 'react-aria'
 function Button(props) {
   const ref = useRef(null)
   const { buttonProps } = useButton(props, ref)
-  
+
   // Automatically includes:
   // - role="button" (if not a <button> element)
   // - aria-disabled (if disabled)
   // - Keyboard handlers (Enter, Space)
   // - Pointer event handlers
-  
+
   return <button {...buttonProps} ref={ref} />
 }
 ```
@@ -269,13 +269,13 @@ import { useToggleState } from 'react-stately'
 function Checkbox(props) {
   const state = useToggleState(props)
   const { inputProps } = useCheckbox(props, state, ref)
-  
+
   // Automatically includes:
   // - role="checkbox"
   // - aria-checked
   // - aria-invalid (if validation fails)
   // - Keyboard support
-  
+
   return <input {...inputProps} type="checkbox" />
 }
 ```
@@ -287,13 +287,13 @@ import { useTextField } from 'react-aria'
 
 function TextField(props) {
   const { labelProps, inputProps, errorMessageProps } = useTextField(props, ref)
-  
+
   // Automatically includes:
   // - aria-labelledby
   // - aria-describedby (for errors/help text)
   // - aria-required
   // - aria-invalid
-  
+
   return (
     <>
       <label {...labelProps}>{props.label}</label>
@@ -312,10 +312,10 @@ function TextField(props) {
 
 ### WCAG Contrast Requirements
 
-| Content Type | Normal Text | Large Text | UI Components |
-|-------------|-------------|------------|---------------|
-| **Level AA** | 4.5:1 | 3:1 | 3:1 |
-| **Level AAA** | 7:1 | 4.5:1 | 4.5:1 |
+| Content Type  | Normal Text | Large Text | UI Components |
+| ------------- | ----------- | ---------- | ------------- |
+| **Level AA**  | 4.5:1       | 3:1        | 3:1           |
+| **Level AAA** | 7:1         | 4.5:1      | 4.5:1         |
 
 **Target**: AA for all components, AAA where possible.
 
@@ -355,9 +355,9 @@ test('Button has no accessibility violations', async () => {
 // .storybook/main.ts
 export default {
   addons: [
-    '@storybook/addon-a11y',  // Automatic a11y checks in Storybook
+    "@storybook/addon-a11y", // Automatic a11y checks in Storybook
   ],
-}
+};
 ```
 
 ### 2. Manual Testing Checklist
@@ -376,6 +376,7 @@ For each component:
 ### 3. Screen Reader Testing
 
 Test with:
+
 - **macOS/iOS**: VoiceOver
 - **Windows**: NVDA (free, most common)
 - **Windows**: JAWS (if available)
@@ -410,7 +411,7 @@ Test with:
 
 /* Icon-only buttons */
 .md-icon-button {
-  width: 48px;   /* MD3 spec + our accessibility standard */
+  width: 48px; /* MD3 spec + our accessibility standard */
   height: 48px;
 }
 ```
@@ -427,7 +428,7 @@ function Button(props) {
     onPress: props.onPress,
     // Handles touch, mouse, and keyboard uniformly
   })
-  
+
   return <button {...pressProps}>{props.children}</button>
 }
 ```
@@ -462,16 +463,16 @@ import { I18nProvider } from 'react-aria'
 ```typescript
 function TextField(props) {
   const { inputProps, errorMessageProps } = useTextField(props, ref)
-  
+
   return (
     <>
-      <input 
+      <input
         {...inputProps}
         aria-invalid={props.isInvalid}
         aria-errormessage={props.isInvalid ? errorId : undefined}
       />
       {props.isInvalid && (
-        <span 
+        <span
           {...errorMessageProps}
           id={errorId}
           role="alert"  // Announced immediately
@@ -506,28 +507,24 @@ Every component's documentation must include:
 
 1. **Keyboard Support Table**
    - List all supported keyboard shortcuts
-   
 2. **ARIA Information**
    - Roles, states, and properties used
-   
 3. **Screen Reader Testing**
    - What screen readers announce
-   
 4. **Focus Management**
    - How focus is managed
-   
 5. **Examples**
    - Accessible usage examples
 
 ### Example Documentation Template
 
-````markdown
+```markdown
 ## Accessibility
 
 ### Keyboard Support
 
-| Key | Function |
-|-----|----------|
+| Key   | Function             |
+| ----- | -------------------- |
 | Enter | Activates the button |
 | Space | Activates the button |
 
@@ -544,7 +541,7 @@ The button is announced as "Button name, button" and its state (pressed/disabled
 ### Focus Management
 
 The button receives focus via Tab key and displays a visible focus ring.
-````
+```
 
 ---
 
@@ -553,29 +550,34 @@ The button receives focus via Tab key and displays a visible focus ring.
 Before releasing any component:
 
 ### Keyboard
+
 - [ ] All functionality available via keyboard
 - [ ] Focus indicator visible and meets contrast requirements
 - [ ] Tab order is logical
 - [ ] No keyboard traps
 
 ### Screen Readers
+
 - [ ] All interactive elements have accessible names
 - [ ] State changes are announced
 - [ ] Error messages are announced
 - [ ] Form labels are properly associated
 
 ### Visual
+
 - [ ] Color contrast meets WCAG AA (4.5:1 for text)
 - [ ] Information not conveyed by color alone
 - [ ] Focus indicators are visible
 - [ ] Text can scale to 200% without loss of content
 
 ### Mobile/Touch
+
 - [ ] Touch targets are minimum 44×44 pixels
 - [ ] Gestures work consistently
 - [ ] No hover-only content
 
 ### Testing
+
 - [ ] Passes automated axe tests
 - [ ] Tested with keyboard only
 - [ ] Tested with screen reader
@@ -588,6 +590,7 @@ Before releasing any component:
 ### Required Reading
 
 All contributors should read:
+
 1. [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
 2. [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/)
 3. [React Aria Documentation](https://react-spectrum.adobe.com/react-aria/)
@@ -595,6 +598,7 @@ All contributors should read:
 ### A11y Champions
 
 Designate team members as accessibility champions to:
+
 - Review all PRs for accessibility
 - Stay updated on a11y best practices
 - Conduct screen reader testing
@@ -609,4 +613,3 @@ Designate team members as accessibility champions to:
 - [axe-core](https://github.com/dequelabs/axe-core)
 - [WebAIM](https://webaim.org/)
 - [A11y Project](https://www.a11yproject.com/)
-

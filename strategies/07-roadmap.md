@@ -497,25 +497,21 @@ Track progress in GitHub Projects:
 ### For Each Component
 
 1. **Research** (1 day)
-
    - Study MD3 specs
    - Review React Aria hooks
    - Check existing implementations
 
 2. **Development** (2-3 days)
-
    - Build headless primitive
    - Add MD3 styled layer
    - Implement all variants
 
 3. **Testing** (1 day)
-
    - Unit tests
    - Accessibility tests
    - Interaction tests
 
 4. **Documentation** (1 day)
-
    - Storybook stories
    - API documentation
    - Usage examples

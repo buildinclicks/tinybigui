@@ -608,14 +608,12 @@ Track documentation quality:
 Provide framework-specific setup guides in this priority order:
 
 1. **Next.js (App Router)** — Primary golden path
-
    - Installation with App Router
    - Importing styles in `app/layout.tsx`
    - Using components in Server + Client components
    - RSC considerations
 
 2. **Vite (React)** — Secondary path
-
    - Installation with Vite
    - Importing styles in entry point
    - Standard React usage

@@ -13,41 +13,41 @@
      Material Design 3 color system with light/dark mode support
      Complete set of 18 semantic color roles for light and dark themes
      ========================================================================== */
-  
+
   /* Primary */
   --md-sys-color-primary: #6750a4;
   --md-sys-color-on-primary: #ffffff;
   --md-sys-color-primary-container: #eaddff;
   --md-sys-color-on-primary-container: #21005d;
-  
+
   /* Secondary */
   --md-sys-color-secondary: #625b71;
   --md-sys-color-on-secondary: #ffffff;
   --md-sys-color-secondary-container: #e8def8;
   --md-sys-color-on-secondary-container: #1d192b;
-  
+
   /* Tertiary */
   --md-sys-color-tertiary: #7d5260;
   --md-sys-color-on-tertiary: #ffffff;
   --md-sys-color-tertiary-container: #ffd8e4;
   --md-sys-color-on-tertiary-container: #31111d;
-  
+
   /* Error */
   --md-sys-color-error: #b3261e;
   --md-sys-color-on-error: #ffffff;
   --md-sys-color-error-container: #f9dedc;
   --md-sys-color-on-error-container: #410e0b;
-  
+
   /* Surface */
   --md-sys-color-surface: #fffbfe;
   --md-sys-color-on-surface: #1c1b1f;
   --md-sys-color-surface-variant: #e7e0ec;
   --md-sys-color-on-surface-variant: #49454f;
-  
+
   /* Outline */
   --md-sys-color-outline: #79747e;
   --md-sys-color-outline-variant: #cac4d0;
-  
+
   /* Background */
   --md-sys-color-background: #fffbfe;
   --md-sys-color-on-background: #1c1b1f;
@@ -56,88 +56,89 @@
      TYPOGRAPHY TOKENS
      Material Design 3 Type Scale - 5 categories, 3 sizes each (15 total)
      ========================================================================== */
-  
+
   /* Font families */
-  --md-sys-typescale-font-family-plain: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --md-sys-typescale-font-family-plain:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --md-sys-typescale-font-family-brand: var(--md-sys-typescale-font-family-plain);
-  
+
   /* Display - Large expressive text */
-  --md-sys-typescale-display-large-size: 3.5625rem;        /* 57px */
-  --md-sys-typescale-display-large-line-height: 4rem;       /* 64px */
+  --md-sys-typescale-display-large-size: 3.5625rem; /* 57px */
+  --md-sys-typescale-display-large-line-height: 4rem; /* 64px */
   --md-sys-typescale-display-large-weight: 400;
   --md-sys-typescale-display-large-tracking: -0.25px;
-  
-  --md-sys-typescale-display-medium-size: 2.8125rem;       /* 45px */
-  --md-sys-typescale-display-medium-line-height: 3.25rem;   /* 52px */
+
+  --md-sys-typescale-display-medium-size: 2.8125rem; /* 45px */
+  --md-sys-typescale-display-medium-line-height: 3.25rem; /* 52px */
   --md-sys-typescale-display-medium-weight: 400;
   --md-sys-typescale-display-medium-tracking: 0;
-  
-  --md-sys-typescale-display-small-size: 2.25rem;          /* 36px */
-  --md-sys-typescale-display-small-line-height: 2.75rem;    /* 44px */
+
+  --md-sys-typescale-display-small-size: 2.25rem; /* 36px */
+  --md-sys-typescale-display-small-line-height: 2.75rem; /* 44px */
   --md-sys-typescale-display-small-weight: 400;
   --md-sys-typescale-display-small-tracking: 0;
-  
+
   /* Headline - High-emphasis text */
-  --md-sys-typescale-headline-large-size: 2rem;            /* 32px */
-  --md-sys-typescale-headline-large-line-height: 2.5rem;    /* 40px */
+  --md-sys-typescale-headline-large-size: 2rem; /* 32px */
+  --md-sys-typescale-headline-large-line-height: 2.5rem; /* 40px */
   --md-sys-typescale-headline-large-weight: 400;
   --md-sys-typescale-headline-large-tracking: 0;
-  
-  --md-sys-typescale-headline-medium-size: 1.75rem;        /* 28px */
-  --md-sys-typescale-headline-medium-line-height: 2.25rem;  /* 36px */
+
+  --md-sys-typescale-headline-medium-size: 1.75rem; /* 28px */
+  --md-sys-typescale-headline-medium-line-height: 2.25rem; /* 36px */
   --md-sys-typescale-headline-medium-weight: 400;
   --md-sys-typescale-headline-medium-tracking: 0;
-  
-  --md-sys-typescale-headline-small-size: 1.5rem;          /* 24px */
-  --md-sys-typescale-headline-small-line-height: 2rem;      /* 32px */
+
+  --md-sys-typescale-headline-small-size: 1.5rem; /* 24px */
+  --md-sys-typescale-headline-small-line-height: 2rem; /* 32px */
   --md-sys-typescale-headline-small-weight: 400;
   --md-sys-typescale-headline-small-tracking: 0;
-  
+
   /* Title - Medium-emphasis text */
-  --md-sys-typescale-title-large-size: 1.375rem;           /* 22px */
-  --md-sys-typescale-title-large-line-height: 1.75rem;      /* 28px */
+  --md-sys-typescale-title-large-size: 1.375rem; /* 22px */
+  --md-sys-typescale-title-large-line-height: 1.75rem; /* 28px */
   --md-sys-typescale-title-large-weight: 400;
   --md-sys-typescale-title-large-tracking: 0;
-  
-  --md-sys-typescale-title-medium-size: 1rem;              /* 16px */
-  --md-sys-typescale-title-medium-line-height: 1.5rem;      /* 24px */
+
+  --md-sys-typescale-title-medium-size: 1rem; /* 16px */
+  --md-sys-typescale-title-medium-line-height: 1.5rem; /* 24px */
   --md-sys-typescale-title-medium-weight: 500;
   --md-sys-typescale-title-medium-tracking: 0.15px;
-  
-  --md-sys-typescale-title-small-size: 0.875rem;           /* 14px */
-  --md-sys-typescale-title-small-line-height: 1.25rem;      /* 20px */
+
+  --md-sys-typescale-title-small-size: 0.875rem; /* 14px */
+  --md-sys-typescale-title-small-line-height: 1.25rem; /* 20px */
   --md-sys-typescale-title-small-weight: 500;
   --md-sys-typescale-title-small-tracking: 0.1px;
-  
+
   /* Body - Plain text */
-  --md-sys-typescale-body-large-size: 1rem;                /* 16px */
-  --md-sys-typescale-body-large-line-height: 1.5rem;        /* 24px */
+  --md-sys-typescale-body-large-size: 1rem; /* 16px */
+  --md-sys-typescale-body-large-line-height: 1.5rem; /* 24px */
   --md-sys-typescale-body-large-weight: 400;
   --md-sys-typescale-body-large-tracking: 0.5px;
-  
-  --md-sys-typescale-body-medium-size: 0.875rem;           /* 14px */
-  --md-sys-typescale-body-medium-line-height: 1.25rem;      /* 20px */
+
+  --md-sys-typescale-body-medium-size: 0.875rem; /* 14px */
+  --md-sys-typescale-body-medium-line-height: 1.25rem; /* 20px */
   --md-sys-typescale-body-medium-weight: 400;
   --md-sys-typescale-body-medium-tracking: 0.25px;
-  
-  --md-sys-typescale-body-small-size: 0.75rem;             /* 12px */
-  --md-sys-typescale-body-small-line-height: 1rem;          /* 16px */
+
+  --md-sys-typescale-body-small-size: 0.75rem; /* 12px */
+  --md-sys-typescale-body-small-line-height: 1rem; /* 16px */
   --md-sys-typescale-body-small-weight: 400;
   --md-sys-typescale-body-small-tracking: 0.4px;
-  
+
   /* Label - UI labels, buttons */
-  --md-sys-typescale-label-large-size: 0.875rem;           /* 14px */
-  --md-sys-typescale-label-large-line-height: 1.25rem;      /* 20px */
+  --md-sys-typescale-label-large-size: 0.875rem; /* 14px */
+  --md-sys-typescale-label-large-line-height: 1.25rem; /* 20px */
   --md-sys-typescale-label-large-weight: 500;
   --md-sys-typescale-label-large-tracking: 0.1px;
-  
-  --md-sys-typescale-label-medium-size: 0.75rem;           /* 12px */
-  --md-sys-typescale-label-medium-line-height: 1rem;        /* 16px */
+
+  --md-sys-typescale-label-medium-size: 0.75rem; /* 12px */
+  --md-sys-typescale-label-medium-line-height: 1rem; /* 16px */
   --md-sys-typescale-label-medium-weight: 500;
   --md-sys-typescale-label-medium-tracking: 0.5px;
-  
-  --md-sys-typescale-label-small-size: 0.6875rem;          /* 11px */
-  --md-sys-typescale-label-small-line-height: 1rem;         /* 16px */
+
+  --md-sys-typescale-label-small-size: 0.6875rem; /* 11px */
+  --md-sys-typescale-label-small-line-height: 1rem; /* 16px */
   --md-sys-typescale-label-small-weight: 500;
   --md-sys-typescale-label-small-tracking: 0.5px;
 
@@ -145,7 +146,7 @@
      SHAPE TOKENS
      Material Design 3 corner radius system
      ========================================================================== */
-  
+
   --md-sys-shape-corner-none: 0;
   --md-sys-shape-corner-extra-small: 0.25rem;
   --md-sys-shape-corner-small: 0.5rem;
@@ -158,7 +159,7 @@
      ELEVATION TOKENS
      Material Design 3 elevation system (box shadows)
      ========================================================================== */
-  
+
   --md-sys-elevation-level0: none;
   --md-sys-elevation-level1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
   --md-sys-elevation-level2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
@@ -170,7 +171,7 @@
      MOTION TOKENS
      Material Design 3 motion system (duration and easing)
      ========================================================================== */
-  
+
   --md-sys-motion-duration-short1: 50ms;
   --md-sys-motion-duration-short2: 100ms;
   --md-sys-motion-duration-short3: 150ms;
@@ -183,7 +184,7 @@
   --md-sys-motion-duration-long2: 500ms;
   --md-sys-motion-duration-long3: 550ms;
   --md-sys-motion-duration-long4: 600ms;
-  
+
   --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
@@ -201,35 +202,35 @@
     --md-sys-color-on-primary: #381e72;
     --md-sys-color-primary-container: #4f378b;
     --md-sys-color-on-primary-container: #eaddff;
-    
+
     /* Secondary */
     --md-sys-color-secondary: #ccc2dc;
     --md-sys-color-on-secondary: #332d41;
     --md-sys-color-secondary-container: #4a4458;
     --md-sys-color-on-secondary-container: #e8def8;
-    
+
     /* Tertiary */
     --md-sys-color-tertiary: #efb8c8;
     --md-sys-color-on-tertiary: #492532;
     --md-sys-color-tertiary-container: #633b48;
     --md-sys-color-on-tertiary-container: #ffd8e4;
-    
+
     /* Error */
     --md-sys-color-error: #f2b8b5;
     --md-sys-color-on-error: #601410;
     --md-sys-color-error-container: #8c1d18;
     --md-sys-color-on-error-container: #f9dedc;
-    
+
     /* Surface */
     --md-sys-color-surface: #1c1b1f;
     --md-sys-color-on-surface: #e6e1e5;
     --md-sys-color-surface-variant: #49454f;
     --md-sys-color-on-surface-variant: #cac4d0;
-    
+
     /* Outline */
     --md-sys-color-outline: #938f99;
     --md-sys-color-outline-variant: #49454f;
-    
+
     /* Background */
     --md-sys-color-background: #1c1b1f;
     --md-sys-color-on-background: #e6e1e5;
@@ -245,43 +246,42 @@
   /* Color Utilities
      Maps MD3 semantic color roles to Tailwind color utilities
      Usage: bg-primary, text-on-primary, border-outline, etc. */
-  
+
   /* Primary colors */
   --color-primary: var(--md-sys-color-primary);
   --color-on-primary: var(--md-sys-color-on-primary);
   --color-primary-container: var(--md-sys-color-primary-container);
   --color-on-primary-container: var(--md-sys-color-on-primary-container);
-  
+
   /* Secondary colors */
   --color-secondary: var(--md-sys-color-secondary);
   --color-on-secondary: var(--md-sys-color-on-secondary);
   --color-secondary-container: var(--md-sys-color-secondary-container);
   --color-on-secondary-container: var(--md-sys-color-on-secondary-container);
-  
+
   /* Tertiary colors */
   --color-tertiary: var(--md-sys-color-tertiary);
   --color-on-tertiary: var(--md-sys-color-on-tertiary);
   --color-tertiary-container: var(--md-sys-color-tertiary-container);
   --color-on-tertiary-container: var(--md-sys-color-on-tertiary-container);
-  
+
   /* Error colors */
   --color-error: var(--md-sys-color-error);
   --color-on-error: var(--md-sys-color-on-error);
   --color-error-container: var(--md-sys-color-error-container);
   --color-on-error-container: var(--md-sys-color-on-error-container);
-  
+
   /* Surface colors */
   --color-surface: var(--md-sys-color-surface);
   --color-on-surface: var(--md-sys-color-on-surface);
   --color-surface-variant: var(--md-sys-color-surface-variant);
   --color-on-surface-variant: var(--md-sys-color-on-surface-variant);
-  
+
   /* Outline colors */
   --color-outline: var(--md-sys-color-outline);
   --color-outline-variant: var(--md-sys-color-outline-variant);
-  
+
   /* Background colors */
   --color-background: var(--md-sys-color-background);
   --color-on-background: var(--md-sys-color-on-background);
 }
-

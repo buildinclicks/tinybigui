@@ -39,35 +39,35 @@ Added `@theme` directive block that maps MD3 color tokens to Tailwind utilities:
   --color-on-primary: var(--md-sys-color-on-primary);
   --color-primary-container: var(--md-sys-color-primary-container);
   --color-on-primary-container: var(--md-sys-color-on-primary-container);
-  
+
   /* Secondary colors */
   --color-secondary: var(--md-sys-color-secondary);
   --color-on-secondary: var(--md-sys-color-on-secondary);
   --color-secondary-container: var(--md-sys-color-secondary-container);
   --color-on-secondary-container: var(--md-sys-color-on-secondary-container);
-  
+
   /* Tertiary colors */
   --color-tertiary: var(--md-sys-color-tertiary);
   --color-on-tertiary: var(--md-sys-color-on-tertiary);
   --color-tertiary-container: var(--md-sys-color-tertiary-container);
   --color-on-tertiary-container: var(--md-sys-color-on-tertiary-container);
-  
+
   /* Error colors */
   --color-error: var(--md-sys-color-error);
   --color-on-error: var(--md-sys-color-on-error);
   --color-error-container: var(--md-sys-color-error-container);
   --color-on-error-container: var(--md-sys-color-on-error-container);
-  
+
   /* Surface colors */
   --color-surface: var(--md-sys-color-surface);
   --color-on-surface: var(--md-sys-color-on-surface);
   --color-surface-variant: var(--md-sys-color-surface-variant);
   --color-on-surface-variant: var(--md-sys-color-on-surface-variant);
-  
+
   /* Outline colors */
   --color-outline: var(--md-sys-color-outline);
   --color-outline-variant: var(--md-sys-color-outline-variant);
-  
+
   /* Background colors */
   --color-background: var(--md-sys-color-background);
   --color-on-background: var(--md-sys-color-on-background);
@@ -81,6 +81,7 @@ Added `@theme` directive block that maps MD3 color tokens to Tailwind utilities:
 ### 1. Semantic Tailwind Utilities
 
 **Before integration:**
+
 ```tsx
 // Users had to use arbitrary values
 <button className="bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
@@ -89,16 +90,16 @@ Added `@theme` directive block that maps MD3 color tokens to Tailwind utilities:
 ```
 
 **After integration:**
+
 ```tsx
 // Clean, semantic utilities
-<button className="bg-primary text-on-primary">
-  Click me
-</button>
+<button className="bg-primary text-on-primary">Click me</button>
 ```
 
 ### 2. Complete Token Mapping
 
 **18 MD3 color roles mapped:**
+
 - 4 Primary colors (primary, on-primary, primary-container, on-primary-container)
 - 4 Secondary colors
 - 4 Tertiary colors
@@ -108,6 +109,7 @@ Added `@theme` directive block that maps MD3 color tokens to Tailwind utilities:
 - 2 Background colors
 
 **Generated ~54 Tailwind utilities:**
+
 - `bg-*` (background colors)
 - `text-*` (text colors)
 - `border-*` (border colors)
@@ -148,25 +150,34 @@ Because Tailwind utilities reference CSS variables, dark mode works automaticall
 **Two-level approach:**
 
 1. **MD3 Tokens** (Internal, semantic)
+
    ```css
    --md-sys-color-primary: #6750a4;
    ```
 
 2. **Tailwind Variables** (Public, utility-facing)
+
    ```css
    --color-primary: var(--md-sys-color-primary);
    ```
 
 3. **Tailwind Utilities** (Generated automatically)
    ```css
-   .bg-primary { background-color: var(--color-primary); }
-   .text-primary { color: var(--color-primary); }
-   .border-primary { border-color: var(--color-primary); }
+   .bg-primary {
+     background-color: var(--color-primary);
+   }
+   .text-primary {
+     color: var(--color-primary);
+   }
+   .border-primary {
+     border-color: var(--color-primary);
+   }
    ```
 
 ### Why Two Levels?
 
 **Separation of concerns:**
+
 - ✅ **MD3 tokens** = Design system source of truth
 - ✅ **Tailwind variables** = Framework integration layer
 - ✅ Can change Tailwind without touching MD3 tokens
@@ -178,20 +189,20 @@ Because Tailwind utilities reference CSS variables, dark mode works automaticall
 
 ### Primary Colors
 
-| MD3 Token | Tailwind Var | Generated Utilities |
-|-----------|--------------|---------------------|
-| `--md-sys-color-primary` | `--color-primary` | `bg-primary`, `text-primary`, `border-primary` |
-| `--md-sys-color-on-primary` | `--color-on-primary` | `bg-on-primary`, `text-on-primary`, `border-on-primary` |
-| `--md-sys-color-primary-container` | `--color-primary-container` | `bg-primary-container`, `text-primary-container`, `border-primary-container` |
+| MD3 Token                             | Tailwind Var                   | Generated Utilities                                                                   |
+| ------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------- |
+| `--md-sys-color-primary`              | `--color-primary`              | `bg-primary`, `text-primary`, `border-primary`                                        |
+| `--md-sys-color-on-primary`           | `--color-on-primary`           | `bg-on-primary`, `text-on-primary`, `border-on-primary`                               |
+| `--md-sys-color-primary-container`    | `--color-primary-container`    | `bg-primary-container`, `text-primary-container`, `border-primary-container`          |
 | `--md-sys-color-on-primary-container` | `--color-on-primary-container` | `bg-on-primary-container`, `text-on-primary-container`, `border-on-primary-container` |
 
 ### Secondary Colors
 
-| MD3 Token | Tailwind Var | Generated Utilities |
-|-----------|--------------|---------------------|
-| `--md-sys-color-secondary` | `--color-secondary` | `bg-secondary`, `text-secondary`, `border-secondary` |
-| `--md-sys-color-on-secondary` | `--color-on-secondary` | `bg-on-secondary`, `text-on-secondary`, `border-on-secondary` |
-| (continues for container variants...) | | |
+| MD3 Token                             | Tailwind Var           | Generated Utilities                                           |
+| ------------------------------------- | ---------------------- | ------------------------------------------------------------- |
+| `--md-sys-color-secondary`            | `--color-secondary`    | `bg-secondary`, `text-secondary`, `border-secondary`          |
+| `--md-sys-color-on-secondary`         | `--color-on-secondary` | `bg-on-secondary`, `text-on-secondary`, `border-on-secondary` |
+| (continues for container variants...) |                        |                                                               |
 
 **Total**: 18 color tokens × 3 utilities each = **54 Tailwind utilities**
 
@@ -202,6 +213,7 @@ Because Tailwind utilities reference CSS variables, dark mode works automaticall
 ### 1. Material Design 3 Semantics in Tailwind
 
 **Semantic naming:**
+
 ```tsx
 // Expressive, clear intent
 <button className="bg-primary text-on-primary">
@@ -214,11 +226,10 @@ Because Tailwind utilities reference CSS variables, dark mode works automaticall
 ```
 
 **vs Generic naming:**
+
 ```tsx
 // Less clear, no semantic meaning
-<button className="bg-purple-600 text-white">
-  Primary Action
-</button>
+<button className="bg-purple-600 text-white">Primary Action</button>
 ```
 
 ### 2. Type Safety and IntelliSense
@@ -226,15 +237,16 @@ Because Tailwind utilities reference CSS variables, dark mode works automaticall
 Tailwind's IntelliSense extension recognizes our custom colors:
 
 ```tsx
-className="bg-pr|"
-         //  ↑ IntelliSense suggests:
-         //  - bg-primary
-         //  - bg-primary-container
+className = "bg-pr|";
+//  ↑ IntelliSense suggests:
+//  - bg-primary
+//  - bg-primary-container
 ```
 
 ### 3. Consistent with MD3 Guidelines
 
 Using proper color roles ensures:
+
 - ✅ Accessible contrast ratios
 - ✅ Consistent visual hierarchy
 - ✅ Proper light/dark mode pairings
@@ -246,10 +258,7 @@ Because utilities reference CSS variables:
 
 ```javascript
 // Change theme at runtime
-document.documentElement.style.setProperty(
-  '--md-sys-color-primary',
-  '#0077be'
-);
+document.documentElement.style.setProperty("--md-sys-color-primary", "#0077be");
 // All .bg-primary elements update instantly!
 ```
 
@@ -260,18 +269,14 @@ document.documentElement.style.setProperty(
 ### Basic Component
 
 ```tsx
-function Button({ children, variant = 'filled' }) {
+function Button({ children, variant = "filled" }) {
   const classes = {
-    filled: 'bg-primary text-on-primary',
-    outlined: 'border-2 border-outline text-primary bg-surface',
-    text: 'text-primary bg-transparent',
+    filled: "bg-primary text-on-primary",
+    outlined: "border-2 border-outline text-primary bg-surface",
+    text: "text-primary bg-transparent",
   };
-  
-  return (
-    <button className={`px-4 py-2 rounded-lg ${classes[variant]}`}>
-      {children}
-    </button>
-  );
+
+  return <button className={`rounded-lg px-4 py-2 ${classes[variant]}`}>{children}</button>;
 }
 ```
 
@@ -280,7 +285,7 @@ function Button({ children, variant = 'filled' }) {
 ```tsx
 function Card({ children }) {
   return (
-    <div className="bg-surface text-on-surface border border-outline-variant rounded-xl p-4">
+    <div className="bg-surface text-on-surface border-outline-variant rounded-xl border p-4">
       {children}
     </div>
   );
@@ -290,18 +295,14 @@ function Card({ children }) {
 ### Alert Component
 
 ```tsx
-function Alert({ type = 'info', message }) {
+function Alert({ type = "info", message }) {
   const styles = {
-    error: 'bg-error-container text-on-error-container border-error',
-    success: 'bg-primary-container text-on-primary-container border-primary',
-    info: 'bg-surface-variant text-on-surface-variant border-outline',
+    error: "bg-error-container text-on-error-container border-error",
+    success: "bg-primary-container text-on-primary-container border-primary",
+    info: "bg-surface-variant text-on-surface-variant border-outline",
   };
-  
-  return (
-    <div className={`p-4 rounded-lg border-l-4 ${styles[type]}`}>
-      {message}
-    </div>
-  );
+
+  return <div className={`rounded-lg border-l-4 p-4 ${styles[type]}`}>{message}</div>;
 }
 ```
 
@@ -319,7 +320,7 @@ function Alert({ type = 'info', message }) {
 @theme {
   /* Colors (done) */
   --color-primary: var(--md-sys-color-primary);
-  
+
   /* Typography (future) */
   --font-size-display-lg: var(--md-sys-typescale-display-large-size);
   --font-size-headline-md: var(--md-sys-typescale-headline-medium-size);
@@ -359,16 +360,16 @@ function Alert({ type = 'info', message }) {
 **How to verify this integration works:**
 
 1. **Check @theme block exists:**
+
    ```bash
    grep -A5 "@theme" packages/tokens/src/tokens.css
    ```
 
 2. **Test Tailwind utilities (after build):**
+
    ```tsx
    // In a test component
-   <div className="bg-primary text-on-primary p-4">
-     If styled correctly, integration works!
-   </div>
+   <div className="bg-primary text-on-primary p-4">If styled correctly, integration works!</div>
    ```
 
 3. **Check dark mode:**
@@ -382,10 +383,12 @@ function Alert({ type = 'info', message }) {
 ## 🔗 Related Files
 
 ### Implementation Files:
+
 - `packages/tokens/src/tokens.css` - Contains `@theme` block
 - `packages/react/src/styles.css` - Imports tokens
 
 ### Documentation Files:
+
 - `docs/task-4.2-configure-tailwind-v4.md` - Complete implementation details
 - `docs/task-5.1-color-tokens.md` - Color token system
 - `docs/task-4.1-research-tailwind-v4.md` - Tailwind v4 research
@@ -404,6 +407,7 @@ function Alert({ type = 'info', message }) {
 ## ✅ Task Complete!
 
 **Summary:**
+
 - ✅ 18 MD3 color tokens mapped to Tailwind
 - ✅ ~54 Tailwind utilities generated
 - ✅ Semantic color naming (bg-primary, text-on-surface, etc.)
@@ -414,4 +418,3 @@ function Alert({ type = 'info', message }) {
 Tailwind v4 now understands Material Design 3 semantics! 🎨
 
 **Note**: This task was completed in Task 4.2. See that documentation for complete implementation details and commit information.
-

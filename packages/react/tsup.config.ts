@@ -1,11 +1,11 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from "tsup";
 
 export default defineConfig({
   // Entry points
-  entry: ['src/index.ts', 'src/styles.css'],
+  entry: ["src/index.ts", "src/styles.css"],
 
   // Output formats
-  format: ['esm', 'cjs'],
+  format: ["esm", "cjs"],
 
   // Generate type definitions
   dts: true,
@@ -23,11 +23,7 @@ export default defineConfig({
   minify: false, // Keep readable for debugging, enable for production releases
 
   // External dependencies (not bundled)
-  external: [
-    'react',
-    'react-dom',
-    'react/jsx-runtime',
-  ],
+  external: ["react", "react-dom", "react/jsx-runtime"],
 
   // Tree-shaking
   treeshake: true,
@@ -36,19 +32,18 @@ export default defineConfig({
   bundle: true,
 
   // Target environment
-  target: 'es2022',
+  target: "es2022",
 
   // Platform
-  platform: 'neutral', // Works in both Node.js and browser
+  platform: "neutral", // Works in both Node.js and browser
 
   // Preserve JSX for better debugging
-  jsx: 'automatic',
+  jsx: "automatic",
 
   // Output extension for CJS
-  outExtension({ format }: { format: 'esm' | 'cjs' }) {
+  outExtension({ format }: { format: "esm" | "cjs" }) {
     return {
-      js: format === 'cjs' ? '.cjs' : '.js',
+      js: format === "cjs" ? ".cjs" : ".js",
     };
   },
 });
-
