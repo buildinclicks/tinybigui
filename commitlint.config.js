@@ -28,7 +28,7 @@
  * @see https://commitlint.js.org/
  */
 
-module.exports = {
+export default {
   extends: ["@commitlint/config-conventional"],
 
   rules: {
@@ -79,4 +79,3 @@ module.exports = {
     "footer-max-line-length": [2, "always", 100],
   },
 };
-
