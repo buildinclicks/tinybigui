@@ -13,7 +13,7 @@
  * @see https://github.com/lint-staged/lint-staged
  */
 
-module.exports = {
+export default {
   // TypeScript and JavaScript files
   "*.{ts,tsx,js,jsx}": [
     // 1. Run ESLint with auto-fix
@@ -32,4 +32,3 @@ module.exports = {
   // It will run in CI/CD to catch type errors on the full codebase.
   // Running typecheck on every commit would be too slow for large projects.
 };
-
