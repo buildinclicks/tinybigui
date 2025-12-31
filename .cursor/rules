@@ -145,6 +145,42 @@ Task: Add Vitest for testing
 - "Tailwind CSS v4 [framework] setup guide"
 - "Tailwind CSS v4 migration from v3"
 
+## 📚 Storybook Handling (CRITICAL)
+
+**IMPORTANT**: AI training data is from April 2024 (Storybook 7.x era). Current project uses Storybook 10.x.
+
+**MANDATORY RULE for ANY Storybook related task**:
+
+1. 🔍 **ALWAYS search the web first** for current Storybook version documentation
+2. ✅ Use latest official docs from storybook.js.org
+3. ✅ Verify syntax, configuration, and API are version-compatible
+4. ✅ Check for breaking changes between versions (7.x → 8.x → 9.x → 10.x)
+5. ❌ NEVER rely solely on training data for Storybook specifics
+
+**Current Version**: Storybook 10.1.11 (as of December 2025)
+
+**Tasks requiring web search**:
+- Installation and setup
+- Configuration (main.ts, preview.ts, manager.ts)
+- Addon installation and configuration
+- Story syntax and API (CSF format)
+- Testing with @storybook/test or addon-vitest
+- Framework integration (React, Vite, Next.js)
+- Deployment and build configuration
+- Chromatic or visual testing setup
+
+**Search terms to use**:
+- "Storybook 10 [specific feature] documentation"
+- "Storybook 10 React Vite setup"
+- "Storybook 10 addon configuration"
+- "Storybook 10 migration guide"
+
+**Version-specific notes**:
+- Package structure changed in v10 (some addons consolidated)
+- Testing integration improved (addon-vitest, built-in Playwright)
+- Configuration syntax may differ from v7/v8
+- Some addons don't have v10 versions (e.g., addon-essentials caps at v8)
+
 ## Project Structure
 
 ```
