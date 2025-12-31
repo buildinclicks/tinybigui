@@ -7,6 +7,9 @@
  * and other MD3 specifications.
  */
 
+/* Import Tailwind CSS v4 */
+@import "tailwindcss";
+
 :root {
   /* ==========================================================================
      COLOR TOKENS
