@@ -6,7 +6,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import storybook from "eslint-plugin-storybook";
 import prettier from "eslint-config-prettier";
 
-export default tseslint.config(
+export default [
   // Ignore patterns
   {
     ignores: [
@@ -231,5 +231,5 @@ export default tseslint.config(
   },
 
   // Disable rules that conflict with Prettier
-  prettier
-);
+  prettier,
+];
