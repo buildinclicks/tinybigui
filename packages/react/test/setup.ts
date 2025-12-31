@@ -1,22 +1,22 @@
 /**
  * Test Setup File
- * 
+ *
  * This file runs BEFORE any tests start.
  * It sets up the testing environment and adds helpful utilities.
- * 
+ *
  * Think of this as "preparing the stage" before the show (tests) begin.
  */
 
 // Import Vitest utilities for mocking
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 // Import testing utilities from React Testing Library
 // These help us test React components
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // What is @testing-library/jest-dom?
 // It adds helpful matchers (assertions) for testing DOM elements
-// 
+//
 // Examples:
 // - expect(element).toBeInTheDocument()
 // - expect(element).toHaveTextContent('Hello')
@@ -28,7 +28,7 @@ import '@testing-library/jest-dom';
 // Mock window.matchMedia (needed for responsive tests)
 // Many components use matchMedia to check screen size
 // But it doesn't exist in the test environment, so we mock it
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
     matches: false, // Default: media query doesn't match
@@ -71,4 +71,3 @@ global.ResizeObserver = class ResizeObserver {
 // - Global test utilities
 // - Mock data
 // - Environment variables
-
