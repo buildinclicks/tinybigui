@@ -342,7 +342,7 @@ export function pxToRem(px: number | string): string {
  * <p style={multiLine}>Long paragraph text here...</p>
  * ```
  */
-export function truncateText(lines: number = 1): React.CSSProperties {
+export function truncateText(lines = 1): React.CSSProperties {
   if (lines === 1) {
     return {
       overflow: 'hidden',

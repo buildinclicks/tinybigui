@@ -66,7 +66,7 @@ describe('Component Testing Helpers', () => {
     });
 
     test('button without label does not have accessible label', () => {
-      const { getByTestId } = render(<button data-testid="btn"></button>);
+      const { getByTestId } = render(<button data-testid="btn" />);
       const button = getByTestId('btn');
       
       expect(hasAccessibleLabel(button)).toBe(false);
