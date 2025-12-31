@@ -1,12 +1,13 @@
 import type React from "react";
+import type { AriaButtonProps } from "react-aria";
 
 /**
- * Button variant types
+ * Button variant types (Material Design 3)
  */
 export type ButtonVariant = "filled" | "outlined" | "tonal" | "elevated" | "text";
 
 /**
- * Button color schemes
+ * Button color schemes (Material Design 3 color roles)
  */
 export type ButtonColor = "primary" | "secondary" | "tertiary" | "error";
 
@@ -18,8 +19,9 @@ export type ButtonSize = "small" | "medium" | "large";
 /**
  * Material Design 3 Button Component Props
  *
+ * Built on React Aria for world-class accessibility.
  * Supports 5 variants: filled, outlined, tonal, elevated, text
- * Implementation uses Tailwind CSS classes mapped to MD3 tokens.
+ * Implementation uses CVA + Tailwind CSS classes mapped to MD3 tokens.
  *
  * @example
  * ```tsx
@@ -39,12 +41,20 @@ export type ButtonSize = "small" | "medium" | "large";
  * </Button>
  *
  * // Disabled
- * <Button variant="outlined" disabled>
+ * <Button variant="outlined" isDisabled>
  *   Disabled
  * </Button>
+ *
+ * // Headless version (custom styling)
+ * <ButtonHeadless className="my-custom-styles">
+ *   Click me
+ * </ButtonHeadless>
  * ```
  */
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends
+    AriaButtonProps,
+    Omit<React.HTMLAttributes<HTMLButtonElement>, keyof AriaButtonProps | "children"> {
   /**
    * Button variant
    * @default 'filled'
@@ -102,7 +112,41 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   className?: string;
 
   /**
-   * Click handler
+   * Tab index for keyboard navigation
+   * @default 0
    */
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  tabIndex?: number;
+
+  /**
+   * Button type attribute
+   * @default 'button'
+   */
+  type?: "button" | "submit" | "reset";
+}
+
+/**
+ * Props for the headless Button component
+ * Extends AriaButtonProps for accessibility
+ */
+export interface ButtonHeadlessProps extends AriaButtonProps {
+  /**
+   * Additional CSS classes
+   */
+  className?: string;
+
+  /**
+   * Button content
+   */
+  children: React.ReactNode;
+
+  /**
+   * Tab index for keyboard navigation
+   * @default 0
+   */
+  tabIndex?: number;
+
+  /**
+   * Mouse down handler (for ripple effect)
+   */
+  onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }

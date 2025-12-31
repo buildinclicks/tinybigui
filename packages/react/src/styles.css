@@ -11,7 +11,7 @@
    Imports Material Design 3 tokens and Tailwind v4 integration
    ========================================================================== */
 
-@import "@tinybigui/tokens/tokens.css";
+@import "../../../packages/tokens/src/tokens.css";
 
 /* ==========================================================================
    COMPONENT STYLES

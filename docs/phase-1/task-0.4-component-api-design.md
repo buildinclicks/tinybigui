@@ -1,7 +1,7 @@
 # Task 0.4: Component API Design
 
 **Date**: 2025-12-31  
-**Status**: ✅ Complete  
+**Status**: ✅ Complete (Updated: 2025-12-31)  
 **Phase**: 1a - Core Buttons (Research & Planning)
 
 ---
@@ -14,6 +14,71 @@ This document defines the TypeScript interfaces and API contracts for all three 
 - **FAB** (4 sizes + extended)
 
 These APIs will guide all implementation tasks and ensure consistency across components.
+
+---
+
+## 🏗️ Architecture Strategy
+
+### **Three-Layer Component Architecture**
+
+We follow a **three-layer architecture** for maximum flexibility and world-class accessibility:
+
+```
+┌─────────────────────────────────────┐
+│   Layer 3: MD3 Styled Components   │  ← What most users use
+│   (Button.tsx)                      │     • Material Design 3 styling
+│   • Uses CVA for variants          │     • Pre-configured variants
+│   • Applies MD3 tokens             │     • Opinionated defaults
+│   • Wraps headless layer           │
+└─────────────────────────────────────┘
+              ↓ uses
+┌─────────────────────────────────────┐
+│   Layer 2: Headless Primitives     │  ← Advanced users/customization
+│   (ButtonHeadless.tsx)              │     • Unstyled, functional
+│   • Uses React Aria hooks          │     • Full accessibility
+│   • Provides behavior only         │     • Bring your own styles
+│   • Type-safe props                │
+└─────────────────────────────────────┘
+              ↓ uses
+┌─────────────────────────────────────┐
+│   Layer 1: React Aria Hooks        │  ← Foundation (Adobe)
+│   (useButton, useFocusRing, etc.)  │     • WCAG AA/AAA compliant
+│   • World-class accessibility      │     • Keyboard navigation
+│   • Cross-browser compatibility    │     • Screen reader support
+│   • Battle-tested                  │     • Touch/pointer events
+└─────────────────────────────────────┘
+```
+
+### **Why This Architecture?**
+
+1. **Accessibility**: React Aria provides Adobe-quality accessibility primitives
+2. **Flexibility**: Users can use styled components OR headless primitives
+3. **Customization**: Full control when needed, convenience by default
+4. **Maintainability**: Clear separation of concerns
+5. **Future-proof**: Easy to update styling without breaking behavior
+
+### **File Structure Per Component**
+
+Each component follows this exact structure:
+
+```
+packages/react/src/components/Button/
+├── ButtonHeadless.tsx      # Layer 2: React Aria wrapper (unstyled)
+├── Button.variants.ts      # CVA variant definitions
+├── Button.tsx              # Layer 3: MD3 styled component
+├── Button.types.ts         # TypeScript interfaces
+├── Button.test.tsx         # Comprehensive tests
+├── Button.stories.tsx      # Storybook stories
+└── index.ts                # Public exports
+```
+
+### **Key Technologies**
+
+- **React Aria** (`react-aria`): Accessibility hooks and primitives
+- **React Aria Components** (`react-aria-components`): Pre-built accessible components
+- **CVA** (`class-variance-authority`): Type-safe variant management
+- **Tailwind CSS v4**: Utility-first styling with MD3 tokens
+- **clsx + tailwind-merge**: Smart className merging
 
 ---
 
@@ -766,82 +831,315 @@ import { cn } from '@/utils/cn';
 
 ---
 
-## 🎨 Styling Approach
+## 🎨 Implementation Approach
 
-### **Component Structure**
+### **Layer 1: React Aria Hooks (Foundation)**
 
-Each button component will follow this structure:
+React Aria provides the accessibility foundation:
 
-```tsx
-<button
-  ref={ref}
-  type={type}
-  disabled={disabled || loading}
-  aria-label={ariaLabel}
-  onClick={handleClick}
-  className={cn(
-    // Base classes (all buttons)
+```typescript
+// Example: Using React Aria hooks in headless component
+import { useButton } from 'react-aria';
+import type { AriaButtonProps } from 'react-aria';
+
+// React Aria handles:
+// - Keyboard interactions (Enter, Space)
+// - Focus management
+// - Disabled states
+// - ARIA attributes
+// - Touch/pointer events
+// - Screen reader support
+```
+
+### **Layer 2: Headless Primitive**
+
+Unstyled, behavior-only component using React Aria:
+
+```typescript
+// ButtonHeadless.tsx
+import { useRef } from 'react';
+import { useButton } from 'react-aria';
+import type { AriaButtonProps } from 'react-aria';
+
+interface ButtonHeadlessProps extends AriaButtonProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export function ButtonHeadless(props: ButtonHeadlessProps) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const { buttonProps } = useButton(props, ref);
+
+  return (
+    <button {...buttonProps} ref={ref} className={props.className}>
+      {props.children}
+    </button>
+  );
+}
+```
+
+### **Layer 3: CVA Variants**
+
+Type-safe variant management using CVA:
+
+```typescript
+// Button.variants.ts
+import { cva, type VariantProps } from 'class-variance-authority';
+
+export const buttonVariants = cva(
+  // Base styles (always applied)
+  [
     'relative inline-flex items-center justify-center',
-    'transition-all duration-200',
-    'focus-visible:outline-2 focus-visible:outline-primary',
-    
-    // Size classes
-    sizeClasses[size],
-    
-    // Variant classes
-    variantClasses[variant],
-    
-    // State classes
-    disabled && 'opacity-38 pointer-events-none',
-    loading && 'cursor-wait',
-    
-    // User custom classes
-    className
-  )}
-  {...otherProps}
->
-  {/* Loading spinner (if loading) */}
-  {loading && <Spinner />}
-  
-  {/* Icon (if provided) */}
-  {icon && <span className="icon">{icon}</span>}
-  
-  {/* Content */}
-  {children}
-  
-  {/* Ripple effect */}
-  {ripples}
-</button>
+    'font-medium transition-all',
+    'focus-visible:outline-2 focus-visible:outline-offset-2',
+    'disabled:opacity-38 disabled:pointer-events-none',
+  ],
+  {
+    variants: {
+      variant: {
+        filled: 'shadow-none hover:shadow-md',
+        outlined: 'bg-transparent border border-outline',
+        tonal: '',
+        elevated: 'shadow-elevation-1 hover:shadow-elevation-2',
+        text: 'bg-transparent',
+      },
+      color: {
+        primary: '',
+        secondary: '',
+        tertiary: '',
+        error: '',
+      },
+      size: {
+        small: 'h-10 px-4 text-sm gap-2 rounded-full',
+        medium: 'h-12 px-6 text-base gap-2 rounded-full',
+        large: 'h-14 px-8 text-lg gap-3 rounded-full',
+      },
+    },
+    compoundVariants: [
+      // Filled variants with colors
+      {
+        variant: 'filled',
+        color: 'primary',
+        className: 'bg-primary text-on-primary hover:bg-primary/90',
+      },
+      {
+        variant: 'filled',
+        color: 'secondary',
+        className: 'bg-secondary text-on-secondary hover:bg-secondary/90',
+      },
+      {
+        variant: 'filled',
+        color: 'tertiary',
+        className: 'bg-tertiary text-on-tertiary hover:bg-tertiary/90',
+      },
+      {
+        variant: 'filled',
+        color: 'error',
+        className: 'bg-error text-on-error hover:bg-error/90',
+      },
+      // Outlined variants with colors
+      {
+        variant: 'outlined',
+        color: 'primary',
+        className: 'text-primary hover:bg-primary/10',
+      },
+      {
+        variant: 'outlined',
+        color: 'secondary',
+        className: 'text-secondary hover:bg-secondary/10',
+      },
+      {
+        variant: 'outlined',
+        color: 'tertiary',
+        className: 'text-tertiary hover:bg-tertiary/10',
+      },
+      {
+        variant: 'outlined',
+        color: 'error',
+        className: 'text-error hover:bg-error/10',
+      },
+      // Tonal variants with colors
+      {
+        variant: 'tonal',
+        color: 'primary',
+        className: 'bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80',
+      },
+      {
+        variant: 'tonal',
+        color: 'secondary',
+        className: 'bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80',
+      },
+      {
+        variant: 'tonal',
+        color: 'tertiary',
+        className: 'bg-tertiary-container text-on-tertiary-container hover:bg-tertiary-container/80',
+      },
+      {
+        variant: 'tonal',
+        color: 'error',
+        className: 'bg-error-container text-on-error-container hover:bg-error-container/80',
+      },
+      // Elevated variants with colors
+      {
+        variant: 'elevated',
+        color: 'primary',
+        className: 'bg-surface-container-low text-primary hover:shadow-elevation-2',
+      },
+      {
+        variant: 'elevated',
+        color: 'secondary',
+        className: 'bg-surface-container-low text-secondary hover:shadow-elevation-2',
+      },
+      {
+        variant: 'elevated',
+        color: 'tertiary',
+        className: 'bg-surface-container-low text-tertiary hover:shadow-elevation-2',
+      },
+      {
+        variant: 'elevated',
+        color: 'error',
+        className: 'bg-surface-container-low text-error hover:shadow-elevation-2',
+      },
+      // Text variants with colors
+      {
+        variant: 'text',
+        color: 'primary',
+        className: 'text-primary hover:bg-primary/10',
+      },
+      {
+        variant: 'text',
+        color: 'secondary',
+        className: 'text-secondary hover:bg-secondary/10',
+      },
+      {
+        variant: 'text',
+        color: 'tertiary',
+        className: 'text-tertiary hover:bg-tertiary/10',
+      },
+      {
+        variant: 'text',
+        color: 'error',
+        className: 'text-error hover:bg-error/10',
+      },
+    ],
+    defaultVariants: {
+      variant: 'filled',
+      color: 'primary',
+      size: 'medium',
+    },
+  }
+);
+
+export type ButtonVariants = VariantProps<typeof buttonVariants>;
+```
+
+### **Layer 3: MD3 Styled Component**
+
+Combines headless primitive + CVA variants:
+
+```typescript
+// Button.tsx
+'use client';
+
+import { forwardRef } from 'react';
+import { ButtonHeadless } from './ButtonHeadless';
+import { buttonVariants, type ButtonVariants } from './Button.variants';
+import { cn } from '../../utils/cn';
+import { useRipple } from '../../hooks/useRipple';
+import type { ButtonProps } from './Button.types';
+
+export const Button = forwardRef<
+  HTMLButtonElement,
+  ButtonProps & ButtonVariants
+>(({ variant, color, size, className, icon, children, loading, disableRipple, ...props }, ref) => {
+  const { ripples, rippleRef } = useRipple({ disabled: props.disabled || loading, disableRipple });
+
+  return (
+    <ButtonHeadless
+      {...props}
+      ref={ref}
+      className={cn(
+        buttonVariants({ variant, color, size }),
+        className
+      )}
+    >
+      {loading && <Spinner />}
+      {icon && !loading && <span className="icon">{icon}</span>}
+      {children}
+      {ripples}
+    </ButtonHeadless>
+  );
+});
+
+Button.displayName = 'Button';
 ```
 
 ---
 
-### **Variant Class Maps**
+## 🔧 Implementation Guidelines
 
-Pre-defined Tailwind class combinations for each variant:
+### **DO's**
 
+✅ **Use React Aria for all interactive components**
+- Provides battle-tested accessibility
+- Handles keyboard, mouse, touch, screen readers
+- Cross-browser compatible
+
+✅ **Use CVA for all variant styling**
+- Type-safe variants
+- Compound variants for complex combinations
+- IntelliSense support
+
+✅ **Export both headless and styled versions**
 ```typescript
-const buttonVariantClasses = {
-  filled: 'bg-primary text-on-primary shadow-none',
-  outlined: 'bg-transparent border border-outline text-primary',
-  tonal: 'bg-secondary-container text-on-secondary-container',
-  elevated: 'bg-surface-container-low text-primary shadow-elevation-1',
-  text: 'bg-transparent text-primary',
-};
+export { Button } from './Button';           // Styled
+export { ButtonHeadless } from './ButtonHeadless'; // Headless
+export { buttonVariants } from './Button.variants'; // CVA
+```
 
-const iconButtonVariantClasses = {
-  standard: 'bg-transparent text-on-surface-variant',
+✅ **Follow three-layer architecture**
+- React Aria → Headless → Styled
+- Keep each layer focused and testable
+
+✅ **Use `cn()` utility for className merging**
+- Combines clsx + tailwind-merge
+- Prevents Tailwind class conflicts
+
+### **DON'Ts**
+
+❌ **Don't implement accessibility manually**
+- Use React Aria hooks instead
+- Don't reinvent keyboard handling
+- Don't manually manage ARIA attributes
+
+❌ **Don't use manual class maps**
+```typescript
+// ❌ BAD: Manual class maps
+const variantClasses = {
   filled: 'bg-primary text-on-primary',
-  tonal: 'bg-secondary-container text-on-secondary-container',
-  outlined: 'bg-transparent border border-outline text-on-surface-variant',
+  outlined: 'border border-outline',
 };
 
-const fabVariantClasses = {
-  primary: 'bg-primary-container text-on-primary-container',
-  secondary: 'bg-secondary-container text-on-secondary-container',
-  tertiary: 'bg-tertiary-container text-on-tertiary-container',
-  surface: 'bg-surface text-primary',
-};
+// ✅ GOOD: Use CVA
+export const buttonVariants = cva('base', {
+  variants: { variant: { filled: '...', outlined: '...' } }
+});
+```
+
+❌ **Don't skip the headless layer**
+- Always provide unstyled version
+- Enables advanced customization
+
+❌ **Don't hardcode default values in component**
+```typescript
+// ❌ BAD
+function Button({ variant = 'filled', ...props }) { }
+
+// ✅ GOOD: Define in CVA defaultVariants
+export const buttonVariants = cva('base', {
+  variants: { ... },
+  defaultVariants: { variant: 'filled' }
+});
 ```
 
 ---
@@ -1015,25 +1313,113 @@ All components will implement these exact interfaces with no deviations.
 
 ---
 
-## 🎓 Summary
+## 📝 Refactoring Plan
 
-We've defined comprehensive TypeScript APIs for all three button components:
+### **Current Button Implementation**
 
-**Button**: 5 variants, optional icons, text required  
-**IconButton**: 4 variants, icon only, aria-label required  
-**FAB**: 4 sizes, icon required, aria-label required, fixed positioning
+The existing `Button.tsx` was implemented with a **simple, single-layer approach**:
+- ❌ Manual accessibility implementation
+- ❌ Manual class maps (not using CVA)
+- ❌ No headless layer
+- ❌ No React Aria foundation
 
-**Key Features**:
-- ✅ Type-safe with strict TypeScript
-- ✅ Accessibility enforced at type level
-- ✅ Consistent prop naming across components
-- ✅ Flexible (polymorphic, ref forwarding)
-- ✅ Developer-friendly (JSDoc, examples, validation)
+### **Required Refactoring**
 
-These APIs are now **locked** and ready for implementation!
+To align with our three-layer architecture, we need to:
+
+1. **Install Dependencies** ✅ DONE
+   - `react-aria` - Accessibility hooks
+   - `react-aria-components` - Pre-built components
+   - `class-variance-authority` - Already installed
+
+2. **Refactor Button Component** 🔄 PENDING
+   - Create `ButtonHeadless.tsx` using React Aria
+   - Create `Button.variants.ts` using CVA
+   - Refactor `Button.tsx` to use headless + variants
+   - Update tests to cover all layers
+   - Update stories to showcase flexibility
+
+3. **Update Button Types** 🔄 PENDING
+   - Extend `AriaButtonProps` from React Aria
+   - Add variant types from CVA
+   - Keep existing prop interface
+
+4. **Verify Functionality** 🔄 PENDING
+   - Run existing tests (should still pass)
+   - Run Storybook (styling should work)
+   - Verify accessibility with screen reader
+   - Check keyboard navigation
+
+### **Implementation Order**
+
+```
+Task 1.1.1: Refactor Button Component
+├── Step 1: Create ButtonHeadless.tsx (React Aria)
+├── Step 2: Create Button.variants.ts (CVA)
+├── Step 3: Refactor Button.tsx (combine layers)
+├── Step 4: Update Button.types.ts (extend AriaButtonProps)
+├── Step 5: Update tests
+├── Step 6: Update stories
+└── Step 7: Verify & document
+
+Task 1.2: Implement IconButton (using new pattern)
+Task 1.3: Implement FAB (using new pattern)
+```
 
 ---
 
-**Task Status**: ✅ Complete  
-**Next Task**: 1.1 - Implement Button Component (TDD)
+## 🎓 Summary
+
+We've defined comprehensive TypeScript APIs for all three button components **with three-layer architecture**:
+
+### **Components**
+- **Button**: 5 variants, optional icons, text required  
+- **IconButton**: 4 variants, icon only, aria-label required  
+- **FAB**: 4 sizes, icon required, aria-label required, fixed positioning
+
+### **Architecture**
+- **Layer 1**: React Aria hooks (accessibility foundation)
+- **Layer 2**: Headless primitives (unstyled, behavior-only)
+- **Layer 3**: MD3 styled components (CVA variants + Tailwind)
+
+### **Key Features**
+- ✅ **World-class accessibility** (React Aria by Adobe)
+- ✅ **Type-safe variants** (CVA with IntelliSense)
+- ✅ **Maximum flexibility** (use styled OR headless)
+- ✅ **Consistent patterns** across all components
+- ✅ **Battle-tested foundation** (React Aria)
+
+### **Technologies**
+- ✅ `react-aria` + `react-aria-components` - Accessibility
+- ✅ `class-variance-authority` - Variant management
+- ✅ `clsx` + `tailwind-merge` - ClassName utilities
+- ✅ Tailwind CSS v4 - Styling with MD3 tokens
+
+---
+
+## 🚨 Important Notes
+
+### **Breaking Change from Initial Implementation**
+
+The Button component implemented in Task 1.1 **does NOT follow this architecture** and needs refactoring:
+- ❌ Uses manual accessibility (should use React Aria)
+- ❌ Uses manual class maps (should use CVA)
+- ❌ Single-layer design (should be three-layer)
+
+**Action Required**: Refactor Task 1.1 Button before proceeding to IconButton and FAB.
+
+### **Going Forward**
+
+All future component implementations **MUST follow**:
+1. ✅ Use React Aria for accessibility
+2. ✅ Use CVA for variant management
+3. ✅ Implement three-layer architecture
+4. ✅ Export both headless and styled versions
+5. ✅ Test all three layers independently
+
+---
+
+**Task Status**: ✅ Complete (Architecture Defined)  
+**Next Task**: 1.1.1 - Refactor Button Component (Three-Layer Architecture)  
+**Then**: 1.2 - Implement IconButton | 1.3 - Implement FAB
 
