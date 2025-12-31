@@ -1,53 +1,12 @@
+"use client";
+
 import { forwardRef } from "react";
 import type React from "react";
+import { ButtonHeadless } from "./ButtonHeadless";
+import { buttonVariants, type ButtonVariants } from "./Button.variants";
 import { cn } from "../../utils/cn";
 import { useRipple } from "../../hooks/useRipple";
-import type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./Button.types";
-
-/**
- * Tailwind classes for button variants
- */
-const variantClasses: Record<ButtonVariant, Record<ButtonColor, string>> = {
-  filled: {
-    primary: "bg-primary text-on-primary shadow-none",
-    secondary: "bg-secondary text-on-secondary shadow-none",
-    tertiary: "bg-tertiary text-on-tertiary shadow-none",
-    error: "bg-error text-on-error shadow-none",
-  },
-  outlined: {
-    primary: "bg-transparent border border-outline text-primary",
-    secondary: "bg-transparent border border-outline text-secondary",
-    tertiary: "bg-transparent border border-outline text-tertiary",
-    error: "bg-transparent border border-outline text-error",
-  },
-  tonal: {
-    primary: "bg-secondary-container text-on-secondary-container",
-    secondary: "bg-secondary-container text-on-secondary-container",
-    tertiary: "bg-tertiary-container text-on-tertiary-container",
-    error: "bg-error-container text-on-error-container",
-  },
-  elevated: {
-    primary: "bg-surface-container-low text-primary shadow-elevation-1",
-    secondary: "bg-surface-container-low text-secondary shadow-elevation-1",
-    tertiary: "bg-surface-container-low text-tertiary shadow-elevation-1",
-    error: "bg-surface-container-low text-error shadow-elevation-1",
-  },
-  text: {
-    primary: "bg-transparent text-primary",
-    secondary: "bg-transparent text-secondary",
-    tertiary: "bg-transparent text-tertiary",
-    error: "bg-transparent text-error",
-  },
-};
-
-/**
- * Tailwind classes for button sizes
- */
-const sizeClasses: Record<ButtonSize, string> = {
-  small: "h-8 px-4 text-sm gap-2",
-  medium: "h-10 px-6 text-sm gap-2",
-  large: "h-12 px-8 text-base gap-3",
-};
+import type { ButtonProps } from "./Button.types";
 
 /**
  * Loading spinner component
@@ -55,6 +14,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 const Spinner = (): React.ReactElement => (
   <svg
     role="progressbar"
+    aria-label="Loading"
     className="h-4 w-4 animate-spin"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -70,28 +30,79 @@ const Spinner = (): React.ReactElement => (
 );
 
 /**
- * Material Design 3 Button Component
+ * Material Design 3 Button Component (Layer 3: Styled)
  *
- * Supports 5 variants: filled, outlined, tonal, elevated, text
- * Implementation uses Tailwind CSS classes mapped to MD3 tokens.
+ * Built on React Aria for world-class accessibility.
+ * Uses CVA for type-safe variant management.
+ * Styled with Tailwind CSS using MD3 design tokens.
+ *
+ * Features:
+ * - ✅ 5 MD3 variants: filled, outlined, tonal, elevated, text
+ * - ✅ 4 color schemes: primary, secondary, tertiary, error
+ * - ✅ 3 sizes: small, medium, large
+ * - ✅ Loading state with spinner
+ * - ✅ Ripple effect (Material Design)
+ * - ✅ Full keyboard accessibility (via React Aria)
+ * - ✅ Screen reader support (via React Aria)
+ * - ✅ Focus management (via React Aria)
+ *
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <Button>Click me</Button>
+ *
+ * // With variant and color
+ * <Button variant="outlined" color="secondary">
+ *   Secondary Action
+ * </Button>
+ *
+ * // With icon
+ * <Button icon={<IconAdd />}>
+ *   Add Item
+ * </Button>
+ *
+ * // Loading state
+ * <Button loading>
+ *   Saving...
+ * </Button>
+ *
+ * // Disabled
+ * <Button isDisabled>
+ *   Disabled
+ * </Button>
+ *
+ * // Full width
+ * <Button fullWidth>
+ *   Full Width Button
+ * </Button>
+ * ```
  */
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVariants, "disabled">>(
   (
     {
+      // Variant props (CVA)
       variant = "filled",
       color = "primary",
       size = "medium",
+      fullWidth = false,
+
+      // Content props
       icon,
       trailingIcon,
       children,
-      fullWidth = false,
+
+      // State props
       loading = false,
       disableRipple = false,
-      disabled = false,
+      isDisabled = false,
+
+      // Styling
       className,
-      type = "button",
-      onClick,
+
+      // Other props
       tabIndex = 0,
+      type = "button",
+      onPress,
       ...props
     },
     ref
@@ -110,62 +121,39 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     // Combine disabled states
-    const isDisabled = disabled || loading;
+    const isButtonDisabled = isDisabled || loading;
 
     // Ripple effect
     const { onMouseDown: handleRipple, ripples } = useRipple({
-      disabled: isDisabled || disableRipple,
+      disabled: isButtonDisabled || disableRipple,
     });
 
-    // Handle click
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
-      if (isDisabled) {
-        event.preventDefault();
-        return;
-      }
-      onClick?.(event);
-    };
+    // Handle press event (React Aria uses onPress instead of onClick)
+    // Note: onPress is already handled by React Aria in ButtonHeadless
+    // We just pass it through
 
     return (
-      <button
+      <ButtonHeadless
+        {...props}
         ref={ref}
-        // eslint-disable-next-line react/button-has-type
         type={type}
-        disabled={isDisabled}
-        onClick={handleClick}
-        onMouseDown={handleRipple}
+        isDisabled={isButtonDisabled}
+        {...(onPress && { onPress })}
         tabIndex={tabIndex}
+        onMouseDown={handleRipple}
         className={cn(
-          // Base classes
-          "relative inline-flex items-center justify-center",
-          "overflow-hidden rounded-full font-medium",
-          "transition-all duration-200",
-          "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
-
-          // State layers (hover, focus, active)
-          "before:absolute before:inset-0 before:rounded-[inherit] before:transition-opacity before:duration-200",
-          "before:bg-current before:opacity-0",
-          "hover:before:opacity-8",
-          "focus-visible:before:opacity-12",
-          "active:before:opacity-12",
-
-          // Size classes
-          sizeClasses[size],
-
-          // Variant + color classes
-          variantClasses[variant][color],
-
-          // State classes
-          isDisabled && "pointer-events-none opacity-38",
-          loading && "cursor-wait",
-
-          // Full width
-          fullWidth && "w-full",
-
+          // Apply CVA variants
+          buttonVariants({
+            variant,
+            color,
+            size,
+            fullWidth,
+            disabled: isButtonDisabled,
+            loading,
+          }),
           // User custom classes
           className
         )}
-        {...props}
       >
         {/* Ripple effect */}
         {ripples}
@@ -193,7 +181,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             {trailingIcon}
           </span>
         )}
-      </button>
+      </ButtonHeadless>
     );
   }
 );

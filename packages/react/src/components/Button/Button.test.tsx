@@ -156,7 +156,7 @@ describe("Button", () => {
 
   describe("States", () => {
     test("handles disabled state", () => {
-      render(<Button disabled>Disabled</Button>);
+      render(<Button isDisabled>Disabled</Button>);
       const button = screen.getByRole("button");
       expect(button).toBeDisabled();
       expect(button).toHaveClass("opacity-38", "pointer-events-none");
@@ -197,66 +197,66 @@ describe("Button", () => {
   });
 
   describe("Interactions", () => {
-    test("calls onClick when clicked", async () => {
-      const handleClick = vi.fn();
+    test("calls onPress when clicked", async () => {
+      const handlePress = vi.fn();
       const user = userEvent.setup();
 
-      render(<Button onClick={handleClick}>Click me</Button>);
+      render(<Button onPress={handlePress}>Click me</Button>);
       await user.click(screen.getByRole("button"));
 
-      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(handlePress).toHaveBeenCalledTimes(1);
     });
 
-    test("does not call onClick when disabled", async () => {
-      const handleClick = vi.fn();
+    test("does not call onPress when disabled", async () => {
+      const handlePress = vi.fn();
       const user = userEvent.setup();
 
       render(
-        <Button onClick={handleClick} disabled>
+        <Button onPress={handlePress} isDisabled>
           Disabled
         </Button>
       );
       await user.click(screen.getByRole("button"));
 
-      expect(handleClick).not.toHaveBeenCalled();
+      expect(handlePress).not.toHaveBeenCalled();
     });
 
-    test("does not call onClick when loading", async () => {
-      const handleClick = vi.fn();
+    test("does not call onPress when loading", async () => {
+      const handlePress = vi.fn();
       const user = userEvent.setup();
 
       render(
-        <Button onClick={handleClick} loading>
+        <Button onPress={handlePress} loading>
           Loading
         </Button>
       );
       await user.click(screen.getByRole("button"));
 
-      expect(handleClick).not.toHaveBeenCalled();
+      expect(handlePress).not.toHaveBeenCalled();
     });
 
     test("activates on Enter key", async () => {
-      const handleClick = vi.fn();
+      const handlePress = vi.fn();
       const user = userEvent.setup();
 
-      render(<Button onClick={handleClick}>Press Enter</Button>);
+      render(<Button onPress={handlePress}>Press Enter</Button>);
       const button = screen.getByRole("button");
       button.focus();
       await user.keyboard("{Enter}");
 
-      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(handlePress).toHaveBeenCalledTimes(1);
     });
 
     test("activates on Space key", async () => {
-      const handleClick = vi.fn();
+      const handlePress = vi.fn();
       const user = userEvent.setup();
 
-      render(<Button onClick={handleClick}>Press Space</Button>);
+      render(<Button onPress={handlePress}>Press Space</Button>);
       const button = screen.getByRole("button");
       button.focus();
       await user.keyboard(" ");
 
-      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(handlePress).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -406,20 +406,20 @@ describe("Button", () => {
 
     test("prevents event bubbling when disabled", async () => {
       const parentClick = vi.fn();
-      const buttonClick = vi.fn();
+      const buttonPress = vi.fn();
       const user = userEvent.setup();
 
       render(
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div onClick={parentClick}>
-          <Button onClick={buttonClick} disabled>
+          <Button onPress={buttonPress} isDisabled>
             Disabled
           </Button>
         </div>
       );
 
       await user.click(screen.getByRole("button"));
-      expect(buttonClick).not.toHaveBeenCalled();
+      expect(buttonPress).not.toHaveBeenCalled();
       // Parent should also not receive click due to pointer-events-none
     });
   });
