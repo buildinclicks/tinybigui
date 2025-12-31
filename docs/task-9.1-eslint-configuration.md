@@ -12,6 +12,7 @@
 **Objective:** Configure ESLint for React + TypeScript + Accessibility linting with latest stable versions.
 
 **Why This Task Matters:**
+
 - **Catch bugs early** - Find potential issues before runtime
 - **Enforce best practices** - React, TypeScript, and accessibility rules
 - **Consistent code** - Team-wide coding standards
@@ -25,15 +26,15 @@
 
 **Method:** Direct npm registry queries via `pnpm view`
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `eslint` | 9.39.2 | Core linting engine |
-| `typescript-eslint` | 8.51.0 | TypeScript support |
-| `eslint-plugin-react` | 7.37.5 | React-specific rules |
-| `eslint-plugin-react-hooks` | 7.0.1 | React Hooks rules |
-| `eslint-plugin-jsx-a11y` | 6.10.2 | Accessibility rules |
-| `eslint-config-prettier` | 10.1.8 | Prettier compatibility |
-| `eslint-plugin-storybook` | 10.1.11 | Already installed! |
+| Package                     | Version | Purpose                |
+| --------------------------- | ------- | ---------------------- |
+| `eslint`                    | 9.39.2  | Core linting engine    |
+| `typescript-eslint`         | 8.51.0  | TypeScript support     |
+| `eslint-plugin-react`       | 7.37.5  | React-specific rules   |
+| `eslint-plugin-react-hooks` | 7.0.1   | React Hooks rules      |
+| `eslint-plugin-jsx-a11y`    | 6.10.2  | Accessibility rules    |
+| `eslint-config-prettier`    | 10.1.8  | Prettier compatibility |
+| `eslint-plugin-storybook`   | 10.1.11 | Already installed!     |
 
 **Total New Packages:** 6 packages installed
 
@@ -61,17 +62,18 @@ pnpm add -D eslint@^9.39.2 \
 **Configuration Structure:**
 
 ```javascript
-import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import react from 'eslint-plugin-react';
-import reactHooks from 'eslint-plugin-react-hooks';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
-import storybook from 'eslint-plugin-storybook';
-import prettier from 'eslint-config-prettier';
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
+import jsxA11y from "eslint-plugin-jsx-a11y";
+import storybook from "eslint-plugin-storybook";
+import prettier from "eslint-config-prettier";
 
-export default tseslint.config(
+export default tseslint
+  .config
   // Multiple configuration objects...
-);
+  ();
 ```
 
 ---
@@ -79,6 +81,7 @@ export default tseslint.config(
 ### 4. Configuration Sections ✅
 
 #### **A. Ignore Patterns**
+
 ```javascript
 {
   ignores: [
@@ -93,11 +96,13 @@ export default tseslint.config(
 ```
 
 #### **B. Base Rules**
+
 - JavaScript recommended (`js.configs.recommended`)
 - TypeScript recommended + stylistic
 - Project service for type-aware linting
 
 #### **C. React Rules**
+
 ```javascript
 {
   'react/prop-types': 'off', // We use TypeScript
@@ -110,6 +115,7 @@ export default tseslint.config(
 ```
 
 #### **D. React Hooks Rules**
+
 ```javascript
 {
   'react-hooks/rules-of-hooks': 'error', // Enforce Rules of Hooks
@@ -118,6 +124,7 @@ export default tseslint.config(
 ```
 
 #### **E. Accessibility Rules (WCAG)**
+
 ```javascript
 {
   'jsx-a11y/alt-text': 'error',
@@ -132,6 +139,7 @@ export default tseslint.config(
 ```
 
 #### **F. TypeScript Rules**
+
 ```javascript
 {
   '@typescript-eslint/consistent-type-imports': 'error',
@@ -143,6 +151,7 @@ export default tseslint.config(
 ```
 
 #### **G. Test Files Overrides**
+
 ```javascript
 {
   files: ['**/*.test.{ts,tsx}', '**/test/**/*.{ts,tsx}'],
@@ -156,6 +165,7 @@ export default tseslint.config(
 ```
 
 #### **H. Node.js Scripts**
+
 ```javascript
 {
   files: ['**/scripts/*.js', '*.config.js'],
@@ -169,6 +179,7 @@ export default tseslint.config(
 ```
 
 #### **I. Storybook Files**
+
 ```javascript
 {
   files: ['**/*.stories.{ts,tsx}'],
@@ -178,6 +189,7 @@ export default tseslint.config(
 ```
 
 #### **J. Prettier Integration**
+
 ```javascript
 prettier, // Disables conflicting rules
 ```
@@ -196,6 +208,7 @@ prettier, // Disables conflicting rules
 ```
 
 **Usage:**
+
 - `pnpm lint` - Check for issues
 - `pnpm lint:fix` - Auto-fix issues
 
@@ -206,20 +219,22 @@ prettier, // Disables conflicting rules
 **Issues Found and Fixed:**
 
 1. **`cn.test.ts`** - Constant truthiness
+
    ```typescript
    // ❌ Before
    const result = cn("button", false && "hidden");
-   
+
    // ✅ After
    const shouldHide = false;
    const result = cn("button", shouldHide && "hidden");
    ```
 
 2. **`colors.ts`** - Missing return type
+
    ```typescript
    // ❌ Before
    const toHex = (n: number) => { ... }
-   
+
    // ✅ After
    const toHex = (n: number): string => { ... }
    ```
@@ -232,14 +247,14 @@ prettier, // Disables conflicting rules
 
 ### **What Changed:**
 
-| Feature | Old (.eslintrc) | New (flat config) |
-|---------|----------------|-------------------|
-| **Config File** | `.eslintrc.json` | `eslint.config.js` |
-| **Format** | JSON/YAML | JavaScript ES modules |
-| **Extends** | String array | Import and spread |
-| **Plugins** | String names | Import objects |
-| **Overrides** | `overrides` array | Multiple config objects |
-| **Type** | Static | Dynamic (full JS power) |
+| Feature         | Old (.eslintrc)   | New (flat config)       |
+| --------------- | ----------------- | ----------------------- |
+| **Config File** | `.eslintrc.json`  | `eslint.config.js`      |
+| **Format**      | JSON/YAML         | JavaScript ES modules   |
+| **Extends**     | String array      | Import and spread       |
+| **Plugins**     | String names      | Import objects          |
+| **Overrides**   | `overrides` array | Multiple config objects |
+| **Type**        | Static            | Dynamic (full JS power) |
 
 ### **Benefits of Flat Config:**
 
@@ -254,18 +269,23 @@ prettier, // Disables conflicting rules
 ## 💡 Rules Explained
 
 ### **Why `react/prop-types` is OFF:**
+
 We use TypeScript for prop validation, so PropTypes are redundant.
 
 ### **Why `react/react-in-jsx-scope` is OFF:**
+
 React 18+ with new JSX transform doesn't require `import React` in every file.
 
 ### **Why `jsx-a11y/click-events-have-key-events` is WARN:**
+
 React Aria handles keyboard events automatically, so this would be noisy. But still warn in case we forget React Aria.
 
 ### **Why `@typescript-eslint/explicit-function-return-type` is WARN:**
+
 Encourages return types but doesn't block (TypeScript infers most types correctly).
 
 ### **Why Test Files Have Relaxed Rules:**
+
 - Mocking often requires `any` types
 - Testing raw elements doesn't need button types
 - Test code is less critical than production code
@@ -322,6 +342,7 @@ Encourages return types but doesn't block (TypeScript infers most types correctl
 ### 1. ESLint 9.x Flat Config is Different
 
 **Migration from old format:**
+
 ```javascript
 // ❌ Old (.eslintrc.json)
 {
@@ -380,6 +401,7 @@ Production code: Strict rules ✅
 Test code: Relaxed rules ✅
 
 Example:
+
 - `@typescript-eslint/no-explicit-any`: `error` in prod, `off` in tests
 - `react/button-has-type`: `error` in prod, `off` in tests
 
@@ -388,7 +410,7 @@ Example:
 Always include `eslint-config-prettier` last to disable conflicting formatting rules:
 
 ```javascript
-import prettier from 'eslint-config-prettier';
+import prettier from "eslint-config-prettier";
 
 export default [
   // ... other configs
@@ -401,12 +423,15 @@ export default [
 ## 🔗 Related Tasks
 
 **Prerequisite Tasks:**
+
 - ✅ Part A-I completed (all foundation work)
 
 **This Task (9.1):**
+
 - ✅ ESLint configuration complete
 
 **Next Tasks:**
+
 - ⏳ Task 9.2 - Prettier Configuration
 - ⏳ Task 9.3 - Husky Setup
 - ⏳ Task 9.4 - Commitlint Configuration
@@ -419,6 +444,7 @@ export default [
 ### Task 9.2: Prettier
 
 Will add:
+
 - Code formatting
 - **Tailwind class sorting** (automatic!)
 - `.prettierrc` config
@@ -461,6 +487,7 @@ pnpm eslint packages/react/src
 **Result:** ESLint 9.39.2 configured with React, TypeScript, and accessibility rules. All code passes linting.
 
 **What We Have:**
+
 - ✅ Latest ESLint (9.39.2)
 - ✅ TypeScript support (8.51.0)
 - ✅ React best practices
@@ -471,6 +498,7 @@ pnpm eslint packages/react/src
 - ✅ All code passing lint checks
 
 **To Lint:**
+
 ```bash
 pnpm lint           # Check for issues
 pnpm lint:fix       # Auto-fix issues
@@ -480,5 +508,4 @@ pnpm lint:fix       # Auto-fix issues
 
 ---
 
-*Task completed on 2025-12-31 as part of Phase 0 - Part J (Code Quality)*
-
+_Task completed on 2025-12-31 as part of Phase 0 - Part J (Code Quality)_
