@@ -71,3 +71,8 @@ global.ResizeObserver = class ResizeObserver {
 // - Global test utilities
 // - Mock data
 // - Environment variables
+
+// Mock React Aria live announcer — avoids bundler + SSR issues in tests
+vi.mock("@react-aria/live-announcer", () => ({
+  announce: () => {},
+}));

@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
+    "@react-aria/live-announcer": "^3.4.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "react-aria": "^3.45.0",
