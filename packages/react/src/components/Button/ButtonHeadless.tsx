@@ -48,7 +48,7 @@ export interface ButtonHeadlessProps extends AriaButtonProps {
 }
 
 export const ButtonHeadless = forwardRef<HTMLButtonElement, ButtonHeadlessProps>(
-  ({ className, children, tabIndex = 0, onMouseDown, ...props }, forwardedRef) => {
+  ({ className, children, tabIndex = 0, onMouseDown, type, ...restProps }, forwardedRef) => {
     // Internal ref for React Aria
     const internalRef = useRef<HTMLButtonElement>(null);
 
@@ -58,22 +58,40 @@ export const ButtonHeadless = forwardRef<HTMLButtonElement, ButtonHeadlessProps>
     // React Aria hook - handles all accessibility
     const { buttonProps } = useButton(
       {
-        ...props,
+        ...restProps,
         // Ensure element type is 'button' for proper semantics
         elementType: "button",
       },
       ref
     );
 
-    // Merge React Aria props with custom props
-    const mergedProps = mergeProps(buttonProps, {
-      tabIndex,
-      className,
-      onMouseDown,
-    });
+    // Filter out React Aria-specific props that shouldn't be on DOM elements
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {
+      isDisabled,
+      onPress,
+      onPressStart,
+      onPressEnd,
+      onPressChange,
+      onPressUp,
+      ...htmlAttrs
+    } = restProps;
+
+    // Merge React Aria props with custom props and HTML attributes
+    // Order matters: buttonProps first, then custom props/HTML attributes to allow overrides
+    const mergedProps = mergeProps(
+      buttonProps,
+      {
+        tabIndex,
+        className,
+        onMouseDown,
+      },
+      htmlAttrs // Pass through only HTML attributes (title, data-*, etc.)
+    );
 
     return (
-      <button {...mergedProps} ref={ref} type="button">
+      // eslint-disable-next-line react/button-has-type -- type is dynamically passed from props
+      <button {...mergedProps} ref={ref} type={type ?? "button"}>
         {children}
       </button>
     );
