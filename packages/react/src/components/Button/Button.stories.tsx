@@ -49,7 +49,7 @@ const meta: Meta<typeof Button> = {
       options: ["small", "medium", "large"],
       description: "Button size",
     },
-    disabled: {
+    isDisabled: {
       control: "boolean",
       description: "Disable the button",
     },
@@ -228,17 +228,17 @@ export const Disabled: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2">
-        <Button disabled>Filled</Button>
-        <Button variant="outlined" disabled>
+        <Button isDisabled>Filled</Button>
+        <Button variant="outlined" isDisabled>
           Outlined
         </Button>
-        <Button variant="tonal" disabled>
+        <Button variant="tonal" isDisabled>
           Tonal
         </Button>
-        <Button variant="elevated" disabled>
+        <Button variant="elevated" isDisabled>
           Elevated
         </Button>
-        <Button variant="text" disabled>
+        <Button variant="text" isDisabled>
           Text
         </Button>
       </div>
@@ -292,10 +292,10 @@ const InteractiveExample = (): React.ReactElement => {
     <div className="flex flex-col items-center gap-4">
       <p className="text-lg">Count: {count}</p>
       <div className="flex gap-2">
-        <Button onClick={() => setCount(count + 1)} icon={<IconAdd />}>
+        <Button onPress={() => setCount(count + 1)} icon={<IconAdd />}>
           Increment
         </Button>
-        <Button variant="outlined" onClick={() => setCount(0)} disabled={count === 0}>
+        <Button variant="outlined" onPress={() => setCount(0)} isDisabled={count === 0}>
           Reset
         </Button>
       </div>
@@ -402,7 +402,7 @@ export const Playground: Story = {
     variant: "filled",
     color: "primary",
     size: "medium",
-    disabled: false,
+    isDisabled: false,
     loading: false,
     fullWidth: false,
     disableRipple: false,
