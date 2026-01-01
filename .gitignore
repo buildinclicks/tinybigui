@@ -41,6 +41,8 @@ lerna-debug.log*
 
 # Project-specific
 info.txt
+docs/
+strategies/
 
 
 *storybook.log
