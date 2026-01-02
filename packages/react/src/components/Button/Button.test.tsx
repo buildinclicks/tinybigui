@@ -159,7 +159,8 @@ describe("Button", () => {
       render(<Button isDisabled>Disabled</Button>);
       const button = screen.getByRole("button");
       expect(button).toBeDisabled();
-      expect(button).toHaveClass("opacity-38", "pointer-events-none");
+      // MD3 spec: disabled state uses pointer-events-none, cursor-not-allowed, and removes shadows
+      expect(button).toHaveClass("pointer-events-none", "cursor-not-allowed", "shadow-none");
     });
 
     test("handles loading state", () => {

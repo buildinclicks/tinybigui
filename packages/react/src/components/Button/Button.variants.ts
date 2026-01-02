@@ -12,9 +12,10 @@ export const buttonVariants = cva(
     "relative inline-flex items-center justify-center",
     "overflow-hidden rounded-full font-medium",
     "transition-all duration-200",
+    "tracking-[0.1px]", // MD3 spec: +0.1px letter-spacing for label-large
     "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
 
-    // State layers (hover, focus, active)
+    // State layers (hover, focus, active) - MD3 spec: 8%/12%/12% opacity
     "before:absolute before:inset-0 before:rounded-[inherit] before:transition-opacity before:duration-200",
     "before:bg-current before:opacity-0",
     "hover:before:opacity-8",
@@ -27,10 +28,10 @@ export const buttonVariants = cva(
        * Button variant (MD3 specification)
        */
       variant: {
-        filled: "shadow-none",
+        filled: "shadow-none hover:shadow-elevation-1", // MD3: gains elevation on hover
         outlined: "bg-transparent border border-outline",
         tonal: "",
-        elevated: "shadow-elevation-1",
+        elevated: "shadow-elevation-1 hover:shadow-elevation-2", // MD3: level 1 → level 2 on hover
         text: "bg-transparent",
       },
 
@@ -62,10 +63,16 @@ export const buttonVariants = cva(
       },
 
       /**
-       * Disabled state
+       * Disabled state (MD3 spec: container 12% opacity, content 38% opacity)
        */
       disabled: {
-        true: "pointer-events-none opacity-38",
+        true: [
+          "pointer-events-none cursor-not-allowed",
+          "bg-on-surface/12", // MD3: disabled container uses on-surface at 12%
+          "text-on-surface/38", // MD3: disabled text/icons use on-surface at 38%
+          "border-on-surface/12", // For outlined variant
+          "shadow-none", // Remove elevation when disabled
+        ],
         false: "",
       },
 
