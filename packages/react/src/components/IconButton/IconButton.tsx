@@ -57,7 +57,7 @@ export const IconButton = forwardRef<
       size = "medium",
       // IconButton specific props
       children,
-      selected = false,
+      selected,
       disableRipple = false,
       className,
       // React Aria props
@@ -65,6 +65,7 @@ export const IconButton = forwardRef<
       onPress,
       onMouseDown,
       "aria-label": ariaLabel,
+      title,
       ...props
     },
     ref
@@ -121,13 +122,14 @@ export const IconButton = forwardRef<
           "active:before:opacity-12",
 
           // CVA variants
-          iconButtonVariants({ variant, color, size, selected, isDisabled }),
+          iconButtonVariants({ variant, color, size, selected: selected ?? false, isDisabled }),
 
           // User custom classes
           className
         )}
         aria-label={ariaLabel}
         selected={selected}
+        title={title}
         {...mergedPropsValue}
       >
         {/* Ripple effect */}
