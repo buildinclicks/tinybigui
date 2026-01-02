@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
+    "@storybook/addon-themes", // Theme switcher addon
   ],
   framework: {
     name: "@storybook/react-vite",

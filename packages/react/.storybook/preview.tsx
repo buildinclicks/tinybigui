@@ -1,7 +1,17 @@
 import type { Preview } from "@storybook/react-vite";
+import { withThemeByClassName } from "@storybook/addon-themes";
 import "../src/styles.css"; // Import MD3 tokens and Tailwind
 
 const preview: Preview = {
+  decorators: [
+    withThemeByClassName({
+      themes: {
+        light: "light",
+        dark: "dark",
+      },
+      defaultTheme: "light",
+    }),
+  ],
   parameters: {
     // Configure controls
     controls: {
@@ -88,20 +98,6 @@ const preview: Preview = {
 
     // Configure layout
     layout: "centered", // Center components by default
-  },
-
-  // Global types for toolbar controls
-  globalTypes: {
-    theme: {
-      description: "Global theme for components",
-      defaultValue: "light",
-      toolbar: {
-        title: "Theme",
-        icon: "circlehollow",
-        items: ["light", "dark"],
-        dynamicTitle: true,
-      },
-    },
   },
 };
 

@@ -124,7 +124,9 @@ export const AllVariants: Story = {
       <Button variant="filled">Filled</Button>
       <Button variant="outlined">Outlined</Button>
       <Button variant="tonal">Tonal</Button>
-      <Button variant="elevated">Elevated</Button>
+      <Button variant="elevated" color="primary">
+        Elevated
+      </Button>
       <Button variant="text">Text</Button>
     </div>
   ),
