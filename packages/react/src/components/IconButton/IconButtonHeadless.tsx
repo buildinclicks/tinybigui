@@ -1,8 +1,7 @@
 import { forwardRef, useRef } from "react";
 import { useButton } from "react-aria";
 import type { AriaButtonProps } from "react-aria";
-import { mergeProps } from "@react-aria/utils";
-import { filterDOMProps } from "react-aria";
+import { mergeProps, filterDOMProps } from "@react-aria/utils";
 
 /**
  * Headless IconButton Component (Layer 2)
@@ -64,6 +63,11 @@ export interface IconButtonHeadlessProps extends AriaButtonProps {
    * REQUIRED: Accessible label for screen readers
    */
   "aria-label": string;
+
+  /**
+   * HTML title attribute for tooltip
+   */
+  title?: string;
 }
 
 export const IconButtonHeadless = forwardRef<HTMLButtonElement, IconButtonHeadlessProps>(
@@ -76,6 +80,7 @@ export const IconButtonHeadless = forwardRef<HTMLButtonElement, IconButtonHeadle
       type,
       selected,
       "aria-label": ariaLabel,
+      title,
       ...props
     },
     forwardedRef
@@ -99,7 +104,7 @@ export const IconButtonHeadless = forwardRef<HTMLButtonElement, IconButtonHeadle
     );
 
     // Filter out React Aria-specific props that shouldn't be passed to the DOM element
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+
     const domProps = filterDOMProps(props);
 
     // Merge React Aria props with custom props and filtered DOM props
@@ -112,8 +117,10 @@ export const IconButtonHeadless = forwardRef<HTMLButtonElement, IconButtonHeadle
         className,
         onMouseDown,
         type: type ?? "button",
-        // Add aria-pressed for toggle buttons
+        // Add aria-pressed for toggle buttons (only if selected is defined)
         ...(selected !== undefined && { "aria-pressed": selected }),
+        // Add title if provided
+        ...(title && { title }),
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any;
