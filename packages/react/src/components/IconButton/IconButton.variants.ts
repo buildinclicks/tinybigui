@@ -212,7 +212,7 @@ export const iconButtonVariants = cva(
       variant: "standard",
       color: "primary",
       size: "medium",
-      selected: undefined,
+      selected: false,
       isDisabled: false,
     },
   }
