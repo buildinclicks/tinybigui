@@ -46,6 +46,13 @@ const Spinner = (): React.ReactElement => (
  * - ✅ Screen reader support (via React Aria)
  * - ✅ Focus management (via React Aria)
  *
+ * MD3 Specifications:
+ * - Height: 40dp (medium), 32dp (small), 48dp (large)
+ * - Typography: Label Large (14px, 500 weight, +0.1px letter-spacing)
+ * - Icon size: 18px × 18px (per MD3 spec)
+ * - State layers: 8% hover, 12% focus/pressed
+ * - Elevation: Level 1 on hover (filled), Level 1→2 (elevated)
+ *
  * @example
  * ```tsx
  * // Basic usage
@@ -56,8 +63,8 @@ const Spinner = (): React.ReactElement => (
  *   Secondary Action
  * </Button>
  *
- * // With icon
- * <Button icon={<IconAdd />}>
+ * // With icon (MD3 spec: icons should be 18px × 18px)
+ * <Button icon={<IconAdd className="h-[18px] w-[18px]" />}>
  *   Add Item
  * </Button>
  *

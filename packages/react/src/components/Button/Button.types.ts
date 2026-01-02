@@ -75,11 +75,29 @@ export interface ButtonProps
 
   /**
    * Leading icon (before text)
+   *
+   * MD3 Specification: Icons should be 18px × 18px
+   *
+   * @example
+   * ```tsx
+   * <Button icon={<IconAdd className="h-[18px] w-[18px]" />}>
+   *   Add Item
+   * </Button>
+   * ```
    */
   icon?: React.ReactNode;
 
   /**
    * Trailing icon (after text)
+   *
+   * MD3 Specification: Icons should be 18px × 18px
+   *
+   * @example
+   * ```tsx
+   * <Button trailingIcon={<IconArrow className="h-[18px] w-[18px]" />}>
+   *   Continue
+   * </Button>
+   * ```
    */
   trailingIcon?: React.ReactNode;
 
