@@ -428,6 +428,139 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
 
 ## Testing Rules
 
+### Test-Driven Development (TDD) - MANDATORY
+
+**ALL components MUST be developed using TDD approach. NO EXCEPTIONS.**
+
+#### TDD Process (RED → GREEN → REFACTOR):
+
+```
+1. 🔴 RED: Write failing tests FIRST
+   ├── Define test cases based on requirements/specs
+   ├── Write tests that describe expected behavior
+   └── Run tests → All should FAIL (component doesn't exist yet)
+
+2. 🟢 GREEN: Write minimum code to make tests pass
+   ├── Implement just enough to make tests pass
+   ├── Don't worry about perfection yet
+   └── Run tests → All should PASS
+
+3. 🔵 REFACTOR: Improve code quality
+   ├── Clean up implementation
+   ├── Apply DRY principles
+   ├── Optimize performance
+   └── Run tests → All should STILL PASS
+```
+
+#### Implementation Order for Components:
+
+```
+1. Write test file FIRST (ComponentName.test.tsx)
+   ├── Test rendering with default props
+   ├── Test all variants
+   ├── Test all states (disabled, loading, etc.)
+   ├── Test interactions (click, keyboard)
+   ├── Test accessibility (axe, ARIA attributes)
+   └── Run tests → RED (all failing)
+
+2. Create types (ComponentName.types.ts)
+   └── Define interfaces based on test requirements
+
+3. Create variants (ComponentName.variants.ts)
+   └── Define CVA variants based on test cases
+
+4. Create headless component (ComponentNameHeadless.tsx)
+   └── Implement React Aria integration
+
+5. Create styled component (ComponentName.tsx)
+   └── Wrap headless + CVA variants
+
+6. Run tests → GREEN (all passing)
+
+7. Create Storybook stories (ComponentName.stories.tsx)
+   └── Visual documentation and manual testing
+
+8. Refactor if needed
+   └── Run tests → Still GREEN
+```
+
+#### TDD Benefits:
+
+- ✅ Tests define requirements upfront
+- ✅ Prevents over-engineering
+- ✅ Ensures testable code
+- ✅ Catches bugs early
+- ✅ Documents behavior through tests
+- ✅ Enables confident refactoring
+
+#### Example TDD Flow:
+
+```typescript
+// STEP 1: Write test FIRST (IconButton.test.tsx)
+describe('IconButton', () => {
+  test('renders with aria-label', () => {
+    render(<IconButton aria-label="Delete"><IconDelete /></IconButton>)
+    expect(screen.getByLabelText('Delete')).toBeInTheDocument()
+  })
+  
+  test('renders standard variant by default', () => {
+    render(<IconButton aria-label="Delete"><IconDelete /></IconButton>)
+    expect(screen.getByRole('button')).toHaveClass('bg-transparent')
+  })
+  
+  test('renders filled variant', () => {
+    render(
+      <IconButton aria-label="Delete" variant="filled">
+        <IconDelete />
+      </IconButton>
+    )
+    expect(screen.getByRole('button')).toHaveClass('bg-primary')
+  })
+})
+
+// STEP 2: Run tests → RED (all fail - component doesn't exist)
+
+// STEP 3: Create types (IconButton.types.ts)
+export interface IconButtonProps {
+  'aria-label': string; // Required
+  variant?: 'standard' | 'filled';
+  children: React.ReactNode;
+}
+
+// STEP 4: Create variants (IconButton.variants.ts)
+export const iconButtonVariants = cva('base', {
+  variants: {
+    variant: {
+      standard: 'bg-transparent',
+      filled: 'bg-primary',
+    },
+  },
+  defaultVariants: { variant: 'standard' },
+})
+
+// STEP 5: Create component (IconButton.tsx)
+export const IconButton = ({ variant, children, ...props }: IconButtonProps) => {
+  return (
+    <button className={iconButtonVariants({ variant })} {...props}>
+      {children}
+    </button>
+  )
+}
+
+// STEP 6: Run tests → GREEN (all pass)
+
+// STEP 7: Refactor if needed → Tests still GREEN
+```
+
+#### When to Skip TDD:
+
+**NEVER.** TDD is mandatory for all components.
+
+If you find yourself wanting to skip TDD, it's a sign that:
+- Requirements aren't clear (clarify first)
+- Component is too complex (break it down)
+- Tests are hard to write (simplify design)
+
 ### Required Tests
 
 Every component MUST have:
