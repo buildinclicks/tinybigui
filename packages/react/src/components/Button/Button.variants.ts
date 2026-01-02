@@ -9,7 +9,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 export const buttonVariants = cva(
   [
     // Base classes (always applied)
-    "relative inline-flex items-center justify-center",
+    "relative inline-flex items-center justify-center cursor-pointer",
     "overflow-hidden rounded-full font-medium",
     "transition-all duration-200",
     "tracking-[0.1px]", // MD3 spec: +0.1px letter-spacing for label-large

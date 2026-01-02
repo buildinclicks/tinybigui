@@ -8,3 +8,6 @@ export type {
   IconButtonColor,
   IconButtonSize,
 } from "./IconButton";
+
+export { FAB } from "./FAB";
+export type { FABProps, FABSize, FABColor } from "./FAB";
