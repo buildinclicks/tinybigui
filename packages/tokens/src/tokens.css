@@ -170,12 +170,12 @@
      Material Design 3 elevation system (box shadows)
      ========================================================================== */
 
-  --md-sys-elevation-level0: none;
-  --md-sys-elevation-level1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
-  --md-sys-elevation-level2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
-  --md-sys-elevation-level3: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
-  --md-sys-elevation-level4: 0 2px 3px 0 rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
-  --md-sys-elevation-level5: 0 4px 4px 0 rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-0: none;
+  --md-sys-elevation-level-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-3: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-4: 0 2px 3px 0 rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-5: 0 4px 4px 0 rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
 
   /* ==========================================================================
      MOTION TOKENS
@@ -205,53 +205,64 @@
    DARK MODE (Placeholder)
    ========================================================================== */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Primary */
-    --md-sys-color-primary: #d0bcff;
-    --md-sys-color-on-primary: #381e72;
-    --md-sys-color-primary-container: #4f378b;
-    --md-sys-color-on-primary-container: #eaddff;
+/* Dark mode with class selector (for manual toggling, e.g., Storybook) */
+.dark {
+  /* Primary */
+  --md-sys-color-primary: #d0bcff;
+  --md-sys-color-on-primary: #381e72;
+  --md-sys-color-primary-container: #4f378b;
+  --md-sys-color-on-primary-container: #eaddff;
 
-    /* Secondary */
-    --md-sys-color-secondary: #ccc2dc;
-    --md-sys-color-on-secondary: #332d41;
-    --md-sys-color-secondary-container: #4a4458;
-    --md-sys-color-on-secondary-container: #e8def8;
+  /* Secondary */
+  --md-sys-color-secondary: #ccc2dc;
+  --md-sys-color-on-secondary: #332d41;
+  --md-sys-color-secondary-container: #4a4458;
+  --md-sys-color-on-secondary-container: #e8def8;
 
-    /* Tertiary */
-    --md-sys-color-tertiary: #efb8c8;
-    --md-sys-color-on-tertiary: #492532;
-    --md-sys-color-tertiary-container: #633b48;
-    --md-sys-color-on-tertiary-container: #ffd8e4;
+  /* Tertiary */
+  --md-sys-color-tertiary: #efb8c8;
+  --md-sys-color-on-tertiary: #492532;
+  --md-sys-color-tertiary-container: #633b48;
+  --md-sys-color-on-tertiary-container: #ffd8e4;
 
-    /* Error */
-    --md-sys-color-error: #f2b8b5;
-    --md-sys-color-on-error: #601410;
-    --md-sys-color-error-container: #8c1d18;
-    --md-sys-color-on-error-container: #f9dedc;
+  /* Error */
+  --md-sys-color-error: #f2b8b5;
+  --md-sys-color-on-error: #601410;
+  --md-sys-color-error-container: #8c1d18;
+  --md-sys-color-on-error-container: #f9dedc;
 
-    /* Surface */
-    --md-sys-color-surface: #1c1b1f;
-    --md-sys-color-on-surface: #e6e1e5;
-    --md-sys-color-surface-variant: #49454f;
-    --md-sys-color-on-surface-variant: #cac4d0;
+  /* Surface */
+  --md-sys-color-surface: #1c1b1f;
+  --md-sys-color-on-surface: #e6e1e5;
+  --md-sys-color-surface-variant: #49454f;
+  --md-sys-color-on-surface-variant: #cac4d0;
 
-    /* Surface containers (MD3 elevation system - dark mode) */
-    --md-sys-color-surface-container-lowest: #0f0d13;
-    --md-sys-color-surface-container-low: #1d1b20;
-    --md-sys-color-surface-container: #211f26;
-    --md-sys-color-surface-container-high: #2b2930;
-    --md-sys-color-surface-container-highest: #36343b;
+  /* Surface containers (MD3 elevation system - dark mode) */
+  --md-sys-color-surface-container-lowest: #0f0d13;
+  --md-sys-color-surface-container-low: #1d1b20;
+  --md-sys-color-surface-container: #211f26;
+  --md-sys-color-surface-container-high: #2b2930;
+  --md-sys-color-surface-container-highest: #36343b;
 
-    /* Outline */
-    --md-sys-color-outline: #938f99;
-    --md-sys-color-outline-variant: #49454f;
+  /* Outline */
+  --md-sys-color-outline: #938f99;
+  --md-sys-color-outline-variant: #49454f;
 
-    /* Background */
-    --md-sys-color-background: #1c1b1f;
-    --md-sys-color-on-background: #e6e1e5;
-  }
+  /* Background */
+  --md-sys-color-background: #1c1b1f;
+  --md-sys-color-on-background: #e6e1e5;
+}
+
+/* ==========================================================================
+   GLOBAL STYLES
+   Apply MD3 surface colors to body element
+   ========================================================================== */
+
+body {
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  margin: 0;
+  font-family: var(--md-sys-typescale-font-family-plain);
 }
 
 /* ==========================================================================
@@ -259,6 +270,7 @@
    Maps MD3 design tokens to Tailwind utility classes
    ========================================================================== */
 
+/* @theme is a Tailwind v4 directive - ignore unknown at-rule warning */
 @theme {
   /* Color Utilities
      Maps MD3 semantic color roles to Tailwind color utilities
@@ -308,6 +320,16 @@
   /* Background colors */
   --color-background: var(--md-sys-color-background);
   --color-on-background: var(--md-sys-color-on-background);
+
+  /* Elevation/Shadow utilities
+     Maps MD3 elevation levels to Tailwind box-shadow utilities
+     Usage: shadow-elevation-1, shadow-elevation-2, etc. */
+  --shadow-elevation-0: var(--md-sys-elevation-level-0);
+  --shadow-elevation-1: var(--md-sys-elevation-level-1);
+  --shadow-elevation-2: var(--md-sys-elevation-level-2);
+  --shadow-elevation-3: var(--md-sys-elevation-level-3);
+  --shadow-elevation-4: var(--md-sys-elevation-level-4);
+  --shadow-elevation-5: var(--md-sys-elevation-level-5);
 }
 
 /* ==========================================================================
@@ -323,6 +345,7 @@
 }
 
 /* Extend Tailwind theme with MD3 animations and opacity values */
+/* @theme is a Tailwind v4 directive - ignore unknown at-rule warning */
 @theme {
   /* Animations */
   --animate-ripple: ripple 450ms cubic-bezier(0.2, 0, 0, 1);

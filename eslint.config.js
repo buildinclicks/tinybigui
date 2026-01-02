@@ -37,6 +37,7 @@ export default [
             "*.js",
             "*.mjs",
             "packages/react/.storybook/*.ts",
+            "packages/react/.storybook/*.tsx",
             "packages/tokens/scripts/*.js",
           ],
         },
