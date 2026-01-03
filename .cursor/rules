@@ -777,11 +777,523 @@ Before suggesting ANY code change, verify:
 
 **If answer is "No" to any → Don't suggest it!**
 
+## 🚀 Release Management & Workflow (CRITICAL)
+
+**This project follows a structured release and branch management strategy. ALL development MUST follow this workflow.**
+
+**Reference**: See `learning-docs/strategies/release-strategy.md` for complete details.
+
+### Release Timeline & Milestones
+
+```
+v0.1.0 → Phase 1a + 1b (Button, IconButton, FAB, TextField, Checkbox, Switch) → Week 2-3
+v0.2.0 → + Phase 2 (Navigation: AppBar, Tabs, Drawer) → Week 5-6
+v0.3.0 → + Phase 3 (Feedback: Dialog, Snackbar, Menu) → Week 8-9
+v1.0.0 → Stable Release (All phases complete, API frozen) → Week 16+
+```
+
+**Current Status**: Phase 1a Complete ✅ (Button, IconButton, FAB)
+
+### Semantic Versioning Rules
+
+**Pre-1.0 (v0.x.x) - Development Phase:**
+- `v0.x.0` → New features (minor version bump)
+- `v0.x.y` → Bug fixes (patch version bump)
+- Breaking changes ALLOWED (document in CHANGELOG)
+
+**Post-1.0 (v1.x.x) - Stable Phase:**
+- `v1.0.0` → First stable release (API frozen)
+- `v1.x.0` → New features (backward compatible)
+- `v1.0.x` → Bug fixes only
+- `v2.0.0` → Breaking changes (major version bump)
+
+### Branch Strategy: GitHub Flow + Phase Prefixes
+
+**Primary Branches:**
+- **`main`** - Production releases ONLY (protected, tagged)
+- **`dev`** - Integration branch (protected, default for PRs)
+
+**Feature Branch Format**: `type/phase-component-description`
+
+**Branch Types & Naming:**
+
+| Type | Format | Example | When to Use |
+|------|--------|---------|-------------|
+| Feature | `feat/phase-name` | `feat/1b-textfield-component` | New components/features |
+| Bug Fix | `fix/description` | `fix/button-disabled-state` | Bug fixes |
+| Documentation | `docs/description` | `docs/button-storybook-examples` | Docs only |
+| Refactor | `refactor/description` | `refactor/tokens-color-system` | Code refactoring |
+| Test | `test/description` | `test/button-accessibility-tests` | Adding tests |
+| Chore | `chore/description` | `chore/deps-update-react-aria` | Maintenance |
+| Hotfix | `hotfix/vX.X.X-description` | `hotfix/v0.1.1-button-crash` | Emergency fixes |
+
+**Phase Prefixes for Features:**
+```
+feat/1a-button-component          # Phase 1a: Core Buttons
+feat/1b-textfield-component       # Phase 1b: Form Components
+feat/2-navigation-drawer          # Phase 2: Navigation
+feat/3-feedback-dialog            # Phase 3: Feedback
+```
+
+### Mandatory Feature Development Workflow
+
+**EVERY feature/component MUST follow these 8 steps in order:**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  STEP 1: Create Feature Branch                          │
+├─────────────────────────────────────────────────────────┤
+│  git checkout dev                                        │
+│  git checkout -b feat/1b-textfield-component            │
+│  git push -u origin feat/1b-textfield-component         │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 2: Write Tests First (TDD)                        │
+├─────────────────────────────────────────────────────────┤
+│  Create ComponentName.test.tsx with 50+ tests           │
+│  Run tests → All RED (component doesn't exist yet)      │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 3: Implement Component (Three-Layer Architecture) │
+├─────────────────────────────────────────────────────────┤
+│  1. ComponentName.types.ts - TypeScript types           │
+│  2. ComponentName.variants.ts - CVA variants            │
+│  3. ComponentNameHeadless.tsx - React Aria layer        │
+│  4. ComponentName.tsx - Styled component                │
+│  5. index.ts - Exports                                  │
+│  Commit after each file with conventional commits       │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 4: Add Storybook Stories                          │
+├─────────────────────────────────────────────────────────┤
+│  Create ComponentName.stories.tsx                       │
+│  All standard stories (Default, Variants, States, etc.) │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 5: Run Quality Checks                             │
+├─────────────────────────────────────────────────────────┤
+│  pnpm test        → All GREEN (50+ tests passing)       │
+│  pnpm lint        → No errors                           │
+│  pnpm typecheck   → No TypeScript errors                │
+│  pnpm storybook   → Visual verification                 │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 6: Commit Changes (Conventional Commits)          │
+├─────────────────────────────────────────────────────────┤
+│  git add .                                              │
+│  git commit -m "feat(textfield): implement TextField"   │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 7: Create Task Completion Documentation           │
+├─────────────────────────────────────────────────────────┤
+│  Create docs/phase-X/task-X.X-component-name.md        │
+│  Document: implementation, bugs fixed, learnings        │
+│  Commit: "docs(textfield): add task completion doc"    │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  STEP 8: Push & Prepare for PR                          │
+├─────────────────────────────────────────────────────────┤
+│  git push origin feat/1b-textfield-component            │
+│  Provide PR template for GitHub                         │
+│  Include: title, description, checklist, screenshots    │
+└─────────────────────────────────────────────────────────┘
+```
+
+### AI Assistant Behavioral Rules
+
+**MUST DO for every component/feature:**
+
+1. ✅ **Before Starting**: Suggest creating feature branch with proper naming
+2. ✅ **During Development**: Make multiple small commits with conventional format
+3. ✅ **After Each File**: Suggest committing with descriptive message
+4. ✅ **Quality Gates**: Run test → lint → typecheck before final commit
+5. ✅ **Documentation**: Create task completion doc after component done
+6. ✅ **Progress Tracking**: Show current phase/milestone status
+7. ✅ **PR Preparation**: Provide complete PR template when ready to push
+
+**Example AI Response Pattern:**
+
+```markdown
+User: "Let's implement TextField"
+
+AI Response:
+"Perfect! TextField is the first component of Phase 1b, part of our v0.1.0 milestone.
+
+📍 Current Progress:
+✅ Phase 1a Complete: Button, IconButton, FAB
+🔄 Phase 1b In Progress: TextField (starting), Checkbox (pending), Switch (pending)
+🎯 Milestone: v0.1.0 (Week 3)
+
+Let's follow our 8-step workflow:
+
+**STEP 1: Create Feature Branch**
+```bash
+git checkout dev
+git checkout -b feat/1b-textfield-component
+git push -u origin feat/1b-textfield-component
+```
+
+Ready to proceed? I'll start by writing comprehensive tests (TDD approach)."
+```
+
+**NEVER DO:**
+- ❌ Start work without creating a feature branch
+- ❌ Work directly on `main` or `dev`
+- ❌ Skip creating task completion documentation
+- ❌ Forget to track progress toward milestone
+- ❌ Use non-conventional commit messages
+- ❌ Skip quality checks before committing
+
+### Commit Message Format (Conventional Commits)
+
+**Format**: `type(scope): description`
+
+**Types:**
+- `feat` - New feature or component
+- `fix` - Bug fix
+- `docs` - Documentation only
+- `test` - Adding or updating tests
+- `refactor` - Code refactoring
+- `style` - Code formatting (no logic change)
+- `chore` - Maintenance tasks
+- `perf` - Performance improvements
+- `ci` - CI/CD changes
+- `build` - Build system changes
+- `revert` - Revert previous commit
+
+**Scope**: Component name or area (lowercase)
+
+**Examples:**
+```bash
+# Good commits
+feat(textfield): implement TextField component
+feat(textfield): add validation support
+fix(button): resolve disabled state styling
+test(iconbutton): add keyboard navigation tests
+docs(fab): add storybook stories
+refactor(tokens): reorganize color system
+chore(deps): update react-aria to v3.30.0
+
+# Bad commits (NEVER USE)
+feat: add stuff
+fix: fix bug
+update
+WIP
+asdf
+fixes
+```
+
+### Quality Gate Checklist
+
+**Before ANY commit, verify:**
+- [ ] All tests passing (`pnpm test`)
+- [ ] No linter errors (`pnpm lint`)
+- [ ] No TypeScript errors (`pnpm typecheck`)
+- [ ] Code follows three-layer architecture
+- [ ] Uses React Aria for accessibility
+- [ ] Uses CVA for variants
+- [ ] MD3 specification compliant
+- [ ] 85%+ test coverage maintained
+
+**Before ANY push, additionally verify:**
+- [ ] All commits use conventional format
+- [ ] Task completion documentation created
+- [ ] Storybook stories added and verified
+- [ ] Ready for code review
+
+### Pull Request Template
+
+**When pushing feature branch, provide this PR template:**
+
+```markdown
+## 🎯 What does this PR do?
+
+[Brief description]
+
+## 📋 Changes
+
+- [ ] ComponentName.tsx - Main styled component
+- [ ] ComponentNameHeadless.tsx - Headless primitive
+- [ ] ComponentName.variants.ts - CVA variants
+- [ ] ComponentName.types.ts - TypeScript types
+- [ ] ComponentName.test.tsx - Unit tests (XX tests)
+- [ ] ComponentName.stories.tsx - Storybook stories
+- [ ] task-X.X-component-name.md - Documentation
+
+## 🧪 Testing
+
+- [ ] All existing tests pass
+- [ ] XX new tests added
+- [ ] Test coverage maintained at 85%+
+- [ ] Manual testing in Storybook completed
+
+## 📸 Screenshots / Demo
+
+[Add Storybook screenshots]
+
+## ✅ Checklist
+
+- [ ] Tests written first (TDD)
+- [ ] All tests passing
+- [ ] Linter passes
+- [ ] TypeScript strict mode passes
+- [ ] Storybook stories added
+- [ ] Three-layer architecture followed
+- [ ] React Aria used for accessibility
+- [ ] MD3 specification compliant
+- [ ] Conventional commits used
+- [ ] Documentation created
+
+## 🔗 Related
+
+Part of Phase 1b - v0.1.0 milestone
+[Link to component specification if applicable]
+```
+
+### Phase Completion Documentation
+
+**After completing each phase, create phase summary:**
+
+Create: `learning-docs/phase-X/phase-X-completion.md`
+
+Include:
+- Overall achievements
+- All components implemented
+- Test coverage statistics
+- Learnings and challenges
+- Next steps
+
+**Example:**
+```markdown
+# Phase 1a Completion Summary
+
+## 🎉 Overview
+Phase 1a (Core Buttons) complete! All three button components implemented.
+
+## ✅ Completed Components
+1. Button - 53 tests passing
+2. IconButton - 49 tests passing  
+3. FAB - 51 tests passing
+
+## 📊 Metrics
+- Total Tests: 153
+- Test Coverage: 91.2%
+- Time: 2 weeks
+
+## 🚀 Next Steps
+Phase 1b - Form Components (TextField, Checkbox, Switch)
+Target: v0.1.0 release after Phase 1b
+```
+
+### Release Process (When Ready)
+
+**At release milestones (e.g., v0.1.0 after Phase 1b):**
+
+AI should guide through:
+1. Version bump with Changesets or manual
+2. CHANGELOG.md update
+3. Create release branch (`release/v0.1.0`)
+4. Final quality checks
+5. Merge to `main` (no squash)
+6. Tag release (`git tag -a v0.1.0`)
+7. GitHub release creation
+8. NPM publishing
+9. Sync `dev` with `main`
+10. Announce release
+
+**AI should ask**: "Phase 1b complete! Ready to start the v0.1.0 release process?"
+
+### Progress Tracking Format
+
+**ALWAYS include progress context when starting or completing work:**
+
+```
+📍 Current Progress:
+✅ Phase 1a: Button ✅ IconButton ✅ FAB ✅
+🔄 Phase 1b: TextField 🔄 Checkbox ⬜ Switch ⬜
+⬜ Phase 2: Not started
+🎯 Next Milestone: v0.1.0 (after Phase 1b completion)
+```
+
+### Workflow Example: Complete Feature Implementation
+
+**User**: "Let's implement TextField"
+
+**AI**:
+```markdown
+Perfect! Let's implement TextField component for Phase 1b.
+
+📍 **Current Status:**
+✅ Phase 1a Complete: Button, IconButton, FAB
+🔄 Phase 1b In Progress: TextField (starting)
+🎯 Milestone: v0.1.0 (Week 3)
+
+---
+
+### STEP 1: Create Feature Branch
+
+git checkout dev
+git checkout -b feat/1b-textfield-component
+git push -u origin feat/1b-textfield-component
+
+[Branch created! ✅]
+
+### STEP 2: Write Tests First (TDD)
+
+I'll create TextField.test.tsx with comprehensive tests...
+
+[Creates 52 tests covering all functionality]
+[Runs tests → All RED ✅]
+
+git add packages/react/src/components/TextField/TextField.test.tsx
+git commit -m "test(textfield): add 52 unit tests for TextField"
+
+### STEP 3: Implement Component
+
+**3.1 - Types**
+[Creates TextField.types.ts]
+
+git add packages/react/src/components/TextField/TextField.types.ts
+git commit -m "feat(textfield): add TypeScript types and interfaces"
+
+**3.2 - CVA Variants**
+[Creates TextField.variants.ts]
+
+git add packages/react/src/components/TextField/TextField.variants.ts
+git commit -m "feat(textfield): add CVA variants"
+
+**3.3 - Headless Primitive**
+[Creates TextFieldHeadless.tsx using React Aria]
+
+git add packages/react/src/components/TextField/TextFieldHeadless.tsx
+git commit -m "feat(textfield): implement headless primitive with React Aria"
+
+**3.4 - Styled Component**
+[Creates TextField.tsx]
+
+git add packages/react/src/components/TextField/TextField.tsx
+git commit -m "feat(textfield): implement styled TextField component"
+
+**3.5 - Exports**
+[Updates index.ts]
+
+git add packages/react/src/components/TextField/index.ts
+git add packages/react/src/components/index.ts
+git commit -m "feat(textfield): add component exports"
+
+[Runs tests → All GREEN! ✅ 52/52 passing]
+
+### STEP 4: Add Storybook Stories
+
+[Creates TextField.stories.tsx]
+
+git add packages/react/src/components/TextField/TextField.stories.tsx
+git commit -m "docs(textfield): add Storybook stories"
+
+### STEP 5: Quality Checks
+
+Running quality gates...
+✅ pnpm test - All 52 tests passing
+✅ pnpm lint - No errors
+✅ pnpm typecheck - No TypeScript errors
+✅ Storybook - Visually verified
+
+### STEP 6: Create Documentation
+
+[Creates learning-docs/phase-1/task-1.4-textfield-implementation.md]
+
+git add learning-docs/phase-1/task-1.4-textfield-implementation.md
+git commit -m "docs(textfield): add task completion documentation"
+
+### STEP 7: Push & Prepare PR
+
+git push origin feat/1b-textfield-component
+
+✅ TextField implementation complete!
+
+📊 **Summary:**
+- 52 tests (all passing)
+- 5 component files created
+- Test coverage: 89.3%
+- Storybook stories: 7
+
+📍 **Updated Progress:**
+✅ Phase 1a: Button ✅ IconButton ✅ FAB ✅
+🔄 Phase 1b: TextField ✅ Checkbox ⬜ Switch ⬜
+🎯 Next: Checkbox component
+
+---
+
+**Ready to create PR?** Here's the template:
+
+[Provides complete PR template]
+```
+
+### Context Reminders
+
+**At the START of each session working on the project:**
+
+```
+Welcome back! Here's where we are:
+
+📍 Current Status:
+- Phase 1a: Complete ✅ (Button, IconButton, FAB)
+- Phase 1b: In Progress (TextField ✅, Checkbox ⬜, Switch ⬜)
+- Current branch: feat/1b-checkbox-component
+
+🎯 Next Milestone: v0.1.0 (after Phase 1b)
+📚 Reference: learning-docs/strategies/release-strategy.md
+
+What would you like to work on?
+```
+
+**When COMPLETING a phase:**
+
+```
+🎉 Phase 1b Complete!
+
+All components implemented:
+✅ TextField (52 tests)
+✅ Checkbox (48 tests)
+✅ Switch (45 tests)
+
+📊 Phase 1b Stats:
+- Total: 145 tests
+- Coverage: 88.7%
+- Time: 1 week
+
+🚀 Ready for v0.1.0 Release!
+
+According to our release strategy, this completes the requirements for v0.1.0 
+(Phase 1a + 1b = Core Buttons + Form Components).
+
+Should we proceed with the release process?
+```
+
+### Key Principles
+
+1. **Branch Discipline**: Never work directly on `main` or `dev`
+2. **Conventional Commits**: Every commit follows the format
+3. **Quality First**: All checks pass before pushing
+4. **Documentation Always**: Task completion docs are mandatory
+5. **Progress Visibility**: Always show context and progress
+6. **Release Readiness**: Track toward milestones
+7. **Workflow Adherence**: Follow 8-step process for every feature
+
+---
+
 ## Reference Priority
 
 When answering questions, consult in this order:
 
-1. Strategy docs (`strategies/` folder)
+1. Strategy docs (`learning-docs/strategies/` folder) - **Release & workflow decisions**
 2. Material Design 3 specs (m3.material.io)
 3. React Aria docs (react-spectrum.adobe.com/react-aria)
 4. WCAG guidelines (w3.org/WAI/WCAG21)
@@ -798,4 +1310,5 @@ All code must be:
 - ✅ Following MD3 specifications
 - ✅ Providing excellent DX
 - ✅ Maintainable long-term
+- ✅ **Following release & branch strategy** (NEW)
 
