@@ -105,4 +105,9 @@ export interface FABProps extends AriaButtonProps {
    * HTML title attribute for tooltip
    */
   title?: string;
+
+  /**
+   * Mouse down handler (for ripple effect and custom handling)
+   */
+  onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }

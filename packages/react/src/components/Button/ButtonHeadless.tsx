@@ -66,14 +66,13 @@ export const ButtonHeadless = forwardRef<HTMLButtonElement, ButtonHeadlessProps>
     );
 
     // Filter out React Aria-specific props that shouldn't be on DOM elements
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {
-      isDisabled,
-      onPress,
-      onPressStart,
-      onPressEnd,
-      onPressChange,
-      onPressUp,
+      isDisabled: _isDisabled,
+      onPress: _onPress,
+      onPressStart: _onPressStart,
+      onPressEnd: _onPressEnd,
+      onPressChange: _onPressChange,
+      onPressUp: _onPressUp,
       ...htmlAttrs
     } = restProps;
 

@@ -88,18 +88,17 @@ export const IconButton = forwardRef<
 
     // Ripple effect
     const { onMouseDown: handleRipple, ripples } = useRipple({
-      isDisabled: isDisabled || disableRipple,
+      disabled: isDisabled || disableRipple,
     });
 
     // Merge user's onMouseDown with ripple handler
     const mergedOnMouseDown = (e: React.MouseEvent<HTMLButtonElement>): void => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       onMouseDown?.(e);
       handleRipple(e);
     };
 
     const mergedPropsValue = mergeProps(props, {
-      onPress,
+      ...(onPress && { onPress }),
       onMouseDown: mergedOnMouseDown,
       isDisabled,
     });
@@ -128,8 +127,8 @@ export const IconButton = forwardRef<
           className
         )}
         aria-label={ariaLabel}
-        selected={selected}
-        title={title}
+        {...(selected !== undefined && { selected })}
+        {...(title && { title })}
         {...mergedPropsValue}
       >
         {/* Ripple effect */}
