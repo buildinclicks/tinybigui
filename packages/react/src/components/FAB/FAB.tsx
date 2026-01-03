@@ -80,18 +80,17 @@ export const FAB = forwardRef<HTMLButtonElement, FABProps & Omit<FABVariants, "i
 
     // Ripple effect
     const { onMouseDown: handleRipple, ripples } = useRipple({
-      isDisabled: isDisabled || disableRipple,
+      disabled: isDisabled || disableRipple,
     });
 
     // Merge user's onMouseDown with ripple handler
     const mergedOnMouseDown = (e: React.MouseEvent<HTMLButtonElement>): void => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       onMouseDown?.(e);
       handleRipple(e);
     };
 
     const mergedPropsValue = mergeProps(props, {
-      onPress,
+      ...(onPress && { onPress }),
       onMouseDown: mergedOnMouseDown,
       isDisabled,
     });
@@ -123,7 +122,7 @@ export const FAB = forwardRef<HTMLButtonElement, FABProps & Omit<FABVariants, "i
           className
         )}
         aria-label={ariaLabel}
-        title={title}
+        {...(title && { title })}
         {...mergedPropsValue}
       >
         {/* Ripple effect */}

@@ -108,6 +108,11 @@ export interface IconButtonProps extends AriaButtonProps {
   title?: string;
 
   /**
+   * Mouse down handler (for ripple effect and custom handling)
+   */
+  onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+
+  /**
    * REQUIRED: Accessible label for screen readers
    * Since IconButton has no visible text, this is mandatory
    *
