@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/buildinclicks/tinybigui/discussions/new?category=q-a
+    about: Ask questions in GitHub Discussions (available after v0.1.0 release)
+  - name: Documentation
+    url: https://github.com/buildinclicks/tinybigui#readme
+    about: Check the documentation before opening an issue
+
