@@ -1,0 +1,99 @@
+---
+description: Test-Driven Development (TDD) rules for TinyBigUI
+globs: "**/*.test.tsx, **/*.test.ts, **/*.spec.tsx, **/*.spec.ts"
+alwaysApply: false
+---
+
+# Test-Driven Development (TDD)
+
+**ALL components MUST be developed using TDD. NO EXCEPTIONS.**
+
+## TDD Process (RED → GREEN → REFACTOR)
+
+```
+1. 🔴 RED: Write failing tests FIRST
+   ├── Define test cases based on requirements/specs
+   ├── Write tests that describe expected behavior
+   └── Run tests → All should FAIL (component doesn't exist yet)
+
+2. 🟢 GREEN: Write minimum code to make tests pass
+   ├── Implement just enough to make tests pass
+   ├── Don't worry about perfection yet
+   └── Run tests → All should PASS
+
+3. 🔵 REFACTOR: Improve code quality
+   ├── Clean up implementation
+   ├── Apply DRY principles
+   └── Run tests → All should STILL PASS
+```
+
+## Required Tests Per Component
+
+Every component MUST have:
+
+1. **Rendering tests** (default props, all variants)
+2. **Interaction tests** (click, keyboard)
+3. **Accessibility tests** (axe violations)
+4. **Customization tests** (className merging)
+
+## Test Structure
+
+```typescript
+describe('Button', () => {
+  describe('Rendering', () => {
+    it('renders with default props', () => { })
+    it('renders all variants', () => { })
+  })
+  
+  describe('Interactions', () => {
+    it('handles click events', async () => { })
+    it('handles keyboard navigation', async () => { })
+  })
+  
+  describe('Accessibility', () => {
+    it('has no violations', async () => {
+      const { container } = render(<Button>Click</Button>)
+      const results = await axe(container)
+      expect(results).toHaveNoViolations()
+    })
+  })
+  
+  describe('Customization', () => {
+    it('merges custom className', () => { })
+  })
+})
+```
+
+## Implementation Order
+
+```
+1. Write test file FIRST (ComponentName.test.tsx)
+   └── Run tests → RED (all failing)
+
+2. Create types (ComponentName.types.ts)
+
+3. Create variants (ComponentName.variants.ts)
+
+4. Create headless component (ComponentNameHeadless.tsx)
+
+5. Create styled component (ComponentName.tsx)
+
+6. Run tests → GREEN (all passing)
+
+7. Create Storybook stories
+
+8. Refactor if needed → Tests still GREEN
+```
+
+## Quality Gates
+
+✅ **MUST:**
+- Write tests for every component
+- Include axe accessibility tests
+- Achieve >90% code coverage
+- Test edge cases and error states
+
+❌ **NEVER:**
+- Skip tests (even for "simple" components)
+- Skip accessibility tests
+- Write component code before tests

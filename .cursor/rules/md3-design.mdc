@@ -1,0 +1,91 @@
+---
+description: Material Design 3 specifications and token usage
+globs: packages/react/src/components/**/*.tsx, packages/react/src/components/**/*.variants.ts
+alwaysApply: false
+---
+
+# Material Design 3 Rules
+
+## Design Tokens
+
+✅ **MUST:**
+- Use MD3 design tokens via Tailwind classes (`bg-primary`, `text-on-primary`)
+- Follow MD3 specifications exactly
+- Use MD3 elevation classes (`shadow-elevation-1`)
+- Use MD3 typography classes (`text-headline-large`)
+
+❌ **NEVER:**
+- Use arbitrary color values (`bg-[#6750a4]`)
+- Deviate from MD3 specs
+- Create custom variants not in MD3 spec
+
+## Component Variants
+
+✅ **MUST:**
+- Implement ALL MD3 variants for each component
+- Use MD3 naming (e.g., 'filled', 'outlined' NOT 'solid', 'bordered')
+
+❌ **NEVER:**
+- Create custom variants not in MD3 spec
+- Skip MD3 variants
+
+## Interactions
+
+✅ **MUST:**
+- Implement MD3 state layers
+- Use MD3 motion tokens (`transition-all duration-short2 ease-standard`)
+- Implement ripple effect where specified
+
+❌ **NEVER:**
+- Use custom animations not in MD3
+
+## CVA Pattern for Variants
+
+```typescript
+// button.variants.ts
+import { cva, type VariantProps } from 'class-variance-authority'
+
+export const buttonVariants = cva(
+  'base-classes',
+  {
+    variants: {
+      variant: {
+        filled: 'bg-primary text-on-primary',
+        outlined: 'border-2 border-outline',
+        text: 'bg-transparent',
+        elevated: 'bg-surface-container-low shadow-elevation-1',
+        tonal: 'bg-secondary-container text-on-secondary-container',
+      },
+      size: {
+        small: 'h-10 px-4',
+        medium: 'h-12 px-6',
+        large: 'h-14 px-8',
+      },
+    },
+    defaultVariants: {
+      variant: 'filled',
+      size: 'medium',
+    },
+  }
+)
+
+export type ButtonVariants = VariantProps<typeof buttonVariants>
+```
+
+## Accessibility (WCAG 2.1 AA)
+
+✅ **MUST:**
+- Meet WCAG 2.1 AA minimum (aim for AAA where feasible)
+- Ensure 4.5:1 contrast for text, 3:1 for UI components
+- Provide accessible labels for all interactive elements
+- Support keyboard navigation (Tab, Enter, Space)
+- Show visible focus indicators (never remove)
+- Let React Aria handle ARIA attributes
+- Add `aria-label` for icon-only components
+- Use semantic HTML when possible
+
+❌ **NEVER:**
+- Skip accessibility attributes
+- Rely on color alone for information
+- Create keyboard traps
+- Add redundant ARIA (React Aria handles it)

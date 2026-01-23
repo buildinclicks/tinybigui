@@ -10,6 +10,7 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
     "@storybook/addon-themes", // Theme switcher addon
+    "@storybook/addon-mcp", // MCP server for AI assistants
   ],
   framework: {
     name: "@storybook/react-vite",
