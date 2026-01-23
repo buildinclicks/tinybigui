@@ -1,0 +1,105 @@
+---
+description: Three-layer component architecture for TinyBigUI
+globs: packages/react/src/components/**/*.tsx
+alwaysApply: false
+---
+
+# Three-Layer Component Architecture
+
+**ALL components MUST follow this architecture. NO EXCEPTIONS.**
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────┐
+│   Layer 3: MD3 Styled Components   │  ← ComponentName.tsx
+│   • Uses CVA for variants          │     (Most users use this)
+│   • Wraps headless layer           │
+└─────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│   Layer 2: Headless Primitives     │  ← ComponentNameHeadless.tsx
+│   • Uses React Aria hooks          │     (Advanced customization)
+│   • Behavior only, no styling      │
+└─────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│   Layer 1: React Aria Foundation   │  ← useButton, useFocusRing
+│   • Adobe-backed accessibility     │     (Foundation)
+└─────────────────────────────────────┘
+```
+
+## Required Files Per Component
+
+```
+component-name/
+├── ComponentNameHeadless.tsx    # Layer 2: React Aria wrapper
+├── ComponentName.variants.ts    # CVA variant definitions
+├── ComponentName.tsx            # Layer 3: MD3 styled
+├── ComponentName.types.ts       # TypeScript types
+├── ComponentName.test.tsx       # Tests
+├── ComponentName.stories.tsx    # Storybook
+└── index.ts                     # Exports
+```
+
+## Implementation Rules
+
+✅ **MUST DO:**
+1. Create headless component using React Aria hooks
+2. Define variants using CVA in `.variants.ts`
+3. Create styled component that wraps headless + variants
+4. Export BOTH headless and styled versions
+5. Test all three layers independently
+
+❌ **NEVER DO:**
+1. Skip the headless layer
+2. Implement accessibility manually (use React Aria)
+3. Use manual class maps instead of CVA
+4. Create single-layer components
+
+## Example Implementation
+
+```typescript
+// 1. Headless (React Aria)
+import { useButton } from 'react-aria';
+
+export function ButtonHeadless(props: ButtonProps) {
+  const ref = useRef(null);
+  const { buttonProps } = useButton(props, ref);
+  return <button {...buttonProps} ref={ref} className={props.className} />;
+}
+
+// 2. Variants (CVA)
+import { cva } from 'class-variance-authority';
+
+export const buttonVariants = cva('base-classes', {
+  variants: {
+    variant: { filled: '...', outlined: '...' },
+    size: { small: '...', medium: '...' },
+  },
+  defaultVariants: { variant: 'filled', size: 'medium' },
+});
+
+// 3. Styled (Combines 1 + 2)
+'use client';
+
+export const Button = forwardRef((props, ref) => {
+  const { variant, size, className, ...rest } = props;
+  return (
+    <ButtonHeadless
+      {...rest}
+      ref={ref}
+      className={cn(buttonVariants({ variant, size }), className)}
+    />
+  );
+});
+```
+
+## Verification Checklist
+
+Before completing ANY component:
+- [ ] Headless component exists and uses React Aria
+- [ ] Variants defined with CVA (not manual class maps)
+- [ ] Styled component wraps headless + variants
+- [ ] Both headless and styled exported
+- [ ] Tests cover all three layers

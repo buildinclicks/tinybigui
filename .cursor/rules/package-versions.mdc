@@ -1,0 +1,56 @@
+---
+description: Package version checking guidance - request when adding dependencies
+globs: 
+alwaysApply: false
+---
+
+# Package Version Checking
+
+**ALWAYS check for latest stable package versions via web search, NOT training data.**
+
+## When Adding Dependencies
+
+1. **NEVER use versions from training data by default**
+2. **ALWAYS search web for latest stable versions**:
+   ```
+   Search: "[package-name] latest stable version npm 2026"
+   Example: "vitest latest stable version npm 2026"
+   ```
+3. **Check official sources**:
+   - npm registry (site:npmjs.com)
+   - Official documentation
+   - GitHub releases
+
+## Critical Packages to Always Check
+
+- Testing tools: vitest, @testing-library/*, jsdom
+- Build tools: vite, tsup, esbuild
+- Framework: react, react-dom
+- Styling: tailwindcss, @tailwindcss/*
+- Type definitions: @types/*
+- Storybook: @storybook/*
+- React Aria: react-aria, react-stately
+
+## If Version Info Unavailable
+
+1. Explicitly tell user you cannot verify latest version
+2. Suggest user runs: `pnpm outdated` or `npm outdated`
+3. Use conservative version with caret (^) for flexibility
+4. Add TODO comment to check version after install
+
+## Example Process
+
+```
+Task: Add Vitest for testing
+
+❌ BAD: Use "vitest": "^2.1.8" (from training data)
+
+✅ GOOD:
+1. Search: "vitest latest stable version 2026"
+2. Find: Vitest X.X.X is latest
+3. Check: Breaking changes from previous major
+4. Use: "vitest": "^X.X.X"
+5. Document: "Using Vitest X.x for [reason]"
+```
+
+**Remember:** Fresh projects should use latest stable versions unless there's a specific technical reason not to.
