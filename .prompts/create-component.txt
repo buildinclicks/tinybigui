@@ -1,11 +1,13 @@
 Consider you are an extensively experienced React Frontend Developer and open-source maintainer.
 
 Goal:
-Implement the MD3 TextField component with single- and multi-line support, labels, helper text, error state, and disabled state.
+Create a plan to implement the MD3 TextField component with single- and multi-line support, labels, helper text, error state, and disabled state.
 - Follow three-layer architecture: React Aria (foundation), Headless primitive, Styled component with CVA variants.
 - Include Storybook stories and tests (accessibility, interactions, states).
 - Ensure WCAG 2.1 AA compliance.
 - Follow design guidelines mentioned for MD3 TextField in the documentation https://m3.material.io/components
+- Must follow TDD first approach strictly
+- Must cover storybook as it is covered for the existing component packages/react/src/components/Button/ (make sure that you analyse the existing project thoroughly)
 
 Additional Context:
 - Align with existing token system
