@@ -1,0 +1,26 @@
+Consider you are an extensively experienced React Frontend Developer and open-source maintainer.
+
+Goal:
+Create a plan to implement the MD3 Switch component with on/off states, optional icons, and labeling support.
+- Follow three-layer architecture: React Aria (foundation), Headless primitive, Styled component with CVA variants.
+- Include Storybook stories and tests (accessibility, interactions, states).
+- Ensure WCAG 2.1 AA compliance.
+- Follow design guidelines mentioned for MD3 Switch in the documentation https://m3.material.io/components/switch/overview and https://m3.material.io/components/switch/specs
+- Must follow TDD first approach strictly
+
+Additional Context:
+- Align with existing token system
+- Ripple behavior where applicable
+- Include focus, hover, pressed, disabled states with MD3 state layers.
+- Ensure proper focus ring, state layers, and motion per MD3.
+- Tailwind v4
+
+Acceptance Criteria:
+- Implementation must follow the cursor rules mentioned in .cursor/rules/ strictly
+- Code must be consistent based on the FP paradigm and must utilize the existing helpers and implementation wherever applicable
+- Code must be ESLint error free and prettier format
+- Use MCP servers wherever applicable
+- Before implementation, check the existing implementation of Button component in packages/react/src/components/Button/ and follow the same standard
+- Must be WCAG 2.1 AA compliant with full accessibility support
+- Must strictly follow MD3 design system
+- Must utilize the existing token system
