@@ -9,6 +9,7 @@
 
 import { forwardRef, useState, useId } from "react";
 import { useFocusRing } from "react-aria";
+import { mergeProps } from "@react-aria/utils";
 import { cn } from "../../utils/cn";
 import {
   textFieldContainerVariants,
@@ -72,25 +73,34 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
       isReadOnly = false,
       value,
       defaultValue,
-      onChange,
-      onFocus,
-      onBlur,
+      onChange: onChangeProp,
+      onFocus: onFocusProp,
+      onBlur: onBlurProp,
+      spellCheck,
       ...props
     },
     ref
   ) => {
-    const [isFocused, setIsFocused] = useState(false);
+    const [isManuallyFocused, setIsManuallyFocused] = useState(false);
     const [currentValue, setCurrentValue] = useState(value ?? defaultValue ?? "");
     const labelId = useId();
     const descriptionId = useId();
     const errorId = useId();
+
+    // Convert spellCheck to boolean if it's a string
+    const spellCheckProp =
+      spellCheck === undefined
+        ? undefined
+        : typeof spellCheck === "string"
+          ? spellCheck === "true"
+          : spellCheck;
 
     // Use React Aria's focus ring for keyboard navigation
     const { focusProps } = useFocusRing();
 
     // Determine if label should float
     const hasValue = currentValue.length > 0;
-    const shouldFloatLabel = isFocused || hasValue;
+    const shouldFloatLabel = isManuallyFocused || hasValue;
 
     // Calculate character count
     const characterLength = currentValue.length;
@@ -102,30 +112,24 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
       if (value === undefined) {
         setCurrentValue(newValue);
       }
-      if (onChange) {
-        onChange(e);
+      if (onChangeProp) {
+        onChangeProp(newValue);
       }
     };
 
     // Handle focus
     const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-      setIsFocused(true);
-      if (focusProps.onFocus) {
-        focusProps.onFocus(e);
-      }
-      if (onFocus) {
-        onFocus(e);
+      setIsManuallyFocused(true);
+      if (onFocusProp) {
+        onFocusProp(e);
       }
     };
 
     // Handle blur
     const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-      setIsFocused(false);
-      if (focusProps.onBlur) {
-        focusProps.onBlur(e);
-      }
-      if (onBlur) {
-        onBlur(e);
+      setIsManuallyFocused(false);
+      if (onBlurProp) {
+        onBlurProp(e);
       }
     };
 
@@ -155,7 +159,7 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
               size,
               disabled: isDisabled,
               error: isInvalid,
-              focused: isFocused,
+              focused: isManuallyFocused,
             })
           )}
         >
@@ -182,7 +186,7 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
                   variant,
                   size,
                   floating: shouldFloatLabel,
-                  focused: isFocused,
+                  focused: isManuallyFocused,
                   error: isInvalid,
                   disabled: isDisabled,
                   hasLeadingIcon: !!leadingIcon,
@@ -198,57 +202,61 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
           {multiline ? (
             <textarea
               ref={ref as React.RefObject<HTMLTextAreaElement>}
-              className={cn(
-                textFieldInputVariants({
-                  variant,
-                  size,
-                  disabled: isDisabled,
-                  hasLeadingIcon: !!leadingIcon,
-                  hasTrailingIcon: !!trailingIcon,
-                  multiline: true,
-                })
-              )}
-              disabled={isDisabled}
-              required={isRequired}
-              readOnly={isReadOnly}
-              value={value}
-              defaultValue={defaultValue}
-              onChange={handleChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              rows={rows}
-              maxLength={maxLength}
-              aria-labelledby={label ? labelId : undefined}
-              aria-describedby={ariaDescribedByString}
-              aria-invalid={isInvalid}
-              {...props}
+              {...mergeProps(props, focusProps, {
+                className: cn(
+                  textFieldInputVariants({
+                    variant,
+                    size,
+                    disabled: isDisabled,
+                    hasLeadingIcon: !!leadingIcon,
+                    hasTrailingIcon: !!trailingIcon,
+                    multiline: true,
+                  })
+                ),
+                disabled: isDisabled,
+                required: isRequired,
+                readOnly: isReadOnly,
+                value: value,
+                defaultValue: defaultValue,
+                onChange: handleChange,
+                onFocus: handleFocus,
+                onBlur: handleBlur,
+                rows: rows,
+                maxLength: maxLength,
+                spellCheck: spellCheckProp,
+                "aria-labelledby": label ? labelId : undefined,
+                "aria-describedby": ariaDescribedByString,
+                "aria-invalid": isInvalid,
+              })}
             />
           ) : (
             <input
               ref={ref as React.RefObject<HTMLInputElement>}
-              className={cn(
-                textFieldInputVariants({
-                  variant,
-                  size,
-                  disabled: isDisabled,
-                  hasLeadingIcon: !!leadingIcon,
-                  hasTrailingIcon: !!trailingIcon,
-                  multiline: false,
-                })
-              )}
-              disabled={isDisabled}
-              required={isRequired}
-              readOnly={isReadOnly}
-              value={value}
-              defaultValue={defaultValue}
-              onChange={handleChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              maxLength={maxLength}
-              aria-labelledby={label ? labelId : undefined}
-              aria-describedby={ariaDescribedByString}
-              aria-invalid={isInvalid}
-              {...props}
+              {...mergeProps(props, focusProps, {
+                className: cn(
+                  textFieldInputVariants({
+                    variant,
+                    size,
+                    disabled: isDisabled,
+                    hasLeadingIcon: !!leadingIcon,
+                    hasTrailingIcon: !!trailingIcon,
+                    multiline: false,
+                  })
+                ),
+                disabled: isDisabled,
+                required: isRequired,
+                readOnly: isReadOnly,
+                value: value,
+                defaultValue: defaultValue,
+                onChange: handleChange,
+                onFocus: handleFocus,
+                onBlur: handleBlur,
+                maxLength: maxLength,
+                spellCheck: spellCheckProp,
+                "aria-labelledby": label ? labelId : undefined,
+                "aria-describedby": ariaDescribedByString,
+                "aria-invalid": isInvalid,
+              })}
             />
           )}
 

@@ -30,7 +30,10 @@ export type TextFieldSize = "small" | "medium" | "large";
  * Extends React Aria's AriaTextFieldProps for accessibility.
  * Provides behavior without styling.
  */
-export interface TextFieldHeadlessProps extends Omit<AriaTextFieldProps, "children"> {
+export interface TextFieldHeadlessProps extends Omit<
+  AriaTextFieldProps,
+  "children" | "onFocus" | "onBlur"
+> {
   /**
    * Label text for the input
    */
@@ -90,6 +93,16 @@ export interface TextFieldHeadlessProps extends Omit<AriaTextFieldProps, "childr
    * Custom className for the error message element
    */
   errorClassName?: string;
+
+  /**
+   * Handler called when the input is focused
+   */
+  onFocus?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+
+  /**
+   * Handler called when the input loses focus
+   */
+  onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 /**

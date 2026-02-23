@@ -46,3 +46,6 @@ export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./comp
 
 export { TextField } from "./components/TextField";
 export type { TextFieldProps, TextFieldVariant, TextFieldSize } from "./components/TextField";
+
+export { Checkbox } from "./components/Checkbox";
+export type { CheckboxProps } from "./components/Checkbox";

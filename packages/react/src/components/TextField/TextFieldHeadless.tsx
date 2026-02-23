@@ -58,6 +58,8 @@ export const TextFieldHeadless = forwardRef<
       HTMLInputElement & HTMLTextAreaElement
     >;
 
+    const inputElementType = multiline ? ("textarea" as const) : ("input" as const);
+
     // Use React Aria's useTextField hook for accessibility
     const {
       labelProps,
@@ -68,12 +70,12 @@ export const TextFieldHeadless = forwardRef<
       validationErrors,
     } = useTextField(
       {
-        ...restProps,
         label,
         description,
         errorMessage,
         isInvalid: isInvalid ?? false,
-        inputElementType: multiline ? "textarea" : "input",
+        inputElementType,
+        ...restProps,
       },
       ref
     );
@@ -109,6 +111,7 @@ export const TextFieldHeadless = forwardRef<
       onSelect: _onSelect,
       onBeforeInput: _onBeforeInput,
       onInput: _onInput,
+      onFocusChange: _onFocusChange,
       ...htmlAttrs
     } = restProps;
 
