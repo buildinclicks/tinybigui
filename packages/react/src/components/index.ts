@@ -11,3 +11,11 @@ export type {
 
 export { FAB } from "./FAB";
 export type { FABProps, FABSize, FABColor } from "./FAB";
+
+export { Radio, RadioGroup, RadioHeadless, RadioGroupHeadless } from "./Radio";
+export type {
+  RadioProps,
+  RadioGroupProps,
+  RadioHeadlessProps,
+  RadioGroupHeadlessProps,
+} from "./Radio";
