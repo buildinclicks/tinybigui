@@ -52,3 +52,11 @@ export type { CheckboxProps } from "./components/Checkbox";
 
 export { Switch } from "./components/Switch";
 export type { SwitchProps } from "./components/Switch";
+
+export { Radio, RadioGroup, RadioHeadless, RadioGroupHeadless } from "./components/Radio";
+export type {
+  RadioProps,
+  RadioGroupProps,
+  RadioHeadlessProps,
+  RadioGroupHeadlessProps,
+} from "./components/Radio";
