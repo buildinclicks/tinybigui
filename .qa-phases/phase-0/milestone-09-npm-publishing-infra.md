@@ -1,3 +1,7 @@
+# Agent Role
+
+Consider you are a ReactJS, TailwindCSS expert and open-source contributor.
+
 # Milestone 9: NPM Publishing Infrastructure
 
 > **Status:** Not Started
