@@ -14,6 +14,12 @@ import { vi } from "vitest";
 // These help us test React components
 import "@testing-library/jest-dom";
 
+// Extend vitest-axe matchers for accessibility testing (axe-core integration)
+import { toHaveNoViolations } from "vitest-axe/matchers";
+import { expect } from "vitest";
+
+expect.extend({ toHaveNoViolations });
+
 // What is @testing-library/jest-dom?
 // It adds helpful matchers (assertions) for testing DOM elements
 //

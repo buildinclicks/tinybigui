@@ -3,6 +3,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
+import { axe } from "vitest-axe";
 import { IconButton } from "./IconButton";
 import React from "react";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
@@ -594,6 +595,28 @@ describe("IconButton", () => {
       expect(consoleWarn).toHaveBeenCalledWith(
         "[IconButton] IconButton should have an icon as children."
       );
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no accessibility violations", async () => {
+      const { container } = render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when disabled", async () => {
+      const { container } = render(
+        <IconButton aria-label="Delete" isDisabled>
+          <IconDelete />
+        </IconButton>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });

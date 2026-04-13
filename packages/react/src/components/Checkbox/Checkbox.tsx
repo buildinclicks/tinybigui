@@ -203,8 +203,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             {isSelected && !isIndeterminate && (
               <path
                 d="M14.1 4.5L6.3 12.3l-3.4-3.4L1.5 10.3l4.8 4.8 9.2-9.2z"
-                className={cn(checkboxIconVariants({ type: "check" }))}
-                style={{ fill: "var(--color-on-primary)" }}
+                className={cn(checkboxIconVariants({ type: "check" }), "fill-on-primary")}
               />
             )}
 
@@ -215,8 +214,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 y="8"
                 width="10"
                 height="2"
-                className={cn(checkboxIconVariants({ type: "dash" }))}
-                style={{ fill: "var(--color-on-primary)" }}
+                className={cn(checkboxIconVariants({ type: "dash" }), "fill-on-primary")}
               />
             )}
 
