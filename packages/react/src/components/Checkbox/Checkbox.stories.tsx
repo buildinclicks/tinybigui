@@ -301,7 +301,7 @@ export const IndeterminateParent: Story = {
         </Checkbox>
         <div className="border-outline ml-6 flex flex-col gap-2 border-l-2 pl-4">
           <Checkbox
-            isSelected={checkedItems[0]}
+            isSelected={checkedItems[0] ?? false}
             onChange={(value): void => {
               const newItems = [...checkedItems];
               newItems[0] = value;
@@ -311,7 +311,7 @@ export const IndeterminateParent: Story = {
             Option 1
           </Checkbox>
           <Checkbox
-            isSelected={checkedItems[1]}
+            isSelected={checkedItems[1] ?? false}
             onChange={(value): void => {
               const newItems = [...checkedItems];
               newItems[1] = value;
@@ -321,7 +321,7 @@ export const IndeterminateParent: Story = {
             Option 2
           </Checkbox>
           <Checkbox
-            isSelected={checkedItems[2]}
+            isSelected={checkedItems[2] ?? false}
             onChange={(value): void => {
               const newItems = [...checkedItems];
               newItems[2] = value;

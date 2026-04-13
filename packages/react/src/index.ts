@@ -44,6 +44,18 @@ export {
 export { Button } from "./components/Button";
 export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./components/Button";
 
+export { IconButton, IconButtonHeadless } from "./components/IconButton";
+export type {
+  IconButtonProps,
+  IconButtonVariant,
+  IconButtonColor,
+  IconButtonSize,
+  IconButtonHeadlessProps,
+} from "./components/IconButton";
+
+export { FAB, FABHeadless } from "./components/FAB";
+export type { FABProps, FABSize, FABColor, FABHeadlessProps } from "./components/FAB";
+
 export { TextField } from "./components/TextField";
 export type { TextFieldProps, TextFieldVariant, TextFieldSize } from "./components/TextField";
 

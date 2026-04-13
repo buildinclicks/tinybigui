@@ -24,13 +24,13 @@
 
 ---
 
-## ⚠️ Development Status
+## ⚙️ Development Status
 
-> **🚧 Work in Progress**
+> **Pre-release: v0.0.x**
 >
-> TinyBigUI is currently in **Phase 0** (Foundation Setup) and is **not ready for production use**.
+> Phase 1a (Button, IconButton, FAB) and Phase 1b (TextField, Checkbox, Switch, Radio) are complete. The library is approaching its first public release (**v0.1.0**) and is **not yet published to npm**.
 >
-> We're actively building the foundation and core components. Star ⭐ or watch 👁️ this repository to follow our progress!
+> Watch this repository to follow our progress!
 
 ---
 
@@ -39,7 +39,7 @@
 - 🎨 **Material Design 3** - Implements the latest MD3 design system with full token support
 - ⚛️ **React 18+** - Built for modern React with hooks and concurrent features
 - 🎯 **TypeScript First** - 100% TypeScript with full type safety and IntelliSense
-- 🌙 **Dark Mode Built-in** - Automatic light/dark theme support based on system preferences
+- 🌙 **Dark Mode Built-in** - Class-based dark mode via `.dark` class on `<html>` or ancestor element
 - ♿ **Accessibility** - WCAG 2.1 AA compliant with comprehensive keyboard navigation
 - 🎨 **Tailwind CSS v4** - Powered by the latest Tailwind with utility-first styling
 - 📦 **Tree-shakable** - Import only what you need, optimized bundle size
@@ -53,10 +53,9 @@
 
 ## 🚀 Installation
 
-> **Coming Soon!** The library will be available on npm once we reach Phase 1b.
+> **v0.1.0 is in preparation.** The package will be published to npm as part of the upcoming v0.1.0 release.
 
 ```bash
-# This will work soon:
 npm install @tinybigui/react
 # or
 pnpm add @tinybigui/react
@@ -95,22 +94,22 @@ function App() {
 
 This is a monorepo containing multiple packages:
 
-| Package                                  | Description                   | Version     | Status         |
-| ---------------------------------------- | ----------------------------- | ----------- | -------------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | Coming soon | 🚧 In progress |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | Coming soon | 🚧 In progress |
+| Package                                  | Description                   | Version     | Status                          |
+| ---------------------------------------- | ----------------------------- | ----------- | ------------------------------- |
+| [`@tinybigui/react`](./packages/react)   | React components              | Coming soon | Pre-release: v0.1.0 coming soon |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | Coming soon | Pre-release: v0.1.0 coming soon |
 
 ---
 
 ## 🗺️ Roadmap
 
-### Phase 0: Foundation ✅ (In Progress)
+### Phase 0: Foundation ✅
 
 - [x] Monorepo setup (pnpm workspaces)
 - [x] TypeScript configuration
 - [x] Build tooling (tsup, PostCSS)
 - [x] Tailwind CSS v4 integration
-- [x] Material Design 3 design tokens (145 tokens)
+- [x] Material Design 3 design tokens (120 tokens)
 - [x] Base utilities (color, typography, cn)
 - [x] Testing setup (Vitest + React Testing Library)
 - [x] Storybook 10 configuration
@@ -118,23 +117,21 @@ This is a monorepo containing multiple packages:
 - [x] CI/CD (GitHub Actions)
 - [x] Documentation structure
 
-### Phase 1a: Core Buttons (Next)
+### Phase 1a: Core Buttons ✅
 
-- [ ] Button component
-- [ ] IconButton component
-- [ ] FloatingActionButton (FAB) component
-- [ ] Comprehensive tests
-- [ ] Storybook stories
-- [ ] Accessibility compliance
+- [x] Button component (53 tests)
+- [x] IconButton component (49 tests)
+- [x] FloatingActionButton (FAB) component (51 tests)
+- [x] Comprehensive tests
+- [x] Accessibility compliance
 
-### Phase 1b: Form Components
+### Phase 1b: Form Components ✅
 
-- [ ] TextField component
-- [ ] Select component
-- [ ] Checkbox component
-- [ ] Radio component
-- [ ] Switch component
-- [ ] First npm release (v0.1.0)
+- [x] TextField component (56 tests)
+- [x] Checkbox component (49 tests)
+- [x] Radio component (47 tests)
+- [x] Switch component (50 tests)
+- [ ] First npm release (v0.1.0) — in preparation
 
 ### Phase 2: Layout & Navigation
 
@@ -214,8 +211,6 @@ tinybigui/
 │   └── tokens/         # Design tokens
 │       └── src/
 │           └── tokens.css
-├── docs/               # Task documentation
-├── strategies/         # Project planning
 └── .github/
     └── workflows/      # CI/CD
 ```
@@ -271,7 +266,7 @@ pnpm typecheck
 - **GitHub Repository**: [github.com/buildinclicks/tinybigui](https://github.com/buildinclicks/tinybigui)
 - **Documentation Site**: Coming soon at [tinybigui.dev](https://tinybigui.dev)
 - **Storybook**: Coming soon (interactive component playground)
-- **Task Docs**: See [/docs](/docs) for detailed task completion documentation
+- **QA Phases**: See [/.qa-phases](.qa-phases) for milestone tracking toward v0.1.0
 
 ---
 

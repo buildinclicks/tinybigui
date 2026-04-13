@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { axe } from "vitest-axe";
 import { Switch } from "./Switch";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
 
@@ -426,6 +427,32 @@ describe("Switch", () => {
       switchElement.focus();
       await user.keyboard(" ");
       expect(handleSubmit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no accessibility violations", async () => {
+      const { container } = render(<Switch>Low power mode</Switch>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations with aria-label", async () => {
+      const { container } = render(<Switch aria-label="Toggle option" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when selected", async () => {
+      const { container } = render(<Switch isSelected>Enabled</Switch>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when disabled", async () => {
+      const { container } = render(<Switch isDisabled>Disabled option</Switch>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });

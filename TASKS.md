@@ -1,8 +1,8 @@
 # TinyBigUI - Phase 0 Task List
 
-> **Current Phase**: Phase 0 - Foundation Setup  
+> **Phase 0**: Complete ✅  
 > **Started**: December 29, 2025  
-> **Target**: Complete foundation before Phase 1a (Button components)
+> **Completed**: April 13, 2026 — Phase 1a + 1b also complete; approaching v0.1.0
 
 ---
 
@@ -38,9 +38,9 @@
 
 | Status | #   | Task                          | Description             | Files Created                                                    |
 | ------ | --- | ----------------------------- | ----------------------- | ---------------------------------------------------------------- |
-| ⬜     | 1.1 | **Root workspace setup**      | Create workspace config | `package.json`, `pnpm-workspace.yaml`, `.npmrc`, `.gitignore`    |
-| ⬜     | 1.2 | **packages/react structure**  | React package setup     | `packages/react/package.json`, `packages/react/src/index.ts`     |
-| ⬜     | 1.3 | **packages/tokens structure** | Tokens package setup    | `packages/tokens/package.json`, `packages/tokens/src/tokens.css` |
+| ✅     | 1.1 | **Root workspace setup**      | Create workspace config | `package.json`, `pnpm-workspace.yaml`, `.npmrc`, `.gitignore`    |
+| ✅     | 1.2 | **packages/react structure**  | React package setup     | `packages/react/package.json`, `packages/react/src/index.ts`     |
+| ✅     | 1.3 | **packages/tokens structure** | Tokens package setup    | `packages/tokens/package.json`, `packages/tokens/src/tokens.css` |
 
 ---
 
@@ -51,9 +51,9 @@
 
 | Status | #   | Task                        | Description                  | Files Created                   |
 | ------ | --- | --------------------------- | ---------------------------- | ------------------------------- |
-| ⬜     | 2.1 | **Root tsconfig.json**      | Base TypeScript config       | `tsconfig.json`                 |
-| ⬜     | 2.2 | **React package tsconfig**  | Extends base, React-specific | `packages/react/tsconfig.json`  |
-| ⬜     | 2.3 | **Tokens package tsconfig** | Minimal config for tokens    | `packages/tokens/tsconfig.json` |
+| ✅     | 2.1 | **Root tsconfig.json**      | Base TypeScript config       | `tsconfig.json`                 |
+| ✅     | 2.2 | **React package tsconfig**  | Extends base, React-specific | `packages/react/tsconfig.json`  |
+| ✅     | 2.3 | **Tokens package tsconfig** | Minimal config for tokens    | `packages/tokens/tsconfig.json` |
 
 ---
 
@@ -64,8 +64,8 @@
 
 | Status | #   | Task                     | Description               | Files Created                                              |
 | ------ | --- | ------------------------ | ------------------------- | ---------------------------------------------------------- |
-| ⬜     | 3.1 | **React package build**  | tsup config for ESM + CJS | `packages/react/tsup.config.ts`                            |
-| ⬜     | 3.2 | **Tokens package build** | CSS copy/build script     | `packages/tokens/scripts/build.js` or package.json scripts |
+| ✅     | 3.1 | **React package build**  | tsup config for ESM + CJS | `packages/react/tsup.config.ts`                            |
+| ✅     | 3.2 | **Tokens package build** | CSS copy/build script     | `packages/tokens/scripts/build.js` or package.json scripts |
 
 ---
 
@@ -76,8 +76,8 @@
 
 | Status | #   | Task                      | Description                 | Files Created                    |
 | ------ | --- | ------------------------- | --------------------------- | -------------------------------- |
-| ⬜     | 4.1 | **Research Tailwind v4**  | Web search for latest setup | (research only)                  |
-| ⬜     | 4.2 | **Configure Tailwind v4** | PostCSS + Tailwind config   | `postcss.config.js`, CSS imports |
+| ✅     | 4.1 | **Research Tailwind v4**  | Web search for latest setup | (research only)                  |
+| ✅     | 4.2 | **Configure Tailwind v4** | PostCSS + Tailwind config   | `postcss.config.js`, CSS imports |
 
 ---
 
@@ -88,11 +88,11 @@
 
 | Status | #   | Task                       | Description                       | Files Created                                                  |
 | ------ | --- | -------------------------- | --------------------------------- | -------------------------------------------------------------- |
-| ⬜     | 5.1 | **Color tokens**           | 25 MD3 color roles (light + dark) | `packages/tokens/src/colors.css`                               |
-| ⬜     | 5.2 | **Typography tokens**      | 13 MD3 type scales                | `packages/tokens/src/typography.css`                           |
-| ⬜     | 5.3 | **Elevation/Shape/Motion** | Shadows, corners, durations       | `packages/tokens/src/elevation.css`, `shape.css`, `motion.css` |
-| ⬜     | 5.4 | **Tailwind v4 @theme**     | Map tokens to Tailwind utilities  | `packages/tokens/src/theme.css`                                |
-| ⬜     | 5.5 | **Main tokens.css**        | Combine all token files           | `packages/tokens/src/tokens.css`                               |
+| ✅     | 5.1 | **Color tokens**           | 25 MD3 color roles (light + dark) | `packages/tokens/src/colors.css`                               |
+| ✅     | 5.2 | **Typography tokens**      | 13 MD3 type scales                | `packages/tokens/src/typography.css`                           |
+| ✅     | 5.3 | **Elevation/Shape/Motion** | Shadows, corners, durations       | `packages/tokens/src/elevation.css`, `shape.css`, `motion.css` |
+| ✅     | 5.4 | **Tailwind v4 @theme**     | Map tokens to Tailwind utilities  | `packages/tokens/src/theme.css`                                |
+| ✅     | 5.5 | **Main tokens.css**        | Combine all token files           | `packages/tokens/src/tokens.css`                               |
 
 ---
 
@@ -103,9 +103,9 @@
 
 | Status | #   | Task                    | Description                   | Files Created                       |
 | ------ | --- | ----------------------- | ----------------------------- | ----------------------------------- |
-| ⬜     | 6.1 | **cn utility**          | clsx + tailwind-merge wrapper | `packages/react/src/utils/cn.ts`    |
-| ⬜     | 6.2 | **Color utilities**     | MD3 dynamic color helpers     | `packages/react/src/utils/color.ts` |
-| ⬜     | 6.3 | **Utils barrel export** | Export all utilities          | `packages/react/src/utils/index.ts` |
+| ✅     | 6.1 | **cn utility**          | clsx + tailwind-merge wrapper | `packages/react/src/utils/cn.ts`    |
+| ✅     | 6.2 | **Color utilities**     | MD3 dynamic color helpers     | `packages/react/src/utils/color.ts` |
+| ✅     | 6.3 | **Utils barrel export** | Export all utilities          | `packages/react/src/utils/index.ts` |
 
 ---
 
@@ -116,9 +116,9 @@
 
 | Status | #   | Task                     | Description                 | Files Created                     |
 | ------ | --- | ------------------------ | --------------------------- | --------------------------------- |
-| ⬜     | 7.1 | **Vitest configuration** | Test runner config          | `packages/react/vitest.config.ts` |
-| ⬜     | 7.2 | **Test setup file**      | Global test setup, matchers | `packages/react/tests/setup.ts`   |
-| ⬜     | 7.3 | **Test utilities**       | Custom render, helpers      | `packages/react/tests/utils.tsx`  |
+| ✅     | 7.1 | **Vitest configuration** | Test runner config          | `packages/react/vitest.config.ts` |
+| ✅     | 7.2 | **Test setup file**      | Global test setup, matchers | `packages/react/tests/setup.ts`   |
+| ✅     | 7.3 | **Test utilities**       | Custom render, helpers      | `packages/react/tests/utils.tsx`  |
 
 ---
 
@@ -129,9 +129,9 @@
 
 | Status | #   | Task                      | Description                     | Files Created                           |
 | ------ | --- | ------------------------- | ------------------------------- | --------------------------------------- |
-| ⬜     | 8.1 | **Storybook main config** | Framework, addons, stories glob | `packages/react/.storybook/main.ts`     |
-| ⬜     | 8.2 | **Storybook preview**     | Decorators, parameters, theme   | `packages/react/.storybook/preview.tsx` |
-| ⬜     | 8.3 | **Storybook manager**     | UI customization                | `packages/react/.storybook/manager.ts`  |
+| ✅     | 8.1 | **Storybook main config** | Framework, addons, stories glob | `packages/react/.storybook/main.ts`     |
+| ✅     | 8.2 | **Storybook preview**     | Decorators, parameters, theme   | `packages/react/.storybook/preview.tsx` |
+| ✅     | 8.3 | **Storybook manager**     | UI customization                | `packages/react/.storybook/manager.ts`  |
 
 ---
 
@@ -142,11 +142,11 @@
 
 | Status | #   | Task                       | Description                        | Files Created                            |
 | ------ | --- | -------------------------- | ---------------------------------- | ---------------------------------------- |
-| ⬜     | 9.1 | **ESLint configuration**   | React + TS + a11y rules            | `eslint.config.js` (flat config)         |
-| ⬜     | 9.2 | **Prettier configuration** | Code formatting + Tailwind sorting | `.prettierrc`, `.prettierignore`         |
-| ⬜     | 9.3 | **Husky setup**            | Git hooks                          | `.husky/pre-commit`, `.husky/commit-msg` |
-| ⬜     | 9.4 | **Commitlint config**      | Conventional commits               | `commitlint.config.js`                   |
-| ⬜     | 9.5 | **lint-staged config**     | Run linters on staged files        | `lint-staged.config.js`                  |
+| ✅     | 9.1 | **ESLint configuration**   | React + TS + a11y rules            | `eslint.config.js` (flat config)         |
+| ✅     | 9.2 | **Prettier configuration** | Code formatting + Tailwind sorting | `.prettierrc`, `.prettierignore`         |
+| ✅     | 9.3 | **Husky setup**            | Git hooks                          | `.husky/pre-commit`, `.husky/commit-msg` |
+| ✅     | 9.4 | **Commitlint config**      | Conventional commits               | `commitlint.config.js`                   |
+| ✅     | 9.5 | **lint-staged config**     | Run linters on staged files        | `lint-staged.config.js`                  |
 
 ---
 
@@ -157,8 +157,8 @@
 
 | Status | #    | Task                   | Description                        | Files Created              |
 | ------ | ---- | ---------------------- | ---------------------------------- | -------------------------- |
-| ⬜     | 10.1 | **CI workflow**        | Test, lint, typecheck on PR/push   | `.github/workflows/ci.yml` |
-| ⬜     | 10.2 | **Build verification** | Ensure packages build successfully | (included in ci.yml)       |
+| ✅     | 10.1 | **CI workflow**        | Test, lint, typecheck on PR/push   | `.github/workflows/ci.yml` |
+| ✅     | 10.2 | **Build verification** | Ensure packages build successfully | (included in ci.yml)       |
 
 ---
 
@@ -169,10 +169,10 @@
 
 | Status | #    | Task                       | Description                     | Files Created               |
 | ------ | ---- | -------------------------- | ------------------------------- | --------------------------- |
-| ⬜     | 11.1 | **LICENSE**                | MIT license                     | `LICENSE`                   |
-| ⬜     | 11.2 | **Basic README**           | Project overview, "coming soon" | `README.md`                 |
-| ⬜     | 11.3 | **packages/react README**  | Package-specific readme         | `packages/react/README.md`  |
-| ⬜     | 11.4 | **packages/tokens README** | Package-specific readme         | `packages/tokens/README.md` |
+| ✅     | 11.1 | **LICENSE**                | MIT license                     | `LICENSE`                   |
+| ✅     | 11.2 | **Basic README**           | Project overview, "coming soon" | `README.md`                 |
+| ✅     | 11.3 | **packages/react README**  | Package-specific readme         | `packages/react/README.md`  |
+| ✅     | 11.4 | **packages/tokens README** | Package-specific readme         | `packages/tokens/README.md` |
 
 ---
 
@@ -183,12 +183,12 @@
 
 | Status | #    | Task                     | Description               | Command          |
 | ------ | ---- | ------------------------ | ------------------------- | ---------------- |
-| ⬜     | 12.1 | **Install dependencies** | Run pnpm install          | `pnpm install`   |
-| ⬜     | 12.2 | **Build packages**       | Verify build works        | `pnpm build`     |
-| ⬜     | 12.3 | **Run tests**            | Verify test setup         | `pnpm test`      |
-| ⬜     | 12.4 | **Start Storybook**      | Verify Storybook works    | `pnpm storybook` |
-| ⬜     | 12.5 | **Lint check**           | Verify linting works      | `pnpm lint`      |
-| ⬜     | 12.6 | **Commit & push**        | Push to GitHub, verify CI | `git push`       |
+| ✅     | 12.1 | **Install dependencies** | Run pnpm install          | `pnpm install`   |
+| ✅     | 12.2 | **Build packages**       | Verify build works        | `pnpm build`     |
+| ✅     | 12.3 | **Run tests**            | Verify test setup         | `pnpm test`      |
+| ✅     | 12.4 | **Start Storybook**      | Verify Storybook works    | `pnpm storybook` |
+| ✅     | 12.5 | **Lint check**           | Verify linting works      | `pnpm lint`      |
+| ✅     | 12.6 | **Commit & push**        | Push to GitHub, verify CI | `git push`       |
 
 ---
 
@@ -246,14 +246,13 @@
 
 ### Current Status
 
-- **Phase 0 Progress**: 3/44 tasks completed (Part A done)
-- **Current Task**: 1.1 (Root workspace setup)
+- **Phase 0 Progress**: 44/44 tasks completed ✅
+- **Current Task**: Phase 0 Complete. Phase 1a + 1b Complete.
 - **Blockers**: None
 
 ### Next Steps
 
-1. 🤖 Me: Start Task 1.1 (one task at a time)
-2. 👤 You: Review, understand, and approve before next task
+1. Work through `.qa-phases/phase-0/` milestones toward v0.1.0
 
 ---
 
@@ -266,4 +265,4 @@
 
 ---
 
-_Last Updated: December 29, 2025_
+_Last Updated: April 13, 2026_

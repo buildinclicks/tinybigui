@@ -35,6 +35,7 @@ export type {
 export type {
   TextFieldProps,
   TextFieldHeadlessProps,
+  TextFieldRenderProps,
   TextFieldVariant,
   TextFieldSize,
 } from "./TextField.types";

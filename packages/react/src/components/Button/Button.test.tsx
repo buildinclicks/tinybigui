@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { axe } from "vitest-axe";
 import { Button } from "./Button";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
 
@@ -434,6 +435,26 @@ describe("Button", () => {
     test("spreads additional HTML attributes", () => {
       render(<Button title="Tooltip">Hover</Button>);
       expect(screen.getByRole("button")).toHaveAttribute("title", "Tooltip");
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no accessibility violations", async () => {
+      const { container } = render(<Button>Click me</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when disabled", async () => {
+      const { container } = render(<Button isDisabled>Disabled</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations in loading state", async () => {
+      const { container } = render(<Button loading>Saving</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });

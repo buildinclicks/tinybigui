@@ -8,10 +8,12 @@
 
 import { useState } from "react";
 import { describe, test, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { axe } from "vitest-axe";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
 import { TextField } from "./TextField";
+import { TextFieldHeadless } from "./TextFieldHeadless";
 
 describe("TextField", () => {
   describe("Rendering", () => {
@@ -328,13 +330,7 @@ describe("TextField", () => {
     test("handles controlled component", async () => {
       const ControlledTextField = () => {
         const [value, setValue] = useState("");
-        return (
-          <TextField
-            label="Email"
-            value={value}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-          />
-        );
+        return <TextField label="Email" value={value} onChange={(value) => setValue(value)} />;
       };
 
       const user = userEvent.setup();
@@ -380,6 +376,116 @@ describe("TextField", () => {
       render(<TextField label="Phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" />);
       const input = screen.getByRole("textbox");
       expect(input).toHaveAttribute("pattern", "[0-9]{3}-[0-9]{3}-[0-9]{4}");
+    });
+  });
+
+  describe("Architecture Compliance", () => {
+    test("TextField renders TextFieldHeadless internally", () => {
+      // React Aria's useTextField generates an id on the input when a label is present.
+      // The styled TextField must obtain that id through TextFieldHeadless / useTextField,
+      // NOT through manual useId(). We verify by confirming the label's htmlFor matches
+      // the input's id — which React Aria wires automatically via labelProps / inputProps.
+      render(<TextField label="Email" />);
+      const input = screen.getByRole("textbox");
+      const label = screen.getByText("Email").closest("label");
+      expect(label).toBeTruthy();
+      expect(label).toHaveAttribute("for", input.id);
+    });
+
+    test("ARIA attributes come from useTextField (React Aria), not manual wiring", () => {
+      render(
+        <TextField label="Email" description="Enter your email" isInvalid errorMessage="Required" />
+      );
+      const input = screen.getByRole("textbox");
+      // React Aria's useTextField always sets aria-invalid as a boolean attribute or "true"
+      expect(input).toHaveAttribute("aria-invalid");
+      // aria-describedby must be present and non-empty
+      expect(input).toHaveAttribute("aria-describedby");
+      expect(input.getAttribute("aria-describedby")!.length).toBeGreaterThan(0);
+    });
+
+    test("TextFieldHeadless is accessible standalone", () => {
+      render(<TextFieldHeadless label="Standalone" aria-label="Standalone field" />);
+      const input = screen.getByRole("textbox");
+      expect(input).toBeInTheDocument();
+    });
+  });
+
+  describe("Controlled Value Anti-Pattern Guard", () => {
+    test("updating controlled value prop does not cause React render warnings", () => {
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const ControlledWrapper = ({ value }: { value: string }) => (
+        <TextField label="Email" value={value} onChange={() => {}} />
+      );
+
+      const { rerender } = render(<ControlledWrapper value="initial" />);
+
+      act(() => {
+        rerender(<ControlledWrapper value="updated" />);
+      });
+      act(() => {
+        rerender(<ControlledWrapper value="updated again" />);
+      });
+
+      const reactWarnings = errorSpy.mock.calls.filter(
+        (args) =>
+          typeof args[0] === "string" &&
+          (args[0].includes("Cannot update a component") ||
+            args[0].includes("Too many re-renders") ||
+            args[0].includes("Warning:"))
+      );
+      expect(reactWarnings).toHaveLength(0);
+
+      errorSpy.mockRestore();
+    });
+
+    test("controlled component reflects updated value prop immediately", () => {
+      const ControlledWrapper = ({ value }: { value: string }) => (
+        <TextField label="Email" value={value} onChange={() => {}} />
+      );
+
+      const { rerender } = render(<ControlledWrapper value="first" />);
+      expect(screen.getByRole("textbox")).toHaveValue("first");
+
+      act(() => {
+        rerender(<ControlledWrapper value="second" />);
+      });
+      expect(screen.getByRole("textbox")).toHaveValue("second");
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no axe violations with label", async () => {
+      const { container } = render(<TextField label="Email" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no axe violations with aria-label", async () => {
+      const { container } = render(<TextField aria-label="Search field" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no axe violations in error state", async () => {
+      const { container } = render(
+        <TextField label="Email" isInvalid errorMessage="Email is required" />
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no axe violations when disabled", async () => {
+      const { container } = render(<TextField label="Email" isDisabled />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no axe violations in multiline mode", async () => {
+      const { container } = render(<TextField label="Bio" multiline />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });

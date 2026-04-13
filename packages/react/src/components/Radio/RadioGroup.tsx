@@ -112,10 +112,9 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
         ref={ref}
         className={cn("flex flex-col", className)}
         data-testid={dataTestId}
-      >
-        {/* Custom label rendering with styles */}
-        {props.label && (
+        renderLabel={(labelProps) => (
           <div
+            {...labelProps}
             className={cn(
               radioGroupLabelVariants({
                 disabled: isDisabled,
@@ -125,7 +124,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             {props.label}
           </div>
         )}
-
+      >
         {/* Radio buttons container */}
         <div
           className={cn(
