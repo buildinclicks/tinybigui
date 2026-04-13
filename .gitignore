@@ -41,6 +41,9 @@ lerna-debug.log*
 
 # Project-specific
 info.txt
+.cursor/
+.prompts/
+.qa-phases/
 learning-docs/
 
 
