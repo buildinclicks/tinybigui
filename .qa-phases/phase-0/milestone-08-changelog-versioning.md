@@ -1,3 +1,7 @@
+# Agent Role
+
+Consider you are a ReactJS, TailwindCSS expert and open-source contributor.
+
 # Milestone 8: Changelog & Version Management
 
 > **Status:** Not Started

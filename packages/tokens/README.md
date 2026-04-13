@@ -246,32 +246,58 @@ Animation durations and easing curves:
 
 ## 🌙 Dark Mode
 
-Dark mode is applied by adding the `.dark` class to the `<html>` element or any ancestor:
+Three mechanisms control dark mode, listed from lowest to highest priority:
+
+### 1. Automatic — OS/System Preference
+
+Dark mode activates automatically when the user's OS is set to dark. No JavaScript or class changes needed.
 
 ```css
-/* Light mode (default — :root) */
-:root {
-  --md-sys-color-primary: #6750a4;
-  --md-sys-color-surface: #fffbfe;
-}
-
-/* Dark mode — add .dark class to <html> or ancestor */
-.dark {
-  --md-sys-color-primary: #d0bcff;
-  --md-sys-color-surface: #1c1b1f;
+/* Handled internally by @tinybigui/tokens */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --md-sys-color-primary: #d0bcff;
+    --md-sys-color-surface: #1c1b1f;
+    /* ... all dark color tokens */
+  }
 }
 ```
 
-**Usage:**
+This works out of the box once you import the tokens — no setup required.
+
+### 2. Explicit Dark — `.dark` class
+
+Force dark mode regardless of the OS setting by adding `.dark` to `<html>` or any ancestor:
 
 ```html
-<!-- Enable dark mode -->
+<!-- Force dark mode -->
 <html class="dark">
-  <!-- All tokens switch to dark values automatically -->
+  <!-- All tokens switch to dark values -->
 </html>
 ```
 
-> **Note:** Automatic system preference detection via `prefers-color-scheme` is planned for a future release.
+This takes priority over the OS preference and is what Storybook's dark mode toggle uses.
+
+### 3. Force Light — `.light` class
+
+Force light mode even when the OS is set to dark by adding `.light` to `<html>`:
+
+```html
+<!-- Force light mode (overrides OS dark preference) -->
+<html class="light">
+  <!-- All tokens remain light values regardless of OS setting -->
+</html>
+```
+
+### Priority Summary
+
+| Scenario                 | Result                |
+| ------------------------ | --------------------- |
+| No class + OS light      | Light mode            |
+| No class + OS dark       | Dark mode (automatic) |
+| `.dark` class + OS light | Dark mode (explicit)  |
+| `.dark` class + OS dark  | Dark mode (explicit)  |
+| `.light` class + OS dark | Light mode (forced)   |
 
 ---
 
@@ -450,7 +476,7 @@ function MyComponent() {
 | Motion     | 16      | Durations + easing curves                       |
 | **Total**  | **120** | **Complete MD3 token system**                   |
 
-> **Note:** Dark mode reuses the same 120 token names with different values via the `.dark` class — no additional variables are added.
+> **Note:** Dark mode reuses the same 120 token names with different values. Color tokens have dark variants applied via the `.dark` class and `@media (prefers-color-scheme: dark)` — no additional variables are added.
 
 ---
 

@@ -1,6 +1,10 @@
+# Agent Role
+
+Consider you are a ReactJS, TailwindCSS expert and open-source contributor.
+
 # Milestone 7: Dark Mode System Preference Support
 
-> **Status:** Not Started
+> **Status:** Complete
 > **Priority:** Medium
 > **Depends On:** M6 (work on `dev` after main is in sync)
 > **Estimated Effort:** S (< 1 day)
