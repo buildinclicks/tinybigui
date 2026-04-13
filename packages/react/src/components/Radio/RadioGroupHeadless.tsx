@@ -33,7 +33,7 @@ export const RadioGroupContext = createContext<RadioGroupState | null>(null);
  * ```
  */
 export const RadioGroupHeadless = forwardRef<HTMLDivElement, RadioGroupHeadlessProps>(
-  ({ className, children, ...props }, forwardedRef) => {
+  ({ className, children, renderLabel, ...props }, forwardedRef) => {
     // Internal ref for React Aria
     const internalRef = useRef<HTMLDivElement>(null);
 
@@ -51,8 +51,9 @@ export const RadioGroupHeadless = forwardRef<HTMLDivElement, RadioGroupHeadlessP
 
     return (
       <div {...radioGroupProps} ref={ref} className={className} data-testid={dataTestId}>
-        {/* Group label */}
-        {props.label && <span {...labelProps}>{props.label}</span>}
+        {/* Group label — rendered via slot when provided, otherwise default span */}
+        {props.label &&
+          (renderLabel ? renderLabel(labelProps) : <span {...labelProps}>{props.label}</span>)}
 
         {/* Provide state to child Radio components via context */}
         <RadioGroupContext.Provider value={state}>{children}</RadioGroupContext.Provider>
