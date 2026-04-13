@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+# Never cancel a release in progress
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for npm provenance attestation
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org' # Required for NODE_AUTH_TOKEN injection
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Run ESLint
+        run: pnpm lint
+
+      - name: 💅 Check Prettier formatting
+        run: pnpm format:check
+
+      - name: 🔎 Run TypeScript type check
+        run: pnpm typecheck
+
+      - name: 🧪 Run tests
+        run: pnpm test
+
+      - name: 🏗️ Build packages
+        run: pnpm build
+
+      - name: 🚀 Publish @tinybigui/tokens
+        run: pnpm publish --filter @tinybigui/tokens --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: 🚀 Publish @tinybigui/react
+        run: pnpm publish --filter @tinybigui/react --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

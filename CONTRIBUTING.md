@@ -299,19 +299,24 @@ This creates a file in `.changeset/`. Commit this file with your PR.
 
 ### Maintainer Release Workflow
 
-When preparing a release, maintainers run the following commands:
+Publishing to NPM is fully automated via GitHub Actions. When a GitHub Release is created, the [release workflow](.github/workflows/release.yml) runs the full quality gate and publishes both packages with supply-chain provenance attestation.
 
-```bash
-# 1. Consume all pending changesets, bump package versions, and update CHANGELOG.md
-pnpm version-packages
+**Prerequisites:** A repository secret named `NPM_TOKEN` must be configured in GitHub repository Settings → Secrets → Actions. This token must have publish access to the `@tinybigui` npm org.
 
-# 2. Build all packages and publish to npm
-pnpm release
-```
+**Step-by-step release process:**
 
-The `version-packages` command reads all `.changeset/*.md` files, applies version bumps to `package.json` files, appends entries to `CHANGELOG.md`, and deletes the consumed changeset files. The `release` command then builds and publishes the updated packages to npm.
+1. Ensure all milestones for the release are complete and merged to `main`
+2. On the `release/vX.X.X` branch, run `pnpm version-packages` to consume all pending changesets, bump `package.json` versions, and update `CHANGELOG.md`
+3. Commit the version bump: `chore: version packages for vX.X.X`
+4. Open and merge the release branch PR into `main` (no squash)
+5. On GitHub, create a new Release with tag `vX.X.X` pointing to `main`
+6. The release workflow triggers automatically and publishes `@tinybigui/tokens` then `@tinybigui/react` to NPM
+
+The `version-packages` command reads all `.changeset/*.md` files, applies version bumps to `package.json` files, appends entries to `CHANGELOG.md`, and deletes the consumed changeset files.
 
 > **Note:** Do not run `pnpm version-packages` on a feature branch. This is only done on the release branch (`release/vX.X.X`) immediately before merging to `main`.
+>
+> **Note:** Do not run `pnpm publish` manually. The automated workflow enforces the full quality gate before any package reaches NPM.
 
 ## Component Development
 
