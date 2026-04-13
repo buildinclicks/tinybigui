@@ -15,6 +15,7 @@ import { mergeProps } from "@react-aria/utils";
 const Spinner = (): React.ReactElement => (
   <svg
     role="progressbar"
+    aria-label="Loading"
     className="h-6 w-6 animate-spin"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
