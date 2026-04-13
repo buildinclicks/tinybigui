@@ -355,8 +355,7 @@ const InteractiveExample = (): React.ReactElement => {
   const [value, setValue] = useState("");
   const [isValid, setIsValid] = useState(true);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const newValue = e.target.value;
+  const handleChange = (newValue: string): void => {
     setValue(newValue);
     // Simple email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -370,7 +369,7 @@ const InteractiveExample = (): React.ReactElement => {
         value={value}
         onChange={handleChange}
         isInvalid={!isValid}
-        errorMessage={!isValid ? "Please enter a valid email" : undefined}
+        {...(!isValid && { errorMessage: "Please enter a valid email" })}
         leadingIcon={<IconEmail />}
         placeholder="email@example.com"
         description="Enter your email address"
@@ -450,9 +449,7 @@ const FormExample = (): React.ReactElement => {
         label="Email"
         type="email"
         value={formData.email}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setFormData({ ...formData, email: e.target.value })
-        }
+        onChange={(value) => setFormData({ ...formData, email: value })}
         leadingIcon={<IconEmail />}
         isRequired
         description="We'll never share your email"
@@ -460,9 +457,7 @@ const FormExample = (): React.ReactElement => {
       <TextField
         label="Username"
         value={formData.username}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setFormData({ ...formData, username: e.target.value })
-        }
+        onChange={(value) => setFormData({ ...formData, username: value })}
         leadingIcon={<IconPerson />}
         isRequired
         description="Choose a unique username"
@@ -471,9 +466,7 @@ const FormExample = (): React.ReactElement => {
         label="Password"
         type="password"
         value={formData.password}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setFormData({ ...formData, password: e.target.value })
-        }
+        onChange={(value) => setFormData({ ...formData, password: value })}
         trailingIcon={<IconVisibility />}
         isRequired
         description="At least 8 characters"
@@ -483,9 +476,7 @@ const FormExample = (): React.ReactElement => {
         multiline
         rows={4}
         value={formData.bio}
-        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          setFormData({ ...formData, bio: e.target.value })
-        }
+        onChange={(value) => setFormData({ ...formData, bio: value })}
         characterCount
         maxLength={200}
         description="Tell us about yourself"
