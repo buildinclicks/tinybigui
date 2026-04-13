@@ -13,6 +13,7 @@ Thank you for considering contributing to TinyBigUI. This document provides guid
 - [Testing Requirements](#testing-requirements)
 - [Commit Guidelines](#commit-guidelines)
 - [Pull Request Process](#pull-request-process)
+- [Version Management](#version-management)
 - [Component Development](#component-development)
 
 ## Code of Conduct
@@ -261,6 +262,56 @@ Use the pull request template and include:
 
 - Delete your feature branch
 - Pull the latest `dev` branch
+
+## Version Management
+
+TinyBigUI uses [Changesets](https://github.com/changesets/changesets) to manage version bumps and changelog generation across the monorepo.
+
+### What is a Changeset?
+
+A changeset is a small markdown file that describes a change and specifies the semantic version bump it requires (`major`, `minor`, or `patch`). It is committed alongside the code change in the same PR. Changesets are later consumed by maintainers to bump package versions and update `CHANGELOG.md` automatically.
+
+### When to Create a Changeset
+
+Create a changeset for any PR that changes user-facing behavior, including:
+
+- Adding a new component or feature
+- Fixing a bug that affects consumers
+- Making a breaking change to a public API
+
+You do **not** need a changeset for internal refactors, test-only changes, or documentation updates that do not affect the published packages.
+
+### Creating a Changeset
+
+From the repo root, run:
+
+```bash
+pnpm changeset
+```
+
+The CLI will prompt you to:
+
+1. Select which packages are affected (`@tinybigui/react`, `@tinybigui/tokens`, or both)
+2. Choose the bump type (`major`, `minor`, or `patch`)
+3. Write a short summary of the change
+
+This creates a file in `.changeset/`. Commit this file with your PR.
+
+### Maintainer Release Workflow
+
+When preparing a release, maintainers run the following commands:
+
+```bash
+# 1. Consume all pending changesets, bump package versions, and update CHANGELOG.md
+pnpm version-packages
+
+# 2. Build all packages and publish to npm
+pnpm release
+```
+
+The `version-packages` command reads all `.changeset/*.md` files, applies version bumps to `package.json` files, appends entries to `CHANGELOG.md`, and deletes the consumed changeset files. The `release` command then builds and publishes the updated packages to npm.
+
+> **Note:** Do not run `pnpm version-packages` on a feature branch. This is only done on the release branch (`release/vX.X.X`) immediately before merging to `main`.
 
 ## Component Development
 
