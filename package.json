@@ -43,9 +43,13 @@
     "test": "pnpm -r test",
     "test:watch": "pnpm -r test:watch",
     "clean": "pnpm -r clean && rm -rf node_modules",
-    "prepare": "husky"
+    "prepare": "husky",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
     "@testing-library/jest-dom": "^6.9.1",
