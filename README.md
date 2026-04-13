@@ -39,7 +39,7 @@
 - 🎨 **Material Design 3** - Implements the latest MD3 design system with full token support
 - ⚛️ **React 18+** - Built for modern React with hooks and concurrent features
 - 🎯 **TypeScript First** - 100% TypeScript with full type safety and IntelliSense
-- 🌙 **Dark Mode Built-in** - Class-based dark mode via `.dark` class on `<html>` or ancestor element
+- 🌙 **Dark Mode Built-in** - Automatic system preference detection via `prefers-color-scheme` plus `.dark` / `.light` class overrides
 - ♿ **Accessibility** - WCAG 2.1 AA compliant with comprehensive keyboard navigation
 - 🎨 **Tailwind CSS v4** - Powered by the latest Tailwind with utility-first styling
 - 📦 **Tree-shakable** - Import only what you need, optimized bundle size
