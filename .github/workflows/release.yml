@@ -51,12 +51,21 @@ jobs:
       - name: 🏗️ Build packages
         run: pnpm build
 
+      - name: 🏷️ Determine npm dist-tag
+        id: dist-tag
+        run: |
+          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+            echo "tag=next" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: 🚀 Publish @tinybigui/tokens
-        run: pnpm publish --filter @tinybigui/tokens --no-git-checks --provenance
+        run: pnpm publish --filter @tinybigui/tokens --no-git-checks --provenance --tag ${{ steps.dist-tag.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 🚀 Publish @tinybigui/react
-        run: pnpm publish --filter @tinybigui/react --no-git-checks --provenance
+        run: pnpm publish --filter @tinybigui/react --no-git-checks --provenance --tag ${{ steps.dist-tag.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
