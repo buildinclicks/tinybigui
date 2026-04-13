@@ -454,6 +454,31 @@ describe("RadioGroup", () => {
       await user.tab();
       expect(radio).toHaveFocus();
     });
+
+    test("label text appears exactly once in the DOM", () => {
+      render(
+        <RadioGroup label="Favorite Color">
+          <Radio value="red">Red</Radio>
+          <Radio value="blue">Blue</Radio>
+        </RadioGroup>
+      );
+      const labelElements = screen.getAllByText("Favorite Color");
+      expect(labelElements).toHaveLength(1);
+    });
+
+    test("label element id matches aria-labelledby on the radiogroup", () => {
+      render(
+        <RadioGroup label="Favorite Color">
+          <Radio value="red">Red</Radio>
+        </RadioGroup>
+      );
+      const group = screen.getByRole("radiogroup");
+      const ariaLabelledBy = group.getAttribute("aria-labelledby");
+      expect(ariaLabelledBy).toBeTruthy();
+      const labelElement = document.getElementById(ariaLabelledBy!);
+      expect(labelElement).toBeInTheDocument();
+      expect(labelElement).toHaveTextContent("Favorite Color");
+    });
   });
 
   describe("Form Integration", () => {

@@ -139,6 +139,29 @@ export interface RadioGroupHeadlessProps extends AriaRadioGroupProps {
    * Radio buttons to display in the group
    */
   children: React.ReactNode;
+
+  /**
+   * Render slot for the group label.
+   * Receives React Aria's `labelProps` (contains the generated `id` for
+   * `aria-labelledby` association) so the consumer can render a styled
+   * label element while preserving correct ARIA semantics.
+   *
+   * When provided, the default `<span {...labelProps}>` is suppressed and
+   * this callback is responsible for rendering the label.
+   *
+   * @example
+   * ```tsx
+   * <RadioGroupHeadless
+   *   label="Pick one"
+   *   renderLabel={(labelProps) => (
+   *     <div {...labelProps} className="my-label-style">Pick one</div>
+   *   )}
+   * >
+   *   ...
+   * </RadioGroupHeadless>
+   * ```
+   */
+  renderLabel?: (labelProps: React.HTMLAttributes<HTMLElement>) => React.ReactNode;
 }
 
 /**
