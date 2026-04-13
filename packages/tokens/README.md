@@ -12,9 +12,9 @@ A comprehensive collection of Material Design 3 design tokens implemented as CSS
 
 ## ⚠️ Status
 
-> **🚧 Work in Progress**
+> **Pre-release: v0.0.x**
 >
-> This package is currently in active development (Phase 0) and is **not yet published to npm**.
+> This package is complete and approaching its first public release (**v0.1.0**). It is **not yet published to npm**.
 >
 > Follow our [GitHub repository](https://github.com/buildinclicks/tinybigui) for updates!
 
@@ -27,14 +27,14 @@ Design tokens are the **visual design atoms** of a design system. They're named 
 **Think of them as variables for your design system:**
 
 - Instead of `#6750a4`, use `var(--md-sys-color-primary)`
-- Instead of `16px`, use `var(--md-sys-typescale-body-large-font-size)`
+- Instead of `16px`, use `var(--md-sys-typescale-body-large-size)`
 - Change once, update everywhere!
 
 ---
 
 ## ✨ Features
 
-- 🎨 **145 Design Tokens** - Complete Material Design 3 token system
+- 🎨 **120 Design Tokens** - Complete Material Design 3 token system
 - 🌙 **Light & Dark Mode** - Automatic theme switching
 - 🎯 **Standards-Based** - Follows MD3 specifications exactly
 - 📦 **Framework Agnostic** - Use with React, Vue, Angular, or vanilla JS
@@ -49,7 +49,7 @@ Design tokens are the **visual design atoms** of a design system. They're named 
 
 ## 📦 Installation
 
-> **Coming Soon!** This package will be available once we reach Phase 1b.
+> **v0.1.0 is in preparation.** This package will be available on npm as part of the upcoming v0.1.0 release.
 
 ```bash
 npm install @tinybigui/tokens
@@ -81,9 +81,8 @@ import "@tinybigui/tokens";
 .my-component {
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
-  padding: var(--md-sys-spacing-4);
   border-radius: var(--md-sys-shape-corner-medium);
-  box-shadow: var(--md-sys-elevation-2);
+  box-shadow: var(--md-sys-elevation-level-2);
 }
 ```
 
@@ -91,7 +90,7 @@ import "@tinybigui/tokens";
 
 ## 🎨 Available Tokens
 
-### Colors (25 tokens)
+### Colors (29 tokens)
 
 Material Design 3 color system with light and dark variants:
 
@@ -126,6 +125,13 @@ Material Design 3 color system with light and dark variants:
 --md-sys-color-surface-variant
 --md-sys-color-on-surface-variant
 
+/* Surface containers (MD3 elevation system) */
+--md-sys-color-surface-container-lowest
+--md-sys-color-surface-container-low
+--md-sys-color-surface-container
+--md-sys-color-surface-container-high
+--md-sys-color-surface-container-highest
+
 /* Background */
 --md-sys-color-background
 --md-sys-color-on-background
@@ -133,10 +139,6 @@ Material Design 3 color system with light and dark variants:
 /* Outline */
 --md-sys-color-outline
 --md-sys-color-outline-variant
-
-/* Surface tints */
---md-sys-color-surface-tint
---md-sys-color-inverse-surface
 ```
 
 ---
@@ -147,26 +149,26 @@ Material Design 3 color system with light and dark variants:
 
 ```css
 /* Display (Large, Medium, Small) */
---md-sys-typescale-display-large-font-size
+--md-sys-typescale-display-large-size
 --md-sys-typescale-display-large-line-height
 --md-sys-typescale-display-large-weight
---md-sys-typescale-display-large-letter-spacing
+--md-sys-typescale-display-large-tracking
 
 /* Headline (Large, Medium, Small) */
---md-sys-typescale-headline-large-font-size
+--md-sys-typescale-headline-large-size
 --md-sys-typescale-headline-large-line-height
 /* ... */
 
 /* Title (Large, Medium, Small) */
---md-sys-typescale-title-large-font-size
+--md-sys-typescale-title-large-size
 /* ... */
 
 /* Body (Large, Medium, Small) */
---md-sys-typescale-body-large-font-size
+--md-sys-typescale-body-large-size
 /* ... */
 
 /* Label (Large, Medium, Small) */
---md-sys-typescale-label-large-font-size
+--md-sys-typescale-label-large-size
 /* ... */
 ```
 
@@ -177,19 +179,19 @@ Material Design 3 color system with light and dark variants:
 Box shadows for elevation levels 0-5:
 
 ```css
---md-sys-elevation-0  /* No shadow */
---md-sys-elevation-1  /* 1dp */
---md-sys-elevation-2  /* 3dp */
---md-sys-elevation-3  /* 6dp */
---md-sys-elevation-4  /* 8dp */
---md-sys-elevation-5  /* 12dp */
+--md-sys-elevation-level-0  /* No shadow */
+--md-sys-elevation-level-1  /* 1dp */
+--md-sys-elevation-level-2  /* 3dp */
+--md-sys-elevation-level-3  /* 6dp */
+--md-sys-elevation-level-4  /* 8dp */
+--md-sys-elevation-level-5  /* 12dp */
 ```
 
 **Example values:**
 
 ```css
---md-sys-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.15);
---md-sys-elevation-3: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+--md-sys-elevation-level-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+--md-sys-elevation-level-3: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
 ```
 
 ---
@@ -217,14 +219,18 @@ Animation durations and easing curves:
 **Durations:**
 
 ```css
---md-sys-motion-duration-short-1: 50ms;
---md-sys-motion-duration-short-2: 100ms;
---md-sys-motion-duration-short-3: 150ms;
---md-sys-motion-duration-short-4: 200ms;
---md-sys-motion-duration-medium-1: 250ms;
---md-sys-motion-duration-medium-2: 300ms;
---md-sys-motion-duration-long-1: 450ms;
---md-sys-motion-duration-long-2: 500ms;
+--md-sys-motion-duration-short1: 50ms;
+--md-sys-motion-duration-short2: 100ms;
+--md-sys-motion-duration-short3: 150ms;
+--md-sys-motion-duration-short4: 200ms;
+--md-sys-motion-duration-medium1: 250ms;
+--md-sys-motion-duration-medium2: 300ms;
+--md-sys-motion-duration-medium3: 350ms;
+--md-sys-motion-duration-medium4: 400ms;
+--md-sys-motion-duration-long1: 450ms;
+--md-sys-motion-duration-long2: 500ms;
+--md-sys-motion-duration-long3: 550ms;
+--md-sys-motion-duration-long4: 600ms;
 ```
 
 **Easing curves:**
@@ -234,44 +240,38 @@ Animation durations and easing curves:
 --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
 --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
 --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
-/* ... and 4 more */
 ```
 
 ---
 
 ## 🌙 Dark Mode
 
-Dark mode is automatically applied based on system preferences:
+Dark mode is applied by adding the `.dark` class to the `<html>` element or any ancestor:
 
 ```css
-/* Light mode (default) */
+/* Light mode (default — :root) */
 :root {
   --md-sys-color-primary: #6750a4;
   --md-sys-color-surface: #fffbfe;
 }
 
-/* Dark mode (automatic) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --md-sys-color-primary: #d0bcff;
-    --md-sys-color-surface: #1c1b1f;
-  }
+/* Dark mode — add .dark class to <html> or ancestor */
+.dark {
+  --md-sys-color-primary: #d0bcff;
+  --md-sys-color-surface: #1c1b1f;
 }
 ```
 
-**Manual control:**
+**Usage:**
 
 ```html
-<!-- Force dark mode -->
-<html data-theme="dark">
-  <!-- Your content -->
-</html>
-
-<!-- Force light mode -->
-<html data-theme="light">
-  <!-- Your content -->
+<!-- Enable dark mode -->
+<html class="dark">
+  <!-- All tokens switch to dark values automatically -->
 </html>
 ```
+
+> **Note:** Automatic system preference detection via `prefers-color-scheme` is planned for a future release.
 
 ---
 
@@ -297,7 +297,7 @@ Dark mode is automatically applied based on system preferences:
   --md-sys-color-tertiary: #e74c3c;
 
   /* Custom typography */
-  --md-sys-typescale-body-large-font-size: 18px;
+  --md-sys-typescale-body-large-size: 18px;
 
   /* Custom shape */
   --md-sys-shape-corner-medium: 8px;
@@ -377,7 +377,6 @@ function MyComponent() {
       style={{
         background: "var(--md-sys-color-primary)",
         color: "var(--md-sys-color-on-primary)",
-        padding: "var(--md-sys-spacing-4)",
         borderRadius: "var(--md-sys-shape-corner-medium)",
       }}
     >
@@ -413,7 +412,7 @@ function MyComponent() {
 // component.css
 .component {
   background: var(--md-sys-color-surface);
-  box-shadow: var(--md-sys-elevation-2);
+  box-shadow: var(--md-sys-elevation-level-2);
 }
 ```
 
@@ -428,7 +427,7 @@ function MyComponent() {
       .card {
         background: var(--md-sys-color-surface);
         border-radius: var(--md-sys-shape-corner-large);
-        box-shadow: var(--md-sys-elevation-2);
+        box-shadow: var(--md-sys-elevation-level-2);
       }
     </style>
   </head>
@@ -442,16 +441,16 @@ function MyComponent() {
 
 ## 📊 Token Summary
 
-| Category   | Count   | Description                   |
-| ---------- | ------- | ----------------------------- |
-| Colors     | 25      | Primary, secondary, surface   |
-| Typography | 60      | 15 scales × 4 properties      |
-| Elevation  | 6       | Shadow levels 0-5             |
-| Shape      | 7       | Border radius values          |
-| Motion     | 16      | Durations + easing curves     |
-| **Total**  | **114** | **Complete MD3 token system** |
+| Category   | Count   | Description                                     |
+| ---------- | ------- | ----------------------------------------------- |
+| Colors     | 29      | Primary, secondary, surface + containers        |
+| Typography | 62      | 15 scales × 4 properties + 2 font-family tokens |
+| Elevation  | 6       | Shadow levels 0-5                               |
+| Shape      | 7       | Border radius values                            |
+| Motion     | 16      | Durations + easing curves                       |
+| **Total**  | **120** | **Complete MD3 token system**                   |
 
-> **Note:** Some tokens have light/dark variants, bringing the actual CSS variable count to 145.
+> **Note:** Dark mode reuses the same 120 token names with different values via the `.dark` class — no additional variables are added.
 
 ---
 

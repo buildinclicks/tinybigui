@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { axe } from "vitest-axe";
 import { Checkbox } from "./Checkbox";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
 
@@ -411,6 +412,38 @@ describe("Checkbox", () => {
       checkbox.focus();
       await user.keyboard(" ");
       expect(handleSubmit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no accessibility violations", async () => {
+      const { container } = render(<Checkbox>Accept terms</Checkbox>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations with aria-label", async () => {
+      const { container } = render(<Checkbox aria-label="Accept terms" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when checked", async () => {
+      const { container } = render(<Checkbox isSelected>Checked option</Checkbox>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when disabled", async () => {
+      const { container } = render(<Checkbox isDisabled>Disabled option</Checkbox>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations in indeterminate state", async () => {
+      const { container } = render(<Checkbox isIndeterminate>Indeterminate</Checkbox>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });

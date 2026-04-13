@@ -6,17 +6,17 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 **Current Version:** Pre-release (v0.0.x)  
 **Next Release:** v0.1.0  
-**Status:** Phase 1 in progress
+**Status:** Phase 1a + 1b complete, approaching v0.1.0
 
 ## Release Timeline
 
-| Version | Phase   | Components                                           | Status      |
-| ------- | ------- | ---------------------------------------------------- | ----------- |
-| v0.1.0  | 1a + 1b | Button, IconButton, FAB, TextField, Checkbox, Switch | In Progress |
-| v0.2.0  | 2       | AppBar, Tabs, Drawer, Bottom Navigation              | Planned     |
-| v0.3.0  | 3       | Dialog, Snackbar, Menu, Progress Indicators          | Planned     |
-| v0.4.0  | 4       | Card, List, Chip, Table                              | Planned     |
-| v1.0.0  | -       | Stable release, API frozen                           | Planned     |
+| Version | Phase   | Components                                                  | Status         |
+| ------- | ------- | ----------------------------------------------------------- | -------------- |
+| v0.1.0  | 1a + 1b | Button, IconButton, FAB, TextField, Checkbox, Switch, Radio | In Preparation |
+| v0.2.0  | 2       | AppBar, Tabs, Drawer, Bottom Navigation                     | Planned        |
+| v0.3.0  | 3       | Dialog, Snackbar, Menu, Progress Indicators                 | Planned        |
+| v0.4.0  | 4       | Card, List, Chip, Table                                     | Planned        |
+| v1.0.0  | -       | Stable release, API frozen                                  | Planned        |
 
 ## Completed Work
 
@@ -29,6 +29,17 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | FAB        | 51    | Complete |
 
 **Total:** 153 tests passing
+
+### Phase 1b - Form Components
+
+| Component | Tests | Status   |
+| --------- | ----- | -------- |
+| TextField | 56    | Complete |
+| Checkbox  | 49    | Complete |
+| Switch    | 50    | Complete |
+| Radio     | 47    | Complete |
+
+**Total:** 202 tests passing
 
 ### Infrastructure
 
@@ -45,13 +56,13 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## In Progress
 
-### Phase 1b - Form Components
+### v0.1.0 Release Preparation
 
-| Component | Tests | Status      |
-| --------- | ----- | ----------- |
-| TextField | -     | Not started |
-| Checkbox  | -     | Not started |
-| Switch    | -     | Not started |
+- QA milestones (`.qa-phases/phase-0/`) in progress
+- Documentation updates
+- CHANGELOG creation (M8)
+- npm publishing infrastructure (M9)
+- Release workflow automation (M10)
 
 ## Planned Work
 
@@ -111,4 +122,4 @@ Have an idea for a new component or feature? Open a [feature request](https://gi
 ## Stay Updated
 
 - Watch this repository for release notifications
-- Check the [Changelog](CHANGELOG.md) for release notes
+- Check the [Changelog](CHANGELOG.md) for release notes _(CHANGELOG will be created as part of v0.1.0 release — M8)_

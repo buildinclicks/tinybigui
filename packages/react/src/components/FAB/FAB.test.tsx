@@ -3,6 +3,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
+import { axe } from "vitest-axe";
 import { FAB } from "./FAB";
 import React from "react";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
@@ -281,6 +282,11 @@ describe("FAB", () => {
       const button = screen.getByRole("button");
       expect(button).toBeDisabled();
     });
+
+    test("loading spinner has accessible label", () => {
+      render(<FAB aria-label="Creating" icon={<IconAdd />} loading />);
+      expect(screen.getByRole("progressbar", { name: "Loading" })).toBeInTheDocument();
+    });
   });
 
   describe("Ripple Effect", () => {
@@ -432,6 +438,36 @@ describe("FAB", () => {
       expect(consoleWarn).toHaveBeenCalledWith(
         "[FAB] Extended FAB requires text label as children."
       );
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no accessibility violations", async () => {
+      const { container } = render(<FAB aria-label="Add new item" icon={<IconAdd />} />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when disabled", async () => {
+      const { container } = render(<FAB aria-label="Add" icon={<IconAdd />} isDisabled />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations in loading state", async () => {
+      const { container } = render(<FAB aria-label="Creating" icon={<IconAdd />} loading />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations for extended FAB", async () => {
+      const { container } = render(
+        <FAB aria-label="Create new item" icon={<IconAdd />} size="extended">
+          Create
+        </FAB>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });

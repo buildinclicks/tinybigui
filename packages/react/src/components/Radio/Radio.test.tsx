@@ -1,6 +1,7 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { axe } from "vitest-axe";
 import { Radio } from "./Radio";
 import { RadioGroup } from "./RadioGroup";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
@@ -649,6 +650,41 @@ describe("RadioGroup", () => {
     test("handles empty RadioGroup", () => {
       render(<RadioGroup label="Empty" />);
       expect(screen.getByRole("radiogroup", { name: "Empty" })).toBeInTheDocument();
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no accessibility violations", async () => {
+      const { container } = render(
+        <RadioGroup label="Favorite color">
+          <Radio value="red">Red</Radio>
+          <Radio value="blue">Blue</Radio>
+        </RadioGroup>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations with selected value", async () => {
+      const { container } = render(
+        <RadioGroup label="Options" value="a">
+          <Radio value="a">Option A</Radio>
+          <Radio value="b">Option B</Radio>
+        </RadioGroup>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when disabled", async () => {
+      const { container } = render(
+        <RadioGroup label="Options" isDisabled>
+          <Radio value="a">Option A</Radio>
+          <Radio value="b">Option B</Radio>
+        </RadioGroup>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });
