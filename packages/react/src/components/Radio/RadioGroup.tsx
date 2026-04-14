@@ -70,7 +70,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
 
       // State props
       orientation = "vertical",
-      isInvalid = false,
+      isInvalid: _isInvalid = false,
       isDisabled = false,
 
       // Styling

@@ -90,6 +90,9 @@ importers:
       '@react-aria/live-announcer':
         specifier: ^3.4.4
         version: 3.4.4
+      '@react-aria/utils':
+        specifier: ^3.32.0
+        version: 3.32.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -102,6 +105,9 @@ importers:
       react-aria-components:
         specifier: ^1.14.0
         version: 1.14.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-stately:
+        specifier: ^3.43.0
+        version: 3.43.0(react@18.3.1)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0

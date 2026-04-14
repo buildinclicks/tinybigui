@@ -61,10 +61,12 @@
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
     "@react-aria/live-announcer": "^3.4.4",
+    "@react-aria/utils": "^3.32.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "react-aria": "^3.45.0",
     "react-aria-components": "^1.14.0",
+    "react-stately": "^3.43.0",
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {

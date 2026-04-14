@@ -273,7 +273,7 @@ export const FormIntegration: Story = {
   render: function FormExample() {
     const [submittedData, setSubmittedData] = useState<Record<string, string> | null>(null);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
       const data = Object.fromEntries(formData.entries()) as Record<string, string>;
