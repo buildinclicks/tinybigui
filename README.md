@@ -325,6 +325,15 @@ Special thanks to all open-source contributors who make projects like this possi
 
 ---
 
+## Contributors
+
+Thanks to all our contributors!
+
+<!-- ALL-CONTRIBUTORS-LIST:START -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+---
+
 ## 🌟 Show Your Support
 
 If you like this project, please consider:
