@@ -115,7 +115,7 @@ describe("RadioGroup", () => {
         </RadioGroup>
       );
       const radioA = screen.getByRole("radio", { name: "A" });
-      const radioB = screen.getByRole("radio", { name: "B (Disabled)" });
+      const _radioB = screen.getByRole("radio", { name: "B (Disabled)" });
       expect(radioA).not.toBeDisabled();
       // Individual radio disabled state - check via visual styling since React Aria handles it differently
       const labelB = screen.getByText("B (Disabled)").closest("label");
