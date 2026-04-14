@@ -1,5 +1,4 @@
 import type { StorybookConfig } from "@storybook/react-vite";
-import { mergeConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 
 const config: StorybookConfig = {
@@ -25,10 +24,8 @@ const config: StorybookConfig = {
     reactDocgen: "react-docgen-typescript", // Generate prop types from TypeScript
   },
   viteFinal(config) {
-    // Merge with our Vite config to include Tailwind CSS v4 plugin
-    return mergeConfig(config, {
-      plugins: [tailwindcss()],
-    });
+    config.plugins = [...(config.plugins ?? []), tailwindcss()];
+    return config;
   },
 };
 
