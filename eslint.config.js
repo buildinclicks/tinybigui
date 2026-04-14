@@ -47,9 +47,9 @@ export default [
     },
   },
 
-  // Node.js scripts
+  // Node.js scripts and build tool configs
   {
-    files: ["**/scripts/*.js", "*.config.js", "*.config.mjs"],
+    files: ["**/scripts/*.js", "*.config.js", "*.config.mjs", "**/vite.config.ts"],
     languageOptions: {
       globals: {
         console: "readonly",
@@ -61,6 +61,11 @@ export default [
     rules: {
       "@typescript-eslint/no-floating-promises": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
     },
   },
 
