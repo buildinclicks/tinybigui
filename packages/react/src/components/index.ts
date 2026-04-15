@@ -28,3 +28,19 @@ export type {
   RadioHeadlessProps,
   RadioGroupHeadlessProps,
 } from "./Radio";
+
+export {
+  NavigationBar,
+  NavigationBarItem,
+  HeadlessNavigationBar,
+  HeadlessNavigationBarItem,
+} from "./NavigationBar";
+export type {
+  NavigationBarProps,
+  NavigationBarItemProps,
+  NavigationBarItemConfig,
+  NavigationBarBadge,
+  HeadlessNavigationBarProps,
+  HeadlessNavigationBarItemProps,
+  NavigationBarItemRenderProps,
+} from "./NavigationBar";
