@@ -4,19 +4,19 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** Pre-release (v0.0.x)  
-**Next Release:** v0.1.0  
-**Status:** Phase 1a + 1b complete, approaching v0.1.0
+**Current Version:** v0.1.0 (released 2026-04-15)  
+**Next Release:** v0.2.0  
+**Status:** v0.1.0 published to NPM; Phase 2 (Navigation) planned next
 
 ## Release Timeline
 
-| Version | Phase   | Components                                                  | Status         |
-| ------- | ------- | ----------------------------------------------------------- | -------------- |
-| v0.1.0  | 1a + 1b | Button, IconButton, FAB, TextField, Checkbox, Switch, Radio | In Preparation |
-| v0.2.0  | 2       | AppBar, Tabs, Drawer, Bottom Navigation                     | Planned        |
-| v0.3.0  | 3       | Dialog, Snackbar, Menu, Progress Indicators                 | Planned        |
-| v0.4.0  | 4       | Card, List, Chip, Table                                     | Planned        |
-| v1.0.0  | -       | Stable release, API frozen                                  | Planned        |
+| Version | Phase   | Components                                                  | Status              |
+| ------- | ------- | ----------------------------------------------------------- | ------------------- |
+| v0.1.0  | 1a + 1b | Button, IconButton, FAB, TextField, Checkbox, Switch, Radio | Released 2026-04-15 |
+| v0.2.0  | 2       | AppBar, Tabs, Drawer, Bottom Navigation                     | Planned             |
+| v0.3.0  | 3       | Dialog, Snackbar, Menu, Progress Indicators                 | Planned             |
+| v0.4.0  | 4       | Card, List, Chip, Table                                     | Planned             |
+| v1.0.0  | -       | Stable release, API frozen                                  | Planned             |
 
 ## Completed Work
 
@@ -56,13 +56,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## In Progress
 
-### v0.1.0 Release Preparation
+### v0.2.0 Phase 2 — Navigation (Next)
 
-- QA milestones (`.qa-phases/phase-0/`) in progress
-- Documentation updates
-- CHANGELOG creation (M8)
-- npm publishing infrastructure (M9)
-- Release workflow automation (M10)
+Planning in progress. See Planned Work below.
 
 ## Planned Work
 
@@ -122,4 +118,4 @@ Have an idea for a new component or feature? Open a [feature request](https://gi
 ## Stay Updated
 
 - Watch this repository for release notifications
-- Check the [Changelog](CHANGELOG.md) for release notes _(CHANGELOG will be created as part of v0.1.0 release — M8)_
+- Check the [Changelog](CHANGELOG.md) for release notes
