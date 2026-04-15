@@ -15,6 +15,9 @@
     <a href="https://www.npmjs.com/package/@tinybigui/react">
       <img src="https://img.shields.io/npm/v/@tinybigui/react?style=flat-square" alt="npm version" />
     </a>
+    <a href="https://www.chromatic.com/builds?appId=tinybigui">
+      <img src="https://img.shields.io/badge/Chromatic-visual%20tests-FC521F?style=flat-square&logo=storybook&logoColor=white" alt="Chromatic visual tests" />
+    </a>
   </p>
 
   <p>
