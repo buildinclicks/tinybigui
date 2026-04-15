@@ -271,8 +271,8 @@ export const Playground: Story = {
   render: (args) => (
     <PlaygroundExample
       items={args.items ?? fiveItems}
-      hideLabels={args.hideLabels}
-      disableRipple={args.disableRipple}
+      hideLabels={args.hideLabels ?? false}
+      disableRipple={args.disableRipple ?? false}
     />
   ),
   args: {

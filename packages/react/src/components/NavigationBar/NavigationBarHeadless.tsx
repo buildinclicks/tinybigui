@@ -4,8 +4,7 @@ import { createContext, forwardRef, useContext, useRef } from "react";
 import { useTabList, useTab, useFocusRing } from "react-aria";
 import { useTabListState, Item } from "react-stately";
 import { mergeProps } from "@react-aria/utils";
-import type { TabListState } from "@react-stately/tabs";
-import type { NavigationBarContextValue, NavigationBarItemConfig } from "./NavigationBar.types";
+import type { NavigationBarContextValue } from "./NavigationBar.types";
 import type {
   HeadlessNavigationBarProps,
   HeadlessNavigationBarItemProps,

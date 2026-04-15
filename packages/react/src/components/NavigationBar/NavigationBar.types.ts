@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import type { Key } from "react-aria";
-import type { TabListState } from "@react-stately/tabs";
+import type { TabListState } from "react-stately";
 
 /**
  * Badge value for a NavigationBarItem.
@@ -320,7 +320,7 @@ export interface HeadlessNavigationBarItemProps {
  * @internal
  */
 export interface NavigationBarContextValue {
-  state: TabListState<NavigationBarItemConfig>;
+  state: TabListState<object>;
   hideLabels: boolean;
   disableRipple: boolean;
 }
