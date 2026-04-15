@@ -11,6 +11,7 @@ Thank you for considering contributing to TinyBigUI. This document provides guid
 - [Development Workflow](#development-workflow)
 - [Coding Standards](#coding-standards)
 - [Testing Requirements](#testing-requirements)
+- [Visual Regression Testing](#visual-regression-testing)
 - [Commit Guidelines](#commit-guidelines)
 - [Pull Request Process](#pull-request-process)
 - [Version Management](#version-management)
@@ -18,7 +19,7 @@ Thank you for considering contributing to TinyBigUI. This document provides guid
 
 ## Code of Conduct
 
-By participating in this project, you agree to maintain a respectful and inclusive environment. Be kind, constructive, and professional in all interactions.
+This project follows the [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you agree to uphold its standards. Please report unacceptable behavior to [conduct@tinybigui.dev](mailto:conduct@tinybigui.dev).
 
 ## Getting Started
 
@@ -189,6 +190,39 @@ pnpm test -- --coverage
 
 Maintain a minimum of 85% code coverage. New components should aim for 90%+.
 
+## Visual Regression Testing
+
+TinyBigUI uses [Chromatic](https://www.chromatic.com/) to catch unintended visual changes to components.
+
+### What Chromatic Does
+
+Chromatic takes pixel-perfect screenshots of every Storybook story on every PR and compares them against the baseline (the last accepted build). If any story looks different — even slightly — Chromatic flags it for human review. This catches CSS bugs, token changes, or layout regressions that unit tests cannot detect.
+
+### What to Do When Chromatic Flags a Visual Change
+
+When the Chromatic status check on your PR shows visual changes:
+
+1. Open the Chromatic dashboard link in the PR status check
+2. Review each flagged story side by side with the baseline
+
+- **Intentional change** (e.g. you updated a component's styling on purpose): click **Accept** in the Chromatic UI to approve the new baseline
+- **Unintentional change** (e.g. a CSS regression you didn't mean to introduce): fix the issue in your branch before merging
+
+### Maintainer Approval
+
+Maintainers must approve all visual changes in the Chromatic dashboard before a PR is merged. Visual changes that are not explicitly accepted will block merge by convention, even though CI itself does not fail (we use `exitZeroOnChanges: true` to avoid false-positive CI failures from intentional changes).
+
+### Running Chromatic Locally
+
+You can run a Chromatic build locally to preview results before pushing:
+
+```bash
+# From packages/react/
+CHROMATIC_PROJECT_TOKEN=<your-token> pnpm chromatic
+```
+
+The `CHROMATIC_PROJECT_TOKEN` is available to maintainers. Contributors do not need it — the Chromatic GitHub Action runs automatically on every PR.
+
 ## Commit Guidelines
 
 We use [Conventional Commits](https://www.conventionalcommits.org/) for clear, consistent commit history.
@@ -356,6 +390,6 @@ We follow Test-Driven Development (TDD):
 
 ## Questions?
 
-If you have questions about contributing, open a discussion on GitHub or reach out to the maintainers.
+If you have questions about contributing, [open a discussion on GitHub](https://github.com/buildinclicks/tinybigui/discussions) or reach out to the maintainers. GitHub Discussions is the primary place for Q&A, ideas, and community conversation.
 
 Thank you for contributing to TinyBigUI.

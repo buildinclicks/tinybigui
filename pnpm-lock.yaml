@@ -151,6 +151,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.0.16
         version: 4.0.16(@vitest/browser@4.0.16(vite@7.3.0(@types/node@22.19.3)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))(vitest@4.0.16))(vitest@4.0.16)
+      chromatic:
+        specifier: ^16.3.0
+        version: 16.3.0
       eslint:
         specifier: ^9.39.2
         version: 9.39.2(jiti@2.6.1)
@@ -2156,6 +2159,21 @@ packages:
       '@chromatic-com/cypress':
         optional: true
       '@chromatic-com/playwright':
+        optional: true
+
+  chromatic@16.3.0:
+    resolution: {integrity: sha512-PvXUpXP3l8p2NxLEYhMgo4kGNNBQgCgbslMu+O4Bb37ujiiDWk8QExX/Jk7JeHUewNgK2wg98rtw3gdfz3U+Kg==}
+    hasBin: true
+    peerDependencies:
+      '@chromatic-com/cypress': ^0.*.* || ^1.0.0
+      '@chromatic-com/playwright': ^0.*.* || ^1.0.0
+      '@chromatic-com/vitest': ^0.*.* || ^1.0.0
+    peerDependenciesMeta:
+      '@chromatic-com/cypress':
+        optional: true
+      '@chromatic-com/playwright':
+        optional: true
+      '@chromatic-com/vitest':
         optional: true
 
   class-variance-authority@0.7.1:
@@ -6939,6 +6957,8 @@ snapshots:
       readdirp: 4.1.2
 
   chromatic@13.3.4: {}
+
+  chromatic@16.3.0: {}
 
   class-variance-authority@0.7.1:
     dependencies:

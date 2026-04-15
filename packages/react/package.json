@@ -56,7 +56,8 @@
     "test:watch": "vitest",
     "clean": "rm -rf dist",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
@@ -83,6 +84,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitest/browser-playwright": "^4.0.16",
     "@vitest/coverage-v8": "^4.0.16",
+    "chromatic": "^16.3.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
