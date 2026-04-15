@@ -15,6 +15,9 @@
     <a href="https://www.npmjs.com/package/@tinybigui/react">
       <img src="https://img.shields.io/npm/v/@tinybigui/react?style=flat-square" alt="npm version" />
     </a>
+    <a href="https://www.chromatic.com/builds?appId=tinybigui">
+      <img src="https://img.shields.io/badge/Chromatic-visual%20tests-FC521F?style=flat-square&logo=storybook&logoColor=white" alt="Chromatic visual tests" />
+    </a>
   </p>
 
   <p>
@@ -322,6 +325,15 @@ TinyBigUI stands on the shoulders of giants:
 - **[TypeScript](https://www.typescriptlang.org/)** - Type system
 
 Special thanks to all open-source contributors who make projects like this possible! 💙
+
+---
+
+## Contributors
+
+Thanks to all our contributors!
+
+<!-- ALL-CONTRIBUTORS-LIST:START -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ---
 
