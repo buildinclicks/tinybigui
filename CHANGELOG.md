@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-04-15
+
+### Fixed
+
+- **`@tinybigui/react`** — Updated npm README to remove misleading "Work in Progress" / "not yet published" language; reflects actual v0.1.0 released state
+- **`@tinybigui/tokens`** — Updated npm README to remove misleading "Work in Progress" / "not yet published" language; reflects actual v0.1.0 released state
+
 ## [0.1.0] - 2026-04-15
 
 ### Added
@@ -48,5 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Checkbox inline styles** — Replaced `style={{ fill: "var(--color-on-primary)" }}` with a Tailwind CSS class, eliminating the only inline style violation in the codebase
 - **Axe accessibility coverage** — Verified all 7 components pass automated axe checks; added axe test coverage across the test suite
 
-[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/buildinclicks/tinybigui/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/buildinclicks/tinybigui/releases/tag/v0.1.0

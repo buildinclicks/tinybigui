@@ -1,5 +1,11 @@
 # @tinybigui/react
 
+## 0.1.1
+
+### Patch Changes
+
+- 9a84c28: fix misleading pre-release language in npm readme
+
 ## 0.1.0
 
 ### Minor Changes
