@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Pre-release: v0.0.x**
+> **Released: v0.1.0** (2026-04-15)
 >
-> Phase 1a (Button, IconButton, FAB) and Phase 1b (TextField, Checkbox, Switch, Radio) are complete. The library is approaching its first public release (**v0.1.0**) and is **not yet published to npm**.
+> Phase 1a (Button, IconButton, FAB) and Phase 1b (TextField, Checkbox, Switch, Radio, RadioGroup) are complete and published to npm.
 >
 > Watch this repository to follow our progress!
 
@@ -56,8 +56,6 @@
 
 ## 🚀 Installation
 
-> **v0.1.0 is in preparation.** The package will be published to npm as part of the upcoming v0.1.0 release.
-
 ```bash
 npm install @tinybigui/react
 # or
@@ -70,10 +68,7 @@ yarn add @tinybigui/react
 
 ## 📖 Quick Start
 
-> **Coming Soon!** Full documentation will be available at [tinybigui.dev](https://tinybigui.dev)
-
 ```tsx
-// Preview of how it will work:
 import { Button } from "@tinybigui/react";
 import "@tinybigui/react/styles.css";
 
@@ -97,10 +92,10 @@ function App() {
 
 This is a monorepo containing multiple packages:
 
-| Package                                  | Description                   | Version     | Status                          |
-| ---------------------------------------- | ----------------------------- | ----------- | ------------------------------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | Coming soon | Pre-release: v0.1.0 coming soon |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | Coming soon | Pre-release: v0.1.0 coming soon |
+| Package                                  | Description                   | Version | Status   |
+| ---------------------------------------- | ----------------------------- | ------- | -------- |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.1.0   | Released |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.1.0   | Released |
 
 ---
 
@@ -134,7 +129,7 @@ This is a monorepo containing multiple packages:
 - [x] Checkbox component (49 tests)
 - [x] Radio component (47 tests)
 - [x] Switch component (50 tests)
-- [ ] First npm release (v0.1.0) — in preparation
+- [x] First npm release (v0.1.0) — released 2026-04-15
 
 ### Phase 2: Layout & Navigation
 
@@ -268,8 +263,8 @@ pnpm typecheck
 
 - **GitHub Repository**: [github.com/buildinclicks/tinybigui](https://github.com/buildinclicks/tinybigui)
 - **Documentation Site**: Coming soon at [tinybigui.dev](https://tinybigui.dev)
-- **Storybook**: Coming soon (interactive component playground)
-- **QA Phases**: See [/.qa-phases](.qa-phases) for milestone tracking toward v0.1.0
+- **Storybook**: Storybook 10 is set up — run `pnpm storybook` in `packages/react` to explore components locally
+- **QA Phases**: See [/.qa-phases](.qa-phases) for milestone tracking
 
 ---
 

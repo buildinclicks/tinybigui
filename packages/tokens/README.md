@@ -10,11 +10,11 @@ A comprehensive collection of Material Design 3 design tokens implemented as CSS
 
 ---
 
-## ⚠️ Status
+## ✅ Status
 
-> **Pre-release: v0.0.x**
+> **Released: v0.1.0** (2026-04-15)
 >
-> This package is complete and approaching its first public release (**v0.1.0**). It is **not yet published to npm**.
+> This package is published to npm. Install it with `npm install @tinybigui/tokens`.
 >
 > Follow our [GitHub repository](https://github.com/buildinclicks/tinybigui) for updates!
 
@@ -48,8 +48,6 @@ Design tokens are the **visual design atoms** of a design system. They're named 
 ---
 
 ## 📦 Installation
-
-> **v0.1.0 is in preparation.** This package will be available on npm as part of the upcoming v0.1.0 release.
 
 ```bash
 npm install @tinybigui/tokens

@@ -213,32 +213,32 @@
 
 ---
 
-## Phase 0.5: Pre-Release Setup (DO LATER)
+## Phase 0.5: Pre-Release Setup ✅
 
-> **When**: After Phase 1a code is complete, before v0.1.0 release  
+> **Completed**: All infrastructure completed as part of v0.1.0 release (2026-04-15)  
 > **Goal**: Full open-source infrastructure
 
 | Status | Task               | Description                          |
 | ------ | ------------------ | ------------------------------------ |
-| ⬜     | NPM organization   | Create `@tinybigui` org on npmjs.com |
-| ⬜     | NPM access token   | Generate automation token            |
-| ⬜     | GitHub Secrets     | Add `NPM_TOKEN` for publishing       |
-| ⬜     | Release workflow   | Auto-publish to NPM on release       |
-| ⬜     | Changesets setup   | Version management                   |
+| ✅     | NPM organization   | Create `@tinybigui` org on npmjs.com |
+| ✅     | NPM access token   | Generate automation token            |
+| ✅     | GitHub Secrets     | Add `NPM_TOKEN` for publishing       |
+| ✅     | Release workflow   | Auto-publish to NPM on release       |
+| ✅     | Changesets setup   | Version management                   |
 | ⬜     | Storybook deploy   | Vercel deployment workflow           |
-| ⬜     | Chromatic setup    | Visual regression testing            |
+| ✅     | Chromatic setup    | Visual regression testing            |
 | ⬜     | GitHub Discussions | Enable and configure categories      |
 | ⬜     | Issue labels       | Create standard labels               |
 | ⬜     | Milestones         | Create v0.1.0, v0.2.0, v1.0.0        |
 | ⬜     | Issue templates    | Bug report, feature request          |
 | ⬜     | PR template        | Pull request template                |
 | ⬜     | CONTRIBUTING.md    | Full contribution guide              |
-| ⬜     | CODE_OF_CONDUCT.md | Contributor Covenant                 |
-| ⬜     | SECURITY.md        | Security policy                      |
-| ⬜     | Dependabot         | Enable security updates              |
+| ✅     | CODE_OF_CONDUCT.md | Contributor Covenant                 |
+| ✅     | SECURITY.md        | Security policy                      |
+| ✅     | Dependabot         | Enable security updates              |
 | ⬜     | All Contributors   | Install bot                          |
-| ⬜     | Full README        | Complete documentation               |
-| ⬜     | First release      | Publish v0.1.0                       |
+| ✅     | Full README        | Complete documentation               |
+| ✅     | First release      | Publish v0.1.0                       |
 
 ---
 
@@ -252,7 +252,8 @@
 
 ### Next Steps
 
-1. Work through `.qa-phases/phase-0/` milestones toward v0.1.0
+1. v0.1.0 released 2026-04-15 ✅
+2. Begin Phase 2 (Navigation components: AppBar, Tabs, Drawer, Bottom Navigation)
 
 ---
 
@@ -265,4 +266,4 @@
 
 ---
 
-_Last Updated: April 13, 2026_
+_Last Updated: April 15, 2026_
