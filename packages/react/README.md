@@ -10,11 +10,11 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ---
 
-## ⚠️ Status
+## ✅ Status
 
-> **🚧 Work in Progress**
+> **Released: v0.1.0** (2026-04-15)
 >
-> This package is currently in active development (Phase 0) and is **not yet published to npm**.
+> This package is published to npm. Install it with `npm install @tinybigui/react`.
 >
 > Follow our [GitHub repository](https://github.com/buildinclicks/tinybigui) for updates!
 
@@ -36,8 +36,6 @@ A modern, accessible React component library implementing Google's Material Desi
 ---
 
 ## 📦 Installation
-
-> **Coming Soon!** This package will be available once we reach Phase 1b.
 
 ```bash
 npm install @tinybigui/react
@@ -74,18 +72,16 @@ import "@tinybigui/react/styles.css";
 ### 2. Use Components
 
 ```tsx
-import { Button, TextField, Card } from "@tinybigui/react";
+import { Button, TextField, Checkbox } from "@tinybigui/react";
 
 function App() {
   return (
     <div>
-      <Card>
-        <h1>Welcome to TinyBigUI</h1>
-        <TextField label="Email" type="email" />
-        <Button variant="filled" color="primary">
-          Sign Up
-        </Button>
-      </Card>
+      <TextField label="Email" type="email" />
+      <Checkbox label="Accept terms" />
+      <Button variant="filled" color="primary">
+        Sign Up
+      </Button>
     </div>
   );
 }
@@ -106,23 +102,23 @@ Override CSS variables to customize the theme:
 
 ## 📚 Components
 
-### Phase 1a: Core Buttons (In Progress)
+### Phase 1a: Core Buttons ✅
 
-| Component              | Status | Description                   |
-| ---------------------- | ------ | ----------------------------- |
-| `Button`               | 🚧     | Standard button with variants |
-| `IconButton`           | 🚧     | Button with icon only         |
-| `FloatingActionButton` | 🚧     | FAB for primary actions       |
+| Component    | Status | Description                   |
+| ------------ | ------ | ----------------------------- |
+| `Button`     | ✅     | Standard button with variants |
+| `IconButton` | ✅     | Button with icon only         |
+| `FAB`        | ✅     | FAB for primary actions       |
 
-### Phase 1b: Form Components (Planned)
+### Phase 1b: Form Components ✅
 
-| Component   | Status | Description           |
-| ----------- | ------ | --------------------- |
-| `TextField` | 📋     | Text input with label |
-| `Select`    | 📋     | Dropdown selection    |
-| `Checkbox`  | 📋     | Checkbox input        |
-| `Radio`     | 📋     | Radio button input    |
-| `Switch`    | 📋     | Toggle switch         |
+| Component    | Status | Description           |
+| ------------ | ------ | --------------------- |
+| `TextField`  | ✅     | Text input with label |
+| `Checkbox`   | ✅     | Checkbox input        |
+| `Radio`      | ✅     | Radio button input    |
+| `RadioGroup` | ✅     | Radio group container |
+| `Switch`     | ✅     | Toggle switch         |
 
 ### Phase 2: Layout & Navigation (Planned)
 
@@ -332,7 +328,7 @@ Components work seamlessly with Tailwind utilities:
 
 - **GitHub Repository**: [github.com/buildinclicks/tinybigui](https://github.com/buildinclicks/tinybigui)
 - **Documentation Site**: Coming soon at [tinybigui.dev](https://tinybigui.dev)
-- **Storybook**: Coming soon (interactive component playground)
+- **Storybook**: Storybook 10 is set up in `packages/react/.storybook/` — run `pnpm storybook` to explore components locally
 - **API Reference**: Coming soon
 
 ---

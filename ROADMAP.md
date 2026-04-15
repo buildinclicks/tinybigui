@@ -56,13 +56,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## In Progress
 
-### v0.1.0 Release Preparation
+### v0.2.0 Phase 2 — Navigation (Next)
 
-- QA milestones (`.qa-phases/phase-0/`) in progress
-- Documentation updates
-- CHANGELOG creation (M8)
-- npm publishing infrastructure (M9)
-- Release workflow automation (M10)
+Planning in progress. See Planned Work below.
 
 ## Planned Work
 
@@ -122,4 +118,4 @@ Have an idea for a new component or feature? Open a [feature request](https://gi
 ## Stay Updated
 
 - Watch this repository for release notifications
-- Check the [Changelog](CHANGELOG.md) for release notes _(CHANGELOG will be created as part of v0.1.0 release — M8)_
+- Check the [Changelog](CHANGELOG.md) for release notes
