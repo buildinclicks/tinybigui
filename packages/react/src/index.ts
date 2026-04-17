@@ -41,6 +41,9 @@ export {
 } from "./utils";
 
 // Components
+export { AppBar, AppBarHeadless } from "./components/AppBar";
+export type { AppBarProps, AppBarHeadlessProps, AppBarVariant } from "./components/AppBar";
+
 export { Button } from "./components/Button";
 export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./components/Button";
 

@@ -1,3 +1,6 @@
+export { AppBar, AppBarHeadless } from "./AppBar";
+export type { AppBarProps, AppBarHeadlessProps, AppBarVariant } from "./AppBar";
+
 export { Button } from "./Button";
 export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./Button";
 
