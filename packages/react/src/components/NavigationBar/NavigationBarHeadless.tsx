@@ -2,15 +2,24 @@
 
 import { createContext, forwardRef, useContext, useRef } from "react";
 import { useTabList, useTab, useFocusRing } from "react-aria";
-import { useTabListState, Item } from "react-stately";
+import { useTabListState, Item, type TabListState } from "react-stately";
 import { mergeProps } from "@react-aria/utils";
-import type { NavigationBarContextValue } from "./NavigationBar.types";
 import type {
   HeadlessNavigationBarProps,
   HeadlessNavigationBarItemProps,
 } from "./NavigationBar.types";
 
 // ─── Context ──────────────────────────────────────────────────────────────────
+
+/**
+ * Context value shared between HeadlessNavigationBar and HeadlessNavigationBarItem.
+ * @internal
+ */
+export interface NavigationBarContextValue {
+  state: TabListState<object>;
+  hideLabels: boolean;
+  disableRipple: boolean;
+}
 
 /**
  * Shared context between HeadlessNavigationBar and HeadlessNavigationBarItem.

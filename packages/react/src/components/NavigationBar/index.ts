@@ -7,6 +7,7 @@ export {
   HeadlessNavigationBar,
   HeadlessNavigationBarItem,
   NavigationBarContext,
+  type NavigationBarContextValue,
 } from "./NavigationBarHeadless";
 
 // CVA Variants (for external customization)
@@ -32,5 +33,4 @@ export type {
   HeadlessNavigationBarProps,
   HeadlessNavigationBarItemProps,
   NavigationBarItemRenderProps,
-  NavigationBarContextValue,
 } from "./NavigationBar.types";
