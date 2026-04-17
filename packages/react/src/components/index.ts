@@ -47,3 +47,24 @@ export type {
   HeadlessNavigationBarItemProps,
   NavigationBarItemRenderProps,
 } from "./NavigationBar";
+
+export {
+  Tabs,
+  TabList,
+  Tab,
+  TabPanel,
+  HeadlessTabList,
+  HeadlessTab,
+  HeadlessTabPanel,
+} from "./Tabs";
+export type {
+  TabsProps,
+  TabListProps,
+  TabProps,
+  TabPanelProps,
+  TabVariant,
+  TabLayout,
+  TabItem,
+  HeadlessTabProps,
+  HeadlessTabPanelProps,
+} from "./Tabs";

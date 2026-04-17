@@ -77,6 +77,27 @@ export type {
 } from "./components/Radio";
 
 export {
+  Tabs,
+  TabList,
+  Tab,
+  TabPanel,
+  HeadlessTabList,
+  HeadlessTab,
+  HeadlessTabPanel,
+} from "./components/Tabs";
+export type {
+  TabsProps,
+  TabListProps,
+  TabProps,
+  TabPanelProps,
+  TabVariant,
+  TabLayout,
+  TabItem,
+  HeadlessTabProps,
+  HeadlessTabPanelProps,
+} from "./components/Tabs";
+
+export {
   NavigationBar,
   NavigationBarItem,
   HeadlessNavigationBar,
