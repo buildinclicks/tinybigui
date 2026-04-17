@@ -112,3 +112,20 @@ export type {
   HeadlessNavigationBarItemProps,
   NavigationBarItemRenderProps,
 } from "./components/NavigationBar";
+
+export {
+  Drawer,
+  DrawerItem,
+  DrawerSection,
+  HeadlessDrawer,
+  HeadlessDrawerItem,
+} from "./components/Drawer";
+export type {
+  DrawerProps,
+  DrawerItemProps,
+  DrawerSectionProps,
+  DrawerVariant,
+  HeadlessDrawerProps,
+  HeadlessDrawerItemProps,
+  DrawerContextValue,
+} from "./components/Drawer";
