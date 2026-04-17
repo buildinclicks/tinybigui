@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { NavigationBar } from "./NavigationBar";
 import { NavigationBarItem } from "./NavigationBarItem";
 import { HeadlessNavigationBar, HeadlessNavigationBarItem } from "./NavigationBarHeadless";
-import type { NavigationBarItemConfig } from "./NavigationBar.types";
+import type { NavigationBarItemConfig, NavigationBarProps } from "./NavigationBar.types";
 import type { Key } from "react-aria";
 
 // ─── MD3 Material Icons (inline SVG) ─────────────────────────────────────────
@@ -250,7 +250,9 @@ function PlaygroundExample({
  * The current active destination is shown above the bar.
  */
 export const Controlled: Story = {
-  render: (args) => <ControlledExample items={args.items ?? fourItems} />,
+  render: (args: Partial<NavigationBarProps>) => (
+    <ControlledExample items={args.items ?? fourItems} />
+  ),
   args: {
     items: fourItems,
   },
@@ -268,7 +270,7 @@ export const Controlled: Story = {
  * Interactive playground: full control over all props.
  */
 export const Playground: Story = {
-  render: (args) => (
+  render: (args: Partial<NavigationBarProps>) => (
     <PlaygroundExample
       items={args.items ?? fiveItems}
       hideLabels={args.hideLabels ?? false}
