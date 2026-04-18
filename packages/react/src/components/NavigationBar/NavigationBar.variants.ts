@@ -129,7 +129,7 @@ export const navigationBarItemVariants = cva(
  */
 export const indicatorPillVariants = cva(
   [
-    "absolute inset-x-0 mx-auto",
+    "absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2",
     "w-16 h-8",
     "rounded-full bg-secondary-container",
     "transition-[transform,opacity] duration-medium2 ease-emphasized",

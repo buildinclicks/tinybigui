@@ -112,7 +112,7 @@ export const switchHandleContainerVariants = cva(
        */
       selected: {
         true: [
-          "left-[28px]", // Position when ON (52px - 24px = 28px)
+          "left-[24px]", // Position when ON (52px - 24px = 28px)
           "text-primary", // State layer color
         ],
         false: [

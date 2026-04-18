@@ -15,7 +15,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 export const iconButtonVariants = cva(
   [
     // Base classes (always applied)
-    "relative inline-flex items-center justify-center",
+    "relative inline-flex items-center justify-center cursor-pointer",
     "overflow-hidden rounded-full", // Circular shape
     "transition-all duration-200",
     "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",

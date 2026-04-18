@@ -120,7 +120,10 @@ export const NavigationBarItem = forwardRef<HTMLButtonElement, NavigationBarItem
           <span
             data-indicator-pill
             data-active={isActive}
-            className={cn(indicatorPillVariants({ isActive }))}
+            className={cn(
+              indicatorPillVariants({ isActive }),
+              !hideLabels && !showBadge && "-mt-3.5"
+            )}
             aria-hidden="true"
           />
 
