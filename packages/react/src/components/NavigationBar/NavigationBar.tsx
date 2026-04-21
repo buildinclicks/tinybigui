@@ -83,7 +83,7 @@ function ItemVisual({ config, isActive, hideLabels, disableRipple }: ItemVisualP
         data-indicator-pill
         data-active={isActive}
         aria-hidden="true"
-        className={cn(indicatorPillVariants({ isActive }), !hideLabels && !showBadge && "-mt-3.5")}
+        className={cn(indicatorPillVariants({ isActive }), !hideLabels && "-mt-3.5")}
       />
 
       {/* Icon + Badge wrapper */}

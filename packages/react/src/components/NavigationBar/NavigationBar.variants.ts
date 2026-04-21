@@ -171,12 +171,12 @@ export const badgeVariants = cva(
       isDot: {
         true: [
           // Dot: 6dp diameter, top-right of icon
-          "top-0 right-3.5",
+          "top-0 right-0.5 z-10",
           "w-1.5 h-1.5 min-w-0 rounded-full",
         ],
         false: [
           // Numeric: pill shape, top-right of icon
-          "top-0 right-2",
+          "-top-1 left-3 z-10",
           "min-w-[1rem] h-4 px-1 rounded-full",
         ],
       },
