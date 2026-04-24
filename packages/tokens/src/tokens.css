@@ -62,6 +62,9 @@
   --md-sys-color-background: #fffbfe;
   --md-sys-color-on-background: #1c1b1f;
 
+  /* Scrim */
+  --md-sys-color-scrim: #000000;
+
   /* ==========================================================================
      TYPOGRAPHY TOKENS
      Material Design 3 Type Scale - 5 categories, 3 sizes each (15 total)
@@ -251,6 +254,9 @@
   /* Background */
   --md-sys-color-background: #1c1b1f;
   --md-sys-color-on-background: #e6e1e5;
+
+  /* Scrim */
+  --md-sys-color-scrim: #000000;
 }
 
 /* System/OS dark mode preference (activates when no .light class is present) */
@@ -300,6 +306,9 @@
     /* Background */
     --md-sys-color-background: #1c1b1f;
     --md-sys-color-on-background: #e6e1e5;
+
+    /* Scrim */
+    --md-sys-color-scrim: #000000;
   }
 }
 
@@ -371,6 +380,9 @@ body {
   --color-background: var(--md-sys-color-background);
   --color-on-background: var(--md-sys-color-on-background);
 
+  /* Scrim color */
+  --color-scrim: var(--md-sys-color-scrim);
+
   /* Elevation/Shadow utilities
      Maps MD3 elevation levels to Tailwind box-shadow utilities
      Usage: shadow-elevation-1, shadow-elevation-2, etc. */
@@ -403,6 +415,7 @@ body {
   /* Opacity values for MD3 state layers */
   --opacity-8: 0.08;
   --opacity-12: 0.12;
+  --opacity-32: 0.32;
   --opacity-38: 0.38;
 
   /* Typography utilities
@@ -479,4 +492,15 @@ body {
   --spacing-appbar-small: 4rem; /* 64px */
   --spacing-appbar-medium: 7rem; /* 112px */
   --spacing-appbar-large: 9.5rem; /* 152px */
+
+  /* Drawer width: MD3 spec = 360dp */
+  --spacing-drawer: 22.5rem; /* 360px */
+
+  /* Shape radius utilities for MD3 components */
+  --radius-xs: var(--md-sys-shape-corner-extra-small); /* 4px */
+  --radius-sm: var(--md-sys-shape-corner-small); /* 8px */
+  --radius-md: var(--md-sys-shape-corner-medium); /* 12px */
+  --radius-lg: var(--md-sys-shape-corner-large); /* 16px */
+  --radius-xl: var(--md-sys-shape-corner-extra-large); /* 28px */
+  --radius-full: var(--md-sys-shape-corner-full);
 }

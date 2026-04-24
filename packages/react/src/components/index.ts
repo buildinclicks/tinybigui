@@ -68,3 +68,14 @@ export type {
   HeadlessTabProps,
   HeadlessTabPanelProps,
 } from "./Tabs";
+
+export { Drawer, DrawerItem, DrawerSection, HeadlessDrawer, HeadlessDrawerItem } from "./Drawer";
+export type {
+  DrawerProps,
+  DrawerItemProps,
+  DrawerSectionProps,
+  DrawerVariant,
+  HeadlessDrawerProps,
+  HeadlessDrawerItemProps,
+  DrawerContextValue,
+} from "./Drawer";
