@@ -24,6 +24,8 @@ export const drawerVariants = cva(
     "transition-transform duration-medium4 ease-emphasized-decelerate",
     // Focus outline removal (focus management handled by FocusScope / React Aria)
     "outline-none",
+    // Padding for content spacing
+    "px-3",
   ],
   {
     variants: {
@@ -147,7 +149,7 @@ export const drawerSectionVariants = cva(["flex flex-col w-full"]);
  * Header text: `text-title-small text-on-surface-variant` per MD3 spec.
  */
 export const drawerSectionHeaderVariants = cva([
-  "px-7 pt-4 pb-2",
+  "px-4 pt-4 pb-2",
   "text-title-small text-on-surface-variant",
   "select-none",
 ]);
