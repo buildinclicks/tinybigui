@@ -12,7 +12,6 @@ import { cva, type VariantProps } from "class-variance-authority";
  * - Outline width: 2dp
  * - State layers: 8% hover, 12% focus/pressed
  * - Disabled: 38% opacity
- * - Label spacing: 16px (ml-4)
  */
 export const checkboxVariants = cva(
   [
@@ -199,7 +198,7 @@ export const checkboxLabelVariants = cva(
     "text-sm", // MD3: Body Medium (14px)
     "text-on-surface",
     "select-none",
-    "ml-4", // 16px spacing between checkbox and label (MD3 standard)
+    "ml-1.5",
   ],
   {
     variants: {

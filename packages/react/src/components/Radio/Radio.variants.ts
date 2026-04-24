@@ -248,6 +248,7 @@ export const radioLabelVariants = cva(
     "text-sm", // MD3: Body Medium (14px)
     "text-on-surface",
     "select-none",
+    "ml-1.5",
   ],
   {
     variants: {
