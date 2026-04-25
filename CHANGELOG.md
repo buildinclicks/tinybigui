@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-25
+
+### Added
+
+#### `@tinybigui/react`
+
+- **NavigationBar** — MD3 Bottom Navigation Bar with 3–5 destination items; animated active indicator pill; badge support (dot, numeric, "999+" truncation); `hideLabels` prop for icon-only mode; controlled and uncontrolled usage; full keyboard navigation (Arrow Left/Right, Home, End); WCAG 2.1 AA via `role="navigation"` + `role="tablist"`; 46 tests including axe audit
+- **AppBar** — MD3 Top App Bar with four size variants (small, center-aligned, medium, large); composable navigation and action icon slots; scroll-triggered elevation via `useScrollElevation` hook
+- **Tabs** — MD3 Primary and Secondary tab variants; composable `Tab`, `TabList`, and `TabPanel` slots; animated active indicator; full keyboard navigation; WCAG 2.1 AA via React Aria `useTabList`/`useTab`
+- **NavigationDrawer** — MD3 Navigation Drawer with modal and standard variants; composable `DrawerItem` and `DrawerSection` slots; scrim overlay; focus trap; WCAG 2.1 AA via React Aria `useDialog`/`useOverlay`
+
+#### `@tinybigui/tokens`
+
+- Typography, motion, easing, and spacing token mappings added to Tailwind `@theme` for AppBar and Tabs
+- Scrim color, `opacity-32`, drawer width, and shape tokens
+
+### Fixed
+
+- Button tonal/primary variant now correctly uses `bg-primary-container text-on-primary-container` per MD3 spec
+- NavigationBar active status indicator styling
+- Drawer component spacing and alignment
+- TextField label positioning and placeholder visibility
+- Style consistency across Checkbox, Radio, Switch, FAB, and IconButton variants
+- Tabs `Tab.tsx` state layer rendering order
+
 ## [0.1.1] - 2026-04-15
 
 ### Fixed
@@ -55,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Checkbox inline styles** — Replaced `style={{ fill: "var(--color-on-primary)" }}` with a Tailwind CSS class, eliminating the only inline style violation in the codebase
 - **Axe accessibility coverage** — Verified all 7 components pass automated axe checks; added axe test coverage across the test suite
 
-[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/buildinclicks/tinybigui/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/buildinclicks/tinybigui/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/buildinclicks/tinybigui/releases/tag/v0.1.0

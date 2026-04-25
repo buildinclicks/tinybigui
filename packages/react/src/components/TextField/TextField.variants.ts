@@ -183,8 +183,8 @@ export const textFieldLabelVariants = cva(
   {
     variants: {
       variant: {
-        filled: "top-4",
-        outlined: "top-3 bg-surface px-1",
+        filled: "top-2.5",
+        outlined: "top-2.5 bg-surface px-1",
       },
       size: {
         small: "text-sm",
@@ -192,7 +192,7 @@ export const textFieldLabelVariants = cva(
         large: "text-lg",
       },
       floating: {
-        true: "-translate-y-6 scale-75",
+        true: "-translate-y-5 scale-75",
         false: "scale-100",
       },
       focused: {
@@ -217,7 +217,7 @@ export const textFieldLabelVariants = cva(
       {
         variant: "outlined",
         floating: true,
-        className: "-top-2",
+        className: "top-2.5",
       },
     ],
     defaultVariants: {

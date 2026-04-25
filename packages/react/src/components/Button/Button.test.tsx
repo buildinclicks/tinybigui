@@ -47,7 +47,7 @@ describe("Button", () => {
     test("renders tonal variant", () => {
       render(<Button variant="tonal">Tonal</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-secondary-container", "text-on-secondary-container");
+      expect(button).toHaveClass("bg-primary-container", "text-on-primary-container");
     });
 
     test("renders elevated variant", () => {

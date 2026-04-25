@@ -41,6 +41,9 @@ export {
 } from "./utils";
 
 // Components
+export { AppBar, AppBarHeadless } from "./components/AppBar";
+export type { AppBarProps, AppBarHeadlessProps, AppBarVariant } from "./components/AppBar";
+
 export { Button } from "./components/Button";
 export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./components/Button";
 
@@ -72,3 +75,57 @@ export type {
   RadioHeadlessProps,
   RadioGroupHeadlessProps,
 } from "./components/Radio";
+
+export {
+  Tabs,
+  TabList,
+  Tab,
+  TabPanel,
+  HeadlessTabList,
+  HeadlessTab,
+  HeadlessTabPanel,
+} from "./components/Tabs";
+export type {
+  TabsProps,
+  TabListProps,
+  TabProps,
+  TabPanelProps,
+  TabVariant,
+  TabLayout,
+  TabItem,
+  HeadlessTabProps,
+  HeadlessTabPanelProps,
+} from "./components/Tabs";
+
+export {
+  NavigationBar,
+  NavigationBarItem,
+  HeadlessNavigationBar,
+  HeadlessNavigationBarItem,
+} from "./components/NavigationBar";
+export type {
+  NavigationBarProps,
+  NavigationBarItemProps,
+  NavigationBarItemConfig,
+  NavigationBarBadge,
+  HeadlessNavigationBarProps,
+  HeadlessNavigationBarItemProps,
+  NavigationBarItemRenderProps,
+} from "./components/NavigationBar";
+
+export {
+  Drawer,
+  DrawerItem,
+  DrawerSection,
+  HeadlessDrawer,
+  HeadlessDrawerItem,
+} from "./components/Drawer";
+export type {
+  DrawerProps,
+  DrawerItemProps,
+  DrawerSectionProps,
+  DrawerVariant,
+  HeadlessDrawerProps,
+  HeadlessDrawerItemProps,
+  DrawerContextValue,
+} from "./components/Drawer";
