@@ -61,7 +61,7 @@ jobs:
           fi
 
       - name: 🔑 Configure npm auth
-        run: npm set //registry.npmjs.org/:_authToken $NODE_AUTH_TOKEN
+        run: npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
