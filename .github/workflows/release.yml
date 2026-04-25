@@ -60,6 +60,11 @@ jobs:
             echo "tag=latest" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: 🔑 Configure npm auth
+        run: npm set //registry.npmjs.org/:_authToken $NODE_AUTH_TOKEN
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: 🚀 Publish @tinybigui/tokens
         run: pnpm publish --filter @tinybigui/tokens --no-git-checks --provenance --tag ${{ steps.dist-tag.outputs.tag }}
         env:
