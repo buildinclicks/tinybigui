@@ -129,3 +129,6 @@ export type {
   HeadlessDrawerItemProps,
   DrawerContextValue,
 } from "./components/Drawer";
+
+export { Progress, ProgressHeadless } from "./components/Progress";
+export type { ProgressProps, ProgressHeadlessProps } from "./components/Progress";
