@@ -189,7 +189,8 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
                         hasLeadingIcon: !!leadingIcon,
                         hasTrailingIcon: !!trailingIcon,
                         multiline: true,
-                      })
+                      }),
+                      label && "placeholder:opacity-0"
                     )}
                     rows={rows}
                     spellCheck={spellCheckProp}
@@ -206,7 +207,8 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
                         hasLeadingIcon: !!leadingIcon,
                         hasTrailingIcon: !!trailingIcon,
                         multiline: false,
-                      })
+                      }),
+                      label && "placeholder:opacity-0" // Hide placeholder when there's a value to prevent overlap with floating label
                     )}
                     spellCheck={spellCheckProp}
                   />

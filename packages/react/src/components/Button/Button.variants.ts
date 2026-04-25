@@ -143,7 +143,7 @@ export const buttonVariants = cva(
       {
         variant: "tonal",
         color: "primary",
-        className: "bg-secondary-container text-on-secondary-container",
+        className: "bg-primary-container text-on-primary-container",
       },
       {
         variant: "tonal",

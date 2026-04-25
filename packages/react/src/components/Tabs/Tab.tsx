@@ -150,7 +150,8 @@ export const Tab = forwardRef<TabElement, TabProps>(
             disabled: finalIsDisabled,
             layout,
           }),
-          isFocusVisible && "outline-primary outline outline-2 outline-offset-2",
+          isFocusVisible && "outline-primary outline-2 outline-offset-2",
+          hasLabel && hasIcon && "min-h-16",
           className
         )}
         {...htmlProps}

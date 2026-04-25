@@ -103,7 +103,7 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
         )}
 
         {/* Label and optional secondary text */}
-        <span className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <span className="relative z-10 flex min-w-0 flex-1 flex-col text-left">
           <span className="truncate">{label}</span>
           {secondaryText && (
             <span className="text-body-small truncate opacity-70">{secondaryText}</span>
@@ -112,7 +112,10 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
 
         {/* Trailing badge */}
         {badge && (
-          <span className="relative z-10 ml-auto flex shrink-0 items-center" aria-hidden="true">
+          <span
+            className="relative z-10 ml-auto flex shrink-0 items-center pr-2"
+            aria-hidden="true"
+          >
             {badge}
           </span>
         )}

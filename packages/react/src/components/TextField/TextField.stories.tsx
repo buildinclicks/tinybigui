@@ -508,8 +508,6 @@ export const InputTypes: Story = {
       <TextField label="Number" type="number" placeholder="123" />
       <TextField label="Telephone" type="tel" placeholder="(555) 123-4567" />
       <TextField label="URL" type="url" placeholder="https://example.com" />
-      <TextField label="Date" type="date" />
-      <TextField label="Time" type="time" />
     </div>
   ),
 };

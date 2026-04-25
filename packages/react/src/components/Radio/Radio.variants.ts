@@ -248,7 +248,7 @@ export const radioLabelVariants = cva(
     "text-sm", // MD3: Body Medium (14px)
     "text-on-surface",
     "select-none",
-    "ml-4", // 16px spacing between radio and label (MD3 standard)
+    "ml-1.5",
   ],
   {
     variants: {

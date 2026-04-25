@@ -280,7 +280,7 @@ const ScrollBehaviorDemo = (): React.ReactElement => {
         <button
           type="button"
           onClick={() => setScrolled((s) => !s)}
-          className="bg-primary text-on-primary text-label-large rounded-full px-4 py-2"
+          className="bg-primary text-on-primary text-label-large cursor-pointer rounded-full px-4 py-2"
         >
           Toggle scrolled: {scrolled ? "ON" : "OFF"}
         </button>
