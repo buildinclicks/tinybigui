@@ -132,3 +132,31 @@ export type {
 
 export { Progress, ProgressHeadless } from "./components/Progress";
 export type { ProgressProps, ProgressHeadlessProps } from "./components/Progress";
+
+export {
+  MenuTrigger,
+  Menu,
+  MenuItem,
+  MenuSection,
+  MenuDivider,
+  HeadlessMenuTrigger,
+  HeadlessMenu,
+  HeadlessMenuItem,
+  HeadlessMenuSection,
+  HeadlessMenuDivider,
+  MenuContext,
+  useMenuContext,
+} from "./components/Menu";
+export type {
+  MenuVariant,
+  MenuProps,
+  MenuTriggerProps,
+  MenuItemProps,
+  MenuSectionProps,
+  MenuDividerProps,
+  HeadlessMenuProps,
+  HeadlessMenuTriggerProps,
+  HeadlessMenuItemProps,
+  HeadlessMenuSectionProps,
+  MenuContextValue,
+} from "./components/Menu";
