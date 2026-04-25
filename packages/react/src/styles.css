@@ -18,6 +18,9 @@
    Base styles for all components (future)
    ========================================================================== */
 
+/* Progress Indicator — indeterminate keyframes */
+@import "./components/Progress/Progress.css";
+
 /* TODO: Component-specific styles will be added here as we build components:
  * - State layers (hover, press, focus states)
  * - Ripple effects
