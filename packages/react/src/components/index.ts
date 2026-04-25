@@ -110,3 +110,20 @@ export type {
   HeadlessMenuSectionProps,
   MenuContextValue,
 } from "./Menu";
+
+export {
+  Snackbar,
+  SnackbarHeadless,
+  SnackbarProvider,
+  SnackbarContext,
+  useSnackbar,
+} from "./Snackbar";
+export type {
+  SnackbarProps,
+  SnackbarHeadlessProps,
+  SnackbarProviderProps,
+  SnackbarContextValue,
+  SnackbarSeverity,
+  SnackbarAction,
+  SnackbarItem,
+} from "./Snackbar";
