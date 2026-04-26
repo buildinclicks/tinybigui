@@ -177,3 +177,23 @@ export type {
   SnackbarAction,
   SnackbarItem,
 } from "./components/Snackbar";
+
+export {
+  Dialog,
+  DialogHeadline,
+  DialogContent,
+  DialogActions,
+  DialogHeadless,
+  DialogContext,
+  useDialogContext,
+} from "./components/Dialog";
+export type {
+  DialogVariant,
+  DialogAnimationState,
+  DialogProps,
+  DialogHeadlessProps,
+  DialogHeadlineProps,
+  DialogContentProps,
+  DialogActionsProps,
+  DialogContextValue,
+} from "./components/Dialog";
