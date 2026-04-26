@@ -519,6 +519,9 @@ body {
   /* Snackbar max width: MD3 spec = 568dp */
   --spacing-snackbar-max: 35.5rem; /* 568px */
 
+  /* Dialog max width: MD3 spec = 560dp */
+  --spacing-dialog-max: 35rem; /* 560px */
+
   /* Shape radius utilities for MD3 components */
   --radius-xs: var(--md-sys-shape-corner-extra-small); /* 4px */
   --radius-sm: var(--md-sys-shape-corner-small); /* 8px */
