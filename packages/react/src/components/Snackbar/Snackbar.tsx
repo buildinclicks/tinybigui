@@ -8,14 +8,16 @@ import { SnackbarHeadless } from "./SnackbarHeadless";
 import {
   snackbarAnimationVariants,
   snackbarBaseVariants,
+  snackbarPositionVariants,
   snackbarContentVariants,
   snackbarMessageVariants,
   snackbarSupportingTextVariants,
   snackbarActionVariants,
   snackbarCloseVariants,
+  getEnterDirection,
 } from "./Snackbar.variants";
 import type { SnackbarAnimationState } from "./SnackbarHeadless";
-import type { SnackbarProps } from "./Snackbar.types";
+import type { SnackbarPosition, SnackbarProps } from "./Snackbar.types";
 
 /**
  * Close icon SVG (24dp, MD3 standard close symbol).
@@ -74,6 +76,7 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
     showClose = false,
     duration = 4000,
     severity = "default",
+    position = "bottom-center",
     onClose,
     className,
   },
@@ -81,8 +84,12 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
 ) {
   const isTwoLine = Boolean(supportingText);
 
-  // Base structural classes (not animation-state-dependent)
-  const baseClassName = cn(snackbarBaseVariants({ twoLine: isTwoLine }), className);
+  // Base structural classes merged with position classes (not animation-state-dependent)
+  const baseClassName = cn(
+    snackbarBaseVariants({ twoLine: isTwoLine }),
+    snackbarPositionVariants({ position }),
+    className
+  );
 
   return (
     <SnackbarHeadless
@@ -93,10 +100,11 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
       showClose={showClose}
       duration={duration}
       severity={severity}
+      position={position}
       {...(onClose !== undefined && { onClose })}
       className={baseClassName}
-      getAnimationClassName={(state: SnackbarAnimationState) =>
-        snackbarAnimationVariants({ animationState: state })
+      getAnimationClassName={(state: SnackbarAnimationState, pos: SnackbarPosition) =>
+        snackbarAnimationVariants({ animationState: state, enterDirection: getEnterDirection(pos) })
       }
     >
       {({ onClose: triggerClose }) => (

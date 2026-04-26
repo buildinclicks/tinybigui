@@ -1,5 +1,23 @@
 import type { ReactNode } from "react";
 
+// ─── Position ────────────────────────────────────────────────────────────────
+
+/**
+ * Screen position of the Snackbar.
+ *
+ * MD3 default is `bottom-center`. All six positions are supported for
+ * application-specific layout needs (e.g. presence of a FAB or navigation bar).
+ *
+ * @default 'bottom-center'
+ */
+export type SnackbarPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
+
 // ─── Severity ────────────────────────────────────────────────────────────────
 
 /**
@@ -107,6 +125,12 @@ export interface SnackbarProps {
   severity?: SnackbarSeverity;
 
   /**
+   * Screen position of the Snackbar.
+   * @default 'bottom-center'
+   */
+  position?: SnackbarPosition;
+
+  /**
    * Callback fired when the Snackbar finishes its exit animation and is removed.
    * Also fires when the close icon is pressed.
    */
@@ -154,15 +178,17 @@ export interface SnackbarHeadlessProps extends Omit<SnackbarProps, "className"> 
 
   /**
    * Optional callback that returns additional CSS classes based on the current
-   * animation state. Used by the styled `Snackbar` layer to inject CVA
-   * animation variant classes onto the headless container div at render time.
+   * animation state and position. Used by the styled `Snackbar` layer to inject
+   * CVA animation + position variant classes onto the headless container div.
    *
    * @example
    * ```tsx
-   * getAnimationClassName={(state) => snackbarAnimationVariants({ animationState: state })}
+   * getAnimationClassName={(state, pos) =>
+   *   snackbarAnimationVariants({ animationState: state, enterDirection: getEnterDirection(pos) })
+   * }
    * ```
    */
-  getAnimationClassName?: (state: SnackbarAnimationState) => string;
+  getAnimationClassName?: (state: SnackbarAnimationState, position: SnackbarPosition) => string;
 }
 
 // ─── Queue ───────────────────────────────────────────────────────────────────

@@ -48,6 +48,7 @@ export const SnackbarHeadless = forwardRef<HTMLDivElement, SnackbarHeadlessProps
       showClose,
       duration = 4000,
       severity = "default",
+      position = "bottom-center",
       onClose,
       children,
       className,
@@ -195,8 +196,8 @@ export const SnackbarHeadless = forwardRef<HTMLDivElement, SnackbarHeadlessProps
         ? ({ role: "alert", "aria-live": "assertive", "aria-atomic": "true" } as const)
         : ({ role: "status", "aria-live": "polite", "aria-atomic": "true" } as const);
 
-    // Merge base className with animation-state-dependent classes
-    const computedClassName = cn(className, getAnimationClassName?.(animationState));
+    // Merge base className with animation-state and position-dependent classes
+    const computedClassName = cn(className, getAnimationClassName?.(animationState, position));
 
     // Resolve children — render-prop or static ReactNode
     const childContent =

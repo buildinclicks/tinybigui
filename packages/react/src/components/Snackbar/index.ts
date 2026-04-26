@@ -12,20 +12,24 @@ export { SnackbarProvider, SnackbarContext, useSnackbar } from "./SnackbarProvid
 export {
   snackbarBaseVariants,
   snackbarAnimationVariants,
+  snackbarPositionVariants,
   snackbarContainerVariants,
   snackbarMessageVariants,
   snackbarSupportingTextVariants,
   snackbarActionVariants,
   snackbarCloseVariants,
   snackbarContentVariants,
+  getEnterDirection,
   type SnackbarBaseVariants,
   type SnackbarAnimationVariants,
+  type SnackbarPositionVariants,
   type SnackbarContainerVariants,
 } from "./Snackbar.variants";
 
 // Types
 export type {
   SnackbarSeverity,
+  SnackbarPosition,
   SnackbarProps,
   SnackbarHeadlessProps,
   SnackbarAction,

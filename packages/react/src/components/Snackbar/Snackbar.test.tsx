@@ -6,6 +6,7 @@ import { Snackbar } from "./Snackbar";
 import { SnackbarHeadless } from "./SnackbarHeadless";
 import { SnackbarProvider, useSnackbar } from "./SnackbarProvider";
 import type { SnackbarProps } from "./Snackbar.types";
+// SnackbarPosition is used indirectly via SnackbarProps.position in test assertions
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -472,6 +473,69 @@ describe("Snackbar", () => {
       renderSnackbar({ message: "Hello" });
       const el = screen.getByRole("status");
       expect(el.className).toMatch(/opacity/);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Position
+  // ---------------------------------------------------------------------------
+
+  describe("Position", () => {
+    test("defaults to bottom-center position classes", () => {
+      renderSnackbar({ message: "Hello" });
+      const el = screen.getByRole("status");
+      expect(el.className).toMatch(/bottom-4/);
+      expect(el.className).toMatch(/left-1\/2/);
+    });
+
+    test("applies bottom-left position classes", () => {
+      renderSnackbar({ message: "Hello", position: "bottom-left" });
+      const el = screen.getByRole("status");
+      expect(el.className).toMatch(/bottom-4/);
+      expect(el.className).toMatch(/left-4/);
+    });
+
+    test("applies bottom-right position classes", () => {
+      renderSnackbar({ message: "Hello", position: "bottom-right" });
+      const el = screen.getByRole("status");
+      expect(el.className).toMatch(/bottom-4/);
+      expect(el.className).toMatch(/right-4/);
+    });
+
+    test("applies top-center position classes", () => {
+      renderSnackbar({ message: "Hello", position: "top-center" });
+      const el = screen.getByRole("status");
+      expect(el.className).toMatch(/top-4/);
+      expect(el.className).toMatch(/left-1\/2/);
+    });
+
+    test("applies top-left position classes", () => {
+      renderSnackbar({ message: "Hello", position: "top-left" });
+      const el = screen.getByRole("status");
+      expect(el.className).toMatch(/top-4/);
+      expect(el.className).toMatch(/left-4/);
+    });
+
+    test("applies top-right position classes", () => {
+      renderSnackbar({ message: "Hello", position: "top-right" });
+      const el = screen.getByRole("status");
+      expect(el.className).toMatch(/top-4/);
+      expect(el.className).toMatch(/right-4/);
+    });
+
+    test("bottom positions enter with translate-y-4 (slide up)", () => {
+      renderSnackbar({ message: "Hello", position: "bottom-center" });
+      const el = screen.getByRole("status");
+      // In entering state (before the zero-delay setTimeout fires), the
+      // compound variant for "up" direction applies translate-y-4.
+      expect(el.className).toMatch(/translate-y-4/);
+    });
+
+    test("top positions enter with -translate-y-4 (slide down)", () => {
+      renderSnackbar({ message: "Hello", position: "top-center" });
+      const el = screen.getByRole("status");
+      // In entering state with "down" direction, compound variant applies -translate-y-4.
+      expect(el.className).toMatch(/-translate-y-4/);
     });
   });
 

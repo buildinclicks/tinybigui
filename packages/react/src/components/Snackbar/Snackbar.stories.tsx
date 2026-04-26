@@ -1,7 +1,10 @@
+import { within, userEvent, expect } from "storybook/test";
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState, type JSX } from "react";
+import { type JSX } from "react";
+import { Button } from "../Button";
 import { Snackbar } from "./Snackbar";
 import { SnackbarProvider, useSnackbar } from "./SnackbarProvider";
+import type { SnackbarPosition } from "./Snackbar.types";
 
 /**
  * Material Design 3 Snackbar Component
@@ -9,31 +12,36 @@ import { SnackbarProvider, useSnackbar } from "./SnackbarProvider";
  * Snackbars provide brief messages about app processes at the bottom of the
  * screen. They appear temporarily and don't require user input to disappear.
  *
- * ## Content Configurations
- * - **Single-line** — message text only
- * - **Two-line** — message + supporting text (when content exceeds one line)
- * - **With action** — single text button for an undo or related action
- * - **With close icon** — explicit dismiss button for persistent messages
- *
- * ## MD3 Specifications
- * - Surface: `inverse-surface` with `inverse-on-surface` text
- * - Shape: extra-small corner (4dp) → `rounded-xs`
- * - Elevation: level 3 → `shadow-elevation-3`
- * - Width: 288dp min, 568dp max, centered `bottom-4`
- * - Auto-dismiss: 4000ms default, pauses on hover and focus
- * - Motion: entry slide-up 200ms / exit fade-out 100ms
- *
  * ## Usage
+ *
+ * Wrap your application with `SnackbarProvider`, then trigger snackbars from
+ * any descendant component using the `useSnackbar` hook:
+ *
  * ```tsx
- * // Wrap your app with SnackbarProvider
  * <SnackbarProvider>
  *   <App />
  * </SnackbarProvider>
  *
- * // Trigger from any descendant component
+ * // Inside any descendant:
  * const { showSnackbar } = useSnackbar();
  * showSnackbar({ message: "File deleted", action: { label: "Undo", onAction: handleUndo } });
  * ```
+ *
+ * ## Content Configurations
+ *
+ * - **Single-line** — message text only
+ * - **Two-line** — message + supporting text
+ * - **With action** — single text button (Undo / View / etc.)
+ * - **With close icon** — explicit dismiss button for persistent messages
+ *
+ * ## MD3 Specifications
+ *
+ * - Surface: `inverse-surface` with `inverse-on-surface` text
+ * - Shape: extra-small corner (4dp) → `rounded-xs`
+ * - Elevation: level 3 → `shadow-elevation-3`
+ * - Width: 288dp min, 568dp max, centered `bottom-4` by default
+ * - Auto-dismiss: 4000ms default, pauses on hover and focus
+ * - Motion: entry slide 200ms / exit fade 100ms
  */
 const meta: Meta<typeof Snackbar> = {
   title: "Components/Snackbar",
@@ -58,12 +66,23 @@ const meta: Meta<typeof Snackbar> = {
     duration: {
       control: { type: "number", min: 0, step: 500 },
       description: "Auto-dismiss duration in ms. Set to 0 to disable.",
-      defaultValue: 4000,
     },
     severity: {
       control: "radio",
       options: ["default", "error"],
       description: "Controls ARIA live region — polite (default) or assertive (error)",
+    },
+    position: {
+      control: "select",
+      options: [
+        "bottom-center",
+        "bottom-left",
+        "bottom-right",
+        "top-center",
+        "top-left",
+        "top-right",
+      ] satisfies SnackbarPosition[],
+      description: "Screen position of the Snackbar",
     },
     showClose: {
       control: "boolean",
@@ -84,404 +103,469 @@ const meta: Meta<typeof Snackbar> = {
 export default meta;
 type Story = StoryObj<typeof Snackbar>;
 
-// ---------------------------------------------------------------------------
-// Individual content configuration stories
-// ---------------------------------------------------------------------------
+// ─── Default ──────────────────────────────────────────────────────────────────
 
 /**
- * Single-line message — the simplest Snackbar configuration.
- * Auto-dismisses after 4 seconds.
+ * The default Snackbar — a single trigger button launches a snackbar with a
+ * message and an Undo action, inspired by the Google Keep demo on m3.material.io.
+ *
+ * Click "Open Snackbar" to see the component in action.
  */
-export const SingleLine: Story = {
-  args: {
-    message: "File deleted",
-    duration: 0,
-  },
+const DefaultDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex items-center justify-center p-8">
+      <Button
+        variant="filled"
+        onPress={() =>
+          showSnackbar({
+            message: "Note archived",
+            action: { label: "Undo", onAction: () => undefined },
+          })
+        }
+      >
+        Open Snackbar
+      </Button>
+    </div>
+  );
 };
 
-/**
- * Two-line configuration — message + supporting text.
- * Used when the message exceeds one line.
- */
-export const TwoLine: Story = {
-  args: {
-    message: "Connection lost",
-    supportingText: "Please check your network and try again",
-    duration: 0,
-  },
+export const Default: Story = {
+  render: () => <DefaultDemo />,
 };
 
-/**
- * With action button — single text action for an undo or related task.
- * Action button uses `inverse-primary` color per MD3 spec.
- */
-export const WithAction: Story = {
-  args: {
-    message: "File deleted",
-    action: { label: "Undo", onAction: () => alert("Undo triggered") },
-    duration: 0,
-  },
-};
+// ─── Position ─────────────────────────────────────────────────────────────────
 
 /**
- * With close icon — explicit dismiss button.
- * Useful when auto-dismiss is disabled or the message is important.
+ * Use the `position` prop to control where the Snackbar appears on screen.
+ * All six positions are demonstrated — click any button to see the Snackbar
+ * appear at that corner or edge.
+ *
+ * MD3 recommends `bottom-center` as the default position.
  */
-export const WithCloseIcon: Story = {
-  args: {
-    message: "File deleted",
-    showClose: true,
-    duration: 0,
-  },
-};
+const PositionDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
 
-/**
- * With action and close icon — all interactive elements combined.
- */
-export const WithActionAndClose: Story = {
-  args: {
-    message: "File deleted",
-    action: { label: "Undo", onAction: () => alert("Undo") },
-    showClose: true,
-    duration: 0,
-  },
-};
+  const positions: SnackbarPosition[] = [
+    "top-left",
+    "top-center",
+    "top-right",
+    "bottom-left",
+    "bottom-center",
+    "bottom-right",
+  ];
 
-/**
- * Error severity — uses `role="alert" aria-live="assertive"` for urgent
- * screen reader announcements.
- */
-export const ErrorSeverity: Story = {
-  args: {
-    message: "Upload failed. Please try again.",
-    severity: "error",
-    showClose: true,
-    duration: 0,
-  },
-};
+  const labels: Record<SnackbarPosition, string> = {
+    "top-left": "Top-Left",
+    "top-center": "Top-Center",
+    "top-right": "Top-Right",
+    "bottom-left": "Bottom-Left",
+    "bottom-center": "Bottom-Center",
+    "bottom-right": "Bottom-Right",
+  };
 
-// ---------------------------------------------------------------------------
-// Auto-dismiss demos
-// ---------------------------------------------------------------------------
-
-/**
- * Short duration — dismisses after 2 seconds.
- */
-export const ShortDuration: Story = {
-  args: {
-    message: "Copied to clipboard",
-    duration: 2000,
-  },
-};
-
-/**
- * Persistent — no auto-dismiss (duration=0). Requires explicit close.
- */
-export const Persistent: Story = {
-  args: {
-    message: "This message will not auto-dismiss",
-    duration: 0,
-    showClose: true,
-  },
-};
-
-// ---------------------------------------------------------------------------
-// Interactive queue demo
-// ---------------------------------------------------------------------------
-
-/**
- * Queue demo — multiple Snackbars displayed sequentially, never stacked.
- * Click the buttons quickly to queue several messages.
- */
-export const QueueDemo: Story = {
-  render: function QueueDemoRender() {
-    const { showSnackbar } = useSnackbar();
-
-    return (
-      <div className="flex flex-col gap-3">
-        <p className="text-body-medium text-on-surface-variant">
-          Click buttons to queue multiple Snackbars. They appear one at a time.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => showSnackbar({ message: "File deleted", duration: 3000 })}
-            className="bg-primary text-on-primary text-label-large rounded-full px-4 py-2"
-          >
-            File deleted
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              showSnackbar({
-                message: "Photo saved",
-                action: { label: "View", onAction: () => alert("Viewing photo") },
-                duration: 3000,
-              })
-            }
-            className="bg-secondary text-on-secondary text-label-large rounded-full px-4 py-2"
-          >
-            Photo saved (with action)
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              showSnackbar({
-                message: "Upload failed",
-                severity: "error",
-                showClose: true,
-                duration: 4000,
-              })
-            }
-            className="bg-error text-on-error text-label-large rounded-full px-4 py-2"
-          >
-            Upload failed (error)
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              showSnackbar({
-                message: "Connection lost",
-                supportingText: "Check your network settings",
-                showClose: true,
-                duration: 3000,
-              })
-            }
-            className="bg-surface-container-high text-on-surface text-label-large rounded-full px-4 py-2"
-          >
-            Two-line
-          </button>
-        </div>
-      </div>
-    );
-  },
-};
-
-// ---------------------------------------------------------------------------
-// Playground
-// ---------------------------------------------------------------------------
-
-/**
- * Playground — trigger Snackbars with configurable options.
- */
-export const Playground: Story = {
-  render: function PlaygroundRender(): JSX.Element {
-    const { showSnackbar } = useSnackbar();
-    const [message, setMessage] = useState("Changes saved");
-    const [supportingText, setSupportingText] = useState("");
-    const [actionLabel, setActionLabel] = useState("");
-    const [showCloseIcon, setShowCloseIcon] = useState(false);
-    const [duration, setDuration] = useState(4000);
-    const [severity, setSeverity] = useState<"default" | "error">("default");
-
-    const trigger = (): void => {
-      showSnackbar({
-        message,
-        supportingText: supportingText || undefined,
-        action: actionLabel
-          ? { label: actionLabel, onAction: () => alert(`Action: ${actionLabel}`) }
-          : undefined,
-        showClose: showCloseIcon,
-        duration,
-        severity,
-      });
-    };
-
-    return (
-      <div className="flex w-full max-w-lg flex-col gap-6">
-        <div className="bg-surface-container-high flex flex-col gap-4 rounded-xl p-5">
-          <h3 className="text-title-medium text-on-surface">Configure Snackbar</h3>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="sb-message" className="text-label-large text-on-surface-variant">
-              Message
-            </label>
-            <input
-              id="sb-message"
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="bg-surface border-outline text-body-medium text-on-surface rounded-sm border px-3 py-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="sb-supporting" className="text-label-large text-on-surface-variant">
-              Supporting text (optional, makes two-line)
-            </label>
-            <input
-              id="sb-supporting"
-              type="text"
-              value={supportingText}
-              onChange={(e) => setSupportingText(e.target.value)}
-              placeholder="Leave empty for single-line"
-              className="bg-surface border-outline text-body-medium text-on-surface rounded-sm border px-3 py-2"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="sb-action" className="text-label-large text-on-surface-variant">
-              Action button label (optional)
-            </label>
-            <input
-              id="sb-action"
-              type="text"
-              value={actionLabel}
-              onChange={(e) => setActionLabel(e.target.value)}
-              placeholder="e.g. Undo"
-              className="bg-surface border-outline text-body-medium text-on-surface rounded-sm border px-3 py-2"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <label className="text-body-medium text-on-surface flex cursor-pointer items-center gap-2">
-              <input
-                type="checkbox"
-                checked={showCloseIcon}
-                onChange={(e) => setShowCloseIcon(e.target.checked)}
-              />
-              Show close icon
-            </label>
-
-            <div className="flex items-center gap-2">
-              <label htmlFor="sb-duration" className="text-label-large text-on-surface-variant">
-                Duration (ms):
-              </label>
-              <input
-                id="sb-duration"
-                type="number"
-                value={duration}
-                step={500}
-                min={0}
-                onChange={(e) => setDuration(Number(e.target.value))}
-                className="bg-surface border-outline text-body-medium text-on-surface w-24 rounded-sm border px-2 py-1"
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label htmlFor="sb-severity" className="text-label-large text-on-surface-variant">
-                Severity:
-              </label>
-              <select
-                id="sb-severity"
-                value={severity}
-                onChange={(e) => setSeverity(e.target.value as "default" | "error")}
-                className="bg-surface border-outline text-body-medium text-on-surface rounded-sm border px-2 py-1"
-              >
-                <option value="default">default</option>
-                <option value="error">error</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={trigger}
-          className="bg-primary text-on-primary text-label-large w-fit rounded-full px-6 py-3"
+  return (
+    <div className="grid grid-cols-3 gap-3 p-8">
+      {positions.map((pos) => (
+        <Button
+          key={pos}
+          variant="outlined"
+          onPress={() =>
+            showSnackbar({
+              message: "I love snacks",
+              position: pos,
+              duration: 3000,
+            })
+          }
         >
-          Show Snackbar
-        </button>
-      </div>
-    );
+          {labels[pos]}
+        </Button>
+      ))}
+    </div>
+  );
+};
+
+export const Position: Story = {
+  render: () => <PositionDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Click any position button to see the Snackbar appear at that corner. The default is `bottom-center` per MD3 spec.",
+      },
+    },
   },
 };
 
-// ---------------------------------------------------------------------------
-// All configurations showcase
-// ---------------------------------------------------------------------------
+// ─── Content Variations (Variants) ───────────────────────────────────────────
 
 /**
- * All configurations — visual reference for all four MD3 content layouts.
- * Each Snackbar is rendered declaratively with `duration=0` (no auto-dismiss)
- * so they remain visible in the docs.
+ * All four MD3 content configurations, each triggered by a dedicated button.
+ *
+ * - **Single-line** — message text only (simplest form)
+ * - **Two-line** — message + supporting text for longer context
+ * - **With Action** — single text action button (e.g. Undo)
+ * - **With Close** — explicit close icon button for persistent messages
+ * - **Action + Close** — all interactive elements combined
  */
-export const AllConfigurations: Story = {
-  render: function AllConfigurationsRender() {
-    return (
-      <div className="flex w-full flex-col gap-4">
-        <p className="text-title-medium text-on-surface">
-          All MD3 Snackbar content configurations:
-        </p>
-        <p className="text-body-small text-on-surface-variant">
-          Rendered declaratively — Snackbars are normally positioned fixed at bottom of viewport.
-          Here they are shown inline for documentation purposes.
-        </p>
+const ContentVariationsDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex flex-wrap justify-center gap-3 p-8">
+      <Button
+        variant="filled"
+        onPress={() =>
+          showSnackbar({
+            message: "File deleted",
+            duration: 4000,
+          })
+        }
+      >
+        Single-line
+      </Button>
+      <Button
+        variant="tonal"
+        onPress={() =>
+          showSnackbar({
+            message: "Connection lost",
+            supportingText: "Please check your network and try again",
+            duration: 4000,
+          })
+        }
+      >
+        Two-line
+      </Button>
+      <Button
+        variant="outlined"
+        onPress={() =>
+          showSnackbar({
+            message: "Photo archived",
+            action: { label: "Undo", onAction: () => undefined },
+            duration: 4000,
+          })
+        }
+      >
+        With Action
+      </Button>
+      <Button
+        variant="elevated"
+        onPress={() =>
+          showSnackbar({
+            message: "Message sent",
+            showClose: true,
+            duration: 0,
+          })
+        }
+      >
+        With Close
+      </Button>
+      <Button
+        variant="text"
+        onPress={() =>
+          showSnackbar({
+            message: "Changes saved",
+            action: { label: "View", onAction: () => undefined },
+            showClose: true,
+            duration: 0,
+          })
+        }
+      >
+        Action + Close
+      </Button>
+    </div>
+  );
+};
 
-        <div className="mt-4 flex flex-col gap-3">
-          {/* Single-line */}
-          <div
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="bg-inverse-surface text-inverse-on-surface shadow-elevation-3 max-w-snackbar-max flex w-max min-w-72 items-center gap-x-2 rounded-xs px-4 py-3"
-          >
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="text-body-medium text-inverse-on-surface">File deleted</span>
-            </div>
-          </div>
+export const ContentVariations: Story = {
+  render: () => <ContentVariationsDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates all four MD3 content configurations. Each button triggers the corresponding layout. Close-icon variants use `duration: 0` (persistent) since they have an explicit dismiss control.",
+      },
+    },
+  },
+};
 
-          {/* Two-line */}
-          <div
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="bg-inverse-surface text-inverse-on-surface shadow-elevation-3 max-w-snackbar-max flex w-max min-w-72 items-center gap-x-2 rounded-xs px-4 py-4"
-          >
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="text-body-medium text-inverse-on-surface">Connection lost</span>
-              <span className="text-body-medium text-inverse-on-surface opacity-80">
-                Please check your network settings
-              </span>
-            </div>
-          </div>
+// ─── Auto Dismiss ─────────────────────────────────────────────────────────────
 
-          {/* With action */}
-          <div
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="bg-inverse-surface text-inverse-on-surface shadow-elevation-3 max-w-snackbar-max flex w-max min-w-72 items-center gap-x-2 rounded-xs px-4 py-3"
-          >
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="text-body-medium text-inverse-on-surface">Photo archived</span>
-            </div>
-            <button type="button" className="text-inverse-primary text-label-large shrink-0 px-2">
-              Undo
-            </button>
-          </div>
+/**
+ * The `duration` prop controls how long the Snackbar stays visible before
+ * automatically dismissing. The timer pauses when you hover over or focus
+ * inside the Snackbar, and resumes when you move away.
+ *
+ * MD3 recommends providing at least 4 seconds for users to read the message.
+ */
+const AutoDismissDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex items-center justify-center p-8">
+      <Button
+        variant="filled"
+        onPress={() =>
+          showSnackbar({
+            message: "This Snackbar will be dismissed in 5 seconds.",
+            duration: 5000,
+          })
+        }
+      >
+        Open Snackbar
+      </Button>
+    </div>
+  );
+};
 
-          {/* With close */}
-          <div
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="bg-inverse-surface text-inverse-on-surface shadow-elevation-3 max-w-snackbar-max flex w-max min-w-72 items-center gap-x-2 rounded-xs px-4 py-3"
-          >
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="text-body-medium text-inverse-on-surface">
-                Message sent successfully
-              </span>
-            </div>
-            <button
-              type="button"
-              aria-label="Close"
-              className="text-inverse-on-surface shrink-0 p-1"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-              </svg>
-            </button>
-          </div>
-        </div>
+export const AutoDismiss: Story = {
+  render: () => <AutoDismissDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Triggers a Snackbar that auto-dismisses after 5 seconds. Hover or focus the Snackbar to pause the timer. Set `duration: 0` to disable auto-dismiss entirely.",
+      },
+    },
+  },
+};
+
+// ─── Accessibility ────────────────────────────────────────────────────────────
+
+/**
+ * The `severity` prop controls the ARIA live region role:
+ *
+ * - `severity="default"` → `role="status" aria-live="polite"` — announced
+ *   at the next available opportunity (non-urgent, informational)
+ * - `severity="error"` → `role="alert" aria-live="assertive"` — announced
+ *   immediately, interrupting any in-progress speech (urgent errors)
+ *
+ * Screen readers will announce the error Snackbar as soon as it appears.
+ */
+const AccessibilityDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex flex-wrap justify-center gap-4 p-8">
+      <Button
+        variant="filled"
+        onPress={() =>
+          showSnackbar({
+            message: "File saved successfully.",
+            severity: "default",
+            duration: 4000,
+          })
+        }
+      >
+        Polite (default)
+      </Button>
+      <Button
+        variant="filled"
+        color="error"
+        onPress={() =>
+          showSnackbar({
+            message: "Upload failed. Please try again.",
+            severity: "error",
+            showClose: true,
+            duration: 0,
+          })
+        }
+      >
+        Assertive (error)
+      </Button>
+    </div>
+  );
+};
+
+export const Accessibility: Story = {
+  render: () => <AccessibilityDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates both ARIA live region modes. "Polite" is for informational updates; "Assertive" interrupts the screen reader immediately for critical errors. The error Snackbar uses `duration: 0` and `showClose` since users may need more time to process an error.',
+      },
+    },
+  },
+};
+
+// ─── Consecutive Snackbars ────────────────────────────────────────────────────
+
+/**
+ * Multiple `showSnackbar` calls are queued and displayed one at a time —
+ * they are never stacked. Click the buttons in rapid succession to build up
+ * a queue and watch them animate sequentially.
+ *
+ * This matches the MD3 spec that Snackbars should appear one at a time.
+ */
+const ConsecutiveSnackbarsDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex flex-col items-center gap-4 p-8">
+      <p className="text-body-medium text-on-surface-variant">
+        Click the buttons quickly to queue multiple Snackbars.
+      </p>
+      <div className="flex gap-3">
+        <Button
+          variant="filled"
+          onPress={() =>
+            showSnackbar({
+              message: "Message A",
+              action: { label: "Undo", onAction: () => undefined },
+              duration: 3000,
+            })
+          }
+        >
+          Show message A
+        </Button>
+        <Button
+          variant="tonal"
+          onPress={() =>
+            showSnackbar({
+              message: "Message B",
+              duration: 3000,
+            })
+          }
+        >
+          Show message B
+        </Button>
       </div>
-    );
+    </div>
+  );
+};
+
+export const ConsecutiveSnackbars: Story = {
+  render: () => <ConsecutiveSnackbarsDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Multiple Snackbars are displayed sequentially, never stacked, per MD3 spec. Build up the queue by clicking both buttons before the first one dismisses.",
+      },
+    },
+  },
+};
+
+// ─── Interactive (play function) ──────────────────────────────────────────────
+
+/**
+ * Automated interaction test — the play function clicks the trigger button,
+ * waits for the Snackbar to appear, verifies it contains the expected message,
+ * then clicks the Undo action.
+ */
+const InteractiveDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex items-center justify-center p-8">
+      <Button
+        variant="filled"
+        onPress={() =>
+          showSnackbar({
+            message: "File deleted",
+            action: { label: "Undo", onAction: () => undefined },
+            duration: 0,
+          })
+        }
+      >
+        Open Snackbar
+      </Button>
+    </div>
+  );
+};
+
+export const Interactive: Story = {
+  render: () => <InteractiveDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const trigger = canvas.getByRole("button", { name: /open snackbar/i });
+    await userEvent.click(trigger);
+
+    // The Snackbar renders into document.body via a portal, so we query the
+    // full document rather than the canvas element.
+    const snackbar = await within(document.body).findByRole("status");
+    await expect(snackbar).toBeInTheDocument();
+    await expect(snackbar).toHaveTextContent("File deleted");
+
+    const undoButton = within(document.body).getByRole("button", { name: /undo/i });
+    await userEvent.click(undoButton);
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Automated interaction test. The play function opens the Snackbar, verifies its content via ARIA role, then clicks the Undo action. The Snackbar renders in a portal so assertions target `document.body`.",
+      },
+    },
+  },
+};
+
+// ─── Playground ───────────────────────────────────────────────────────────────
+
+/**
+ * Configure all Snackbar options using the Controls panel, then click
+ * "Show Snackbar" to preview the result. Combine props freely to explore
+ * all supported configurations.
+ */
+const PlaygroundDemo = ({
+  message,
+  supportingText,
+  showClose,
+  duration,
+  severity,
+  position,
+}: {
+  message?: string;
+  supportingText?: string;
+  showClose?: boolean;
+  duration?: number;
+  severity?: "default" | "error";
+  position?: SnackbarPosition;
+}): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex items-center justify-center p-8">
+      <Button
+        variant="filled"
+        onPress={() =>
+          showSnackbar({
+            message: message ?? "Changes saved",
+            ...(supportingText ? { supportingText } : {}),
+            showClose: showClose ?? false,
+            duration: duration ?? 4000,
+            severity: severity ?? "default",
+            position: position ?? "bottom-center",
+          })
+        }
+      >
+        Show Snackbar
+      </Button>
+    </div>
+  );
+};
+
+export const Playground: Story = {
+  render: (args) => (
+    <PlaygroundDemo
+      message={args.message}
+      supportingText={args.supportingText}
+      showClose={args.showClose}
+      duration={args.duration}
+      severity={args.severity}
+      position={args.position}
+    />
+  ),
+  args: {
+    message: "Changes saved",
+    supportingText: "",
+    showClose: false,
+    duration: 4000,
+    severity: "default",
+    position: "bottom-center",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use the Controls panel to configure any combination of props, then click Show Snackbar to preview.",
+      },
+    },
   },
 };

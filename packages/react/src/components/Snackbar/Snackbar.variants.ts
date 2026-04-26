@@ -12,27 +12,24 @@ import { cva, type VariantProps } from "class-variance-authority";
  * - Elevation: level-3 → shadow-elevation-3
  * - Min width: 288dp → min-w-72
  * - Max width: 568dp → max-w-snackbar-max
- * - Position: fixed bottom-4, horizontally centered
+ * - Default position: fixed bottom-4, horizontally centered
  * - Message text: body-medium
  * - Action text: label-large, inverse-primary color
- * - Entry motion: short4 (200ms) + ease-emphasized-decelerate (slide up + fade in)
+ * - Entry motion: short4 (200ms) + ease-emphasized-decelerate (slide up/down + fade in)
  * - Exit motion:  short2 (100ms) + ease-emphasized-accelerate (fade out)
  */
 
-// ─── Base container (positioning, surface, shape, layout) ────────────────────
+// ─── Base container (surface, shape, layout — no positioning) ─────────────────
 
 /**
  * Snackbar base container variants — structural, surface, and layout classes.
- * Split from animation variants so the headless layer can merge its own
- * animation-state classes at render time.
+ * Positioning is handled separately via `snackbarPositionVariants` so it can
+ * be updated independently from animation state.
  */
 export const snackbarBaseVariants = cva(
   [
-    // Positioning (portal renders to body; fixed centers at bottom)
+    // Fixed stacking context
     "fixed",
-    "bottom-4",
-    "left-1/2",
-    "-translate-x-1/2",
     "z-50",
 
     // Sizing (MD3 spec: 288dp min, 568dp max)
@@ -82,35 +79,76 @@ export const snackbarBaseVariants = cva(
 
 export type SnackbarBaseVariants = VariantProps<typeof snackbarBaseVariants>;
 
+// ─── Position variants ────────────────────────────────────────────────────────
+
+/**
+ * Snackbar screen position variants.
+ *
+ * Maps to a fixed corner/edge of the viewport with 16dp (4) inset.
+ * MD3 default is `bottom-center`.
+ *
+ * Center variants add `left-1/2 -translate-x-1/2` for horizontal centering.
+ */
+export const snackbarPositionVariants = cva("", {
+  variants: {
+    position: {
+      "bottom-center": ["bottom-4", "left-1/2", "-translate-x-1/2"],
+      "bottom-left": ["bottom-4", "left-4"],
+      "bottom-right": ["bottom-4", "right-4"],
+      "top-center": ["top-4", "left-1/2", "-translate-x-1/2"],
+      "top-left": ["top-4", "left-4"],
+      "top-right": ["top-4", "right-4"],
+    },
+  },
+  defaultVariants: {
+    position: "bottom-center",
+  },
+});
+
+export type SnackbarPositionVariants = VariantProps<typeof snackbarPositionVariants>;
+
 // ─── Animation state classes ──────────────────────────────────────────────────
 
 /**
  * Snackbar animation state variants.
  * Applied by `SnackbarHeadless` based on its internal animation state machine.
  *
- * - `entering`: initial mount state — starts below + transparent before rAF
- * - `visible`:  slide up + fade in (short4 / emphasized-decelerate)
- * - `exiting`:  fade out (short2 / emphasized-accelerate)
+ * The `enterDirection` controls the initial translate offset:
+ * - `up`   (bottom positions): starts `translate-y-4`  (below) → slides up
+ * - `down` (top positions):    starts `-translate-y-4` (above) → slides down
+ *
+ * - `entering`: initial mount state — starts offset + transparent
+ * - `visible`:  translate-y-0 + fade in (short4 / emphasized-decelerate)
+ * - `exiting`:  fade out in place (short2 / emphasized-accelerate)
  * - `exited`:   fully transparent (removed from DOM by provider)
  */
 export const snackbarAnimationVariants = cva("", {
   variants: {
     animationState: {
-      entering: ["translate-y-4", "opacity-0"],
+      entering: ["opacity-0"],
       visible: ["translate-y-0", "opacity-100", "duration-short4", "ease-emphasized-decelerate"],
       exiting: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
       exited: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
     },
+    enterDirection: {
+      up: [],
+      down: [],
+    },
   },
+  compoundVariants: [
+    { animationState: "entering", enterDirection: "up", class: "translate-y-4" },
+    { animationState: "entering", enterDirection: "down", class: "-translate-y-4" },
+  ],
   defaultVariants: {
     animationState: "entering",
+    enterDirection: "up",
   },
 });
 
 export type SnackbarAnimationVariants = VariantProps<typeof snackbarAnimationVariants>;
 
 /**
- * Combined container variants (base + animation) for convenience.
+ * Combined container variants (base + position + animation) for convenience.
  * The headless layer uses `snackbarAnimationVariants` directly; this export
  * is kept for consumers who want the full combined class string without the
  * render-prop pattern.
@@ -118,9 +156,6 @@ export type SnackbarAnimationVariants = VariantProps<typeof snackbarAnimationVar
 export const snackbarContainerVariants = cva(
   [
     "fixed",
-    "bottom-4",
-    "left-1/2",
-    "-translate-x-1/2",
     "z-50",
     "min-w-72",
     "max-w-snackbar-max",
@@ -140,18 +175,36 @@ export const snackbarContainerVariants = cva(
   {
     variants: {
       animationState: {
-        entering: ["translate-y-4", "opacity-0"],
+        entering: ["opacity-0"],
         visible: ["translate-y-0", "opacity-100", "duration-short4", "ease-emphasized-decelerate"],
         exiting: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
         exited: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
+      },
+      enterDirection: {
+        up: [],
+        down: [],
+      },
+      position: {
+        "bottom-center": ["bottom-4", "left-1/2", "-translate-x-1/2"],
+        "bottom-left": ["bottom-4", "left-4"],
+        "bottom-right": ["bottom-4", "right-4"],
+        "top-center": ["top-4", "left-1/2", "-translate-x-1/2"],
+        "top-left": ["top-4", "left-4"],
+        "top-right": ["top-4", "right-4"],
       },
       twoLine: {
         true: "py-4",
         false: "py-3",
       },
     },
+    compoundVariants: [
+      { animationState: "entering", enterDirection: "up", class: "translate-y-4" },
+      { animationState: "entering", enterDirection: "down", class: "-translate-y-4" },
+    ],
     defaultVariants: {
       animationState: "entering",
+      enterDirection: "up",
+      position: "bottom-center",
       twoLine: false,
     },
   }
@@ -219,3 +272,13 @@ export const snackbarContentVariants = cva(["flex", "flex-col", "flex-1", "min-w
  * Positioned off-screen below and transparent.
  */
 export const snackbarInitialVariants = cva(["translate-y-4", "opacity-0"]);
+
+// ─── Position → direction helper ─────────────────────────────────────────────
+
+/**
+ * Derives the enter animation direction from the Snackbar position.
+ * Bottom positions slide up; top positions slide down.
+ */
+export function getEnterDirection(position: string): "up" | "down" {
+  return position.startsWith("top") ? "down" : "up";
+}

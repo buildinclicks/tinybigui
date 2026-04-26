@@ -149,6 +149,7 @@ export function SnackbarProvider({ children }: SnackbarProviderProps): JSX.Eleme
             {...(active.showClose !== undefined && { showClose: active.showClose })}
             {...(active.duration !== undefined && { duration: active.duration })}
             {...(active.severity !== undefined && { severity: active.severity })}
+            {...(active.position !== undefined && { position: active.position })}
             {...(active.className !== undefined && { className: active.className })}
             onClose={() => {
               active.onClose?.();
