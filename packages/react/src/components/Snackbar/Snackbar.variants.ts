@@ -36,6 +36,7 @@ export const snackbarBaseVariants = cva(
     "min-w-72",
     "max-w-snackbar-max",
     "w-max",
+    "min-h-12",
 
     // Surface
     "bg-inverse-surface",
@@ -49,8 +50,8 @@ export const snackbarBaseVariants = cva(
     // Layout
     "flex",
     "items-center",
-    "gap-x-2",
-    "px-4",
+    "gap-x-1",
+    "pl-4 pr-2",
 
     // Typography
     "text-body-medium",
@@ -67,8 +68,8 @@ export const snackbarBaseVariants = cva(
        * Adjusts vertical padding to MD3 spec for two-line configuration.
        */
       twoLine: {
-        true: "py-4",
-        false: "py-3",
+        true: "py-1",
+        false: "py-1",
       },
     },
     defaultVariants: {
@@ -153,62 +154,42 @@ export type SnackbarAnimationVariants = VariantProps<typeof snackbarAnimationVar
  * is kept for consumers who want the full combined class string without the
  * render-prop pattern.
  */
-export const snackbarContainerVariants = cva(
-  [
-    "fixed",
-    "z-50",
-    "min-w-72",
-    "max-w-snackbar-max",
-    "w-max",
-    "bg-inverse-surface",
-    "rounded-xs",
-    "shadow-elevation-3",
-    "flex",
-    "items-center",
-    "gap-x-2",
-    "px-4",
-    "text-body-medium",
-    "text-inverse-on-surface",
-    "transition-[opacity,transform]",
-    "will-change-[opacity,transform]",
+export const snackbarContainerVariants = cva([...snackbarBaseVariants()], {
+  variants: {
+    animationState: {
+      entering: ["opacity-0"],
+      visible: ["translate-y-0", "opacity-100", "duration-short4", "ease-emphasized-decelerate"],
+      exiting: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
+      exited: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
+    },
+    enterDirection: {
+      up: [],
+      down: [],
+    },
+    position: {
+      "bottom-center": ["bottom-4", "left-1/2", "-translate-x-1/2"],
+      "bottom-left": ["bottom-4", "left-4"],
+      "bottom-right": ["bottom-4", "right-4"],
+      "top-center": ["top-4", "left-1/2", "-translate-x-1/2"],
+      "top-left": ["top-4", "left-4"],
+      "top-right": ["top-4", "right-4"],
+    },
+    twoLine: {
+      true: "py-1",
+      false: "py-1",
+    },
+  },
+  compoundVariants: [
+    { animationState: "entering", enterDirection: "up", class: "translate-y-4" },
+    { animationState: "entering", enterDirection: "down", class: "-translate-y-4" },
   ],
-  {
-    variants: {
-      animationState: {
-        entering: ["opacity-0"],
-        visible: ["translate-y-0", "opacity-100", "duration-short4", "ease-emphasized-decelerate"],
-        exiting: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
-        exited: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
-      },
-      enterDirection: {
-        up: [],
-        down: [],
-      },
-      position: {
-        "bottom-center": ["bottom-4", "left-1/2", "-translate-x-1/2"],
-        "bottom-left": ["bottom-4", "left-4"],
-        "bottom-right": ["bottom-4", "right-4"],
-        "top-center": ["top-4", "left-1/2", "-translate-x-1/2"],
-        "top-left": ["top-4", "left-4"],
-        "top-right": ["top-4", "right-4"],
-      },
-      twoLine: {
-        true: "py-4",
-        false: "py-3",
-      },
-    },
-    compoundVariants: [
-      { animationState: "entering", enterDirection: "up", class: "translate-y-4" },
-      { animationState: "entering", enterDirection: "down", class: "-translate-y-4" },
-    ],
-    defaultVariants: {
-      animationState: "entering",
-      enterDirection: "up",
-      position: "bottom-center",
-      twoLine: false,
-    },
-  }
-);
+  defaultVariants: {
+    animationState: "entering",
+    enterDirection: "up",
+    position: "bottom-center",
+    twoLine: false,
+  },
+});
 
 export type SnackbarContainerVariants = VariantProps<typeof snackbarContainerVariants>;
 
@@ -263,7 +244,7 @@ export const snackbarCloseVariants = cva(["shrink-0", "text-inverse-on-surface"]
 /**
  * Inner content column (message + optional supporting text).
  */
-export const snackbarContentVariants = cva(["flex", "flex-col", "flex-1", "min-w-0"]);
+export const snackbarContentVariants = cva(["flex", "flex-col", "flex-1", "min-w-0 py-2 pr-2"]);
 
 // ─── Initial hidden state ─────────────────────────────────────────────────────
 
