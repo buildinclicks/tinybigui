@@ -204,7 +204,6 @@ function LinearProgress({ percentage, indeterminate }: LinearProgressProps): Rea
       <div
         data-stop-indicator=""
         className={cn(progressStopIndicatorVariants())}
-        style={{ left: `${percentage}%` }}
         aria-hidden="true"
       />
     </div>
