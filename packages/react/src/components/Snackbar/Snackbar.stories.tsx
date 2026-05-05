@@ -565,7 +565,7 @@ const PlaygroundDemo = ({
 };
 
 export const Playground: StoryObj<PlaygroundArgs> = {
-  render: (args) => (
+  render: (args: PlaygroundArgs) => (
     <PlaygroundDemo
       message={args.message}
       supportingText={args.supportingText}
