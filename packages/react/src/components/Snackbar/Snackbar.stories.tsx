@@ -486,7 +486,7 @@ const InteractiveDemo = (): JSX.Element => {
 
 export const Interactive: Story = {
   render: () => <InteractiveDemo />,
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
 
     const trigger = canvas.getByRole("button", { name: /open snackbar/i });
@@ -512,6 +512,15 @@ export const Interactive: Story = {
 };
 
 // ─── Playground ───────────────────────────────────────────────────────────────
+
+interface PlaygroundArgs {
+  message: string;
+  supportingText: string;
+  showClose: boolean;
+  duration: number;
+  severity: "default" | "error";
+  position: SnackbarPosition;
+}
 
 /**
  * Configure all Snackbar options using the Controls panel, then click
@@ -555,7 +564,7 @@ const PlaygroundDemo = ({
   );
 };
 
-export const Playground: Story = {
+export const Playground: StoryObj<PlaygroundArgs> = {
   render: (args) => (
     <PlaygroundDemo
       message={args.message}
