@@ -8,7 +8,6 @@ import { SnackbarHeadless } from "./SnackbarHeadless";
 import {
   snackbarAnimationVariants,
   snackbarBaseVariants,
-  snackbarPositionVariants,
   snackbarContentVariants,
   snackbarMessageVariants,
   snackbarSupportingTextVariants,
@@ -84,12 +83,9 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
 ) {
   const isTwoLine = Boolean(supportingText);
 
-  // Base structural classes merged with position classes (not animation-state-dependent)
-  const baseClassName = cn(
-    snackbarBaseVariants({ twoLine: isTwoLine }),
-    snackbarPositionVariants({ position }),
-    className
-  );
+  // Base structural classes only — positioning is handled by the stack container
+  // in SnackbarProvider. pointer-events-auto is included in snackbarBaseVariants.
+  const baseClassName = cn(snackbarBaseVariants({ twoLine: isTwoLine }), className);
 
   return (
     <SnackbarHeadless

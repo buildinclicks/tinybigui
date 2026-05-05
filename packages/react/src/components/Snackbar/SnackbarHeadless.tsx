@@ -84,14 +84,14 @@ export const SnackbarHeadless = forwardRef<HTMLDivElement, SnackbarHeadlessProps
       setAnimationState("exiting");
       // Fallback: if onTransitionEnd does not fire (jsdom, reduced-motion,
       // or CSS transitions disabled), ensure onClose is called after the
-      // exit animation duration (MD3 short2 = 100ms + small buffer).
+      // exit animation duration (MD3 short4 = 200ms + small buffer).
       exitFallbackRef.current = setTimeout(() => {
         if (!closedRef.current) {
           closedRef.current = true;
           setAnimationState("exited");
           onClose?.();
         }
-      }, 150);
+      }, 250);
     }, [clearDismissTimer, onClose]);
 
     const startDismissTimer = useCallback(
@@ -104,15 +104,22 @@ export const SnackbarHeadless = forwardRef<HTMLDivElement, SnackbarHeadlessProps
       [clearDismissTimer, triggerExit]
     );
 
-    // Entry animation: a zero-delay timer ensures the component is painted
-    // in its initial "entering" state before transitioning to "visible",
-    // allowing CSS transitions to fire. Using setTimeout instead of rAF
-    // ensures compatibility with vi.useFakeTimers() in tests.
+    // Entry animation: double requestAnimationFrame guarantees the browser
+    // completes at least one full paint cycle with the component in its
+    // "entering" state (scale-75 + opacity-0) before we transition to
+    // "visible" (scale-100 + opacity-100). A single setTimeout(0) is not
+    // reliable — browsers may batch the renders and never paint the initial
+    // state, preventing the CSS zoom-in transition from firing entirely.
+    // With fake timers (vi.useFakeTimers), rAF is faked as setTimeout(~16ms),
+    // so advancing by 32ms in tests fires both frames correctly.
     useEffect(() => {
-      const id = setTimeout(() => {
-        setAnimationState("visible");
-      }, 0);
-      return () => clearTimeout(id);
+      let frameId: number;
+      frameId = requestAnimationFrame(() => {
+        frameId = requestAnimationFrame(() => {
+          setAnimationState("visible");
+        });
+      });
+      return () => cancelAnimationFrame(frameId);
     }, []);
 
     // Start auto-dismiss timer once the component is in `visible` state.

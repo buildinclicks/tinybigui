@@ -1,11 +1,22 @@
 "use client";
 
-import { createContext, useCallback, useContext, useId, useRef, useState, type JSX } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type JSX,
+} from "react";
 import { createPortal } from "react-dom";
 import { Snackbar } from "./Snackbar";
+import { snackbarStackContainerVariants } from "./Snackbar.variants";
 import type {
   SnackbarContextValue,
   SnackbarItem,
+  SnackbarPosition,
   SnackbarProps,
   SnackbarProviderProps,
 } from "./Snackbar.types";
@@ -60,17 +71,27 @@ export function useSnackbar(): SnackbarContextValue {
  * `SnackbarProvider` — context provider, queue manager, and portal host.
  *
  * Wrap your application (or Storybook preview) with this component to enable
- * the Snackbar queue and portal rendering.
+ * the Snackbar stack and portal rendering.
  *
- * - Multiple `showSnackbar` calls are **queued** and displayed sequentially
- *   (never stacked) per MD3 spec.
- * - The active Snackbar is rendered via `createPortal` into `document.body`,
- *   positioned `fixed bottom-4 left-1/2 -translate-x-1/2` per MD3 spec.
+ * - Multiple `showSnackbar` calls are displayed simultaneously in a vertical
+ *   stack, grouped by their `position` prop.
+ * - Each position group is rendered in its own fixed container via `createPortal`
+ *   into `document.body`.
+ * - Bottom positions stack upward (newest at bottom); top positions stack
+ *   downward (newest at top).
+ * - The `maxVisible` prop caps how many snackbars can be visible at once per
+ *   position group. Snackbars beyond the cap are queued and shown as existing
+ *   ones are dismissed.
  *
  * @example
  * ```tsx
  * // Application root
  * <SnackbarProvider>
+ *   <App />
+ * </SnackbarProvider>
+ *
+ * // With custom cap (default is 5)
+ * <SnackbarProvider maxVisible={3}>
  *   <App />
  * </SnackbarProvider>
  *
@@ -84,16 +105,15 @@ export function useSnackbar(): SnackbarContextValue {
  * ];
  * ```
  */
-export function SnackbarProvider({ children }: SnackbarProviderProps): JSX.Element {
+export function SnackbarProvider({ children, maxVisible = 5 }: SnackbarProviderProps): JSX.Element {
   const [queue, setQueue] = useState<SnackbarItem[]>([]);
-  // Monotonically increasing counter for unique id generation without hooks
   const counterRef = useRef<number>(0);
   const baseId = useId();
 
   /**
    * Enqueue a new Snackbar. Returns the assigned id.
-   * If no Snackbar is currently shown, the new item is displayed immediately.
-   * Otherwise it is appended to the queue.
+   * The snackbar is immediately visible if the position group has fewer than
+   * `maxVisible` items currently displayed.
    */
   const showSnackbar = useCallback(
     (options: SnackbarProps): string => {
@@ -105,57 +125,73 @@ export function SnackbarProvider({ children }: SnackbarProviderProps): JSX.Eleme
   );
 
   /**
-   * Imperatively dismiss the currently displayed Snackbar.
-   * Triggers the exit animation; removal happens via the `onClose` callback.
+   * Imperatively dismiss the oldest snackbar across all position groups.
+   * The snackbar's own exit animation plays before it is removed.
    */
   const closeSnackbar = useCallback(() => {
     setQueue((prev) => {
       if (prev.length === 0) return prev;
-      // Mark the current item for removal by clearing the queue head.
-      // The Snackbar's own onClose callback (fired after exit animation)
-      // will drive the actual dequeue below.
-      return prev;
+      return prev.slice(1);
     });
-    // Signal to the active Snackbar to begin its exit animation by removing
-    // it from the queue head — we do this by firing handleClose on the current item.
-    // The onClose callback below handles the actual shift.
-    setQueue((prev) => (prev.length > 0 ? prev.slice(1) : prev));
   }, []);
 
   /**
-   * Called by the active Snackbar after its exit animation completes.
-   * Shifts the queue so the next item (if any) is displayed.
+   * Removes a specific snackbar by id after its exit animation completes.
    */
-  const handleCurrentClose = useCallback(() => {
-    setQueue((prev) => prev.slice(1));
+  const removeById = useCallback((id: string) => {
+    setQueue((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
   const contextValue: SnackbarContextValue = { showSnackbar, closeSnackbar };
 
-  // The active Snackbar is always the first item in the queue (if any).
-  const active = queue[0];
+  // Group visible queue items by position, respecting maxVisible per group.
+  const positionGroups = useMemo(() => {
+    const groups = new Map<SnackbarPosition, SnackbarItem[]>();
+    const countByPosition = new Map<SnackbarPosition, number>();
+
+    for (const item of queue) {
+      const pos: SnackbarPosition = item.position ?? "bottom-center";
+      const count = countByPosition.get(pos) ?? 0;
+      if (count < maxVisible) {
+        const existing = groups.get(pos) ?? [];
+        groups.set(pos, [...existing, item]);
+        countByPosition.set(pos, count + 1);
+      }
+    }
+
+    return groups;
+  }, [queue, maxVisible]);
 
   return (
     <SnackbarContext.Provider value={contextValue}>
       {children}
-      {active &&
-        typeof document !== "undefined" &&
+      {typeof document !== "undefined" &&
         createPortal(
-          <Snackbar
-            key={active.id}
-            message={active.message}
-            {...(active.supportingText !== undefined && { supportingText: active.supportingText })}
-            {...(active.action !== undefined && { action: active.action })}
-            {...(active.showClose !== undefined && { showClose: active.showClose })}
-            {...(active.duration !== undefined && { duration: active.duration })}
-            {...(active.severity !== undefined && { severity: active.severity })}
-            {...(active.position !== undefined && { position: active.position })}
-            {...(active.className !== undefined && { className: active.className })}
-            onClose={() => {
-              active.onClose?.();
-              handleCurrentClose();
-            }}
-          />,
+          <>
+            {Array.from(positionGroups.entries()).map(([position, items]) => (
+              <div key={position} className={snackbarStackContainerVariants({ position })}>
+                {items.map((item) => (
+                  <Snackbar
+                    key={item.id}
+                    message={item.message}
+                    {...(item.supportingText !== undefined && {
+                      supportingText: item.supportingText,
+                    })}
+                    {...(item.action !== undefined && { action: item.action })}
+                    {...(item.showClose !== undefined && { showClose: item.showClose })}
+                    {...(item.duration !== undefined && { duration: item.duration })}
+                    {...(item.severity !== undefined && { severity: item.severity })}
+                    {...(item.position !== undefined && { position: item.position })}
+                    {...(item.className !== undefined && { className: item.className })}
+                    onClose={() => {
+                      item.onClose?.();
+                      removeById(item.id);
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+          </>,
           document.body
         )}
     </SnackbarContext.Provider>

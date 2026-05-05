@@ -10,6 +10,7 @@ export { SnackbarProvider, SnackbarContext, useSnackbar } from "./SnackbarProvid
 
 // CVA Variants
 export {
+  snackbarStackContainerVariants,
   snackbarBaseVariants,
   snackbarAnimationVariants,
   snackbarPositionVariants,
@@ -20,6 +21,7 @@ export {
   snackbarCloseVariants,
   snackbarContentVariants,
   getEnterDirection,
+  type SnackbarStackContainerVariants,
   type SnackbarBaseVariants,
   type SnackbarAnimationVariants,
   type SnackbarPositionVariants,

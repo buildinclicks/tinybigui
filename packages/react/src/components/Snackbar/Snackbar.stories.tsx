@@ -41,7 +41,7 @@ import type { SnackbarPosition } from "./Snackbar.types";
  * - Elevation: level 3 → `shadow-elevation-3`
  * - Width: 288dp min, 568dp max, centered `bottom-4` by default
  * - Auto-dismiss: 4000ms default, pauses on hover and focus
- * - Motion: entry slide 200ms / exit fade 100ms
+ * - Motion: entry slide 250ms standard-decelerate / exit fade 200ms standard-accelerate
  */
 const meta: Meta<typeof Snackbar> = {
   title: "Components/Snackbar",
@@ -386,21 +386,23 @@ export const Accessibility: Story = {
   },
 };
 
-// ─── Consecutive Snackbars ────────────────────────────────────────────────────
+// ─── Stacked Snackbars ────────────────────────────────────────────────────────
 
 /**
- * Multiple `showSnackbar` calls are queued and displayed one at a time —
- * they are never stacked. Click the buttons in rapid succession to build up
- * a queue and watch them animate sequentially.
+ * Multiple `showSnackbar` calls produce a visible vertical stack.
+ * Click the buttons in rapid succession to see snackbars stack up with
+ * proper spacing. Each snackbar manages its own independent animation
+ * lifecycle — entry and exit animations run independently per item.
  *
- * This matches the MD3 spec that Snackbars should appear one at a time.
+ * Bottom positions stack upward (newest at bottom edge);
+ * top positions stack downward (newest at top edge).
  */
-const ConsecutiveSnackbarsDemo = (): JSX.Element => {
+const StackedSnackbarsDemo = (): JSX.Element => {
   const { showSnackbar } = useSnackbar();
   return (
     <div className="flex flex-col items-center gap-4 p-8">
       <p className="text-body-medium text-on-surface-variant">
-        Click the buttons quickly to queue multiple Snackbars.
+        Click the buttons quickly to stack multiple Snackbars.
       </p>
       <div className="flex gap-3">
         <Button
@@ -426,18 +428,30 @@ const ConsecutiveSnackbarsDemo = (): JSX.Element => {
         >
           Show message B
         </Button>
+        <Button
+          variant="outlined"
+          onPress={() =>
+            showSnackbar({
+              message: "Message C — with close",
+              showClose: true,
+              duration: 5000,
+            })
+          }
+        >
+          Show message C
+        </Button>
       </div>
     </div>
   );
 };
 
-export const ConsecutiveSnackbars: Story = {
-  render: () => <ConsecutiveSnackbarsDemo />,
+export const StackedSnackbars: Story = {
+  render: () => <StackedSnackbarsDemo />,
   parameters: {
     docs: {
       description: {
         story:
-          "Multiple Snackbars are displayed sequentially, never stacked, per MD3 spec. Build up the queue by clicking both buttons before the first one dismisses.",
+          "Multiple Snackbars stack vertically with 8dp spacing between them. Each item enters and exits independently. Bottom positions stack upward; top positions stack downward. Click all three buttons quickly to see the full stack.",
       },
     },
   },

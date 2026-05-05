@@ -15,28 +15,66 @@ import { cva, type VariantProps } from "class-variance-authority";
  * - Default position: fixed bottom-4, horizontally centered
  * - Message text: body-medium
  * - Action text: label-large, inverse-primary color
- * - Entry motion: short4 (200ms) + ease-emphasized-decelerate (slide up/down + fade in)
- * - Exit motion:  short2 (100ms) + ease-emphasized-accelerate (fade out)
+ * - Entry motion: medium1 (250ms) + ease-emphasized-decelerate (zoom in)
+ * - Exit motion:  short4 (200ms) + ease-standard-accelerate (fade out)
  */
+
+// ─── Stack container (fixed viewport anchor, per-position group) ──────────────
+
+/**
+ * Outer wrapper rendered once per active position group by `SnackbarProvider`.
+ * Handles the fixed viewport positioning and stacking direction for all
+ * snackbars sharing the same `position` value.
+ *
+ * - Bottom positions use `flex-col-reverse` so the newest snackbar sits at
+ *   the bottom edge and older ones push upward.
+ * - Top positions use `flex-col` so the newest sits at the top edge and
+ *   older ones push downward.
+ * - `pointer-events-none` on the container lets clicks pass through the gaps
+ *   between snackbars; each snackbar restores `pointer-events-auto`.
+ */
+export const snackbarStackContainerVariants = cva(
+  ["fixed", "z-50", "flex", "gap-2", "pointer-events-none"],
+  {
+    variants: {
+      position: {
+        "bottom-center": [
+          "bottom-4",
+          "left-1/2",
+          "-translate-x-1/2",
+          "flex-col-reverse",
+          "items-center",
+        ],
+        "bottom-left": ["bottom-4", "left-4", "flex-col-reverse", "items-start"],
+        "bottom-right": ["bottom-4", "right-4", "flex-col-reverse", "items-end"],
+        "top-center": ["top-4", "left-1/2", "-translate-x-1/2", "flex-col", "items-center"],
+        "top-left": ["top-4", "left-4", "flex-col", "items-start"],
+        "top-right": ["top-4", "right-4", "flex-col", "items-end"],
+      },
+    },
+    defaultVariants: { position: "bottom-center" },
+  }
+);
+
+export type SnackbarStackContainerVariants = VariantProps<typeof snackbarStackContainerVariants>;
 
 // ─── Base container (surface, shape, layout — no positioning) ─────────────────
 
 /**
  * Snackbar base container variants — structural, surface, and layout classes.
- * Positioning is handled separately via `snackbarPositionVariants` so it can
- * be updated independently from animation state.
+ * Positioning is handled by the stack container (`snackbarStackContainerVariants`)
+ * so individual snackbars only carry surface/shape/layout concerns.
  */
 export const snackbarBaseVariants = cva(
   [
-    // Fixed stacking context
-    "fixed",
-    "z-50",
-
     // Sizing (MD3 spec: 288dp min, 568dp max)
     "min-w-72",
     "max-w-snackbar-max",
     "w-max",
     "min-h-12",
+
+    // Restore pointer events so hover/focus timer pause works
+    "pointer-events-auto",
 
     // Surface
     "bg-inverse-surface",
@@ -85,10 +123,11 @@ export type SnackbarBaseVariants = VariantProps<typeof snackbarBaseVariants>;
 /**
  * Snackbar screen position variants.
  *
- * Maps to a fixed corner/edge of the viewport with 16dp (4) inset.
- * MD3 default is `bottom-center`.
+ * These classes are now applied to the **stack container** rather than
+ * individual snackbars. Kept as a separate export so standalone (non-provider)
+ * usage of `SnackbarHeadless` can still apply position classes directly.
  *
- * Center variants add `left-1/2 -translate-x-1/2` for horizontal centering.
+ * MD3 default is `bottom-center`.
  */
 export const snackbarPositionVariants = cva("", {
   variants: {
@@ -114,32 +153,37 @@ export type SnackbarPositionVariants = VariantProps<typeof snackbarPositionVaria
  * Snackbar animation state variants.
  * Applied by `SnackbarHeadless` based on its internal animation state machine.
  *
- * The `enterDirection` controls the initial translate offset:
- * - `up`   (bottom positions): starts `translate-y-4`  (below) → slides up
- * - `down` (top positions):    starts `-translate-y-4` (above) → slides down
+ * The `enterDirection` sets the transform-origin for the scale animation so the
+ * snackbar appears to grow from the correct viewport edge:
+ * - `up`   (bottom positions): `origin-bottom` — scales up from the bottom edge
+ * - `down` (top positions):    `origin-top`    — scales up from the top edge
  *
- * - `entering`: initial mount state — starts offset + transparent
- * - `visible`:  translate-y-0 + fade in (short4 / emphasized-decelerate)
- * - `exiting`:  fade out in place (short2 / emphasized-accelerate)
+ * MD3 motion spec (Emphasized easing set — appropriate for high-attention UI entries):
+ * - `entering`: initial mount state — scaled down (75%) + transparent (no duration)
+ * - `visible`:  scale-100 + opacity-100 (medium1 / emphasized-decelerate = 250ms) — zoom in
+ * - `exiting`:  scale-75 + opacity-0 (short4 / standard-accelerate = 200ms) — zoom out
  * - `exited`:   fully transparent (removed from DOM by provider)
+ *
+ * `ease-emphasized-decelerate` (cubic-bezier(0.05, 0.7, 0.1, 1)) is used for entry
+ * instead of `ease-standard-decelerate` (cubic-bezier(0, 0, 0, 1)) because the
+ * standard-decelerate curve has an infinite initial velocity — it snaps to ~50%
+ * progress in the first few milliseconds, making the zoom feel abrupt. The
+ * emphasized-decelerate curve has a finite (but high) initial velocity that
+ * produces a visible, smooth movement from scale-75 to scale-100.
  */
 export const snackbarAnimationVariants = cva("", {
   variants: {
     animationState: {
-      entering: ["opacity-0"],
-      visible: ["translate-y-0", "opacity-100", "duration-short4", "ease-emphasized-decelerate"],
-      exiting: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
-      exited: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
+      entering: ["opacity-0", "scale-75"],
+      visible: ["scale-100", "opacity-100", "duration-medium1", "ease-emphasized-decelerate"],
+      exiting: ["scale-75", "opacity-0", "duration-short4", "ease-standard-accelerate"],
+      exited: ["scale-75", "opacity-0", "duration-short4", "ease-standard-accelerate"],
     },
     enterDirection: {
-      up: [],
-      down: [],
+      up: ["origin-bottom"],
+      down: ["origin-top"],
     },
   },
-  compoundVariants: [
-    { animationState: "entering", enterDirection: "up", class: "translate-y-4" },
-    { animationState: "entering", enterDirection: "down", class: "-translate-y-4" },
-  ],
   defaultVariants: {
     animationState: "entering",
     enterDirection: "up",
@@ -152,19 +196,19 @@ export type SnackbarAnimationVariants = VariantProps<typeof snackbarAnimationVar
  * Combined container variants (base + position + animation) for convenience.
  * The headless layer uses `snackbarAnimationVariants` directly; this export
  * is kept for consumers who want the full combined class string without the
- * render-prop pattern.
+ * render-prop pattern (e.g. standalone headless usage outside the provider).
  */
 export const snackbarContainerVariants = cva([...snackbarBaseVariants()], {
   variants: {
     animationState: {
-      entering: ["opacity-0"],
-      visible: ["translate-y-0", "opacity-100", "duration-short4", "ease-emphasized-decelerate"],
-      exiting: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
-      exited: ["translate-y-0", "opacity-0", "duration-short2", "ease-emphasized-accelerate"],
+      entering: ["opacity-0", "scale-75"],
+      visible: ["scale-100", "opacity-100", "duration-medium1", "ease-emphasized-decelerate"],
+      exiting: ["scale-75", "opacity-0", "duration-short4", "ease-standard-accelerate"],
+      exited: ["scale-75", "opacity-0", "duration-short4", "ease-standard-accelerate"],
     },
     enterDirection: {
-      up: [],
-      down: [],
+      up: ["origin-bottom"],
+      down: ["origin-top"],
     },
     position: {
       "bottom-center": ["bottom-4", "left-1/2", "-translate-x-1/2"],
@@ -179,10 +223,6 @@ export const snackbarContainerVariants = cva([...snackbarBaseVariants()], {
       false: "py-1",
     },
   },
-  compoundVariants: [
-    { animationState: "entering", enterDirection: "up", class: "translate-y-4" },
-    { animationState: "entering", enterDirection: "down", class: "-translate-y-4" },
-  ],
   defaultVariants: {
     animationState: "entering",
     enterDirection: "up",
@@ -223,13 +263,7 @@ export const snackbarSupportingTextVariants = cva([
  * Wrapper applied around the action `Button` to override its color to
  * `inverse-primary` as required by MD3 Snackbar spec.
  */
-export const snackbarActionVariants = cva([
-  "shrink-0",
-  // Color override for the nested Button's text — applied via CSS variable
-  // override on the wrapper; the Button(variant="text") reads text color
-  // from the current text color context.
-  "text-inverse-primary",
-]);
+export const snackbarActionVariants = cva(["shrink-0", "text-inverse-primary"]);
 
 // ─── Close icon button wrapper ────────────────────────────────────────────────
 
@@ -250,9 +284,9 @@ export const snackbarContentVariants = cva(["flex", "flex-col", "flex-1", "min-w
 
 /**
  * Classes applied before the enter animation begins (component just mounted).
- * Positioned off-screen below and transparent.
+ * Scaled down and transparent — the zoom-in entry starts from this state.
  */
-export const snackbarInitialVariants = cva(["translate-y-4", "opacity-0"]);
+export const snackbarInitialVariants = cva(["scale-75", "opacity-0"]);
 
 // ─── Position → direction helper ─────────────────────────────────────────────
 
