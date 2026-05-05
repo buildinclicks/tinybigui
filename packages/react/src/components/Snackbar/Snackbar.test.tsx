@@ -5,7 +5,7 @@ import { axe } from "vitest-axe";
 import { Snackbar } from "./Snackbar";
 import { SnackbarHeadless } from "./SnackbarHeadless";
 import { SnackbarProvider, useSnackbar } from "./SnackbarProvider";
-import type { SnackbarProps } from "./Snackbar.types";
+import type { SnackbarPosition, SnackbarProps } from "./Snackbar.types";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -20,23 +20,27 @@ const renderSnackbar = (props: Partial<SnackbarProps> = {}) =>
 
 /**
  * Advance fake timers through all phases of the auto-dismiss lifecycle:
- * 1. entering → visible (setTimeout 0ms fires, React re-renders)
+ * 1. entering → visible (two rAF frames ≈ 32ms fires, React re-renders)
  * 2. visible → exiting (dismiss timer fires)
- * 3. exiting → exited (150ms exit fallback fires → onClose called)
+ * 3. exiting → exited (250ms exit fallback fires → onClose called)
  *
  * Each phase is wrapped in its own act() to ensure React flushes state
  * updates between phases. Must be called with vi.useFakeTimers() active.
+ *
+ * The 32ms advance covers the double requestAnimationFrame used to trigger
+ * the entry animation. With vi.useFakeTimers(), rAF is faked as setTimeout(~16ms),
+ * so two frames require advancing by at least 32ms.
  */
 function advanceAndFinishExit(durationMs: number): void {
   act(() => {
-    vi.advanceTimersByTime(0);
-  }); // entering → visible
+    vi.advanceTimersByTime(32);
+  }); // entering → visible (double rAF: 2 × ~16ms)
   act(() => {
     vi.advanceTimersByTime(durationMs);
   }); // visible → exiting
   act(() => {
-    vi.advanceTimersByTime(200);
-  }); // exit fallback fires
+    vi.advanceTimersByTime(300);
+  }); // exit fallback fires (250ms + buffer)
 }
 
 const renderWithQueue = () => {
@@ -245,9 +249,9 @@ describe("Snackbar", () => {
       const onClose = vi.fn();
       renderSnackbar({ message: "File deleted", duration: 4000, onClose });
 
-      // Flush entering→visible then advance to just before dismiss
+      // Flush entering→visible (double rAF ≈ 32ms) then advance to just before dismiss
       act(() => {
-        vi.advanceTimersByTime(0);
+        vi.advanceTimersByTime(32);
       });
       act(() => {
         vi.advanceTimersByTime(3999);
@@ -276,9 +280,9 @@ describe("Snackbar", () => {
 
       const el = screen.getByRole("status");
 
-      // Flush entering→visible so event handlers see animationState="visible"
+      // Flush entering→visible (double rAF ≈ 32ms) so event handlers see animationState="visible"
       act(() => {
-        vi.advanceTimersByTime(0);
+        vi.advanceTimersByTime(32);
       });
       // Advance 2s
       act(() => {
@@ -302,9 +306,9 @@ describe("Snackbar", () => {
 
       const el = screen.getByRole("status");
 
-      // Flush entering→visible
+      // Flush entering→visible (double rAF ≈ 32ms)
       act(() => {
-        vi.advanceTimersByTime(0);
+        vi.advanceTimersByTime(32);
       });
       // Advance 2s (2000ms consumed, 2000ms remaining)
       act(() => {
@@ -322,9 +326,9 @@ describe("Snackbar", () => {
       act(() => {
         vi.advanceTimersByTime(2000);
       });
-      // Advance past 150ms exit fallback
+      // Advance past 250ms exit fallback
       act(() => {
-        vi.advanceTimersByTime(200);
+        vi.advanceTimersByTime(300);
       });
 
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -350,9 +354,9 @@ describe("Snackbar", () => {
 
       const el = screen.getByRole("status");
 
-      // Flush entering→visible
+      // Flush entering→visible (double rAF ≈ 32ms)
       act(() => {
-        vi.advanceTimersByTime(0);
+        vi.advanceTimersByTime(32);
       });
       // Advance 1s
       act(() => {
@@ -376,9 +380,9 @@ describe("Snackbar", () => {
 
       const el = screen.getByRole("status");
 
-      // Flush entering→visible
+      // Flush entering→visible (double rAF ≈ 32ms)
       act(() => {
-        vi.advanceTimersByTime(0);
+        vi.advanceTimersByTime(32);
       });
       // Advance 1s (1000ms consumed, 3000ms remaining)
       act(() => {
@@ -396,9 +400,9 @@ describe("Snackbar", () => {
       act(() => {
         vi.advanceTimersByTime(3000);
       });
-      // Advance past 150ms exit fallback
+      // Advance past 250ms exit fallback
       act(() => {
-        vi.advanceTimersByTime(200);
+        vi.advanceTimersByTime(300);
       });
 
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -441,9 +445,9 @@ describe("Snackbar", () => {
         fireEvent.click(screen.getByRole("button", { name: /close/i }));
       });
 
-      // Advance past the 150ms exit fallback timer
+      // Advance past the 250ms exit fallback timer
       act(() => {
-        vi.advanceTimersByTime(200);
+        vi.advanceTimersByTime(300);
       });
 
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -476,6 +480,101 @@ describe("Snackbar", () => {
   });
 
   // ---------------------------------------------------------------------------
+  // Position
+  // ---------------------------------------------------------------------------
+
+  describe("Position", () => {
+    // Position classes are now applied to the stack container (parent of the
+    // snackbar element), rendered via the portal by SnackbarProvider. Tests
+    // must trigger snackbars through the queue so the container exists.
+
+    function renderWithPosition(position: string) {
+      const TriggerComponent = () => {
+        const { showSnackbar } = useSnackbar();
+        return (
+          <button
+            onClick={() =>
+              showSnackbar({ message: "Hello", position: position as SnackbarPosition })
+            }
+          >
+            Trigger
+          </button>
+        );
+      };
+      render(
+        <SnackbarProvider>
+          <TriggerComponent />
+        </SnackbarProvider>
+      );
+    }
+
+    test("defaults to bottom-center position classes", async () => {
+      renderWithPosition("bottom-center");
+      await userEvent.click(screen.getByRole("button", { name: "Trigger" }));
+      const container = screen.getByRole("status").parentElement!;
+      expect(container.className).toMatch(/bottom-4/);
+      expect(container.className).toMatch(/left-1\/2/);
+    });
+
+    test("applies bottom-left position classes", async () => {
+      renderWithPosition("bottom-left");
+      await userEvent.click(screen.getByRole("button", { name: "Trigger" }));
+      const container = screen.getByRole("status").parentElement!;
+      expect(container.className).toMatch(/bottom-4/);
+      expect(container.className).toMatch(/left-4/);
+    });
+
+    test("applies bottom-right position classes", async () => {
+      renderWithPosition("bottom-right");
+      await userEvent.click(screen.getByRole("button", { name: "Trigger" }));
+      const container = screen.getByRole("status").parentElement!;
+      expect(container.className).toMatch(/bottom-4/);
+      expect(container.className).toMatch(/right-4/);
+    });
+
+    test("applies top-center position classes", async () => {
+      renderWithPosition("top-center");
+      await userEvent.click(screen.getByRole("button", { name: "Trigger" }));
+      const container = screen.getByRole("status").parentElement!;
+      expect(container.className).toMatch(/top-4/);
+      expect(container.className).toMatch(/left-1\/2/);
+    });
+
+    test("applies top-left position classes", async () => {
+      renderWithPosition("top-left");
+      await userEvent.click(screen.getByRole("button", { name: "Trigger" }));
+      const container = screen.getByRole("status").parentElement!;
+      expect(container.className).toMatch(/top-4/);
+      expect(container.className).toMatch(/left-4/);
+    });
+
+    test("applies top-right position classes", async () => {
+      renderWithPosition("top-right");
+      await userEvent.click(screen.getByRole("button", { name: "Trigger" }));
+      const container = screen.getByRole("status").parentElement!;
+      expect(container.className).toMatch(/top-4/);
+      expect(container.className).toMatch(/right-4/);
+    });
+
+    test("bottom positions enter with scale-75 and origin-bottom (zoom-in from bottom)", () => {
+      renderSnackbar({ message: "Hello", position: "bottom-center" });
+      const el = screen.getByRole("status");
+      // In entering state (before the zero-delay setTimeout fires), the snackbar
+      // starts at scale-75 + opacity-0, anchored at origin-bottom for the zoom.
+      expect(el.className).toMatch(/scale-75/);
+      expect(el.className).toMatch(/origin-bottom/);
+    });
+
+    test("top positions enter with scale-75 and origin-top (zoom-in from top)", () => {
+      renderSnackbar({ message: "Hello", position: "top-center" });
+      const el = screen.getByRole("status");
+      // In entering state with "down" direction, scale anchors at origin-top.
+      expect(el.className).toMatch(/scale-75/);
+      expect(el.className).toMatch(/origin-top/);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Queue ordering
   // ---------------------------------------------------------------------------
 
@@ -491,36 +590,101 @@ describe("Snackbar", () => {
       expect(screen.getByText("First")).toBeInTheDocument();
     });
 
-    test("shows only one snackbar at a time (no stacking)", async () => {
+    test("shows multiple snackbars simultaneously (stacking)", async () => {
       renderWithQueue();
 
       await userEvent.click(screen.getByRole("button", { name: "Show First" }));
       await userEvent.click(screen.getByRole("button", { name: "Show Second" }));
 
       expect(screen.getByText("First")).toBeInTheDocument();
-      expect(screen.queryByText("Second")).not.toBeInTheDocument();
+      expect(screen.getByText("Second")).toBeInTheDocument();
     });
 
-    test("shows second snackbar after first dismisses", () => {
-      vi.useFakeTimers();
+    test("shows all three snackbars simultaneously when stacked", async () => {
       renderWithQueue();
 
-      act(() => {
-        fireEvent.click(screen.getByRole("button", { name: "Show First" }));
-      });
-      act(() => {
-        fireEvent.click(screen.getByRole("button", { name: "Show Second" }));
-      });
+      await userEvent.click(screen.getByRole("button", { name: "Show First" }));
+      await userEvent.click(screen.getByRole("button", { name: "Show Second" }));
+      await userEvent.click(screen.getByRole("button", { name: "Show Third" }));
 
       expect(screen.getByText("First")).toBeInTheDocument();
+      expect(screen.getByText("Second")).toBeInTheDocument();
+      expect(screen.getByText("Third")).toBeInTheDocument();
+    });
 
-      // Advance through first snackbar's full lifecycle
-      advanceAndFinishExit(3000);
+    test("dismisses individual snackbars independently", () => {
+      vi.useFakeTimers();
+
+      // Use a component that lets us trigger two snackbars with different durations
+      const TriggerComponent = () => {
+        const { showSnackbar } = useSnackbar();
+        return (
+          <div>
+            <button onClick={() => showSnackbar({ message: "Short", duration: 1000 })}>
+              Show Short
+            </button>
+            <button onClick={() => showSnackbar({ message: "Long", duration: 10000 })}>
+              Show Long
+            </button>
+          </div>
+        );
+      };
+      render(
+        <SnackbarProvider>
+          <TriggerComponent />
+        </SnackbarProvider>
+      );
+
+      act(() => {
+        fireEvent.click(screen.getByRole("button", { name: "Show Short" }));
+      });
+      act(() => {
+        fireEvent.click(screen.getByRole("button", { name: "Show Long" }));
+      });
+
+      // Both should be visible immediately
+      expect(screen.getByText("Short")).toBeInTheDocument();
+      expect(screen.getByText("Long")).toBeInTheDocument();
+
+      // Advance only past the Short snackbar's duration (1000ms) + exit fallback
+      advanceAndFinishExit(1000);
 
       vi.useRealTimers();
 
-      expect(screen.getByText("Second")).toBeInTheDocument();
-      expect(screen.queryByText("First")).not.toBeInTheDocument();
+      // Long should still be visible, Short should be gone
+      expect(screen.getByText("Long")).toBeInTheDocument();
+      expect(screen.queryByText("Short")).not.toBeInTheDocument();
+    });
+
+    test("respects maxVisible cap — excess snackbars are hidden until space opens", async () => {
+      const TriggerComponent = () => {
+        const { showSnackbar } = useSnackbar();
+        return (
+          <div>
+            {["A", "B", "C"].map((label) => (
+              <button
+                key={label}
+                onClick={() => showSnackbar({ message: `Message ${label}`, duration: 3000 })}
+              >
+                {`Show ${label}`}
+              </button>
+            ))}
+          </div>
+        );
+      };
+      render(
+        <SnackbarProvider maxVisible={2}>
+          <TriggerComponent />
+        </SnackbarProvider>
+      );
+
+      await userEvent.click(screen.getByRole("button", { name: "Show A" }));
+      await userEvent.click(screen.getByRole("button", { name: "Show B" }));
+      await userEvent.click(screen.getByRole("button", { name: "Show C" }));
+
+      expect(screen.getByText("Message A")).toBeInTheDocument();
+      expect(screen.getByText("Message B")).toBeInTheDocument();
+      expect(screen.queryByText("Message C")).not.toBeInTheDocument();
     });
 
     test("useSnackbar throws when used outside SnackbarProvider", () => {

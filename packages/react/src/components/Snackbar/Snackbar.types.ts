@@ -1,5 +1,23 @@
 import type { ReactNode } from "react";
 
+// ─── Position ────────────────────────────────────────────────────────────────
+
+/**
+ * Screen position of the Snackbar.
+ *
+ * MD3 default is `bottom-center`. All six positions are supported for
+ * application-specific layout needs (e.g. presence of a FAB or navigation bar).
+ *
+ * @default 'bottom-center'
+ */
+export type SnackbarPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
+
 // ─── Severity ────────────────────────────────────────────────────────────────
 
 /**
@@ -18,10 +36,10 @@ export type SnackbarSeverity = "default" | "error";
 /**
  * Internal animation state machine for the Snackbar.
  *
- * - `entering` → slide-up + fade-in (MD3 entry: short4 / emphasized-decelerate)
- * - `visible`  → fully shown, auto-dismiss timer running
- * - `exiting`  → fade-out (MD3 exit: short2 / emphasized-accelerate)
- * - `exited`   → removed from DOM / queue advanced
+ * - `entering` → zoom-in start: scale-75 + opacity-0 (no duration, paints before transition)
+ * - `visible`  → scale-100 + opacity-100 (medium1 / standard-decelerate = 250ms)
+ * - `exiting`  → scale-75 + opacity-0 (short4 / standard-accelerate = 200ms)
+ * - `exited`   → removed from DOM / stack updated
  */
 export type SnackbarAnimationState = "entering" | "visible" | "exiting" | "exited";
 
@@ -107,6 +125,12 @@ export interface SnackbarProps {
   severity?: SnackbarSeverity;
 
   /**
+   * Screen position of the Snackbar.
+   * @default 'bottom-center'
+   */
+  position?: SnackbarPosition;
+
+  /**
    * Callback fired when the Snackbar finishes its exit animation and is removed.
    * Also fires when the close icon is pressed.
    */
@@ -154,15 +178,17 @@ export interface SnackbarHeadlessProps extends Omit<SnackbarProps, "className"> 
 
   /**
    * Optional callback that returns additional CSS classes based on the current
-   * animation state. Used by the styled `Snackbar` layer to inject CVA
-   * animation variant classes onto the headless container div at render time.
+   * animation state and position. Used by the styled `Snackbar` layer to inject
+   * CVA animation + position variant classes onto the headless container div.
    *
    * @example
    * ```tsx
-   * getAnimationClassName={(state) => snackbarAnimationVariants({ animationState: state })}
+   * getAnimationClassName={(state, pos) =>
+   *   snackbarAnimationVariants({ animationState: state, enterDirection: getEnterDirection(pos) })
+   * }
    * ```
    */
-  getAnimationClassName?: (state: SnackbarAnimationState) => string;
+  getAnimationClassName?: (state: SnackbarAnimationState, position: SnackbarPosition) => string;
 }
 
 // ─── Queue ───────────────────────────────────────────────────────────────────
@@ -189,12 +215,14 @@ export interface SnackbarItem extends SnackbarProps {
  */
 export interface SnackbarContextValue {
   /**
-   * Enqueue a new Snackbar. Returns the unique id assigned to this item.
-   * Multiple calls are displayed sequentially, not stacked.
+   * Show a new Snackbar. Returns the unique id assigned to this item.
+   * Multiple snackbars are displayed simultaneously in a vertical stack,
+   * grouped by their `position` prop. Once the stack reaches `maxVisible`,
+   * additional items wait until existing ones are dismissed.
    */
   showSnackbar: (options: SnackbarProps) => string;
   /**
-   * Imperatively dismiss the currently displayed Snackbar (triggers exit animation).
+   * Imperatively dismiss the oldest currently displayed Snackbar (triggers exit animation).
    */
   closeSnackbar: () => void;
 }
@@ -205,11 +233,16 @@ export interface SnackbarContextValue {
  * Props for `SnackbarProvider`.
  *
  * Wrap your application (or Storybook decorator) with this provider to enable
- * the Snackbar queue and portal.
+ * the Snackbar stack and portal.
  *
  * @example
  * ```tsx
  * <SnackbarProvider>
+ *   <App />
+ * </SnackbarProvider>
+ *
+ * // Limit visible snackbars per position group
+ * <SnackbarProvider maxVisible={3}>
  *   <App />
  * </SnackbarProvider>
  * ```
@@ -217,4 +250,12 @@ export interface SnackbarContextValue {
 export interface SnackbarProviderProps {
   /** Application children. */
   children: ReactNode;
+
+  /**
+   * Maximum number of snackbars visible at once per position group.
+   * Additional snackbars beyond this cap are queued and shown as existing
+   * ones are dismissed.
+   * @default 5
+   */
+  maxVisible?: number;
 }

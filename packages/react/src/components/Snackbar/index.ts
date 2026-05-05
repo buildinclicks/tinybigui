@@ -10,22 +10,28 @@ export { SnackbarProvider, SnackbarContext, useSnackbar } from "./SnackbarProvid
 
 // CVA Variants
 export {
+  snackbarStackContainerVariants,
   snackbarBaseVariants,
   snackbarAnimationVariants,
+  snackbarPositionVariants,
   snackbarContainerVariants,
   snackbarMessageVariants,
   snackbarSupportingTextVariants,
   snackbarActionVariants,
   snackbarCloseVariants,
   snackbarContentVariants,
+  getEnterDirection,
+  type SnackbarStackContainerVariants,
   type SnackbarBaseVariants,
   type SnackbarAnimationVariants,
+  type SnackbarPositionVariants,
   type SnackbarContainerVariants,
 } from "./Snackbar.variants";
 
 // Types
 export type {
   SnackbarSeverity,
+  SnackbarPosition,
   SnackbarProps,
   SnackbarHeadlessProps,
   SnackbarAction,
