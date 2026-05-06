@@ -1,18 +1,16 @@
 "use client";
 
-import type { JSX } from "react";
+import { type JSX } from "react";
 import { HeadlessMenuDivider } from "./MenuHeadless";
 import { menuDividerVariants } from "./Menu.variants";
 import { cn } from "../../utils/cn";
 import type { MenuDividerProps } from "./Menu.types";
 
 /**
- * Material Design 3 Menu Divider (Layer 3: Styled).
+ * MD3 styled MenuDivider component (Layer 3).
  *
- * Renders a standalone horizontal separator between menu items. Uses
- * `HeadlessMenuDivider` (RAC `Separator`) for `role="separator"` semantics.
- *
- * Color: `border-outline-variant` per MD3 spec.
+ * Renders a horizontal `role="separator"` with `border-outline-variant` styling.
+ * 8dp top/bottom padding (`my-2`) per MD3 spec.
  *
  * @example
  * ```tsx
@@ -20,11 +18,7 @@ import type { MenuDividerProps } from "./Menu.types";
  * <MenuDivider />
  * <MenuItem id="select-all">Select all</MenuItem>
  * ```
- *
- * @see https://m3.material.io/components/menus/specs
  */
 export function MenuDivider({ className }: MenuDividerProps): JSX.Element {
   return <HeadlessMenuDivider className={cn(menuDividerVariants(), className)} />;
 }
-
-MenuDivider.displayName = "MenuDivider";

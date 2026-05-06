@@ -4,6 +4,9 @@ import { MenuTrigger } from "./Menu";
 import { MenuItem } from "./MenuItem";
 import { MenuSection } from "./MenuSection";
 import { MenuDivider } from "./MenuDivider";
+import { MenuGap } from "./MenuGap";
+import { SubmenuTrigger } from "./SubmenuTrigger";
+import { ContextMenuTrigger } from "./ContextMenuTrigger";
 import { HeadlessMenuTrigger, HeadlessMenuItem } from "./MenuHeadless";
 import { menuContainerVariants, menuItemVariants } from "./Menu.variants";
 import { cn } from "../../utils/cn";
@@ -46,11 +49,49 @@ const ListIcon = (): JSX.Element => (
   </svg>
 );
 
+const CardViewIcon = (): JSX.Element => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M4 4h7v5H4V4zm0 7h7v9H4v-9zm9-7h7v9h-7V4zm0 11h7v5h-7v-5z" />
+  </svg>
+);
+
 const MoreVertIcon = (): JSX.Element => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
   </svg>
 );
+
+const StarIcon = (): JSX.Element => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+  </svg>
+);
+
+const ShareIcon = (): JSX.Element => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+  </svg>
+);
+
+const DeleteIcon = (): JSX.Element => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+  </svg>
+);
+
+const InfoIcon = (): JSX.Element => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+  </svg>
+);
+
+// ─── Shared trigger button styles ─────────────────────────────────────────────
+
+const primaryBtn = "bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5";
+const secondaryBtn =
+  "bg-secondary-container text-on-secondary-container text-label-large rounded-full px-6 py-2.5";
+const tertiaryBtn =
+  "bg-tertiary-container text-on-tertiary-container text-label-large rounded-full px-6 py-2.5";
 
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
@@ -61,8 +102,16 @@ const meta: Meta<typeof MenuTrigger> = {
     layout: "centered",
     docs: {
       description: {
-        component:
-          "Material Design 3 Menu — a contextual popup list anchored to a trigger element. Supports leading/trailing icons, keyboard shortcuts, section grouping with dividers, disabled items, and select variants.",
+        component: [
+          "Material Design 3 Menu — a contextual popup list anchored to a trigger element.",
+          "",
+          "Supports both **Baseline** (standard 4dp corners) and **Expressive Vertical** (16dp corners) styles,",
+          "two color schemes (**standard** surface-based and **vibrant** tertiary-based),",
+          "leading/trailing icons, keyboard shortcuts, supporting text, badges,",
+          "section grouping with dividers and gap separators, density control,",
+          "single/multiple selection with automatic checkmarks,",
+          "nested submenus, and right-click context menus.",
+        ].join("\n"),
       },
     },
   },
@@ -78,10 +127,7 @@ export const Basic: Story = {
   name: "Basic Menu",
   render: () => (
     <MenuTrigger>
-      <button
-        type="button"
-        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-      >
+      <button type="button" className={primaryBtn}>
         Open Menu
       </button>
       <MenuTrigger.Menu aria-label="Edit actions">
@@ -100,10 +146,7 @@ export const WithLeadingIcons: Story = {
   name: "With Leading Icons",
   render: () => (
     <MenuTrigger>
-      <button
-        type="button"
-        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-      >
+      <button type="button" className={primaryBtn}>
         Edit
       </button>
       <MenuTrigger.Menu aria-label="Edit">
@@ -127,10 +170,7 @@ export const WithKeyboardShortcuts: Story = {
   name: "With Keyboard Shortcuts",
   render: () => (
     <MenuTrigger>
-      <button
-        type="button"
-        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-      >
+      <button type="button" className={primaryBtn}>
         Edit
       </button>
       <MenuTrigger.Menu aria-label="Edit">
@@ -148,16 +188,97 @@ export const WithKeyboardShortcuts: Story = {
   ),
 };
 
+// ─── Supporting Text ─────────────────────────────────────────────────────────
+
+export const WithSupportingText: Story = {
+  name: "With Supporting Text",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use the `description` prop to add a secondary line of supporting text below the item label. Per MD3 anatomy item 8.",
+      },
+    },
+  },
+  render: () => (
+    <MenuTrigger>
+      <button type="button" className={primaryBtn}>
+        Share
+      </button>
+      <MenuTrigger.Menu aria-label="Share via">
+        <MenuItem
+          id="email"
+          leadingIcon={<CopyIcon />}
+          description="Send to anyone with an email address"
+        >
+          Email
+        </MenuItem>
+        <MenuItem id="link" leadingIcon={<ShareIcon />} description="Anyone with the link can view">
+          Copy link
+        </MenuItem>
+        <MenuItem
+          id="message"
+          leadingIcon={<InfoIcon />}
+          description="Send via SMS to a phone number"
+        >
+          Text message
+        </MenuItem>
+      </MenuTrigger.Menu>
+    </MenuTrigger>
+  ),
+};
+
+// ─── With Badge ───────────────────────────────────────────────────────────────
+
+export const WithBadge: Story = {
+  name: "With Badge",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use the `badge` prop to render a small badge between the label and trailing content. Per MD3 anatomy item 5.",
+      },
+    },
+  },
+  render: () => (
+    <MenuTrigger>
+      <button type="button" className={primaryBtn}>
+        Notifications
+      </button>
+      <MenuTrigger.Menu aria-label="Notification settings">
+        <MenuItem
+          id="all"
+          badge={
+            <span className="text-label-small bg-error text-on-error flex h-4 min-w-4 items-center justify-center rounded-full px-1">
+              12
+            </span>
+          }
+        >
+          All notifications
+        </MenuItem>
+        <MenuItem
+          id="mentions"
+          badge={
+            <span className="text-label-small bg-tertiary text-on-tertiary flex h-4 min-w-4 items-center justify-center rounded-full px-1">
+              3
+            </span>
+          }
+        >
+          Mentions only
+        </MenuItem>
+        <MenuItem id="none">None</MenuItem>
+      </MenuTrigger.Menu>
+    </MenuTrigger>
+  ),
+};
+
 // ─── With Sections ────────────────────────────────────────────────────────────
 
 export const WithSections: Story = {
   name: "With Sections and Dividers",
   render: () => (
     <MenuTrigger>
-      <button
-        type="button"
-        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-      >
+      <button type="button" className={primaryBtn}>
         Edit
       </button>
       <MenuTrigger.Menu aria-label="Edit actions">
@@ -188,10 +309,7 @@ export const WithStandaloneDivider: Story = {
   name: "With Standalone MenuDivider",
   render: () => (
     <MenuTrigger>
-      <button
-        type="button"
-        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-      >
+      <button type="button" className={primaryBtn}>
         Actions
       </button>
       <MenuTrigger.Menu aria-label="Actions">
@@ -212,10 +330,7 @@ export const WithDisabledItems: Story = {
   name: "With Disabled Items",
   render: () => (
     <MenuTrigger>
-      <button
-        type="button"
-        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-      >
+      <button type="button" className={primaryBtn}>
         Edit
       </button>
       <MenuTrigger.Menu aria-label="Edit">
@@ -236,22 +351,54 @@ export const WithDisabledItems: Story = {
   ),
 };
 
-// ─── Select Variant — Single ──────────────────────────────────────────────────
+// ─── Density ──────────────────────────────────────────────────────────────────
+
+export const DensityLevels: Story = {
+  name: "Density Levels",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MD3 web-only density prop controls item height: `0`=48dp (default), `-1`=44dp, `-2`=40dp, `-3`=36dp.",
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-start gap-4">
+      {([-0, -1, -2, -3] as const).map((density) => (
+        <MenuTrigger key={density}>
+          <button type="button" className={primaryBtn}>
+            density={density}
+          </button>
+          <MenuTrigger.Menu aria-label={`Density ${density}`} density={density}>
+            <MenuItem id="cut" leadingIcon={<CutIcon />}>
+              Cut
+            </MenuItem>
+            <MenuItem id="copy" leadingIcon={<CopyIcon />}>
+              Copy
+            </MenuItem>
+            <MenuItem id="paste" leadingIcon={<PasteIcon />}>
+              Paste
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      ))}
+    </div>
+  ),
+};
+
+// ─── Selection — Single ───────────────────────────────────────────────────────
 
 const SelectSingleDemo = (): JSX.Element => {
   const [selected, setSelected] = useState<string>("list");
   return (
     <div className="flex flex-col items-center gap-4">
       <MenuTrigger>
-        <button
-          type="button"
-          className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-        >
+        <button type="button" className={primaryBtn}>
           View: {selected}
         </button>
         <MenuTrigger.Menu
           aria-label="View options"
-          variant="select"
           selectionMode="single"
           selectedKeys={new Set([selected])}
           onSelectionChange={(keys) => {
@@ -265,6 +412,9 @@ const SelectSingleDemo = (): JSX.Element => {
           <MenuItem id="list" leadingIcon={<ListIcon />}>
             List view
           </MenuItem>
+          <MenuItem id="card" leadingIcon={<CardViewIcon />}>
+            Card view
+          </MenuItem>
         </MenuTrigger.Menu>
       </MenuTrigger>
       <p className="text-body-medium text-on-surface-variant">Selected: {selected}</p>
@@ -273,26 +423,30 @@ const SelectSingleDemo = (): JSX.Element => {
 };
 
 export const SelectSingle: Story = {
-  name: "Select Variant — Single Selection",
+  name: "Selection — Single",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Single-selection menus automatically render a leading checkmark on the selected item. Checkmark does not appear when a `leadingIcon` is already provided.",
+      },
+    },
+  },
   render: () => <SelectSingleDemo />,
 };
 
-// ─── Select Variant — Multiple ────────────────────────────────────────────────
+// ─── Selection — Multiple ─────────────────────────────────────────────────────
 
 const SelectMultipleDemo = (): JSX.Element => {
   const [selected, setSelected] = useState<Set<string>>(new Set(["bold"]));
   return (
     <div className="flex flex-col items-center gap-4">
       <MenuTrigger>
-        <button
-          type="button"
-          className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-        >
+        <button type="button" className={primaryBtn}>
           Formatting
         </button>
         <MenuTrigger.Menu
           aria-label="Text formatting"
-          variant="select"
           selectionMode="multiple"
           selectedKeys={selected}
           onSelectionChange={(keys) => setSelected(new Set([...(keys as Set<string>)]))}
@@ -311,8 +465,319 @@ const SelectMultipleDemo = (): JSX.Element => {
 };
 
 export const SelectMultiple: Story = {
-  name: "Select Variant — Multiple Selection",
+  name: "Selection — Multiple",
   render: () => <SelectMultipleDemo />,
+};
+
+// ─── Vibrant Color Scheme ─────────────────────────────────────────────────────
+
+export const VibrantColorScheme: Story = {
+  name: "Vibrant Color Scheme",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The `vibrant` color scheme uses the **tertiary container** background (vs. surface-container in standard). Designed for expressive vertical menus where stronger visual identity is desired.",
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-start gap-4">
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Standard</span>
+        <MenuTrigger>
+          <button type="button" className={secondaryBtn}>
+            Standard
+          </button>
+          <MenuTrigger.Menu aria-label="Standard" colorScheme="standard" menuStyle="vertical">
+            <MenuItem id="star" leadingIcon={<StarIcon />}>
+              Add to favourites
+            </MenuItem>
+            <MenuItem id="share" leadingIcon={<ShareIcon />}>
+              Share
+            </MenuItem>
+            <MenuGap />
+            <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+              Delete
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Vibrant</span>
+        <MenuTrigger>
+          <button type="button" className={tertiaryBtn}>
+            Vibrant
+          </button>
+          <MenuTrigger.Menu aria-label="Vibrant" colorScheme="vibrant" menuStyle="vertical">
+            <MenuItem id="star" leadingIcon={<StarIcon />}>
+              Add to favourites
+            </MenuItem>
+            <MenuItem id="share" leadingIcon={<ShareIcon />}>
+              Share
+            </MenuItem>
+            <MenuGap />
+            <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+              Delete
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+    </div>
+  ),
+};
+
+// ─── Expressive Vertical Menu ─────────────────────────────────────────────────
+
+export const VerticalMenuStyle: Story = {
+  name: "Expressive Vertical Menu",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The `vertical` menu style uses **16dp rounded corners** (vs 4dp in baseline) and supports `MenuGap` — a visual spacing element (not a separator) that groups items without a visible divider line.",
+      },
+    },
+  },
+  render: () => (
+    <MenuTrigger>
+      <button type="button" className={primaryBtn}>
+        More actions
+      </button>
+      <MenuTrigger.Menu aria-label="More actions" menuStyle="vertical" colorScheme="vibrant">
+        <MenuItem id="star" leadingIcon={<StarIcon />}>
+          Add to favourites
+        </MenuItem>
+        <MenuItem id="share" leadingIcon={<ShareIcon />}>
+          Share
+        </MenuItem>
+        <MenuGap />
+        <MenuItem id="rename">Rename</MenuItem>
+        <MenuItem id="duplicate">Duplicate</MenuItem>
+        <MenuGap />
+        <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+          Delete
+        </MenuItem>
+      </MenuTrigger.Menu>
+    </MenuTrigger>
+  ),
+};
+
+// ─── Gap vs Divider ───────────────────────────────────────────────────────────
+
+export const GapVsDivider: Story = {
+  name: "Gap vs Divider (Vertical)",
+  parameters: {
+    docs: {
+      description: {
+        story: [
+          "Side-by-side comparison of the two MD3 vertical-menu separator styles.",
+          "",
+          "- **With gap** (left): A purely visual blank space (`MenuGap`) separates item groups. No visible line — the gap is hidden from the accessibility tree.",
+          "- **With divider** (right): A thin horizontal rule (`MenuDivider`) drawn with `outline-variant` colour separates groups.",
+        ].join("\n"),
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-start gap-8">
+      {/* ── With gap ── */}
+      <div className="flex flex-col items-center gap-2">
+        <MenuTrigger defaultOpen>
+          <button type="button" className={primaryBtn}>
+            With gap
+          </button>
+          <MenuTrigger.Menu aria-label="With gap" menuStyle="vertical">
+            <MenuItem id="item1" leadingIcon={<InfoIcon />}>
+              Item 1
+            </MenuItem>
+            <MenuItem id="item2" leadingIcon={<CopyIcon />} trailingText="⌘C">
+              Item 2
+            </MenuItem>
+            <MenuItem id="item3" leadingIcon={<CutIcon />}>
+              Item 3
+            </MenuItem>
+            <MenuGap />
+            <MenuItem id="item4" leadingIcon={<StarIcon />} trailingIcon={<span>▸</span>}>
+              Item 4
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+
+      {/* ── With divider ── */}
+      <div className="flex flex-col items-center gap-2">
+        <MenuTrigger defaultOpen>
+          <button type="button" className={primaryBtn}>
+            With divider
+          </button>
+          <MenuTrigger.Menu aria-label="With divider" menuStyle="vertical">
+            <MenuItem id="d-item1" leadingIcon={<InfoIcon />}>
+              Item 1
+            </MenuItem>
+            <MenuItem id="d-item2" leadingIcon={<CopyIcon />} trailingText="⌘C">
+              Item 2
+            </MenuItem>
+            <MenuItem id="d-item3" leadingIcon={<CutIcon />}>
+              Item 3
+            </MenuItem>
+            <MenuDivider />
+            <MenuItem id="d-item4" leadingIcon={<StarIcon />} trailingIcon={<span>▸</span>}>
+              Item 4
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+    </div>
+  ),
+};
+
+// ─── Submenu ──────────────────────────────────────────────────────────────────
+
+export const WithSubmenu: Story = {
+  name: "With Submenu",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use `SubmenuTrigger` to nest a second menu inside a `MenuItem`. A trailing chevron is automatically appended. Keyboard: `ArrowRight` opens, `ArrowLeft` / `Escape` closes and returns focus to the parent item.",
+      },
+    },
+  },
+  render: () => (
+    <MenuTrigger>
+      <button type="button" className={primaryBtn}>
+        Actions
+      </button>
+      <MenuTrigger.Menu aria-label="Actions">
+        <MenuItem id="copy" leadingIcon={<CopyIcon />}>
+          Copy
+        </MenuItem>
+        <SubmenuTrigger>
+          <MenuItem id="share" leadingIcon={<ShareIcon />}>
+            Share
+          </MenuItem>
+          <MenuTrigger.Menu aria-label="Share via">
+            <MenuItem id="email">Email</MenuItem>
+            <MenuItem id="sms">SMS</MenuItem>
+            <MenuItem id="link" trailingText="⌘L">
+              Copy link
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </SubmenuTrigger>
+        <MenuDivider />
+        <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+          Delete
+        </MenuItem>
+      </MenuTrigger.Menu>
+    </MenuTrigger>
+  ),
+};
+
+// ─── Context Menu ─────────────────────────────────────────────────────────────
+
+const ContextMenuDemo = (): JSX.Element => {
+  const [lastAction, setLastAction] = useState<string>("(none)");
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <ContextMenuTrigger>
+        <div className="border-outline text-on-surface-variant text-body-medium flex h-32 w-64 items-center justify-center rounded-lg border-dashed select-none">
+          Right-click anywhere here
+        </div>
+        <MenuTrigger.Menu
+          aria-label="Context actions"
+          onAction={(key) => setLastAction(String(key))}
+        >
+          <MenuItem id="cut" leadingIcon={<CutIcon />} trailingText="⌘X">
+            Cut
+          </MenuItem>
+          <MenuItem id="copy" leadingIcon={<CopyIcon />} trailingText="⌘C">
+            Copy
+          </MenuItem>
+          <MenuItem id="paste" leadingIcon={<PasteIcon />} trailingText="⌘V">
+            Paste
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem id="select-all" trailingText="⌘A">
+            Select all
+          </MenuItem>
+        </MenuTrigger.Menu>
+      </ContextMenuTrigger>
+      <p className="text-body-medium text-on-surface-variant">Last action: {lastAction}</p>
+    </div>
+  );
+};
+
+export const ContextMenu: Story = {
+  name: "Context Menu (Right-click)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Wrap any content with `ContextMenuTrigger` to open a menu on right-click or two-finger tap. The menu is positioned at the pointer coordinates.",
+      },
+    },
+  },
+  render: () => <ContextMenuDemo />,
+};
+
+// ─── Scrollable ───────────────────────────────────────────────────────────────
+
+export const Scrollable: Story = {
+  name: "Scrollable Menu",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When menu content exceeds the available viewport height the menu becomes scrollable. Max height is `calc(100vh - 2rem)` by default.",
+      },
+    },
+  },
+  render: () => (
+    <MenuTrigger>
+      <button type="button" className={primaryBtn}>
+        Select country
+      </button>
+      <MenuTrigger.Menu aria-label="Countries">
+        {[
+          "Argentina",
+          "Australia",
+          "Brazil",
+          "Canada",
+          "China",
+          "Denmark",
+          "Egypt",
+          "Finland",
+          "France",
+          "Germany",
+          "India",
+          "Indonesia",
+          "Italy",
+          "Japan",
+          "Mexico",
+          "Netherlands",
+          "New Zealand",
+          "Nigeria",
+          "Norway",
+          "Poland",
+          "Portugal",
+          "South Africa",
+          "South Korea",
+          "Spain",
+          "Sweden",
+          "Switzerland",
+          "Turkey",
+          "United Kingdom",
+          "United States",
+          "Vietnam",
+        ].map((country) => (
+          <MenuItem key={country} id={country.toLowerCase().replace(/ /g, "-")}>
+            {country}
+          </MenuItem>
+        ))}
+      </MenuTrigger.Menu>
+    </MenuTrigger>
+  ),
 };
 
 // ─── Controlled Open ──────────────────────────────────────────────────────────
@@ -323,11 +788,7 @@ const ControlledOpenDemo = (): JSX.Element => {
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-        >
+        <button type="button" onClick={() => setIsOpen(true)} className={primaryBtn}>
           Open
         </button>
         <button
@@ -368,10 +829,10 @@ export const ControlledOpen: Story = {
   render: () => <ControlledOpenDemo />,
 };
 
-// ─── Context Menu (IconButton trigger) ───────────────────────────────────────
+// ─── Icon Button Trigger ──────────────────────────────────────────────────────
 
 export const IconButtonTrigger: Story = {
-  name: "With IconButton Trigger",
+  name: "With Icon Button Trigger",
   render: () => (
     <MenuTrigger>
       <button
@@ -384,55 +845,35 @@ export const IconButtonTrigger: Story = {
       <MenuTrigger.Menu aria-label="More options">
         <MenuItem id="rename">Rename</MenuItem>
         <MenuItem id="duplicate">Duplicate</MenuItem>
-        <MenuItem id="share">Share</MenuItem>
+        <MenuItem id="share" leadingIcon={<ShareIcon />}>
+          Share
+        </MenuItem>
         <MenuDivider />
-        <MenuItem id="delete">Delete</MenuItem>
+        <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+          Delete
+        </MenuItem>
       </MenuTrigger.Menu>
     </MenuTrigger>
   ),
 };
 
-// ─── Headless Primitive ───────────────────────────────────────────────────────
-
-export const HeadlessPrimitive: Story = {
-  name: "Headless — Custom Styling",
-  render: () => (
-    <HeadlessMenuTrigger>
-      <button
-        type="button"
-        className="bg-tertiary text-on-tertiary text-label-large rounded-full px-6 py-2.5"
-      >
-        Custom Styled Menu
-      </button>
-      <HeadlessMenuTrigger.Menu
-        aria-label="Custom"
-        className={cn(menuContainerVariants({ open: true }), "border-outline-variant border")}
-      >
-        <HeadlessMenuItem id="option-a" className={cn(menuItemVariants(), "text-secondary")}>
-          Option A (custom)
-        </HeadlessMenuItem>
-        <HeadlessMenuItem id="option-b" className={cn(menuItemVariants())}>
-          Option B
-        </HeadlessMenuItem>
-      </HeadlessMenuTrigger.Menu>
-    </HeadlessMenuTrigger>
-  ),
-};
-
-// ─── Dark Mode ────────────────────────────────────────────────────────────────
+// ─── Dark Mode — Standard ─────────────────────────────────────────────────────
 
 export const DarkMode: Story = {
-  name: "Dark Mode",
+  name: "Dark Mode — Standard",
   parameters: {
     backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Standard color scheme in dark mode. Tokens automatically adapt via CSS `@media (prefers-color-scheme: dark)` or `.dark` class.",
+      },
+    },
   },
   render: () => (
     <div className="dark">
       <MenuTrigger>
-        <button
-          type="button"
-          className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
-        >
+        <button type="button" className={primaryBtn}>
           Open Menu
         </button>
         <MenuTrigger.Menu aria-label="Edit">
@@ -450,5 +891,73 @@ export const DarkMode: Story = {
         </MenuTrigger.Menu>
       </MenuTrigger>
     </div>
+  ),
+};
+
+// ─── Dark Mode — Vibrant ──────────────────────────────────────────────────────
+
+export const DarkModeVibrant: Story = {
+  name: "Dark Mode — Vibrant Vertical",
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+  render: () => (
+    <div className="dark">
+      <MenuTrigger>
+        <button type="button" className={tertiaryBtn}>
+          More actions
+        </button>
+        <MenuTrigger.Menu aria-label="More actions" menuStyle="vertical" colorScheme="vibrant">
+          <MenuItem id="star" leadingIcon={<StarIcon />}>
+            Add to favourites
+          </MenuItem>
+          <MenuItem id="share" leadingIcon={<ShareIcon />}>
+            Share
+          </MenuItem>
+          <MenuGap />
+          <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+            Delete
+          </MenuItem>
+        </MenuTrigger.Menu>
+      </MenuTrigger>
+    </div>
+  ),
+};
+
+// ─── Headless Primitive ───────────────────────────────────────────────────────
+
+export const HeadlessPrimitive: Story = {
+  name: "Headless — Custom Styling",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Layer 2 headless primitives expose the full RAC API without any MD3 styles applied. Use these as a foundation for fully custom styling.",
+      },
+    },
+  },
+  render: () => (
+    <HeadlessMenuTrigger>
+      <button
+        type="button"
+        className="bg-tertiary text-on-tertiary text-label-large rounded-full px-6 py-2.5"
+      >
+        Custom Styled Menu
+      </button>
+      <HeadlessMenuTrigger.Menu
+        aria-label="Custom"
+        className={cn(
+          menuContainerVariants({ menuStyle: "baseline" }),
+          "border-outline-variant border"
+        )}
+      >
+        <HeadlessMenuItem id="option-a" className={cn(menuItemVariants(), "text-secondary")}>
+          Option A (custom)
+        </HeadlessMenuItem>
+        <HeadlessMenuItem id="option-b" className={cn(menuItemVariants())}>
+          Option B
+        </HeadlessMenuItem>
+      </HeadlessMenuTrigger.Menu>
+    </HeadlessMenuTrigger>
   ),
 };
