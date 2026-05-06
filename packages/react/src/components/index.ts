@@ -98,7 +98,7 @@ export {
   useMenuContext,
 } from "./Menu";
 export type {
-  MenuVariant,
+  MenuContainerVariants,
   MenuProps,
   MenuTriggerProps,
   MenuItemProps,
