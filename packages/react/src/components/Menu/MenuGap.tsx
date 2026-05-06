@@ -25,7 +25,7 @@ import type { MenuGapProps } from "./Menu.types";
  *   - Menu items after the gap render correctly (collection is intact)
  *   - The element has zero ARIA semantics (aria-hidden removes it from the tree)
  */
-const MenuGapItem = createLeafComponent(
+const MenuGapItem = createLeafComponent<object, { className?: string }, HTMLDivElement>(
   // Use the 'separator' string type so createLeafComponent creates a bare
   // CollectionNode subclass — registered in the collection but without the
   // consecutive-separator-drop filter that RAC's own SeparatorNode applies.
