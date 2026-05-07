@@ -884,16 +884,16 @@ const ConnectedWithButtonsExample = (): React.ReactElement => {
           defaultValue="8oz"
           aria-label="Drink size (square)"
         >
-          <Button variant="tonal" aria-pressed>
+          <Button value="8oz" variant="tonal" aria-pressed>
             8 oz
           </Button>
-          <Button variant="outlined" aria-pressed={false}>
+          <Button value="12oz" variant="outlined" aria-pressed={false}>
             12 oz
           </Button>
-          <Button variant="outlined" aria-pressed={false}>
+          <Button value="16oz" variant="outlined" aria-pressed={false}>
             16 oz
           </Button>
-          <Button variant="outlined" aria-pressed={false}>
+          <Button value="20oz" variant="outlined" aria-pressed={false}>
             20 oz
           </Button>
         </ButtonGroup>

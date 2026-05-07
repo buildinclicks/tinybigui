@@ -764,9 +764,23 @@ describe("ButtonGroup.utils", () => {
       expect(classes).toContain("first:rounded-s-full");
     });
 
-    test("round lg returns rounded-lg inner radius", () => {
+    test("round lg returns rounded-lg inner + logical outer/inner corner overrides", () => {
       const classes = getConnectedRadiusClasses(makeCtx("lg", "round"));
       expect(classes).toContain("rounded-lg");
+      expect(classes).toContain("first:rounded-s-full");
+      expect(classes).toContain("first:rounded-e-lg");
+      expect(classes).toContain("last:rounded-e-full");
+      expect(classes).toContain("last:rounded-s-lg");
+    });
+
+    test("round lg returns same classes regardless of selection (no extra rounded-full)", () => {
+      const withSelection: ButtonGroupContextValue = {
+        ...makeCtx("lg", "round"),
+        selectedValues: new Set(["a"]),
+      };
+      expect(getConnectedRadiusClasses(makeCtx("lg", "round"))).toEqual(
+        getConnectedRadiusClasses(withSelection)
+      );
     });
 
     test("round xl returns rounded-[20px] inner radius", () => {

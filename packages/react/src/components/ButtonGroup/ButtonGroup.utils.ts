@@ -51,8 +51,8 @@ const OUTER_RADIUS_SQUARE: Record<ButtonGroupSize, string> = {
  *
  * Each array contains:
  *   [0] Inner radius class (applied to all corners of every button)
- *   [1] `first:` start-side outer radius (first child gets full/outer corners on left)
- *   [2] `last:` end-side outer radius   (last child gets full/outer corners on right)
+ *   … `first:` / `last:` overrides using **logical** `rounded-s-*` / `rounded-e-*` so
+ *     outer vs inner corners stay correct in LTR and RTL (MD3 pill outer, inner lg tier).
  *
  * Writing the full class strings statically (not via string concatenation) ensures
  * the Tailwind CSS v4 scanner can detect all classes at build time.
@@ -62,22 +62,18 @@ const CONNECTED_RADIUS_CLASSES: Record<
   Record<ButtonGroupSize, readonly string[]>
 > = {
   round: {
-    xs: ["rounded-xs", "first:rounded-s-full", "last:rounded-e-full"],
-    sm: ["rounded-sm", "first:rounded-s-full", "last:rounded-e-full"],
-    md: ["rounded-sm", "first:rounded-s-full", "last:rounded-e-full"],
-    lg: [
-      "rounded-lg",
-      "first:rounded-l-full first:rounded-t-lg",
-      "last:rounded-r-full last:rounded-b-lg",
-    ],
-    xl: ["rounded-[20px]", "first:rounded-l-full", "last:rounded-r-full"],
+    xs: ["rounded-xs", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    sm: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    md: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    lg: ["rounded-lg", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    xl: ["rounded-xl", "first:rounded-s-4xl", "last:rounded-e-4xl"],
   },
   square: {
-    xs: ["rounded-xs", "first:rounded-s-xs", "last:rounded-e-xs"],
-    sm: ["rounded-sm", "first:rounded-s-sm", "last:rounded-e-sm"],
-    md: ["rounded-sm", "first:rounded-s-sm", "last:rounded-e-sm"],
-    lg: ["rounded-lg", "first:rounded-s-lg", "last:rounded-e-lg"],
-    xl: ["rounded-[20px]", "first:rounded-s-[20px]", "last:rounded-e-[20px]"],
+    xs: ["rounded-xs", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    sm: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    md: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    lg: ["rounded-lg", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    xl: ["rounded-xl", "first:rounded-s-4xl", "last:rounded-e-4xl"],
   },
 };
 
@@ -107,9 +103,10 @@ export function getConnectedRadiusClasses(
   value?: string
 ): readonly string[] {
   const connectedClasses = CONNECTED_RADIUS_CLASSES[ctx.shape][ctx.size];
-  console.warn(value && ctx.selectedValues.has(value), value, ctx.selectedValues);
   if (value) {
-    return ctx.selectedValues.has(value) ? [...connectedClasses, "rounded-full"] : connectedClasses;
+    return ctx.selectedValues.has(value)
+      ? [...connectedClasses, "rounded-full", "first:rounded-s-full", "last:rounded-e-full"]
+      : connectedClasses;
   }
   return connectedClasses;
 }

@@ -158,7 +158,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
           ]
         : [];
 
-    console.log(groupCtx);
     return (
       <ButtonHeadless
         {...props}
