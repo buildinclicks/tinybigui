@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useCallback, useEffect, useRef } from "react";
 import type React from "react";
 import { ButtonGroupHeadless } from "./ButtonGroupHeadless";
 import { buttonGroupVariants } from "./ButtonGroup.variants";
@@ -75,9 +75,24 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
     },
     ref
   ) => {
-    // Development warnings
+    // Internal ref used by dev-mode DOM inspection — separate from the forwarded ref
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Combine the internal ref with the consumer's forwarded ref
+    const handleRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        if (typeof ref === "function") {
+          ref(node);
+        } else if (ref !== null) {
+          ref.current = node;
+        }
+      },
+      [ref]
+    );
+
+    // Development warnings — synchronous child-prop scan
     if (process.env.NODE_ENV === "development") {
-      // Scan children for disallowed variants
       const childArray = Array.isArray(children) ? children : [children];
 
       for (const child of childArray) {
@@ -88,19 +103,48 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
         }>;
 
         const dataVariant = childEl.props["data-variant"];
-        if (dataVariant === "text" || dataVariant === "icon") {
+        if (dataVariant === "text" || dataVariant === "icon" || dataVariant === "standard") {
           console.warn(
-            "[ButtonGroup] text or icon variant buttons are not recommended inside a ButtonGroup.",
+            "[ButtonGroup] text, icon, or standard variant buttons are not recommended inside a ButtonGroup.",
             `Found child with data-variant="${dataVariant}". Use filled, tonal, or outlined buttons instead.`
           );
         }
       }
     }
 
+    // Development warnings — DOM inspection after mount (async, needs rendered DOM)
+    useEffect(() => {
+      if (process.env.NODE_ENV !== "development") return;
+      if (variant !== "connected" || !containerRef.current) return;
+
+      // Warning: connected group with no toggle buttons
+      const toggleButtons = containerRef.current.querySelectorAll("[aria-pressed]");
+      if (toggleButtons.length === 0) {
+        console.warn(
+          "[ButtonGroup] The `connected` variant is designed for toggle button groups.",
+          'None of the child buttons have `aria-pressed`. Use `selectionMode` on the group and ensure children expose `aria-pressed`, or switch to `variant="standard"` for action-only groups.'
+        );
+      }
+
+      // Warning: connected group with mixed child color styles
+      const colorValues = new Set<string>();
+      containerRef.current.querySelectorAll("[data-color]").forEach((el) => {
+        const c = el.getAttribute("data-color");
+        if (c) colorValues.add(c);
+      });
+      if (colorValues.size > 1) {
+        console.warn(
+          "[ButtonGroup] Mixing color styles inside a `connected` group is not recommended.",
+          `Found buttons with different data-color values: ${[...colorValues].join(", ")}. Use the same color style for all buttons in a connected group.`
+        );
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Run once after mount
+
     return (
       <ButtonGroupHeadless
         {...htmlProps}
-        ref={ref}
+        ref={handleRef}
         variant={variant}
         size={size}
         shape={shape}

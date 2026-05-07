@@ -49,6 +49,26 @@ export function useButtonGroup(): ButtonGroupContextValue {
 }
 
 /**
+ * Optional hook for consuming ButtonGroup context inside child button components.
+ *
+ * Unlike `useButtonGroup()`, this hook does **not** throw when called outside a group.
+ * Use this inside `Button` and `IconButton` so they can read group metadata when
+ * rendered inside a `ButtonGroup` but still work standalone.
+ *
+ * Returns `null` when called outside a `<ButtonGroup>` or `<ButtonGroupHeadless>`.
+ *
+ * @example
+ * ```tsx
+ * // Inside Button or IconButton
+ * const groupCtx = useOptionalButtonGroup();
+ * const isConnected = groupCtx?.variant === 'connected';
+ * ```
+ */
+export function useOptionalButtonGroup(): ButtonGroupContextValue | null {
+  return useContext(ButtonGroupContext);
+}
+
+/**
  * Props for `ButtonGroupProvider`
  */
 export interface ButtonGroupProviderProps {

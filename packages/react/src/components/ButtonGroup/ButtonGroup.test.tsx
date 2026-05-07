@@ -1,12 +1,13 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import type React from "react";
 import { buttonGroupVariants } from "./ButtonGroup.variants";
-import { ButtonGroupContext, useButtonGroup } from "./ButtonGroupContext";
+import { ButtonGroupContext, useButtonGroup, useOptionalButtonGroup } from "./ButtonGroupContext";
 import { ButtonGroupHeadless } from "./ButtonGroupHeadless";
 import { ButtonGroup } from "./ButtonGroup";
+import { getConnectedRadiusClasses, getInnerRadius, getOuterRadius } from "./ButtonGroup.utils";
 import type { ButtonGroupContextValue } from "./ButtonGroup.types";
 
 // ---------------------------------------------------------------------------
@@ -619,5 +620,369 @@ describe("ButtonGroup", () => {
       await user.tab();
       expect(screen.getByText("Third")).toHaveFocus();
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 5. useOptionalButtonGroup
+// ---------------------------------------------------------------------------
+
+describe("useOptionalButtonGroup", () => {
+  test("returns null when called outside a provider", () => {
+    let capturedCtx: ButtonGroupContextValue | null = undefined as unknown as null;
+
+    const Capture = (): null => {
+      capturedCtx = useOptionalButtonGroup();
+      return null;
+    };
+
+    render(<Capture />);
+    expect(capturedCtx).toBeNull();
+  });
+
+  test("returns context value when called inside a provider", () => {
+    const mockValue: ButtonGroupContextValue = {
+      variant: "connected",
+      size: "md",
+      shape: "round",
+      selectionMode: "single",
+      selectedValues: new Set(),
+      onSelectionChange: vi.fn(),
+      connectedInnerRadius: "rounded-sm",
+      connectedOuterRadius: "rounded-full",
+      enforceMinWidth: false,
+    };
+
+    let capturedCtx: ButtonGroupContextValue | null = null;
+
+    const Capture = (): null => {
+      capturedCtx = useOptionalButtonGroup();
+      return null;
+    };
+
+    render(
+      <ButtonGroupContext.Provider value={mockValue}>
+        <Capture />
+      </ButtonGroupContext.Provider>
+    );
+
+    expect(capturedCtx).not.toBeNull();
+    expect(capturedCtx?.variant).toBe("connected");
+    expect(capturedCtx?.connectedInnerRadius).toBe("rounded-sm");
+    expect(capturedCtx?.connectedOuterRadius).toBe("rounded-full");
+    expect(capturedCtx?.enforceMinWidth).toBe(false);
+  });
+
+  test("does NOT throw when called outside a provider (unlike useButtonGroup)", () => {
+    const Capture = (): null => {
+      useOptionalButtonGroup();
+      return null;
+    };
+    expect(() => render(<Capture />)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 6. ButtonGroup.utils — getInnerRadius / getOuterRadius / getConnectedRadiusClasses
+// ---------------------------------------------------------------------------
+
+describe("ButtonGroup.utils", () => {
+  describe("getInnerRadius", () => {
+    test("returns rounded-xs for xs", () => {
+      expect(getInnerRadius("xs")).toBe("rounded-xs");
+    });
+
+    test("returns rounded-sm for sm", () => {
+      expect(getInnerRadius("sm")).toBe("rounded-sm");
+    });
+
+    test("returns rounded-sm for md", () => {
+      expect(getInnerRadius("md")).toBe("rounded-sm");
+    });
+
+    test("returns rounded-lg for lg", () => {
+      expect(getInnerRadius("lg")).toBe("rounded-lg");
+    });
+
+    test("returns rounded-[20px] for xl", () => {
+      expect(getInnerRadius("xl")).toBe("rounded-[20px]");
+    });
+  });
+
+  describe("getOuterRadius", () => {
+    test("round shape always returns rounded-full regardless of size", () => {
+      const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+      sizes.forEach((size) => {
+        expect(getOuterRadius("round", size)).toBe("rounded-full");
+      });
+    });
+
+    test("square shape returns rounded-xs for xs", () => {
+      expect(getOuterRadius("square", "xs")).toBe("rounded-xs");
+    });
+
+    test("square shape returns rounded-sm for sm/md", () => {
+      expect(getOuterRadius("square", "sm")).toBe("rounded-sm");
+      expect(getOuterRadius("square", "md")).toBe("rounded-sm");
+    });
+
+    test("square shape returns rounded-lg for lg", () => {
+      expect(getOuterRadius("square", "lg")).toBe("rounded-lg");
+    });
+
+    test("square shape returns rounded-[20px] for xl", () => {
+      expect(getOuterRadius("square", "xl")).toBe("rounded-[20px]");
+    });
+  });
+
+  describe("getConnectedRadiusClasses", () => {
+    const makeCtx = (
+      size: ButtonGroupContextValue["size"],
+      shape: ButtonGroupContextValue["shape"]
+    ): ButtonGroupContextValue => ({
+      variant: "connected",
+      size,
+      shape,
+      selectionMode: undefined,
+      selectedValues: new Set(),
+      onSelectionChange: vi.fn(),
+      connectedInnerRadius: getInnerRadius(size),
+      connectedOuterRadius: getOuterRadius(shape, size),
+      enforceMinWidth: size === "xs" || size === "sm",
+    });
+
+    test("round md returns inner rounded-sm + full outer pseudo classes", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("md", "round"));
+      expect(classes).toContain("rounded-sm");
+      expect(classes).toContain("first:rounded-s-full");
+      expect(classes).toContain("last:rounded-e-full");
+    });
+
+    test("round xs returns rounded-xs inner radius", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("xs", "round"));
+      expect(classes).toContain("rounded-xs");
+      expect(classes).toContain("first:rounded-s-full");
+    });
+
+    test("round lg returns rounded-lg inner radius", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("lg", "round"));
+      expect(classes).toContain("rounded-lg");
+    });
+
+    test("round xl returns rounded-[20px] inner radius", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("xl", "round"));
+      expect(classes).toContain("rounded-[20px]");
+      expect(classes).toContain("first:rounded-s-full");
+    });
+
+    test("square md returns inner rounded-sm + square outer pseudo classes", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("md", "square"));
+      expect(classes).toContain("rounded-sm");
+      expect(classes).toContain("first:rounded-s-sm");
+      expect(classes).toContain("last:rounded-e-sm");
+    });
+
+    test("square xl returns rounded-[20px] for both inner and outer", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("xl", "square"));
+      expect(classes).toContain("rounded-[20px]");
+      expect(classes).toContain("first:rounded-s-[20px]");
+      expect(classes).toContain("last:rounded-e-[20px]");
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 7. Enhanced ButtonGroupContextValue fields
+// ---------------------------------------------------------------------------
+
+describe("ButtonGroupHeadless enhanced context", () => {
+  const ContextCapture = (): React.ReactElement => {
+    const ctx = useButtonGroup();
+    return (
+      <div
+        data-inner={ctx.connectedInnerRadius}
+        data-outer={ctx.connectedOuterRadius}
+        data-min-width={String(ctx.enforceMinWidth)}
+      />
+    );
+  };
+
+  test("provides connectedInnerRadius = rounded-sm for connected md", () => {
+    render(
+      <ButtonGroupHeadless variant="connected" size="md" shape="round">
+        <ContextCapture />
+      </ButtonGroupHeadless>
+    );
+    expect(screen.getByTestId ? document.querySelector("[data-inner]") : null).toBeTruthy();
+    const el = document.querySelector("[data-inner]");
+    expect(el?.getAttribute("data-inner")).toBe("rounded-sm");
+  });
+
+  test("provides connectedOuterRadius = rounded-full for round shape", () => {
+    render(
+      <ButtonGroupHeadless variant="connected" size="md" shape="round">
+        <ContextCapture />
+      </ButtonGroupHeadless>
+    );
+    const el = document.querySelector("[data-outer]");
+    expect(el?.getAttribute("data-outer")).toBe("rounded-full");
+  });
+
+  test("provides connectedOuterRadius = rounded-sm for square md", () => {
+    render(
+      <ButtonGroupHeadless variant="connected" size="md" shape="square">
+        <ContextCapture />
+      </ButtonGroupHeadless>
+    );
+    const el = document.querySelector("[data-outer]");
+    expect(el?.getAttribute("data-outer")).toBe("rounded-sm");
+  });
+
+  test("enforceMinWidth = true for connected xs", () => {
+    render(
+      <ButtonGroupHeadless variant="connected" size="xs">
+        <ContextCapture />
+      </ButtonGroupHeadless>
+    );
+    const el = document.querySelector("[data-min-width]");
+    expect(el?.getAttribute("data-min-width")).toBe("true");
+  });
+
+  test("enforceMinWidth = true for connected sm", () => {
+    render(
+      <ButtonGroupHeadless variant="connected" size="sm">
+        <ContextCapture />
+      </ButtonGroupHeadless>
+    );
+    const el = document.querySelector("[data-min-width]");
+    expect(el?.getAttribute("data-min-width")).toBe("true");
+  });
+
+  test("enforceMinWidth = false for connected md", () => {
+    render(
+      <ButtonGroupHeadless variant="connected" size="md">
+        <ContextCapture />
+      </ButtonGroupHeadless>
+    );
+    const el = document.querySelector("[data-min-width]");
+    expect(el?.getAttribute("data-min-width")).toBe("false");
+  });
+
+  test("enforceMinWidth = false for standard variant regardless of size", () => {
+    render(
+      <ButtonGroupHeadless variant="standard" size="xs">
+        <ContextCapture />
+      </ButtonGroupHeadless>
+    );
+    const el = document.querySelector("[data-min-width]");
+    expect(el?.getAttribute("data-min-width")).toBe("false");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. Dev warnings — connected without toggles & connected mixed colors
+// ---------------------------------------------------------------------------
+
+describe("ButtonGroup dev warnings (DOM-based)", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubEnv("NODE_ENV", "development");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  test("warns when connected group has no aria-pressed children", async () => {
+    render(
+      <ButtonGroup variant="connected" aria-label="Actions">
+        <button>One</button>
+        <button>Two</button>
+      </ButtonGroup>
+    );
+    await waitFor(() => {
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining("connected"),
+        expect.stringContaining("aria-pressed")
+      );
+    });
+  });
+
+  test("does NOT warn for connected group when children have aria-pressed", async () => {
+    render(
+      <ButtonGroup variant="connected" aria-label="Toggle">
+        <button aria-pressed="false">One</button>
+        <button aria-pressed="true">Two</button>
+      </ButtonGroup>
+    );
+    await waitFor(() => {});
+    const calls = (console.warn as ReturnType<typeof vi.fn>).mock.calls;
+    const connectedWarning = calls.find(
+      (args) =>
+        typeof args[0] === "string" &&
+        args[0].includes("connected") &&
+        String(args[1]).includes("aria-pressed")
+    );
+    expect(connectedWarning).toBeUndefined();
+  });
+
+  test("does NOT warn for standard group without aria-pressed children", async () => {
+    render(
+      <ButtonGroup variant="standard" aria-label="Actions">
+        <button>One</button>
+        <button>Two</button>
+      </ButtonGroup>
+    );
+    await waitFor(() => {});
+    const calls = (console.warn as ReturnType<typeof vi.fn>).mock.calls;
+    const connectedWarning = calls.find(
+      (args) =>
+        typeof args[0] === "string" &&
+        args[0].includes("connected") &&
+        String(args[1]).includes("aria-pressed")
+    );
+    expect(connectedWarning).toBeUndefined();
+  });
+
+  test("warns when connected group has mixed data-color children", async () => {
+    render(
+      <ButtonGroup variant="connected" aria-label="Formatting">
+        <button aria-pressed="false" data-color="primary">
+          Bold
+        </button>
+        <button aria-pressed="false" data-color="secondary">
+          Italic
+        </button>
+      </ButtonGroup>
+    );
+    await waitFor(() => {
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining("color"),
+        expect.stringContaining("data-color")
+      );
+    });
+  });
+
+  test("does NOT warn for connected group with uniform data-color", async () => {
+    render(
+      <ButtonGroup variant="connected" aria-label="Formatting">
+        <button aria-pressed="false" data-color="primary">
+          Bold
+        </button>
+        <button aria-pressed="false" data-color="primary">
+          Italic
+        </button>
+      </ButtonGroup>
+    );
+    await waitFor(() => {});
+    const calls = (console.warn as ReturnType<typeof vi.fn>).mock.calls;
+    const colorWarning = calls.find(
+      (args) =>
+        typeof args[0] === "string" &&
+        args[0].includes("color") &&
+        String(args[1]).includes("data-color")
+    );
+    expect(colorWarning).toBeUndefined();
   });
 });

@@ -68,6 +68,33 @@ export interface ButtonGroupContextValue {
    * The child passes its own `value` string.
    */
   onSelectionChange: (value: string) => void;
+
+  /**
+   * Tailwind class for the inner (adjacent) corner radius in the connected variant.
+   * Applied to all four corners of every button in a connected group.
+   *
+   * @example 'rounded-sm' // for xs/sm/md sizes
+   * @example 'rounded-lg' // for lg size
+   */
+  connectedInnerRadius: string;
+
+  /**
+   * Tailwind class for the outer (exposed) corner radius in the connected variant.
+   * Applied to the start-side of the first button and end-side of the last button.
+   *
+   * @example 'rounded-full' // for round shape
+   * @example 'rounded-sm'   // for square shape + xs/sm/md sizes
+   */
+  connectedOuterRadius: string;
+
+  /**
+   * Whether child buttons should enforce a minimum width of `min-w-12` (48dp).
+   * `true` only for `connected` variant at `xs` or `sm` size — required by MD3
+   * to preserve the 48dp touch target at smaller sizes.
+   *
+   * @default false
+   */
+  enforceMinWidth: boolean;
 }
 
 /**

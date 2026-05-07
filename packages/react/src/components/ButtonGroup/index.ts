@@ -7,9 +7,17 @@ export { ButtonGroupHeadless } from "./ButtonGroupHeadless";
 // CVA Variants
 export { buttonGroupVariants, type ButtonGroupVariants } from "./ButtonGroup.variants";
 
-// Context + hook (for child button components)
-export { ButtonGroupContext, ButtonGroupProvider, useButtonGroup } from "./ButtonGroupContext";
+// Context + hooks (for child button components)
+export {
+  ButtonGroupContext,
+  ButtonGroupProvider,
+  useButtonGroup,
+  useOptionalButtonGroup,
+} from "./ButtonGroupContext";
 export type { ButtonGroupProviderProps } from "./ButtonGroupContext";
+
+// Utilities (for custom button integration)
+export { getConnectedRadiusClasses, getInnerRadius, getOuterRadius } from "./ButtonGroup.utils";
 
 // Types
 export type {

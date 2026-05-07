@@ -53,6 +53,8 @@ export {
   buttonGroupVariants,
   ButtonGroupContext,
   useButtonGroup,
+  useOptionalButtonGroup,
+  getConnectedRadiusClasses,
 } from "./components/ButtonGroup";
 export type {
   ButtonGroupProps,

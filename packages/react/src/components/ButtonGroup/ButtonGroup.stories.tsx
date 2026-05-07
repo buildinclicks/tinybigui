@@ -4,6 +4,8 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { within, userEvent, expect } from "storybook/test";
 import { ButtonGroup } from "./ButtonGroup";
+import { Button } from "../Button/Button";
+import { IconButton } from "../IconButton/IconButton";
 import { useButtonGroup } from "./ButtonGroupContext";
 
 // ---------------------------------------------------------------------------
@@ -43,6 +45,12 @@ const IconFormatItalic = (): React.ReactElement => (
 const IconFormatUnderlined = (): React.ReactElement => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z" />
+  </svg>
+);
+
+const IconCheck = (): React.ReactElement => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
   </svg>
 );
 
@@ -131,7 +139,7 @@ const meta: Meta<typeof ButtonGroup> = {
     docs: {
       description: {
         component:
-          "Material Design 3 ButtonGroup — an invisible container that controls the gap between child buttons and optionally manages toggle-selection state. Supports two layout variants (`standard` and `connected`), five sizes, two corner shapes, and three selection modes (`single`, `required`, `multi`).",
+          "Material Design 3 ButtonGroup — an invisible container that controls the gap between child buttons and optionally manages toggle-selection state. Supports two layout variants (`standard` and `connected`), five sizes, two corner shapes, and three selection modes (`single`, `required`, `multi`). When `Button` or `IconButton` components are placed inside a `connected` group, they automatically receive position-aware corner radii via React Context.",
       },
     },
   },
@@ -829,7 +837,499 @@ export const Interactive: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// 14. Playground — all controls exposed for manual exploration
+// 14. ConnectedWithButtons — real Button components with auto corner radii
+// ---------------------------------------------------------------------------
+
+const ConnectedWithButtonsExample = (): React.ReactElement => {
+  const [selected, setSelected] = React.useState<Set<string>>(new Set(["8oz"]));
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex w-72 flex-col gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">Connected · Round (default)</p>
+        <ButtonGroup
+          variant="connected"
+          size="lg"
+          shape="round"
+          selectionMode="required"
+          selectedValues={selected}
+          onSelectionChange={setSelected}
+          aria-label="Drink size"
+        >
+          {(["8oz", "12oz", "16oz", "20oz"] as const).map((s) => {
+            const isSelected = selected.has(s);
+            return (
+              <Button
+                key={s}
+                value={s}
+                variant={isSelected ? "tonal" : "outlined"}
+                aria-pressed={isSelected}
+                onPress={() => setSelected(new Set([s]))}
+                icon={isSelected ? <IconCheck /> : undefined}
+              >
+                {s}
+              </Button>
+            );
+          })}
+        </ButtonGroup>
+      </div>
+
+      <div className="flex w-72 flex-col gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">Connected · Square</p>
+        <ButtonGroup
+          variant="connected"
+          size="md"
+          shape="square"
+          selectionMode="required"
+          defaultValue="8oz"
+          aria-label="Drink size (square)"
+        >
+          <Button variant="tonal" aria-pressed>
+            8 oz
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            12 oz
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            16 oz
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            20 oz
+          </Button>
+        </ButtonGroup>
+      </div>
+    </div>
+  );
+};
+
+export const ConnectedWithButtons: Story = {
+  render: () => <ConnectedWithButtonsExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Real `Button` components inside a connected group. Corner radii are applied automatically via `useOptionalButtonGroup()` — first button gets outer start-side radius, last button gets outer end-side radius, middle buttons get inner radius on all sides. Round shape uses `rounded-full` on outer corners; square uses the size-specific radius.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// 15. ConnectedWithIconButtons — real IconButton with auto corner radii
+// ---------------------------------------------------------------------------
+
+const ConnectedWithIconButtonsExample = (): React.ReactElement => {
+  const [active, setActive] = React.useState<Set<string>>(new Set(["wifi"]));
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">Standard · Icon-only (round)</p>
+        <ButtonGroup
+          variant="standard"
+          size="md"
+          shape="round"
+          selectionMode="multi"
+          selectedValues={active}
+          onSelectionChange={setActive}
+          aria-label="Quick settings"
+        >
+          <IconButton
+            aria-label="Toggle Bluetooth"
+            variant="tonal"
+            selected={active.has("bluetooth")}
+            onPress={() =>
+              setActive((prev) => {
+                const next = new Set(prev);
+                if (next.has("bluetooth")) {
+                  next.delete("bluetooth");
+                } else {
+                  next.add("bluetooth");
+                }
+                return next;
+              })
+            }
+          >
+            <IconBluetooth />
+          </IconButton>
+          <IconButton
+            aria-label="Toggle Alarm"
+            variant="tonal"
+            selected={active.has("alarm")}
+            onPress={() =>
+              setActive((prev) => {
+                const next = new Set(prev);
+                if (next.has("alarm")) {
+                  next.delete("alarm");
+                } else {
+                  next.add("alarm");
+                }
+                return next;
+              })
+            }
+          >
+            <IconAlarm />
+          </IconButton>
+          <IconButton
+            aria-label="Toggle Wi-Fi"
+            variant="tonal"
+            selected={active.has("wifi")}
+            onPress={() =>
+              setActive((prev) => {
+                const next = new Set(prev);
+                if (next.has("wifi")) {
+                  next.delete("wifi");
+                } else {
+                  next.add("wifi");
+                }
+                return next;
+              })
+            }
+          >
+            <IconWifi />
+          </IconButton>
+        </ButtonGroup>
+      </div>
+
+      <div className="flex w-48 flex-col gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">Connected · Icon-only (round)</p>
+        <ButtonGroup
+          variant="connected"
+          size="md"
+          shape="round"
+          selectionMode="multi"
+          selectedValues={active}
+          onSelectionChange={setActive}
+          aria-label="Quick settings (connected)"
+        >
+          <IconButton
+            aria-label="Toggle Bluetooth"
+            variant="tonal"
+            selected={active.has("bluetooth")}
+            onPress={() =>
+              setActive((prev) => {
+                const next = new Set(prev);
+                if (next.has("bluetooth")) {
+                  next.delete("bluetooth");
+                } else {
+                  next.add("bluetooth");
+                }
+                return next;
+              })
+            }
+          >
+            <IconBluetooth />
+          </IconButton>
+          <IconButton
+            aria-label="Toggle Alarm"
+            variant="tonal"
+            selected={active.has("alarm")}
+            onPress={() =>
+              setActive((prev) => {
+                const next = new Set(prev);
+                if (next.has("alarm")) {
+                  next.delete("alarm");
+                } else {
+                  next.add("alarm");
+                }
+                return next;
+              })
+            }
+          >
+            <IconAlarm />
+          </IconButton>
+          <IconButton
+            aria-label="Toggle Wi-Fi"
+            variant="tonal"
+            selected={active.has("wifi")}
+            onPress={() =>
+              setActive((prev) => {
+                const next = new Set(prev);
+                if (next.has("wifi")) {
+                  next.delete("wifi");
+                } else {
+                  next.add("wifi");
+                }
+                return next;
+              })
+            }
+          >
+            <IconWifi />
+          </IconButton>
+        </ButtonGroup>
+      </div>
+    </div>
+  );
+};
+
+export const ConnectedWithIconButtons: Story = {
+  render: () => <ConnectedWithIconButtonsExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Real `IconButton` components in both `standard` and `connected` variants. In the connected group, corner radii are applied automatically — outer corners stay pill-shaped while inner (adjacent) corners are reduced to `rounded-sm` (8dp). Toggle state is reflected via `selected` prop and `aria-pressed`.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// 16. ConnectedRoundVsSquare — corner radius comparison
+// ---------------------------------------------------------------------------
+
+export const ConnectedRoundVsSquare: Story = {
+  render: () => (
+    <div className="flex flex-col gap-8">
+      {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
+        <div key={size} className="flex flex-col gap-3">
+          <p className="text-on-surface-variant text-xs font-semibold tracking-wide uppercase">
+            size={size}
+          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-on-surface-variant text-xs">Round</p>
+            <ButtonGroup
+              variant="connected"
+              size={size}
+              shape="round"
+              selectionMode="required"
+              defaultValue="a"
+              aria-label={`${size} round connected`}
+              className="w-56"
+            >
+              <Button variant="tonal" aria-pressed>
+                A
+              </Button>
+              <Button variant="outlined" aria-pressed={false}>
+                B
+              </Button>
+              <Button variant="outlined" aria-pressed={false}>
+                C
+              </Button>
+            </ButtonGroup>
+          </div>
+          <div className="flex flex-col gap-2">
+            <p className="text-on-surface-variant text-xs">Square</p>
+            <ButtonGroup
+              variant="connected"
+              size={size}
+              shape="square"
+              selectionMode="required"
+              defaultValue="a"
+              aria-label={`${size} square connected`}
+              className="w-56"
+            >
+              <Button variant="tonal" aria-pressed>
+                A
+              </Button>
+              <Button variant="outlined" aria-pressed={false}>
+                B
+              </Button>
+              <Button variant="outlined" aria-pressed={false}>
+                C
+              </Button>
+            </ButtonGroup>
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "All 5 size tiers with `round` vs `square` shape in connected mode. `round` keeps the outer (exposed) corners as `rounded-full` while inner corners shrink per size. `square` uses uniform radius matching the size tier on all corners.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// 17. ConnectedMinWidth — xs/sm enforce min-w-12
+// ---------------------------------------------------------------------------
+
+export const ConnectedMinWidth: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">
+          xs — enforces <code>min-w-12</code> (48dp) on each button
+        </p>
+        <ButtonGroup
+          variant="connected"
+          size="xs"
+          selectionMode="required"
+          defaultValue="a"
+          aria-label="xs connected"
+        >
+          <Button variant="tonal" aria-pressed>
+            A
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            B
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            C
+          </Button>
+        </ButtonGroup>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">
+          sm — enforces <code>min-w-12</code> (48dp) on each button
+        </p>
+        <ButtonGroup
+          variant="connected"
+          size="sm"
+          selectionMode="required"
+          defaultValue="a"
+          aria-label="sm connected"
+        >
+          <Button variant="tonal" aria-pressed>
+            A
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            B
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            C
+          </Button>
+        </ButtonGroup>
+      </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">md — no minimum width</p>
+        <ButtonGroup
+          variant="connected"
+          size="md"
+          selectionMode="required"
+          defaultValue="a"
+          aria-label="md connected"
+          className="w-48"
+        >
+          <Button variant="tonal" aria-pressed>
+            A
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            B
+          </Button>
+          <Button variant="outlined" aria-pressed={false}>
+            C
+          </Button>
+        </ButtonGroup>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MD3 requires 48dp minimum touch-target width for `xs` and `sm` connected groups. Buttons in these groups automatically receive `min-w-12` from the group context. Medium and larger sizes have no enforced minimum width.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// 18. MixedButtonTypes — Button + IconButton in same group
+// ---------------------------------------------------------------------------
+
+const MixedButtonTypesExample = (): React.ReactElement => {
+  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-on-surface-variant text-sm font-medium">
+          Label buttons + icon buttons (standard)
+        </p>
+        <ButtonGroup
+          variant="standard"
+          size="md"
+          selectionMode="multi"
+          selectedValues={selected}
+          onSelectionChange={setSelected}
+          aria-label="Mixed button group"
+        >
+          <Button
+            variant="outlined"
+            icon={<IconFormatBold />}
+            aria-pressed={selected.has("bold")}
+            onPress={() =>
+              setSelected((prev) => {
+                const next = new Set(prev);
+                if (next.has("bold")) {
+                  next.delete("bold");
+                } else {
+                  next.add("bold");
+                }
+                return next;
+              })
+            }
+          >
+            Bold
+          </Button>
+          <Button
+            variant="outlined"
+            icon={<IconFormatItalic />}
+            aria-pressed={selected.has("italic")}
+            onPress={() =>
+              setSelected((prev) => {
+                const next = new Set(prev);
+                if (next.has("italic")) {
+                  next.delete("italic");
+                } else {
+                  next.add("italic");
+                }
+                return next;
+              })
+            }
+          >
+            Italic
+          </Button>
+          <IconButton
+            aria-label="Underline"
+            variant="outlined"
+            selected={selected.has("underline")}
+            onPress={() =>
+              setSelected((prev) => {
+                const next = new Set(prev);
+                if (next.has("underline")) {
+                  next.delete("underline");
+                } else {
+                  next.add("underline");
+                }
+                return next;
+              })
+            }
+          >
+            <IconFormatUnderlined />
+          </IconButton>
+        </ButtonGroup>
+      </div>
+
+      <p className="text-on-surface-variant text-sm">
+        Active:{" "}
+        <span className="text-on-surface font-medium">
+          {selected.size > 0 ? [...selected].join(", ") : "none"}
+        </span>
+      </p>
+    </div>
+  );
+};
+
+export const MixedButtonTypes: Story = {
+  render: () => <MixedButtonTypesExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Mix of `Button` (with icon+label) and `IconButton` components inside a single standard group. Demonstrates that both component types can coexist in a group — all receive the same context values (shape, size, variant, selection).",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// 19. Playground — all controls exposed for manual exploration
 // ---------------------------------------------------------------------------
 
 export const Playground: Story = {

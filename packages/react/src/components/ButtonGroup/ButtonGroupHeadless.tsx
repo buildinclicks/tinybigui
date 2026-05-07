@@ -1,6 +1,7 @@
 import { forwardRef, useId, useRef, useState } from "react";
 import type React from "react";
 import { ButtonGroupProvider } from "./ButtonGroupContext";
+import { getInnerRadius, getOuterRadius } from "./ButtonGroup.utils";
 import type { ButtonGroupProps } from "./ButtonGroup.types";
 
 /**
@@ -128,6 +129,9 @@ export const ButtonGroupHeadless = forwardRef<HTMLDivElement, ButtonGroupProps>(
             selectionMode,
             selectedValues,
             onSelectionChange: handleSelectionChange,
+            connectedInnerRadius: getInnerRadius(size),
+            connectedOuterRadius: getOuterRadius(shape, size),
+            enforceMinWidth: variant === "connected" && (size === "xs" || size === "sm"),
           }}
         >
           {children}
