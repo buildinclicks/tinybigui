@@ -40,6 +40,7 @@ lerna-debug.log*
 *.tmp
 
 # Project-specific
+md3-specs/
 info.txt
 .cursor/
 .prompts/

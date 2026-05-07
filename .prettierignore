@@ -52,3 +52,9 @@ yarn-error.log*
 # Auto-generated files
 **/.storybook/vitest.setup.ts
 
+# Project-specific
+md3-specs/
+.prompts/
+.qa-phases/
+.github-issues/
+learning-docs/
