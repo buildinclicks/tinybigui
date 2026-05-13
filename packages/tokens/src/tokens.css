@@ -65,6 +65,11 @@
   /* Scrim */
   --md-sys-color-scrim: #000000;
 
+  /* Inverse */
+  --md-sys-color-inverse-surface: #313033;
+  --md-sys-color-inverse-on-surface: #f4eff4;
+  --md-sys-color-inverse-primary: #d0bcff;
+
   /* ==========================================================================
      TYPOGRAPHY TOKENS
      Material Design 3 Type Scale - 5 categories, 3 sizes each (15 total)
@@ -199,6 +204,8 @@
   --md-sys-motion-duration-long4: 600ms;
 
   --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --md-sys-motion-easing-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
   --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
   --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
@@ -257,6 +264,11 @@
 
   /* Scrim */
   --md-sys-color-scrim: #000000;
+
+  /* Inverse */
+  --md-sys-color-inverse-surface: #e6e1e5;
+  --md-sys-color-inverse-on-surface: #313033;
+  --md-sys-color-inverse-primary: #6750a4;
 }
 
 /* System/OS dark mode preference (activates when no .light class is present) */
@@ -309,6 +321,11 @@
 
     /* Scrim */
     --md-sys-color-scrim: #000000;
+
+    /* Inverse */
+    --md-sys-color-inverse-surface: #e6e1e5;
+    --md-sys-color-inverse-on-surface: #313033;
+    --md-sys-color-inverse-primary: #6750a4;
   }
 }
 
@@ -382,6 +399,11 @@ body {
 
   /* Scrim color */
   --color-scrim: var(--md-sys-color-scrim);
+
+  /* Inverse colors */
+  --color-inverse-surface: var(--md-sys-color-inverse-surface);
+  --color-inverse-on-surface: var(--md-sys-color-inverse-on-surface);
+  --color-inverse-primary: var(--md-sys-color-inverse-primary);
 
   /* Elevation/Shadow utilities
      Maps MD3 elevation levels to Tailwind box-shadow utilities
@@ -483,6 +505,8 @@ body {
      Maps MD3 easing tokens to Tailwind transition-timing-function utilities
      Usage: ease-standard, ease-emphasized, etc. */
   --ease-standard: var(--md-sys-motion-easing-standard);
+  --ease-standard-decelerate: var(--md-sys-motion-easing-standard-decelerate);
+  --ease-standard-accelerate: var(--md-sys-motion-easing-standard-accelerate);
   --ease-emphasized: var(--md-sys-motion-easing-emphasized);
   --ease-emphasized-decelerate: var(--md-sys-motion-easing-emphasized-decelerate);
   --ease-emphasized-accelerate: var(--md-sys-motion-easing-emphasized-accelerate);
@@ -495,6 +519,12 @@ body {
 
   /* Drawer width: MD3 spec = 360dp */
   --spacing-drawer: 22.5rem; /* 360px */
+
+  /* Snackbar max width: MD3 spec = 568dp */
+  --spacing-snackbar-max: 35.5rem; /* 568px */
+
+  /* Dialog max width: MD3 spec = 560dp */
+  --spacing-dialog-max: 35rem; /* 560px */
 
   /* Shape radius utilities for MD3 components */
   --radius-xs: var(--md-sys-shape-corner-extra-small); /* 4px */

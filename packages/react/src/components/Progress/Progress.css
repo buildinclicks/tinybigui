@@ -1,0 +1,106 @@
+/*
+ * Progress Indicator Animations
+ * Material Design 3 motion tokens for indeterminate progress states.
+ *
+ * Keyframes are defined here (co-located with the component) per project
+ * convention — they are NOT added to the global tokens.css.
+ *
+ * Motion tokens referenced (from packages/tokens/src/tokens.css):
+ *   --md-sys-motion-duration-medium4 : 400ms  (determinate transitions — applied via Tailwind)
+ *   --md-sys-motion-duration-long2   : 500ms  (linear indeterminate cycle)
+ *   --md-sys-motion-duration-long4   : 600ms  (circular indeterminate rotation)
+ *   --md-sys-motion-easing-standard  : cubic-bezier(0.2, 0, 0, 1)
+ */
+
+/* ---------------------------------------------------------------------------
+   LINEAR INDETERMINATE
+   Two-segment bar animation per MD3 spec.
+   First segment: starts narrow at left, expands, then slides off right.
+   Second segment: follows the first with a short delay.
+   Duration: long2 = 500ms per cycle (repeating).
+   --------------------------------------------------------------------------- */
+
+@keyframes progress-linear-indeterminate-1 {
+  0% {
+    left: -35%;
+    right: 100%;
+  }
+  60% {
+    left: 100%;
+    right: -90%;
+  }
+  100% {
+    left: 100%;
+    right: -90%;
+  }
+}
+
+@keyframes progress-linear-indeterminate-2 {
+  0% {
+    left: -200%;
+    right: 100%;
+  }
+  60% {
+    left: 107%;
+    right: -8%;
+  }
+  100% {
+    left: 107%;
+    right: -8%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   CIRCULAR INDETERMINATE
+   Two-part animation per MD3 spec:
+   1. Container rotation: continuous 360° spin.
+   2. Dash animation: stroke-dasharray pulses between a short and long arc.
+   Rotation duration: long4 = 600ms per cycle (repeating).
+   --------------------------------------------------------------------------- */
+
+@keyframes progress-circular-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress-circular-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   TAILWIND @theme INTEGRATION
+   Register animations so they can be used as Tailwind utilities:
+     animate-progress-linear-indeterminate-1
+     animate-progress-linear-indeterminate-2
+     animate-progress-circular-rotate
+     animate-progress-circular-dash
+   --------------------------------------------------------------------------- */
+
+@theme {
+  --animate-progress-linear-indeterminate-1: progress-linear-indeterminate-1
+    var(--md-sys-motion-duration-long2) var(--md-sys-motion-easing-standard) infinite;
+
+  --animate-progress-linear-indeterminate-2: progress-linear-indeterminate-2
+    var(--md-sys-motion-duration-long2) var(--md-sys-motion-easing-standard) infinite;
+
+  --animate-progress-circular-rotate: progress-circular-rotate var(--md-sys-motion-duration-long4)
+    linear infinite;
+
+  --animate-progress-circular-dash: progress-circular-dash var(--md-sys-motion-duration-long4)
+    var(--md-sys-motion-easing-standard) infinite;
+}

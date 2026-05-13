@@ -1,6 +1,6 @@
 {
   "name": "@tinybigui/react",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Material Design 3 React components built with Tailwind CSS",
   "keywords": [
     "react",
@@ -61,6 +61,7 @@
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
+    "@react-aria/collections": "^3.0.1",
     "@react-aria/live-announcer": "^3.4.4",
     "@react-aria/utils": "^3.32.0",
     "class-variance-authority": "^0.7.1",
