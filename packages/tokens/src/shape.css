@@ -1,0 +1,23 @@
+/**
+ * @tinybigui/tokens — Shape Tokens
+ * Material Design 3 corner radius system.
+ *
+ * Token prefix: --md-sys-shape-corner-*
+ */
+
+:root {
+  /* ==========================================================================
+     CORNER RADIUS SCALE
+     ========================================================================== */
+
+  --md-sys-shape-corner-none: 0;
+  --md-sys-shape-corner-extra-small: 0.25rem; /* 4px  — chips, snackbars */
+  --md-sys-shape-corner-small: 0.5rem; /* 8px  — text fields, menus */
+  --md-sys-shape-corner-medium: 0.75rem; /* 12px — cards */
+  --md-sys-shape-corner-large: 1rem; /* 16px — FABs, nav drawer */
+  --md-sys-shape-corner-large-increased: 1.25rem; /* 20px — M3 Expressive */
+  --md-sys-shape-corner-extra-large: 1.75rem; /* 28px — dialogs, bottom sheets */
+  --md-sys-shape-corner-extra-large-increased: 2rem; /* 32px — M3 Expressive */
+  --md-sys-shape-corner-extra-extra-large: 3rem; /* 48px — M3 Expressive */
+  --md-sys-shape-corner-full: 624.9375rem; /* pill / fully rounded — buttons, chips, badges */
+}

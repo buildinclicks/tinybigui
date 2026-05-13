@@ -56,9 +56,29 @@
   }
 }
 
-/* TODO: Component-specific styles will be added here as we build components:
- * - State layers (hover, press, focus states)
- * - Ripple effects
- * - Elevation transitions
- * - Component-specific overrides
+/* ==========================================================================
+   COMPONENT TRANSITION UTILITIES
+   Split MD3 transition: spatial properties use the expressive spring (allows
+   overshoot); effects properties use the standard spring (no overshoot).
+
+   MD3 spec: opacity/color/blur MUST NOT overshoot — applying the expressive
+   spatial cubic-bezier to color transitions causes a visible flicker/stutter.
+   ========================================================================== */
+
+/**
+ * btn-transition — use on all Button and IconButton elements inside connected
+ * groups where border-radius morphs on selection.
+ *
+ * Spatial  (border-radius):         expressive-fast-spatial  350ms, overshoot ok
+ * Effects  (color / bg / shadow):   standard-fast-effects    150ms, no overshoot
  */
+@utility btn-transition {
+  transition:
+    border-radius var(--md-sys-motion-expressive-fast-spatial-duration),
+    color var(--md-sys-motion-standard-fast-effects-duration),
+    background-color var(--md-sys-motion-standard-fast-effects-duration),
+    border-color var(--md-sys-motion-standard-fast-effects-duration),
+    opacity var(--md-sys-motion-standard-fast-effects-duration),
+    box-shadow var(--md-sys-motion-standard-fast-effects-duration),
+    outline-color var(--md-sys-motion-standard-fast-effects-duration);
+}

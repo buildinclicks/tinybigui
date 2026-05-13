@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { axe } from "vitest-axe";
 import { IconButton } from "./IconButton";
+import { ButtonGroup } from "../ButtonGroup/ButtonGroup";
 import React from "react";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
 
@@ -617,6 +618,230 @@ describe("IconButton", () => {
       );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
+    });
+  });
+
+  describe("data attributes for ButtonGroup integration", () => {
+    test("sets data-variant attribute matching the variant prop", () => {
+      render(
+        <IconButton aria-label="Test" variant="filled">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "filled");
+    });
+
+    test("sets data-variant for standard", () => {
+      render(
+        <IconButton aria-label="Test" variant="standard">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "standard");
+    });
+
+    test("sets data-variant for tonal", () => {
+      render(
+        <IconButton aria-label="Test" variant="tonal">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "tonal");
+    });
+
+    test("sets data-variant for outlined", () => {
+      render(
+        <IconButton aria-label="Test" variant="outlined">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "outlined");
+    });
+
+    test("sets data-color attribute matching the color prop", () => {
+      render(
+        <IconButton aria-label="Test" variant="filled" color="primary">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "primary");
+    });
+
+    test("sets data-color for secondary", () => {
+      render(
+        <IconButton aria-label="Test" variant="filled" color="secondary">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "secondary");
+    });
+
+    test("sets data-color for tertiary", () => {
+      render(
+        <IconButton aria-label="Test" variant="filled" color="tertiary">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "tertiary");
+    });
+
+    test("sets data-color for error", () => {
+      render(
+        <IconButton aria-label="Test" variant="filled" color="error">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "error");
+    });
+  });
+
+  describe("ButtonGroup context consumption", () => {
+    test("standalone IconButton renders normally without group context", () => {
+      render(
+        <IconButton aria-label="Test">
+          <IconDelete />
+        </IconButton>
+      );
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("rounded-full");
+      expect(button).not.toHaveClass("rounded-xs");
+      expect(button).not.toHaveClass("rounded-sm");
+    });
+
+    test("IconButton inside connected group applies inner radius class", () => {
+      render(
+        <ButtonGroup variant="connected" size="medium" aria-label="Group">
+          <IconButton aria-label="First">
+            <IconDelete />
+          </IconButton>
+          <IconButton aria-label="Second">
+            <IconFavorite />
+          </IconButton>
+        </ButtonGroup>
+      );
+      const buttons = screen.getAllByRole("button");
+      buttons.forEach((btn) => {
+        expect(btn).toHaveClass("rounded-sm");
+      });
+    });
+
+    test("IconButton inside connected round group applies graduated outer radius", () => {
+      render(
+        <ButtonGroup variant="connected" size="medium" shape="round" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+          <IconButton aria-label="B">
+            <IconFavorite />
+          </IconButton>
+        </ButtonGroup>
+      );
+      const buttons = screen.getAllByRole("button");
+      expect(buttons[0].className).toContain("first:rounded-s-3xl");
+      expect(buttons[0].className).toContain("last:rounded-e-3xl");
+    });
+
+    test("IconButton inside connected large group has rounded-lg inner radius", () => {
+      render(
+        <ButtonGroup variant="connected" size="large" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+          <IconButton aria-label="B">
+            <IconFavorite />
+          </IconButton>
+        </ButtonGroup>
+      );
+      const buttons = screen.getAllByRole("button");
+      buttons.forEach((btn) => {
+        expect(btn).toHaveClass("rounded-lg");
+      });
+    });
+
+    test("IconButton inside connected extra-large group applies rounded-[20px]", () => {
+      render(
+        <ButtonGroup variant="connected" size="extra-large" shape="round" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+          <IconButton aria-label="B">
+            <IconFavorite />
+          </IconButton>
+        </ButtonGroup>
+      );
+      const buttons = screen.getAllByRole("button");
+      buttons.forEach((btn) => {
+        expect(btn.className).toContain("rounded-[20px]");
+      });
+    });
+
+    test("IconButton inside connected square group applies square outer radius", () => {
+      render(
+        <ButtonGroup variant="connected" size="small" shape="square" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+          <IconButton aria-label="B">
+            <IconFavorite />
+          </IconButton>
+        </ButtonGroup>
+      );
+      const buttons = screen.getAllByRole("button");
+      expect(buttons[0].className).toContain("first:rounded-s-sm");
+      expect(buttons[0].className).toContain("last:rounded-e-sm");
+    });
+
+    test("IconButton inside connected extra-small/small group has min-w-12", () => {
+      render(
+        <ButtonGroup variant="connected" size="extra-small" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+          <IconButton aria-label="B">
+            <IconFavorite />
+          </IconButton>
+        </ButtonGroup>
+      );
+      const buttons = screen.getAllByRole("button");
+      buttons.forEach((btn) => {
+        expect(btn).toHaveClass("min-w-12");
+      });
+    });
+
+    test("IconButton inside connected small group has min-w-12", () => {
+      render(
+        <ButtonGroup variant="connected" size="small" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+        </ButtonGroup>
+      );
+      expect(screen.getByRole("button")).toHaveClass("min-w-12");
+    });
+
+    test("IconButton inside connected medium group does NOT have min-w-12", () => {
+      render(
+        <ButtonGroup variant="connected" size="medium" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+        </ButtonGroup>
+      );
+      expect(screen.getByRole("button")).not.toHaveClass("min-w-12");
+    });
+
+    test("IconButton inside standard group does NOT apply connected radius classes", () => {
+      render(
+        <ButtonGroup variant="standard" size="medium" aria-label="Group">
+          <IconButton aria-label="A">
+            <IconDelete />
+          </IconButton>
+        </ButtonGroup>
+      );
+      const button = screen.getByRole("button");
+      expect(button).toHaveClass("rounded-full");
+      expect(button).not.toHaveClass("rounded-sm");
+      expect(button).not.toHaveClass("min-w-12");
     });
   });
 });

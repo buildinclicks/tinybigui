@@ -6,6 +6,8 @@ import { ButtonHeadless } from "./ButtonHeadless";
 import { buttonVariants, type ButtonVariants } from "./Button.variants";
 import { cn } from "../../utils/cn";
 import { useRipple } from "../../hooks/useRipple";
+import { useOptionalButtonGroup } from "../ButtonGroup/ButtonGroupContext";
+import { getConnectedRadiusClasses } from "../ButtonGroup/ButtonGroup.utils";
 import type { ButtonProps } from "./Button.types";
 
 /**
@@ -45,6 +47,7 @@ const Spinner = (): React.ReactElement => (
  * - ✅ Full keyboard accessibility (via React Aria)
  * - ✅ Screen reader support (via React Aria)
  * - ✅ Focus management (via React Aria)
+ * - ✅ ButtonGroup-aware: applies connected corner radii and min-width when inside a group
  *
  * MD3 Specifications:
  * - Height: 40dp (medium), 32dp (small), 48dp (large)
@@ -82,6 +85,13 @@ const Spinner = (): React.ReactElement => (
  * <Button fullWidth>
  *   Full Width Button
  * </Button>
+ *
+ * // Inside a connected ButtonGroup (corner radii applied automatically)
+ * <ButtonGroup variant="connected" selectionMode="required" defaultValue="md">
+ *   <Button value="sm">S</Button>
+ *   <Button value="md">M</Button>
+ *   <Button value="lg">L</Button>
+ * </ButtonGroup>
  * ```
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVariants, "disabled">>(
@@ -114,6 +124,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
     },
     ref
   ) => {
+    // ButtonGroup context — null when rendered outside a group (safe to call unconditionally)
+    const groupCtx = useOptionalButtonGroup();
+    const isConnected = groupCtx?.variant === "connected";
+
     // Development warnings
     if (process.env.NODE_ENV === "development") {
       if (!children) {
@@ -135,9 +149,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
       disabled: isButtonDisabled || disableRipple,
     });
 
-    // Handle press event (React Aria uses onPress instead of onClick)
-    // Note: onPress is already handled by React Aria in ButtonHeadless
-    // We just pass it through
+    // Connected group radius + min-width overrides
+    const connectedClasses =
+      isConnected && groupCtx
+        ? [
+            ...getConnectedRadiusClasses(groupCtx, props?.value),
+            groupCtx.enforceMinWidth ? "min-w-12" : "",
+          ]
+        : [];
 
     return (
       <ButtonHeadless
@@ -148,8 +167,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
         {...(onPress && { onPress })}
         tabIndex={tabIndex}
         onMouseDown={handleRipple}
+        data-variant={variant}
+        data-color={color}
         className={cn(
-          // Apply CVA variants
+          // Apply CVA variants (includes rounded-full base)
           buttonVariants({
             variant,
             color,
@@ -158,6 +179,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
             disabled: isButtonDisabled,
             loading,
           }),
+          // Connected group overrides: inner radius + start/end outer radius + min-width
+          ...connectedClasses,
           // User custom classes
           className
         )}

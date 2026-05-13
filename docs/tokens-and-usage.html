@@ -1,0 +1,1257 @@
+<!DOCTYPE html><html><head><title></title><meta charset="utf-8"><style>/**
+ * Print / PDF styles for docs/tokens-and-usage.md
+ * Used by: npx md-to-pdf (see comment at bottom of this file for command)
+ */
+
+@page {
+  size: A4;
+  margin: 16mm 14mm 18mm 14mm;
+}
+
+html {
+  font-size: 10.5pt;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family:
+    'Source Sans 3',
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  line-height: 1.45;
+  color: #1a1a1a;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Title & intro */
+h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #6750a4;
+  color: #21005d;
+  page-break-after: avoid;
+}
+
+h1 + p {
+  font-size: 1.02em;
+  color: #333;
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin: 1.75rem 0 0.65rem;
+  padding-top: 0.35rem;
+  color: #31111d;
+  border-top: 1px solid #e8def8;
+  page-break-after: avoid;
+  break-after: avoid-page;
+}
+
+h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin: 1.15rem 0 0.5rem;
+  color: #1d192b;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 0.98rem;
+  font-weight: 650;
+  margin: 1rem 0 0.4rem;
+  color: #1d1b20;
+  page-break-after: avoid;
+}
+
+p {
+  margin: 0.5rem 0;
+  orphans: 3;
+  widows: 3;
+}
+
+a {
+  color: #6750a4;
+  text-decoration: none;
+}
+
+a[href^='http']::after {
+  content: ' (' attr(href) ')';
+  font-size: 0.8em;
+  color: #666;
+  word-break: break-all;
+}
+
+/* Horizontal rules (TOC separators) */
+hr {
+  border: none;
+  border-top: 1px solid #cac4d0;
+  margin: 1rem 0;
+}
+
+/* Lists */
+ul,
+ol {
+  margin: 0.45rem 0 0.75rem;
+  padding-left: 1.35rem;
+}
+
+li {
+  margin: 0.25rem 0;
+}
+
+li > p {
+  margin: 0.2rem 0;
+}
+
+/* Blockquotes (callouts) */
+blockquote {
+  margin: 0.75rem 0;
+  padding: 0.55rem 0.85rem;
+  border-left: 4px solid #6750a4;
+  background: #f7f2fa;
+  color: #1d192b;
+  page-break-inside: avoid;
+}
+
+blockquote p {
+  margin: 0.35rem 0;
+}
+
+blockquote strong {
+  color: #21005d;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.65rem 0 1rem;
+  font-size: 0.78rem;
+  page-break-inside: auto;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+
+th,
+td {
+  border: 1px solid #cac4d0;
+  padding: 0.35rem 0.45rem;
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+th {
+  background: #ece6f0;
+  color: #21005d;
+  font-weight: 650;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Code */
+code {
+  font-family:
+    ui-monospace,
+    'Cascadia Code',
+    'Source Code Pro',
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 0.88em;
+  background: #f3edf7;
+  color: #31111d;
+  padding: 0.12em 0.35em;
+  border-radius: 3px;
+  word-break: break-word;
+}
+
+pre {
+  font-family:
+    ui-monospace,
+    'Cascadia Code',
+    'Source Code Pro',
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  background: #1d1b20;
+  color: #e6e1e5;
+  padding: 0.65rem 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.6rem 0 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+/* “Quick-Reference” pre block at end */
+pre:last-of-type {
+  background: #f5f5f5;
+  color: #1a1a1a;
+  border: 1px solid #cac4d0;
+}
+
+/* Table of contents */
+ol:first-of-type {
+  background: #faf8fc;
+  border: 1px solid #e8def8;
+  border-radius: 6px;
+  padding: 0.85rem 0.85rem 0.85rem 2rem;
+  margin: 0.75rem 0 1.25rem;
+  page-break-inside: avoid;
+}
+
+ol:first-of-type li {
+  margin: 0.35rem 0;
+}
+
+/* Spec references footer list */
+em + ul,
+p em ~ ul {
+  font-size: 0.92em;
+}
+
+body > p:last-child,
+body > ul:last-child {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #cac4d0;
+  font-size: 0.9rem;
+}
+/*# sourceURL=/Users/pukhrajp/Desktop/G-axon/OPEN-SOURCE/tinybigui/docs/tokens-and-usage.print.css*/</style><style>pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}/*# sourceURL=/Users/pukhrajp/.npm/_npx/740a044279f845d9/node_modules/highlight.js/styles/github.css*/</style></head>
+	<body class="">
+		<h1 id="tinybigui--motion-tokens--usage-guide">TinyBigUI — Motion Tokens &amp; Usage Guide</h1>
+<p>This guide covers the complete Material Design 3 motion token system as implemented in <code>@tinybigui/tokens</code>. It explains every token variable, the corresponding Tailwind utility class, when to use each, and how to combine them for real-world UI patterns.</p>
+<hr>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#1-the-two-motion-systems">The Two Motion Systems</a></li>
+<li><a href="#2-legacy-duration-tokens">Legacy Duration Tokens</a></li>
+<li><a href="#3-legacy-easing-tokens">Legacy Easing Tokens</a></li>
+<li><a href="#4-spring-based-motion-tokens--expressive">Spring-Based Motion Tokens — Expressive</a></li>
+<li><a href="#5-spring-based-motion-tokens--standard">Spring-Based Motion Tokens — Standard</a></li>
+<li><a href="#6-composite-animation-utilities">Composite Animation Utilities</a></li>
+<li><a href="#7-keyframes-reference">Keyframes Reference</a></li>
+<li><a href="#8-applying-easing--duration--pairing-rules">Applying Easing &amp; Duration — Pairing Rules</a></li>
+<li><a href="#9-transition-pattern-recipes">Transition Pattern Recipes</a></li>
+<li><a href="#10-common-ui-effect-combinations">Common UI Effect Combinations</a></li>
+<li><a href="#11-reduce-motion-accessibility">Reduce-Motion Accessibility</a></li>
+</ol>
+<hr>
+<h2 id="1-the-two-motion-systems">1. The Two Motion Systems</h2>
+<p>M3 provides two overlapping motion systems:</p>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>Purpose</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Legacy easing + duration</strong></td>
+<td>Page transitions (enter/exit/shared-axis)</td>
+<td>Navigation between screens, dialogs, drawers sliding in/out</td>
+</tr>
+<tr>
+<td><strong>Spring-based (cubic-bezier web conversion)</strong></td>
+<td>Component animations</td>
+<td>Buttons, FABs, chips, cards, menus, and all in-place UI animations</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Key insight:</strong> The spring-based system replaced fixed easing curves for <em>component</em> animations in M3 Expressive (May 2025). The legacy easing tokens are still valid for <em>transition patterns</em> (page-level enter and exit). Both coexist.</p>
+</blockquote>
+<h3 id="spatial-vs-effects">Spatial vs. Effects</h3>
+<p>Within the spring system, every token comes in two types:</p>
+<ul>
+<li><strong>Spatial</strong> — animates position (<code>transform: translate/scale</code>), size, or shape. Springs may overshoot slightly, giving a physical, alive feel.</li>
+<li><strong>Effects</strong> — animates opacity, color, or blur. Must <em>not</em> overshoot (opacity &gt; 1 or out-of-gamut colors break the UI visually).</li>
+</ul>
+<h3 id="expressive-vs-standard-personality">Expressive vs. Standard Personality</h3>
+<ul>
+<li><strong>Expressive</strong> — energetic, playful, with noticeable overshoot on spatial animations. Use for high-emphasis components and moments of delight (FABs, hero buttons, morphing shapes, expanding cards).</li>
+<li><strong>Standard</strong> — calm, purposeful, no overshoot. Use for utility animations, navigation, content transitions, and secondary elements (drawers, nav bars, content fading in).</li>
+</ul>
+<hr>
+<h2 id="2-legacy-duration-tokens">2. Legacy Duration Tokens</h2>
+<h3 id="css-custom-properties">CSS custom properties</h3>
+<pre><code class="hljs css"><span class="hljs-comment">/* Short — micro-interactions, state feedback */</span>
+<span class="hljs-attr">--md-sys-motion-duration-short1</span>:      <span class="hljs-number">50ms</span>
+--md-sys-motion-duration-short2:     <span class="hljs-number">100ms</span>
+--md-sys-motion-duration-short3:     <span class="hljs-number">150ms</span>
+--md-sys-motion-duration-short4:     <span class="hljs-number">200ms</span>
+
+<span class="hljs-comment">/* Medium — most component animations */</span>
+--md-sys-motion-duration-medium1:    <span class="hljs-number">250ms</span>
+--md-sys-motion-duration-medium2:    <span class="hljs-number">300ms</span>
+--md-sys-motion-duration-medium3:    <span class="hljs-number">350ms</span>
+--md-sys-motion-duration-medium4:    <span class="hljs-number">400ms</span>
+
+<span class="hljs-comment">/* Long — large components, complex transitions */</span>
+--md-sys-motion-duration-long1:      <span class="hljs-number">450ms</span>
+--md-sys-motion-duration-long2:      <span class="hljs-number">500ms</span>
+--md-sys-motion-duration-long3:      <span class="hljs-number">550ms</span>
+--md-sys-motion-duration-long4:      <span class="hljs-number">600ms</span>
+
+<span class="hljs-comment">/* Extra-long — full-screen transitions, complex sequences */</span>
+--md-sys-motion-duration-extra-long1: <span class="hljs-number">700ms</span>
+--md-sys-motion-duration-extra-long2: <span class="hljs-number">800ms</span>
+--md-sys-motion-duration-extra-long3: <span class="hljs-number">900ms</span>
+--md-sys-motion-duration-extra-long4: <span class="hljs-number">1000ms</span>
+</code></pre>
+<h3 id="tailwind-utility-classes">Tailwind utility classes</h3>
+<table>
+<thead>
+<tr>
+<th>Utility class</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>duration-short1</code></td>
+<td>50ms</td>
+</tr>
+<tr>
+<td><code>duration-short2</code></td>
+<td>100ms</td>
+</tr>
+<tr>
+<td><code>duration-short3</code></td>
+<td>150ms</td>
+</tr>
+<tr>
+<td><code>duration-short4</code></td>
+<td>200ms</td>
+</tr>
+<tr>
+<td><code>duration-medium1</code></td>
+<td>250ms</td>
+</tr>
+<tr>
+<td><code>duration-medium2</code></td>
+<td>300ms</td>
+</tr>
+<tr>
+<td><code>duration-medium3</code></td>
+<td>350ms</td>
+</tr>
+<tr>
+<td><code>duration-medium4</code></td>
+<td>400ms</td>
+</tr>
+<tr>
+<td><code>duration-long1</code></td>
+<td>450ms</td>
+</tr>
+<tr>
+<td><code>duration-long2</code></td>
+<td>500ms</td>
+</tr>
+<tr>
+<td><code>duration-long3</code></td>
+<td>550ms</td>
+</tr>
+<tr>
+<td><code>duration-long4</code></td>
+<td>600ms</td>
+</tr>
+<tr>
+<td><code>duration-extra-long1</code></td>
+<td>700ms</td>
+</tr>
+<tr>
+<td><code>duration-extra-long2</code></td>
+<td>800ms</td>
+</tr>
+<tr>
+<td><code>duration-extra-long3</code></td>
+<td>900ms</td>
+</tr>
+<tr>
+<td><code>duration-extra-long4</code></td>
+<td>1000ms</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="3-legacy-easing-tokens">3. Legacy Easing Tokens</h2>
+<h3 id="css-custom-properties-1">CSS custom properties</h3>
+<pre><code class="hljs css"><span class="hljs-comment">/* Standard family — utility animations */</span>
+<span class="hljs-attr">--md-sys-motion-easing-standard</span>:             <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.2</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+--md-sys-motion-easing-standard-decelerate:  <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+--md-sys-motion-easing-standard-accelerate:  <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>)
+
+<span class="hljs-comment">/* Emphasized family — high-prominence transitions */</span>
+--md-sys-motion-easing-emphasized:            <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.2</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+--md-sys-motion-easing-emphasized-decelerate: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.05</span>, <span class="hljs-number">0.7</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">1</span>)
+--md-sys-motion-easing-emphasized-accelerate: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.8</span>, <span class="hljs-number">0.15</span>)
+</code></pre>
+<h3 id="tailwind-utility-classes-1">Tailwind utility classes</h3>
+<table>
+<thead>
+<tr>
+<th>Utility class</th>
+<th>Curve</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ease-standard</code></td>
+<td><code>cubic-bezier(0.2, 0, 0, 1)</code></td>
+<td>Element moves within the same screen</td>
+</tr>
+<tr>
+<td><code>ease-standard-decelerate</code></td>
+<td><code>cubic-bezier(0, 0, 0, 1)</code></td>
+<td>Element enters the screen</td>
+</tr>
+<tr>
+<td><code>ease-standard-accelerate</code></td>
+<td><code>cubic-bezier(0.3, 0, 1, 1)</code></td>
+<td>Element exits the screen</td>
+</tr>
+<tr>
+<td><code>ease-emphasized</code></td>
+<td><code>cubic-bezier(0.2, 0, 0, 1)</code></td>
+<td>High-prominence on-screen movement</td>
+</tr>
+<tr>
+<td><code>ease-emphasized-decelerate</code></td>
+<td><code>cubic-bezier(0.05, 0.7, 0.1, 1)</code></td>
+<td>High-prominence element enters</td>
+</tr>
+<tr>
+<td><code>ease-emphasized-accelerate</code></td>
+<td><code>cubic-bezier(0.3, 0, 0.8, 0.15)</code></td>
+<td>High-prominence element exits</td>
+</tr>
+</tbody></table>
+<h3 id="recommended-legacy-pairings-md3-spec">Recommended legacy pairings (MD3 spec)</h3>
+<table>
+<thead>
+<tr>
+<th>Easing</th>
+<th>Duration</th>
+<th>Transition type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ease-emphasized</code></td>
+<td><code>duration-long2</code> (500ms)</td>
+<td>Begin and end on screen</td>
+</tr>
+<tr>
+<td><code>ease-emphasized-decelerate</code></td>
+<td><code>duration-medium4</code> (400ms)</td>
+<td>Enter the screen</td>
+</tr>
+<tr>
+<td><code>ease-emphasized-accelerate</code></td>
+<td><code>duration-short4</code> (200ms)</td>
+<td>Exit the screen</td>
+</tr>
+<tr>
+<td><code>ease-standard</code></td>
+<td><code>duration-medium2</code> (300ms)</td>
+<td>Begin and end on screen (utility)</td>
+</tr>
+<tr>
+<td><code>ease-standard-decelerate</code></td>
+<td><code>duration-medium1</code> (250ms)</td>
+<td>Enter screen (utility)</td>
+</tr>
+<tr>
+<td><code>ease-standard-accelerate</code></td>
+<td><code>duration-short4</code> (200ms)</td>
+<td>Exit screen (utility)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="4-spring-based-motion-tokens--expressive">4. Spring-Based Motion Tokens — Expressive</h2>
+<p>Use expressive motion for high-emphasis, branded moments. The overshoot on spatial springs gives components a physical, alive quality.</p>
+<h3 id="spatial-tokens-position-size-shape--overshoot-allowed">Spatial tokens (position, size, shape — overshoot allowed)</h3>
+<pre><code class="hljs css"><span class="hljs-comment">/* Fast — small components: buttons, chips, badges */</span>
+<span class="hljs-attr">--md-sys-motion-expressive-fast-spatial-easing</span>:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.42</span>, <span class="hljs-number">1.67</span>, <span class="hljs-number">0.21</span>, <span class="hljs-number">0.90</span>)
+--md-sys-motion-expressive-fast-spatial-duration:  <span class="hljs-number">350ms</span>
+
+<span class="hljs-comment">/* Default — standard components: dialogs, cards, sheets */</span>
+--md-sys-motion-expressive-default-spatial-easing: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.38</span>, <span class="hljs-number">1.21</span>, <span class="hljs-number">0.22</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-expressive-default-spatial-duration: <span class="hljs-number">500ms</span>
+
+<span class="hljs-comment">/* Slow — large/full-screen elements */</span>
+--md-sys-motion-expressive-slow-spatial-easing:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.39</span>, <span class="hljs-number">1.29</span>, <span class="hljs-number">0.35</span>, <span class="hljs-number">0.98</span>)
+--md-sys-motion-expressive-slow-spatial-duration:  <span class="hljs-number">650ms</span>
+</code></pre>
+<h4 id="tailwind-utility-classes-2">Tailwind utility classes</h4>
+<table>
+<thead>
+<tr>
+<th>Easing utility</th>
+<th>Duration utility</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ease-expressive-fast-spatial</code></td>
+<td><code>duration-expressive-fast-spatial</code></td>
+<td>350ms</td>
+</tr>
+<tr>
+<td><code>ease-expressive-default-spatial</code></td>
+<td><code>duration-expressive-default-spatial</code></td>
+<td>500ms</td>
+</tr>
+<tr>
+<td><code>ease-expressive-slow-spatial</code></td>
+<td><code>duration-expressive-slow-spatial</code></td>
+<td>650ms</td>
+</tr>
+</tbody></table>
+<h3 id="effects-tokens-opacity-color-blur--no-overshoot">Effects tokens (opacity, color, blur — no overshoot)</h3>
+<pre><code class="hljs css"><span class="hljs-comment">/* Fast — rapid feedback: icon color, badge flash */</span>
+<span class="hljs-attr">--md-sys-motion-expressive-fast-effects-easing</span>:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.31</span>, <span class="hljs-number">0.94</span>, <span class="hljs-number">0.34</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-expressive-fast-effects-duration:  <span class="hljs-number">150ms</span>
+
+<span class="hljs-comment">/* Default — standard fade-in on prominent elements */</span>
+--md-sys-motion-expressive-default-effects-easing: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.34</span>, <span class="hljs-number">0.80</span>, <span class="hljs-number">0.34</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-expressive-default-effects-duration: <span class="hljs-number">200ms</span>
+
+<span class="hljs-comment">/* Slow — fade-in on large or full-screen expressive elements */</span>
+--md-sys-motion-expressive-slow-effects-easing:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.34</span>, <span class="hljs-number">0.88</span>, <span class="hljs-number">0.34</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-expressive-slow-effects-duration:  <span class="hljs-number">300ms</span>
+</code></pre>
+<h4 id="tailwind-utility-classes-3">Tailwind utility classes</h4>
+<table>
+<thead>
+<tr>
+<th>Easing utility</th>
+<th>Duration utility</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ease-expressive-fast-effects</code></td>
+<td><code>duration-expressive-fast-effects</code></td>
+<td>150ms</td>
+</tr>
+<tr>
+<td><code>ease-expressive-default-effects</code></td>
+<td><code>duration-expressive-default-effects</code></td>
+<td>200ms</td>
+</tr>
+<tr>
+<td><code>ease-expressive-slow-effects</code></td>
+<td><code>duration-expressive-slow-effects</code></td>
+<td>300ms</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-spring-based-motion-tokens--standard">5. Spring-Based Motion Tokens — Standard</h2>
+<p>Use standard motion for utility and secondary UI. No overshoot — feels calm and purposeful.</p>
+<h3 id="spatial-tokens-position-size-shape">Spatial tokens (position, size, shape)</h3>
+<pre><code class="hljs css"><span class="hljs-comment">/* Fast — small components or quick utility moves */</span>
+<span class="hljs-attr">--md-sys-motion-standard-fast-spatial-easing</span>:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.27</span>, <span class="hljs-number">1.06</span>, <span class="hljs-number">0.18</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-standard-fast-spatial-duration:  <span class="hljs-number">350ms</span>
+
+<span class="hljs-comment">/* Default — navigation and content animations */</span>
+--md-sys-motion-standard-default-spatial-easing: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.27</span>, <span class="hljs-number">1.06</span>, <span class="hljs-number">0.18</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-standard-default-spatial-duration: <span class="hljs-number">500ms</span>
+
+<span class="hljs-comment">/* Slow — large layout shifts and full-screen transitions */</span>
+--md-sys-motion-standard-slow-spatial-easing:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.27</span>, <span class="hljs-number">1.06</span>, <span class="hljs-number">0.18</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-standard-slow-spatial-duration:  <span class="hljs-number">750ms</span>
+</code></pre>
+<h4 id="tailwind-utility-classes-4">Tailwind utility classes</h4>
+<table>
+<thead>
+<tr>
+<th>Easing utility</th>
+<th>Duration utility</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ease-spring-standard-fast-spatial</code></td>
+<td><code>duration-spring-standard-fast-spatial</code></td>
+<td>350ms</td>
+</tr>
+<tr>
+<td><code>ease-spring-standard-default-spatial</code></td>
+<td><code>duration-spring-standard-default-spatial</code></td>
+<td>500ms</td>
+</tr>
+<tr>
+<td><code>ease-spring-standard-slow-spatial</code></td>
+<td><code>duration-spring-standard-slow-spatial</code></td>
+<td>750ms</td>
+</tr>
+</tbody></table>
+<h3 id="effects-tokens-opacity-color-blur">Effects tokens (opacity, color, blur)</h3>
+<pre><code class="hljs css"><span class="hljs-comment">/* Fast — quick opacity/color changes on utility elements */</span>
+<span class="hljs-attr">--md-sys-motion-standard-fast-effects-easing</span>:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.31</span>, <span class="hljs-number">0.94</span>, <span class="hljs-number">0.34</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-standard-fast-effects-duration:  <span class="hljs-number">150ms</span>
+
+<span class="hljs-comment">/* Default — nav and content fade, tab indicator */</span>
+--md-sys-motion-standard-default-effects-easing: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.34</span>, <span class="hljs-number">0.80</span>, <span class="hljs-number">0.34</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-standard-default-effects-duration: <span class="hljs-number">200ms</span>
+
+<span class="hljs-comment">/* Slow — opacity changes on large/full-screen areas */</span>
+--md-sys-motion-standard-slow-effects-easing:   <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.34</span>, <span class="hljs-number">0.88</span>, <span class="hljs-number">0.34</span>, <span class="hljs-number">1.00</span>)
+--md-sys-motion-standard-slow-effects-duration:  <span class="hljs-number">300ms</span>
+</code></pre>
+<h4 id="tailwind-utility-classes-5">Tailwind utility classes</h4>
+<table>
+<thead>
+<tr>
+<th>Easing utility</th>
+<th>Duration utility</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ease-spring-standard-fast-effects</code></td>
+<td><code>duration-spring-standard-fast-effects</code></td>
+<td>150ms</td>
+</tr>
+<tr>
+<td><code>ease-spring-standard-default-effects</code></td>
+<td><code>duration-spring-standard-default-effects</code></td>
+<td>200ms</td>
+</tr>
+<tr>
+<td><code>ease-spring-standard-slow-effects</code></td>
+<td><code>duration-spring-standard-slow-effects</code></td>
+<td>300ms</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="6-composite-animation-utilities">6. Composite Animation Utilities</h2>
+<p>These <code>animate-*</code> classes are pre-built combinations of a keyframe, duration, and easing — ready to drop on an element.</p>
+<table>
+<thead>
+<tr>
+<th>Utility class</th>
+<th>Keyframe</th>
+<th>Duration</th>
+<th>Easing</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>animate-md-ripple</code></td>
+<td><code>md-ripple</code></td>
+<td>450ms</td>
+<td>emphasized</td>
+<td>Press/click ripple feedback</td>
+</tr>
+<tr>
+<td><code>animate-md-fade-in</code></td>
+<td><code>md-fade-in</code></td>
+<td>200ms</td>
+<td>expressive default effects</td>
+<td>Content appearing, dialog overlay</td>
+</tr>
+<tr>
+<td><code>animate-md-fade-out</code></td>
+<td><code>md-fade-out</code></td>
+<td>150ms</td>
+<td>standard fast effects</td>
+<td>Content disappearing</td>
+</tr>
+<tr>
+<td><code>animate-md-scale-in</code></td>
+<td><code>md-scale-in</code></td>
+<td>350ms</td>
+<td>expressive fast spatial</td>
+<td>Menu/dialog entering</td>
+</tr>
+<tr>
+<td><code>animate-md-scale-out</code></td>
+<td><code>md-scale-out</code></td>
+<td>200ms</td>
+<td>emphasized accelerate</td>
+<td>Menu/dialog exiting</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-in-bottom</code></td>
+<td><code>md-slide-in-bottom</code></td>
+<td>500ms</td>
+<td>standard default spatial</td>
+<td>Sheet/nav bar entering from below</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-out-bottom</code></td>
+<td><code>md-slide-out-bottom</code></td>
+<td>200ms</td>
+<td>emphasized accelerate</td>
+<td>Sheet/nav bar exiting below</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-in-right</code></td>
+<td><code>md-slide-in-right</code></td>
+<td>500ms</td>
+<td>standard default spatial</td>
+<td>Forward navigation, drawer (LTR)</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-out-right</code></td>
+<td><code>md-slide-out-right</code></td>
+<td>200ms</td>
+<td>emphasized accelerate</td>
+<td>Back navigation exit</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-in-left</code></td>
+<td><code>md-slide-in-left</code></td>
+<td>500ms</td>
+<td>standard default spatial</td>
+<td>Navigation drawer, back-nav enter</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-out-left</code></td>
+<td><code>md-slide-out-left</code></td>
+<td>200ms</td>
+<td>emphasized accelerate</td>
+<td>Drawer closing</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-in-top</code></td>
+<td><code>md-slide-in-top</code></td>
+<td>500ms</td>
+<td>standard default spatial</td>
+<td>Notifications, banners</td>
+</tr>
+<tr>
+<td><code>animate-md-slide-out-top</code></td>
+<td><code>md-slide-out-top</code></td>
+<td>200ms</td>
+<td>emphasized accelerate</td>
+<td>Top app bar hiding on scroll</td>
+</tr>
+<tr>
+<td><code>animate-md-skeleton-pulse</code></td>
+<td><code>md-skeleton-pulse</code></td>
+<td>700ms</td>
+<td>ease-in-out</td>
+<td>Skeleton loading shimmer</td>
+</tr>
+</tbody></table>
+<h3 id="usage-example">Usage example</h3>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Dialog entering</span>
+&lt;div className=<span class="hljs-string">"animate-md-scale-in"</span>&gt;...&lt;/div&gt;
+
+<span class="hljs-comment">// Skeleton loader</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-skeleton-pulse bg-surface-container rounded-md h-4 w-full"</span> /&gt;</span></span>
+
+<span class="hljs-comment">// Bottom sheet entering</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-slide-in-bottom"</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+</code></pre>
+<hr>
+<h2 id="7-keyframes-reference">7. Keyframes Reference</h2>
+<p>All keyframes are defined globally (outside <code>@theme</code>) and available to any custom animation.</p>
+<table>
+<thead>
+<tr>
+<th>Keyframe</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>md-ripple</code></td>
+<td>Ripple expands from 0 to full size, fades to transparent</td>
+</tr>
+<tr>
+<td><code>md-fade-in</code></td>
+<td>opacity 0 → 1</td>
+</tr>
+<tr>
+<td><code>md-fade-out</code></td>
+<td>opacity 1 → 0</td>
+</tr>
+<tr>
+<td><code>md-scale-in</code></td>
+<td>opacity 0 + scale(0.85) → opacity 1 + scale(1)</td>
+</tr>
+<tr>
+<td><code>md-scale-out</code></td>
+<td>opacity 1 + scale(1) → opacity 0 + scale(0.85)</td>
+</tr>
+<tr>
+<td><code>md-slide-in-bottom</code></td>
+<td>translateY(100%) + opacity 0 → translateY(0) + opacity 1</td>
+</tr>
+<tr>
+<td><code>md-slide-out-bottom</code></td>
+<td>translateY(0) + opacity 1 → translateY(100%) + opacity 0</td>
+</tr>
+<tr>
+<td><code>md-slide-in-right</code></td>
+<td>translateX(100%) + opacity 0 → translateX(0) + opacity 1</td>
+</tr>
+<tr>
+<td><code>md-slide-out-right</code></td>
+<td>translateX(0) + opacity 1 → translateX(100%) + opacity 0</td>
+</tr>
+<tr>
+<td><code>md-slide-in-left</code></td>
+<td>translateX(-100%) + opacity 0 → translateX(0) + opacity 1</td>
+</tr>
+<tr>
+<td><code>md-slide-out-left</code></td>
+<td>translateX(0) + opacity 1 → translateX(-100%) + opacity 0</td>
+</tr>
+<tr>
+<td><code>md-slide-in-top</code></td>
+<td>translateY(-100%) + opacity 0 → translateY(0) + opacity 1</td>
+</tr>
+<tr>
+<td><code>md-slide-out-top</code></td>
+<td>translateY(0) + opacity 1 → translateY(-100%) + opacity 0</td>
+</tr>
+<tr>
+<td><code>md-skeleton-pulse</code></td>
+<td>opacity 1 → 0.4 → 1 (infinite loop)</td>
+</tr>
+</tbody></table>
+<h3 id="custom-animation-using-raw-tokens">Custom animation using raw tokens</h3>
+<pre><code class="hljs css"><span class="hljs-selector-class">.my-card</span> {
+  <span class="hljs-attribute">animation</span>: md-scale-in
+    <span class="hljs-built_in">var</span>(--md-sys-motion-expressive-default-spatial-duration)
+    <span class="hljs-built_in">var</span>(--md-sys-motion-expressive-default-spatial-easing)
+    forwards;
+}
+</code></pre>
+<hr>
+<h2 id="8-applying-easing--duration--pairing-rules">8. Applying Easing &amp; Duration — Pairing Rules</h2>
+<h3 id="rule-1-enter-uses-decelerate-exit-uses-accelerate">Rule 1: Enter uses decelerate, exit uses accelerate</h3>
+<p>Elements entering the screen decelerate to rest (starting fast). Elements exiting accelerate away (starting slow). Elements already on screen use a standard or emphasized curve.</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Button state — stays on screen, uses standard</span>
+&lt;button className=<span class="hljs-string">"transition-all duration-short4 ease-standard"</span> /&gt;
+
+<span class="hljs-comment">// Dialog enter</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"transition-all duration-medium4 ease-emphasized-decelerate"</span> /&gt;</span></span>
+
+<span class="hljs-comment">// Dialog exit</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"transition-all duration-short4 ease-emphasized-accelerate"</span> /&gt;</span></span>
+</code></pre>
+<h3 id="rule-2-match-speed-to-component-size">Rule 2: Match speed to component size</h3>
+<table>
+<thead>
+<tr>
+<th>Component size</th>
+<th>Spring speed tier</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Small (&lt; 48dp)</td>
+<td><code>fast</code></td>
+<td>Buttons, chips, badges</td>
+</tr>
+<tr>
+<td>Standard</td>
+<td><code>default</code></td>
+<td>Dialogs, cards, sheets</td>
+</tr>
+<tr>
+<td>Large / full-screen</td>
+<td><code>slow</code></td>
+<td>Full-screen transitions</td>
+</tr>
+</tbody></table>
+<h3 id="rule-3-use-effects-tokens-for-opacitycolor-spatial-for-positionsize">Rule 3: Use effects tokens for opacity/color, spatial for position/size</h3>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Correct — opacity uses effects token</span>
+&lt;div
+  className=<span class="hljs-string">"transition-opacity"</span>
+  style={{ <span class="hljs-attr">transitionDuration</span>: <span class="hljs-string">'var(--md-sys-motion-expressive-default-effects-duration)'</span>,
+           <span class="hljs-attr">transitionTimingFunction</span>: <span class="hljs-string">'var(--md-sys-motion-expressive-default-effects-easing)'</span> }}
+/&gt;
+
+<span class="hljs-comment">// Correct — transform uses spatial token</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>
+  <span class="hljs-attr">className</span>=<span class="hljs-string">"transition-transform"</span>
+  <span class="hljs-attr">style</span>=<span class="hljs-string">{{</span> <span class="hljs-attr">transitionDuration:</span> '<span class="hljs-attr">var</span>(<span class="hljs-attr">--md-sys-motion-expressive-fast-spatial-duration</span>)',
+           <span class="hljs-attr">transitionTimingFunction:</span> '<span class="hljs-attr">var</span>(<span class="hljs-attr">--md-sys-motion-expressive-fast-spatial-easing</span>)' }}
+/&gt;</span></span>
+</code></pre>
+<h3 id="rule-4-expressive-for-prominent-standard-for-utility">Rule 4: Expressive for prominent, standard for utility</h3>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Expressive — FAB, a hero button: bouncy overshoot</span>
+&lt;button className=<span class="hljs-string">"transition-transform duration-expressive-fast-spatial ease-expressive-fast-spatial"</span> /&gt;
+
+<span class="hljs-comment">// Standard — drawer, navigation: calm and purposeful</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">nav</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"transition-transform duration-spring-standard-default-spatial ease-spring-standard-default-spatial"</span> /&gt;</span></span>
+</code></pre>
+<hr>
+<h2 id="9-transition-pattern-recipes">9. Transition Pattern Recipes</h2>
+<p>These six patterns cover the most common MD3 screen transitions.</p>
+<hr>
+<h3 id="pattern-1-container-transform">Pattern 1: Container Transform</h3>
+<p><strong>Use for:</strong> Card → detail page, List item → full screen, FAB → sheet, Search box expanding.</p>
+<p><strong>How it works:</strong> A persistent container (the card or element) morphs from its starting size and position to fill the destination. The strongest relationship between two screens.</p>
+<p><strong>Motion:</strong> Entry uses <code>ease-emphasized-decelerate</code> / <code>duration-medium4</code> (400ms). Exit uses <code>ease-emphasized-accelerate</code> / <code>duration-short4</code> (200ms). The container's <code>transform</code> and <code>border-radius</code> animate simultaneously.</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Enter state — container transforms to fill screen</span>
+&lt;div className=<span class="hljs-string">"transition-all duration-medium4 ease-emphasized-decelerate rounded-md"</span> /&gt;
+
+<span class="hljs-comment">// Exit state — container collapses back</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"transition-all duration-short4 ease-emphasized-accelerate"</span> /&gt;</span></span>
+</code></pre>
+<hr>
+<h3 id="pattern-2-forward-and-backward">Pattern 2: Forward and Backward</h3>
+<p><strong>Use for:</strong> Inbox → message thread, List item → detail, any hierarchical navigation.</p>
+<p><strong>How it works:</strong> Horizontal sliding motion. Forward = new screen slides in from the right, current screen slides out to the left. Backward = reverse.</p>
+<p><strong>Motion:</strong> Spring standard default spatial (500ms / <code>cubic-bezier(0.27, 1.06, 0.18, 1.00)</code>) for entering. Emphasized accelerate (200ms) for exiting. Combine with a simultaneous fade.</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Entering screen (forward)</span>
+&lt;div className=<span class="hljs-string">"animate-md-slide-in-right"</span> /&gt;
+
+<span class="hljs-comment">// Exiting screen (forward)</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-slide-out-left"</span> /&gt;</span></span>
+</code></pre>
+<hr>
+<h3 id="pattern-3-lateral-peer-navigation">Pattern 3: Lateral (Peer Navigation)</h3>
+<p><strong>Use for:</strong> Tabs, carousels, image galleries, swiping between peer content.</p>
+<p><strong>How it works:</strong> Horizontal sliding without fade or parallax. Elements slide in unison, creating a strong peer-group relationship.</p>
+<p><strong>Motion:</strong> Use standard default spatial (500ms). No opacity change — the slide alone communicates peer relationship.</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Tab content entering from the right (next tab)</span>
+&lt;div
+  className=<span class="hljs-string">"transition-transform duration-spring-standard-default-spatial ease-spring-standard-default-spatial"</span>
+  style={{ <span class="hljs-attr">transform</span>: isActive ? <span class="hljs-string">'translateX(0)'</span> : <span class="hljs-string">'translateX(100%)'</span> }}
+/&gt;
+</code></pre>
+<hr>
+<h3 id="pattern-4-top-level-fade-through">Pattern 4: Top Level (Fade Through)</h3>
+<p><strong>Use for:</strong> Navigation bar / rail / drawer destination changes.</p>
+<p><strong>How it works:</strong> The current screen fades out quickly, then the new screen fades in. No spatial relationship implied — content is unrelated.</p>
+<p><strong>Motion:</strong> Fade out with standard fast effects (150ms). Then fade in with standard default effects (200ms). Two-step sequence.</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Exiting screen</span>
+&lt;div className=<span class="hljs-string">"animate-md-fade-out"</span> /&gt;
+
+<span class="hljs-comment">// Entering screen (starts after exit completes or after a short delay)</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-fade-in"</span> /&gt;</span></span>
+</code></pre>
+<hr>
+<h3 id="pattern-5-enter-and-exit">Pattern 5: Enter and Exit</h3>
+<h4 id="within-screen-bounds-dialogs-menus-snackbars-fabs">Within screen bounds (dialogs, menus, snackbars, FABs)</h4>
+<p><strong>Motion:</strong> Scale + fade on entry using expressive fast spatial (350ms). Fade-only on exit using emphasized accelerate (200ms). Direction of expansion is informed by screen edge proximity.</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Menu entering</span>
+&lt;div className=<span class="hljs-string">"animate-md-scale-in origin-top-left"</span> /&gt;
+
+<span class="hljs-comment">// Snackbar entering from bottom</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-slide-in-bottom"</span> /&gt;</span></span>
+
+<span class="hljs-comment">// Dialog entering</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-scale-in"</span> /&gt;</span></span>
+</code></pre>
+<h4 id="beyond-screen-bounds-drawers-sheets-app-bars">Beyond screen bounds (drawers, sheets, app bars)</h4>
+<p><strong>Motion:</strong> Slide in/out from the relevant screen edge. Sheet from bottom, drawer from left (LTR), notifications from top. Use standard default spatial (500ms) for entry, emphasized accelerate (200ms) for exit.</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Bottom sheet entering</span>
+&lt;div className=<span class="hljs-string">"animate-md-slide-in-bottom"</span> /&gt;
+
+<span class="hljs-comment">// Navigation drawer entering (LTR)</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-slide-in-left"</span> /&gt;</span></span>
+
+<span class="hljs-comment">// Top app bar hiding on scroll</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-slide-out-top"</span> /&gt;</span></span>
+</code></pre>
+<hr>
+<h3 id="pattern-6-skeleton-loaders">Pattern 6: Skeleton Loaders</h3>
+<p><strong>Use for:</strong> Transitioning from loading state to loaded content.</p>
+<p><strong>How it works:</strong> Skeleton shapes pulse to indicate indeterminate loading. Once content loads, it fades in quickly over the skeleton.</p>
+<p><strong>Motion:</strong> Skeleton uses <code>md-skeleton-pulse</code> (700ms infinite). Content fade-in uses standard fast effects (150ms).</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Skeleton placeholder</span>
+&lt;div className=<span class="hljs-string">"animate-md-skeleton-pulse bg-surface-container rounded-md h-4 w-48"</span> /&gt;
+
+<span class="hljs-comment">// Content revealing after load</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-fade-in"</span> /&gt;</span></span>
+</code></pre>
+<hr>
+<h2 id="10-common-ui-effect-combinations">10. Common UI Effect Combinations</h2>
+<h3 id="ripple-press-effect">Ripple press effect</h3>
+<pre><code class="hljs tsx">&lt;button className=<span class="hljs-string">"relative overflow-hidden"</span>&gt;
+  {<span class="hljs-comment">/* Button content */</span>}
+  &lt;span
+    className=<span class="hljs-string">"absolute animate-md-ripple rounded-full bg-on-primary opacity-12"</span>
+    style={{ <span class="hljs-attr">width</span>: <span class="hljs-string">'200%'</span>, <span class="hljs-attr">paddingTop</span>: <span class="hljs-string">'200%'</span>, <span class="hljs-attr">left</span>: <span class="hljs-string">'50%'</span>, <span class="hljs-attr">top</span>: <span class="hljs-string">'50%'</span> }}
+  /&gt;
+&lt;/button&gt;
+</code></pre>
+<h3 id="state-layer-hover--focus">State layer hover / focus</h3>
+<p>State layers use opacity tokens (not motion), but transition them in with a short ease:</p>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Hover state layer fades in</span>
+&lt;div className=<span class="hljs-string">"absolute inset-0 bg-on-surface transition-opacity duration-short2 ease-standard opacity-0 group-hover:opacity-8"</span> /&gt;
+</code></pre>
+<h3 id="fab-floating-action-button-enter">FAB (Floating Action Button) enter</h3>
+<p>The FAB enters with the expressive fast spatial spring — a noticeable bounce that makes it feel lively:</p>
+<pre><code class="hljs tsx">&lt;button className=<span class="hljs-string">"transition-transform duration-expressive-fast-spatial ease-expressive-fast-spatial scale-0 data-[visible=true]:scale-100"</span>&gt;
+  {<span class="hljs-comment">/* FAB icon */</span>}
+&lt;/button&gt;
+</code></pre>
+<h3 id="dialog-basic-enter-and-exit">Dialog (basic) enter and exit</h3>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Enter: scale + fade in over 400ms</span>
+&lt;div className=<span class="hljs-string">"animate-md-scale-in"</span> /&gt;
+
+<span class="hljs-comment">// Exit: fade + scale out over 200ms</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-scale-out"</span> /&gt;</span></span>
+</code></pre>
+<h3 id="navigation-drawer-slide">Navigation drawer slide</h3>
+<pre><code class="hljs tsx"><span class="hljs-comment">// Opening — slide in from left</span>
+&lt;nav className=<span class="hljs-string">"animate-md-slide-in-left"</span> /&gt;
+
+<span class="hljs-comment">// Closing — slide out to left</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">nav</span> <span class="hljs-attr">className</span>=<span class="hljs-string">"animate-md-slide-out-left"</span> /&gt;</span></span>
+</code></pre>
+<h3 id="tab-indicator-sliding-between-tabs-lateral">Tab indicator sliding between tabs (lateral)</h3>
+<p>The tab indicator slides horizontally with the standard default spatial spring. No fade — pure positional movement communicates the peer relationship:</p>
+<pre><code class="hljs tsx">&lt;div
+  className=<span class="hljs-string">"absolute bottom-0 h-0.5 bg-primary transition-transform duration-spring-standard-default-spatial ease-spring-standard-default-spatial"</span>
+  style={{ <span class="hljs-attr">transform</span>: <span class="hljs-string">`translateX(<span class="hljs-subst">${activeIndex * <span class="hljs-number">100</span>}</span>%)`</span>, <span class="hljs-attr">width</span>: <span class="hljs-string">'100%'</span> }}
+/&gt;
+</code></pre>
+<h3 id="snackbar-enter-from-bottom">Snackbar enter from bottom</h3>
+<pre><code class="hljs tsx">&lt;div className=<span class="hljs-string">"animate-md-slide-in-bottom"</span> /&gt;
+</code></pre>
+<h3 id="top-app-bar-hiding-on-scroll">Top app bar hiding on scroll</h3>
+<pre><code class="hljs tsx">&lt;header
+  className=<span class="hljs-string">"transition-transform duration-short4 ease-standard-accelerate"</span>
+  style={{ <span class="hljs-attr">transform</span>: isScrolled ? <span class="hljs-string">'translateY(-100%)'</span> : <span class="hljs-string">'translateY(0)'</span> }}
+/&gt;
+</code></pre>
+<h3 id="tooltip-fade-in">Tooltip fade in</h3>
+<pre><code class="hljs tsx">&lt;div className=<span class="hljs-string">"animate-md-fade-in"</span> /&gt;
+</code></pre>
+<h3 id="navigation-bar-hiding-on-scroll-bottom">Navigation bar hiding on scroll (bottom)</h3>
+<pre><code class="hljs tsx">&lt;nav
+  className=<span class="hljs-string">"transition-transform duration-short4 ease-standard-accelerate"</span>
+  style={{ <span class="hljs-attr">transform</span>: isScrollingDown ? <span class="hljs-string">'translateY(100%)'</span> : <span class="hljs-string">'translateY(0)'</span> }}
+/&gt;
+</code></pre>
+<h3 id="bottom-sheet-expanding">Bottom sheet expanding</h3>
+<pre><code class="hljs tsx">&lt;div className=<span class="hljs-string">"animate-md-slide-in-bottom"</span> /&gt;
+</code></pre>
+<hr>
+<h2 id="11-reduce-motion-accessibility">11. Reduce-Motion Accessibility</h2>
+<p>Always respect user preferences for reduced motion. Wrap animated content in a media query check:</p>
+<pre><code class="hljs css"><span class="hljs-keyword">@media</span> (<span class="hljs-attribute">prefers-reduced-motion</span>: reduce) {
+  *,
+  *<span class="hljs-selector-pseudo">::before</span>,
+  *<span class="hljs-selector-pseudo">::after</span> {
+    <span class="hljs-attribute">animation-duration</span>: <span class="hljs-number">0.01ms</span> <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">animation-iteration-count</span>: <span class="hljs-number">1</span> <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">transition-duration</span>: <span class="hljs-number">0.01ms</span> <span class="hljs-meta">!important</span>;
+  }
+}
+</code></pre>
+<p>In React, check the preference with <code>window.matchMedia</code>:</p>
+<pre><code class="hljs tsx"><span class="hljs-keyword">const</span> prefersReducedMotion = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">matchMedia</span>(<span class="hljs-string">'(prefers-reduced-motion: reduce)'</span>).<span class="hljs-property">matches</span>;
+
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">{prefersReducedMotion</span> ? '' <span class="hljs-attr">:</span> '<span class="hljs-attr">animate-md-scale-in</span>'}&gt;</span>
+  {children}
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+</code></pre>
+<p>Or use the <a href="https://react-spectrum.adobe.com/react-aria/useReducedMotion.html">React Aria <code>useReducedMotion</code></a> hook:</p>
+<pre><code class="hljs tsx"><span class="hljs-keyword">import</span> { useReducedMotion } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-aria'</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Dialog</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> reducedMotion = <span class="hljs-title function_">useReducedMotion</span>();
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">{reducedMotion</span> ? '' <span class="hljs-attr">:</span> '<span class="hljs-attr">animate-md-scale-in</span>'}&gt;</span>
+      {/* content */}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<hr>
+<h2 id="quick-reference-cheat-sheet">Quick-Reference Cheat Sheet</h2>
+<pre><code>LEGACY PAIRS (transitions)
+  Enter prominent  →  ease-emphasized-decelerate  +  duration-medium4  (400ms)
+  Exit prominent   →  ease-emphasized-accelerate  +  duration-short4   (200ms)
+  On-screen        →  ease-emphasized             +  duration-long2    (500ms)
+  Enter utility    →  ease-standard-decelerate    +  duration-medium1  (250ms)
+  Exit utility     →  ease-standard-accelerate    +  duration-short4   (200ms)
+
+SPRING EXPRESSIVE (components — bouncy)
+  Small spatial    →  ease-expressive-fast-spatial    +  duration-expressive-fast-spatial    (350ms)
+  Default spatial  →  ease-expressive-default-spatial +  duration-expressive-default-spatial (500ms)
+  Large spatial    →  ease-expressive-slow-spatial    +  duration-expressive-slow-spatial    (650ms)
+  Fast fade/color  →  ease-expressive-fast-effects    +  duration-expressive-fast-effects    (150ms)
+  Default fade     →  ease-expressive-default-effects +  duration-expressive-default-effects (200ms)
+  Slow fade        →  ease-expressive-slow-effects    +  duration-expressive-slow-effects    (300ms)
+
+SPRING STANDARD (components — calm)
+  Small spatial    →  ease-spring-standard-fast-spatial    +  duration-spring-standard-fast-spatial    (350ms)
+  Default spatial  →  ease-spring-standard-default-spatial +  duration-spring-standard-default-spatial (500ms)
+  Large spatial    →  ease-spring-standard-slow-spatial    +  duration-spring-standard-slow-spatial    (750ms)
+  Fast fade/color  →  ease-spring-standard-fast-effects    +  duration-spring-standard-fast-effects    (150ms)
+  Default fade     →  ease-spring-standard-default-effects +  duration-spring-standard-default-effects (200ms)
+  Slow fade        →  ease-spring-standard-slow-effects    +  duration-spring-standard-slow-effects    (300ms)
+</code></pre>
+<hr>
+<p><em>Spec references:</em></p>
+<ul>
+<li><em><a href="https://m3.material.io/styles/motion/overview/specs">M3 Motion overview &amp; specs</a></em></li>
+<li><em><a href="https://m3.material.io/styles/motion/easing-and-duration/tokens-specs">Easing and duration tokens</a></em></li>
+<li><em><a href="https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration">Applying easing and duration</a></em></li>
+<li><em><a href="https://m3.material.io/styles/motion/transitions/transition-patterns">Transition patterns</a></em></li>
+<li><em><a href="https://m3.material.io/styles/motion/transitions/applying-transitions">Applying transitions</a></em></li>
+</ul>
+
+	
+
+</body></html>

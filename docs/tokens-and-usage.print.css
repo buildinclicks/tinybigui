@@ -1,0 +1,268 @@
+/**
+ * Print / PDF styles for docs/tokens-and-usage.md
+ *
+ * Regenerate the PDF (run from the repository root; requires pandoc and Google Chrome):
+ *
+ *   pandoc docs/tokens-and-usage.md --standalone \
+ *     --metadata title='TinyBigUI — Motion Tokens & Usage Guide' \
+ *     -c "$(pwd)/docs/tokens-and-usage.print.css" \
+ *     --resource-path="$(pwd)/docs:$(pwd)" \
+ *     --syntax-highlighting=tango \
+ *     -o docs/tokens-and-usage.tmp.html
+ *
+ *   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+ *     --headless=new --disable-gpu --no-sandbox \
+ *     --no-pdf-header-footer --print-to-pdf-no-header \
+ *     --print-to-pdf="$(pwd)/docs/tokens-and-usage.pdf" \
+ *     "file://$(pwd)/docs/tokens-and-usage.tmp.html"
+ *
+ *   rm docs/tokens-and-usage.tmp.html
+ */
+
+@page {
+  size: A4;
+  margin: 16mm 14mm 18mm 14mm;
+}
+
+html {
+  font-size: 10.5pt;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family:
+    'Source Sans 3',
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  line-height: 1.45;
+  color: #1a1a1a;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Title & intro */
+h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #6750a4;
+  color: #21005d;
+  page-break-after: avoid;
+}
+
+h1 + p {
+  font-size: 1.02em;
+  color: #333;
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin: 1.75rem 0 0.65rem;
+  padding-top: 0.35rem;
+  color: #31111d;
+  border-top: 1px solid #e8def8;
+  page-break-after: avoid;
+  break-after: avoid-page;
+}
+
+h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin: 1.15rem 0 0.5rem;
+  color: #1d192b;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 0.98rem;
+  font-weight: 650;
+  margin: 1rem 0 0.4rem;
+  color: #1d1b20;
+  page-break-after: avoid;
+}
+
+p {
+  margin: 0.5rem 0;
+  orphans: 3;
+  widows: 3;
+}
+
+a {
+  color: #6750a4;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Horizontal rules (TOC separators) */
+hr {
+  border: none;
+  border-top: 1px solid #cac4d0;
+  margin: 1rem 0;
+}
+
+/* Lists */
+ul,
+ol {
+  margin: 0.45rem 0 0.75rem;
+  padding-left: 1.35rem;
+}
+
+li {
+  margin: 0.25rem 0;
+}
+
+li > p {
+  margin: 0.2rem 0;
+}
+
+/* Blockquotes (callouts) */
+blockquote {
+  margin: 0.75rem 0;
+  padding: 0.55rem 0.85rem;
+  border-left: 4px solid #6750a4;
+  background: #f7f2fa;
+  color: #1d192b;
+  page-break-inside: avoid;
+}
+
+blockquote p {
+  margin: 0.35rem 0;
+}
+
+blockquote strong {
+  color: #21005d;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.65rem 0 1rem;
+  font-size: 0.78rem;
+  page-break-inside: auto;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+
+th,
+td {
+  border: 1px solid #cac4d0;
+  padding: 0.35rem 0.45rem;
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+th {
+  background: #ece6f0;
+  color: #21005d;
+  font-weight: 650;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Inline code (Pandoc + plain markdown) */
+:not(pre) > code {
+  font-family:
+    ui-monospace,
+    'Cascadia Code',
+    'Source Code Pro',
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 0.88em;
+  background: #f3edf7;
+  color: #31111d;
+  padding: 0.12em 0.35em;
+  border-radius: 3px;
+  word-break: break-word;
+}
+
+/* Pandoc fenced blocks */
+div.sourceCode {
+  margin: 0.6rem 0 0.85rem;
+  page-break-inside: avoid;
+  border: 1px solid #cac4d0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f8f8f8;
+}
+
+div.sourceCode pre {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  background: transparent !important;
+  border: none;
+  border-radius: 0;
+}
+
+/* Code blocks (incl. plain pre from Pandoc) */
+pre {
+  font-family:
+    ui-monospace,
+    'Cascadia Code',
+    'Source Code Pro',
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  background: #f5f5f5;
+  border: 1px solid #cac4d0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.6rem 0 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+/* Table of contents */
+ol:first-of-type {
+  background: #faf8fc;
+  border: 1px solid #e8def8;
+  border-radius: 6px;
+  padding: 0.85rem 0.85rem 0.85rem 2rem;
+  margin: 0.75rem 0 1.25rem;
+  page-break-inside: avoid;
+}
+
+ol:first-of-type li {
+  margin: 0.35rem 0;
+}

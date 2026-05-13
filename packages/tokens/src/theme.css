@@ -1,0 +1,508 @@
+/**
+ * @tinybigui/tokens — Tailwind v4 Theme Bridge
+ * Maps MD3 design tokens to Tailwind utility class names via @theme.
+ *
+ * All tokens reference the CSS custom properties defined in the partial files
+ * (color.css, typography.css, shape.css, elevation.css, motion.css) so that
+ * any runtime token override is automatically picked up by Tailwind utilities.
+ *
+ * @theme is a Tailwind v4 CSS-first configuration directive.
+ */
+
+/* ==========================================================================
+   MD3 ANIMATION KEYFRAMES
+   Defined outside @theme so they are globally available as named keyframes.
+   ========================================================================== */
+
+/* Ripple — MD3 press state feedback */
+@keyframes md-ripple {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Fade in — opacity 0 → 1, used for: dialogs, menus, snackbars, tooltips */
+@keyframes md-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade out — opacity 1 → 0, used for: dialog/snackbar/tooltip dismissal */
+@keyframes md-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Scale in — combined scale + fade, used for: menus, dialogs entering */
+@keyframes md-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Scale out — combined scale + fade, used for: menus, dialogs exiting */
+@keyframes md-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+/*
+ * Slide in from bottom — sheets, navigation bars, snackbars, keyboards.
+ * Direction: component enters from below screen bounds.
+ */
+@keyframes md-slide-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * Slide out to bottom — sheets, navigation bars exit below screen.
+ */
+@keyframes md-slide-out-bottom {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+/*
+ * Slide in from right — forward navigation, drawers on LTR layouts.
+ */
+@keyframes md-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/*
+ * Slide out to right — back navigation, drawer closing on LTR layouts.
+ */
+@keyframes md-slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+/*
+ * Slide in from left — navigation drawer entering from the left edge,
+ * back-navigation in LTR layouts.
+ */
+@keyframes md-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/*
+ * Slide out to left — navigation drawer exiting to the left edge.
+ */
+@keyframes md-slide-out-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+/*
+ * Slide in from top — notifications, banners, top app bar reveal on scroll.
+ */
+@keyframes md-slide-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * Slide out to top — top app bar hiding on scroll, notification dismissal.
+ */
+@keyframes md-slide-out-top {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+/*
+ * Skeleton pulse — indeterminate loading state shimmer.
+ * Starts top-left, sweeps to bottom-right per MD3 spec.
+ */
+@keyframes md-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ==========================================================================
+   TAILWIND V4 THEME
+   Maps every MD3 token to a Tailwind utility class name.
+   ========================================================================== */
+
+@theme {
+  /* ── COLORS ────────────────────────────────────────────────────────────────
+     Usage: bg-primary, text-on-primary, border-outline, etc.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --color-primary: var(--md-sys-color-primary);
+  --color-on-primary: var(--md-sys-color-on-primary);
+  --color-primary-container: var(--md-sys-color-primary-container);
+  --color-on-primary-container: var(--md-sys-color-on-primary-container);
+
+  --color-secondary: var(--md-sys-color-secondary);
+  --color-on-secondary: var(--md-sys-color-on-secondary);
+  --color-secondary-container: var(--md-sys-color-secondary-container);
+  --color-on-secondary-container: var(--md-sys-color-on-secondary-container);
+
+  --color-tertiary: var(--md-sys-color-tertiary);
+  --color-on-tertiary: var(--md-sys-color-on-tertiary);
+  --color-tertiary-container: var(--md-sys-color-tertiary-container);
+  --color-on-tertiary-container: var(--md-sys-color-on-tertiary-container);
+
+  --color-error: var(--md-sys-color-error);
+  --color-on-error: var(--md-sys-color-on-error);
+  --color-error-container: var(--md-sys-color-error-container);
+  --color-on-error-container: var(--md-sys-color-on-error-container);
+
+  --color-surface: var(--md-sys-color-surface);
+  --color-on-surface: var(--md-sys-color-on-surface);
+  --color-surface-variant: var(--md-sys-color-surface-variant);
+  --color-on-surface-variant: var(--md-sys-color-on-surface-variant);
+
+  --color-surface-container-lowest: var(--md-sys-color-surface-container-lowest);
+  --color-surface-container-low: var(--md-sys-color-surface-container-low);
+  --color-surface-container: var(--md-sys-color-surface-container);
+  --color-surface-container-high: var(--md-sys-color-surface-container-high);
+  --color-surface-container-highest: var(--md-sys-color-surface-container-highest);
+
+  --color-outline: var(--md-sys-color-outline);
+  --color-outline-variant: var(--md-sys-color-outline-variant);
+
+  --color-background: var(--md-sys-color-background);
+  --color-on-background: var(--md-sys-color-on-background);
+
+  --color-scrim: var(--md-sys-color-scrim);
+
+  --color-inverse-surface: var(--md-sys-color-inverse-surface);
+  --color-inverse-on-surface: var(--md-sys-color-inverse-on-surface);
+  --color-inverse-primary: var(--md-sys-color-inverse-primary);
+
+  /* ── ELEVATION / SHADOW ───────────────────────────────────────────────────
+     Usage: shadow-elevation-0 … shadow-elevation-5
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --shadow-elevation-0: var(--md-sys-elevation-level-0);
+  --shadow-elevation-1: var(--md-sys-elevation-level-1);
+  --shadow-elevation-2: var(--md-sys-elevation-level-2);
+  --shadow-elevation-3: var(--md-sys-elevation-level-3);
+  --shadow-elevation-4: var(--md-sys-elevation-level-4);
+  --shadow-elevation-5: var(--md-sys-elevation-level-5);
+
+  /* ── TYPOGRAPHY ───────────────────────────────────────────────────────────
+     Usage: text-display-large, text-headline-medium, text-body-small, etc.
+     Tailwind v4 pairs --font-size-* with --line-height-* automatically.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --font-size-display-large: var(--md-sys-typescale-display-large-size);
+  --line-height-display-large: var(--md-sys-typescale-display-large-line-height);
+  --font-size-display-medium: var(--md-sys-typescale-display-medium-size);
+  --line-height-display-medium: var(--md-sys-typescale-display-medium-line-height);
+  --font-size-display-small: var(--md-sys-typescale-display-small-size);
+  --line-height-display-small: var(--md-sys-typescale-display-small-line-height);
+
+  --font-size-headline-large: var(--md-sys-typescale-headline-large-size);
+  --line-height-headline-large: var(--md-sys-typescale-headline-large-line-height);
+  --font-size-headline-medium: var(--md-sys-typescale-headline-medium-size);
+  --line-height-headline-medium: var(--md-sys-typescale-headline-medium-line-height);
+  --font-size-headline-small: var(--md-sys-typescale-headline-small-size);
+  --line-height-headline-small: var(--md-sys-typescale-headline-small-line-height);
+
+  --font-size-title-large: var(--md-sys-typescale-title-large-size);
+  --line-height-title-large: var(--md-sys-typescale-title-large-line-height);
+  --font-size-title-medium: var(--md-sys-typescale-title-medium-size);
+  --line-height-title-medium: var(--md-sys-typescale-title-medium-line-height);
+  --font-size-title-small: var(--md-sys-typescale-title-small-size);
+  --line-height-title-small: var(--md-sys-typescale-title-small-line-height);
+
+  --font-size-body-large: var(--md-sys-typescale-body-large-size);
+  --line-height-body-large: var(--md-sys-typescale-body-large-line-height);
+  --font-size-body-medium: var(--md-sys-typescale-body-medium-size);
+  --line-height-body-medium: var(--md-sys-typescale-body-medium-line-height);
+  --font-size-body-small: var(--md-sys-typescale-body-small-size);
+  --line-height-body-small: var(--md-sys-typescale-body-small-line-height);
+
+  --font-size-label-large: var(--md-sys-typescale-label-large-size);
+  --line-height-label-large: var(--md-sys-typescale-label-large-line-height);
+  --font-size-label-medium: var(--md-sys-typescale-label-medium-size);
+  --line-height-label-medium: var(--md-sys-typescale-label-medium-line-height);
+  --font-size-label-small: var(--md-sys-typescale-label-small-size);
+  --line-height-label-small: var(--md-sys-typescale-label-small-line-height);
+
+  /* ── SHAPE / BORDER RADIUS ────────────────────────────────────────────────
+     Usage: rounded-xs, rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-full
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --radius-xs: var(--md-sys-shape-corner-extra-small); /* 4px  */
+  --radius-sm: var(--md-sys-shape-corner-small); /* 8px  */
+  --radius-md: var(--md-sys-shape-corner-medium); /* 12px */
+  --radius-lg: var(--md-sys-shape-corner-large); /* 16px */
+  --radius-lg-increased: var(--md-sys-shape-corner-large-increased); /* 20px */
+  --radius-xl: var(--md-sys-shape-corner-extra-large); /* 28px */
+  --radius-xl-increased: var(--md-sys-shape-corner-extra-large-increased); /* 32px */
+  --radius-2xl: var(--md-sys-shape-corner-extra-extra-large); /* 48px */
+  --radius-full: var(--md-sys-shape-corner-full);
+
+  /* ── SPACING (MD3 component dimension shortcuts) ──────────────────────────
+     Usage: h-appbar-small, w-drawer, max-w-dialog, etc.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --spacing-appbar-small: 4rem; /* 64px  */
+  --spacing-appbar-medium: 7rem; /* 112px */
+  --spacing-appbar-large: 9.5rem; /* 152px */
+  --spacing-drawer: 22.5rem; /* 360px */
+  --spacing-snackbar-max: 35.5rem; /* 568px */
+  --spacing-dialog-max: 35rem; /* 560px */
+
+  /* ── OPACITY (MD3 state layer values) ─────────────────────────────────────
+     Usage: opacity-8, opacity-12, opacity-32, opacity-38
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --opacity-8: 0.08;
+  --opacity-12: 0.12;
+  --opacity-32: 0.32;
+  --opacity-38: 0.38;
+
+  /* ── LEGACY DURATION UTILITIES ────────────────────────────────────────────
+     Usage: duration-short1, duration-medium2, duration-long4, duration-extra-long2
+     These map directly to Tailwind's transition-duration-* utilities.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  /* Short */
+  --transition-duration-short1: var(--md-sys-motion-duration-short1); /* 50ms  */
+  --transition-duration-short2: var(--md-sys-motion-duration-short2); /* 100ms */
+  --transition-duration-short3: var(--md-sys-motion-duration-short3); /* 150ms */
+  --transition-duration-short4: var(--md-sys-motion-duration-short4); /* 200ms */
+
+  /* Medium */
+  --transition-duration-medium1: var(--md-sys-motion-duration-medium1); /* 250ms */
+  --transition-duration-medium2: var(--md-sys-motion-duration-medium2); /* 300ms */
+  --transition-duration-medium3: var(--md-sys-motion-duration-medium3); /* 350ms */
+  --transition-duration-medium4: var(--md-sys-motion-duration-medium4); /* 400ms */
+
+  /* Long */
+  --transition-duration-long1: var(--md-sys-motion-duration-long1); /* 450ms */
+  --transition-duration-long2: var(--md-sys-motion-duration-long2); /* 500ms */
+  --transition-duration-long3: var(--md-sys-motion-duration-long3); /* 550ms */
+  --transition-duration-long4: var(--md-sys-motion-duration-long4); /* 600ms */
+
+  /* Extra-long */
+  --transition-duration-extra-long1: var(--md-sys-motion-duration-extra-long1); /* 700ms  */
+  --transition-duration-extra-long2: var(--md-sys-motion-duration-extra-long2); /* 800ms  */
+  --transition-duration-extra-long3: var(--md-sys-motion-duration-extra-long3); /* 900ms  */
+  --transition-duration-extra-long4: var(--md-sys-motion-duration-extra-long4); /* 1000ms */
+
+  /* ── LEGACY EASING UTILITIES ──────────────────────────────────────────────
+     Usage: ease-standard, ease-emphasized-decelerate, ease-standard-accelerate
+     These map to Tailwind's transition-timing-function-* (ease-*) utilities.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --ease-standard: var(--md-sys-motion-easing-standard);
+  --ease-standard-decelerate: var(--md-sys-motion-easing-standard-decelerate);
+  --ease-standard-accelerate: var(--md-sys-motion-easing-standard-accelerate);
+  --ease-emphasized: var(--md-sys-motion-easing-emphasized);
+  --ease-emphasized-decelerate: var(--md-sys-motion-easing-emphasized-decelerate);
+  --ease-emphasized-accelerate: var(--md-sys-motion-easing-emphasized-accelerate);
+
+  /* ── SPRING EASING UTILITIES — EXPRESSIVE ─────────────────────────────────
+     Usage: ease-expressive-fast-spatial, ease-expressive-default-effects, etc.
+     Apply alongside the matching duration-expressive-* utility.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --ease-expressive-fast-spatial: var(--md-sys-motion-expressive-fast-spatial-easing);
+  --ease-expressive-default-spatial: var(--md-sys-motion-expressive-default-spatial-easing);
+  --ease-expressive-slow-spatial: var(--md-sys-motion-expressive-slow-spatial-easing);
+  --ease-expressive-fast-effects: var(--md-sys-motion-expressive-fast-effects-easing);
+  --ease-expressive-default-effects: var(--md-sys-motion-expressive-default-effects-easing);
+  --ease-expressive-slow-effects: var(--md-sys-motion-expressive-slow-effects-easing);
+
+  /* ── SPRING DURATION UTILITIES — EXPRESSIVE ───────────────────────────────
+     Usage: duration-expressive-fast-spatial, duration-expressive-default-effects, etc.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --transition-duration-expressive-fast-spatial: var(
+    --md-sys-motion-expressive-fast-spatial-duration
+  ); /* 350ms */
+  --transition-duration-expressive-default-spatial: var(
+    --md-sys-motion-expressive-default-spatial-duration
+  ); /* 500ms */
+  --transition-duration-expressive-slow-spatial: var(
+    --md-sys-motion-expressive-slow-spatial-duration
+  ); /* 650ms */
+  --transition-duration-expressive-fast-effects: var(
+    --md-sys-motion-expressive-fast-effects-duration
+  ); /* 150ms */
+  --transition-duration-expressive-default-effects: var(
+    --md-sys-motion-expressive-default-effects-duration
+  ); /* 200ms */
+  --transition-duration-expressive-slow-effects: var(
+    --md-sys-motion-expressive-slow-effects-duration
+  ); /* 300ms */
+
+  /* ── SPRING EASING UTILITIES — STANDARD ───────────────────────────────────
+     Usage: ease-standard-fast-spatial, ease-standard-default-effects, etc.
+     Note: prefix "standard" here refers to the spring motion personality,
+     not the legacy --md-sys-motion-easing-standard curve.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --ease-spring-standard-fast-spatial: var(--md-sys-motion-standard-fast-spatial-easing);
+  --ease-spring-standard-default-spatial: var(--md-sys-motion-standard-default-spatial-easing);
+  --ease-spring-standard-slow-spatial: var(--md-sys-motion-standard-slow-spatial-easing);
+  --ease-spring-standard-fast-effects: var(--md-sys-motion-standard-fast-effects-easing);
+  --ease-spring-standard-default-effects: var(--md-sys-motion-standard-default-effects-easing);
+  --ease-spring-standard-slow-effects: var(--md-sys-motion-standard-slow-effects-easing);
+
+  /* ── SPRING DURATION UTILITIES — STANDARD ─────────────────────────────────
+     Usage: duration-spring-standard-fast-spatial, etc.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  --transition-duration-spring-standard-fast-spatial: var(
+    --md-sys-motion-standard-fast-spatial-duration
+  ); /* 350ms */
+  --transition-duration-spring-standard-default-spatial: var(
+    --md-sys-motion-standard-default-spatial-duration
+  ); /* 500ms */
+  --transition-duration-spring-standard-slow-spatial: var(
+    --md-sys-motion-standard-slow-spatial-duration
+  ); /* 750ms */
+  --transition-duration-spring-standard-fast-effects: var(
+    --md-sys-motion-standard-fast-effects-duration
+  ); /* 150ms */
+  --transition-duration-spring-standard-default-effects: var(
+    --md-sys-motion-standard-default-effects-duration
+  ); /* 200ms */
+  --transition-duration-spring-standard-slow-effects: var(
+    --md-sys-motion-standard-slow-effects-duration
+  ); /* 300ms */
+
+  /* ── COMPOSITE ANIMATION UTILITIES ───────────────────────────────────────
+     Pre-built animate-* utilities combining keyframe + duration + easing.
+     Usage: animate-md-ripple, animate-md-fade-in, animate-md-scale-in, etc.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  /* Ripple — emphasized spatial curve, long1 (450ms) */
+  --animate-md-ripple: md-ripple 450ms cubic-bezier(0.2, 0, 0, 1);
+
+  /* Fade in — expressive default effects: 200ms */
+  --animate-md-fade-in: md-fade-in var(--md-sys-motion-expressive-default-effects-duration)
+    var(--md-sys-motion-expressive-default-effects-easing) forwards;
+
+  /* Fade out — standard fast effects: 150ms */
+  --animate-md-fade-out: md-fade-out var(--md-sys-motion-standard-fast-effects-duration)
+    var(--md-sys-motion-standard-fast-effects-easing) forwards;
+
+  /* Scale in (menu/dialog enter) — expressive fast spatial: 350ms */
+  --animate-md-scale-in: md-scale-in var(--md-sys-motion-expressive-fast-spatial-duration)
+    var(--md-sys-motion-expressive-fast-spatial-easing) forwards;
+
+  /* Scale out (menu/dialog exit) — legacy emphasized accelerate: 200ms */
+  --animate-md-scale-out: md-scale-out var(--md-sys-motion-duration-short4)
+    var(--md-sys-motion-easing-emphasized-accelerate) forwards;
+
+  /* Slide in from bottom (sheets, nav bar) — standard default spatial: 500ms */
+  --animate-md-slide-in-bottom: md-slide-in-bottom
+    var(--md-sys-motion-standard-default-spatial-duration)
+    var(--md-sys-motion-standard-default-spatial-easing) forwards;
+
+  /* Slide out to bottom — legacy emphasized accelerate: 200ms */
+  --animate-md-slide-out-bottom: md-slide-out-bottom var(--md-sys-motion-duration-short4)
+    var(--md-sys-motion-easing-emphasized-accelerate) forwards;
+
+  /* Slide in from right (forward navigation, drawer) — standard default spatial: 500ms */
+  --animate-md-slide-in-right: md-slide-in-right
+    var(--md-sys-motion-standard-default-spatial-duration)
+    var(--md-sys-motion-standard-default-spatial-easing) forwards;
+
+  /* Slide out to right — legacy emphasized accelerate: 200ms */
+  --animate-md-slide-out-right: md-slide-out-right var(--md-sys-motion-duration-short4)
+    var(--md-sys-motion-easing-emphasized-accelerate) forwards;
+
+  /* Slide in from left (nav drawer, back navigation) — standard default spatial: 500ms */
+  --animate-md-slide-in-left: md-slide-in-left
+    var(--md-sys-motion-standard-default-spatial-duration)
+    var(--md-sys-motion-standard-default-spatial-easing) forwards;
+
+  /* Slide out to left — legacy emphasized accelerate: 200ms */
+  --animate-md-slide-out-left: md-slide-out-left var(--md-sys-motion-duration-short4)
+    var(--md-sys-motion-easing-emphasized-accelerate) forwards;
+
+  /* Slide in from top (notifications, banners) — standard default spatial: 500ms */
+  --animate-md-slide-in-top: md-slide-in-top var(--md-sys-motion-standard-default-spatial-duration)
+    var(--md-sys-motion-standard-default-spatial-easing) forwards;
+
+  /* Slide out to top — legacy emphasized accelerate: 200ms */
+  --animate-md-slide-out-top: md-slide-out-top var(--md-sys-motion-duration-short4)
+    var(--md-sys-motion-easing-emphasized-accelerate) forwards;
+
+  /* Skeleton pulse — extra-long1 (700ms), infinitely looping */
+  --animate-md-skeleton-pulse: md-skeleton-pulse 700ms ease-in-out infinite;
+}

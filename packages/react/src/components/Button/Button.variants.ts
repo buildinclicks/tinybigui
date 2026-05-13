@@ -11,16 +11,11 @@ export const buttonVariants = cva(
     // Base classes (always applied)
     "relative inline-flex items-center justify-center cursor-pointer",
     "overflow-hidden rounded-full font-medium",
-    "transition-all duration-200",
+    // Split MD3 transition: spatial (border-radius) uses expressive spring with overshoot;
+    // effects (color/bg/shadow) use standard effects spring — no overshoot allowed on color.
+    "btn-transition",
     "tracking-[0.1px]", // MD3 spec: +0.1px letter-spacing for label-large
     "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
-
-    // State layers (hover, focus, active) - MD3 spec: 8%/12%/12% opacity
-    "before:absolute before:inset-0 before:rounded-[inherit] before:transition-opacity before:duration-200",
-    "before:bg-current before:opacity-0",
-    "hover:before:opacity-8",
-    "focus-visible:before:opacity-12",
-    "active:before:opacity-12",
   ],
   {
     variants: {
