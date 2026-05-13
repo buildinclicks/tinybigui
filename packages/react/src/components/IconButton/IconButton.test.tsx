@@ -710,7 +710,7 @@ describe("IconButton", () => {
 
     test("IconButton inside connected group applies inner radius class", () => {
       render(
-        <ButtonGroup variant="connected" size="md" aria-label="Group">
+        <ButtonGroup variant="connected" size="medium" aria-label="Group">
           <IconButton aria-label="First">
             <IconDelete />
           </IconButton>
@@ -725,9 +725,9 @@ describe("IconButton", () => {
       });
     });
 
-    test("IconButton inside connected round group applies first:rounded-s-full", () => {
+    test("IconButton inside connected round group applies graduated outer radius", () => {
       render(
-        <ButtonGroup variant="connected" size="md" shape="round" aria-label="Group">
+        <ButtonGroup variant="connected" size="medium" shape="round" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>
@@ -737,13 +737,13 @@ describe("IconButton", () => {
         </ButtonGroup>
       );
       const buttons = screen.getAllByRole("button");
-      expect(buttons[0].className).toContain("first:rounded-s-full");
-      expect(buttons[0].className).toContain("last:rounded-e-full");
+      expect(buttons[0].className).toContain("first:rounded-s-3xl");
+      expect(buttons[0].className).toContain("last:rounded-e-3xl");
     });
 
-    test("IconButton inside connected lg group has rounded-lg inner radius", () => {
+    test("IconButton inside connected large group has rounded-lg inner radius", () => {
       render(
-        <ButtonGroup variant="connected" size="lg" aria-label="Group">
+        <ButtonGroup variant="connected" size="large" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>
@@ -758,9 +758,9 @@ describe("IconButton", () => {
       });
     });
 
-    test("IconButton inside connected xl group applies rounded-[20px]", () => {
+    test("IconButton inside connected extra-large group applies rounded-[20px]", () => {
       render(
-        <ButtonGroup variant="connected" size="xl" shape="round" aria-label="Group">
+        <ButtonGroup variant="connected" size="extra-large" shape="round" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>
@@ -777,7 +777,7 @@ describe("IconButton", () => {
 
     test("IconButton inside connected square group applies square outer radius", () => {
       render(
-        <ButtonGroup variant="connected" size="sm" shape="square" aria-label="Group">
+        <ButtonGroup variant="connected" size="small" shape="square" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>
@@ -791,9 +791,9 @@ describe("IconButton", () => {
       expect(buttons[0].className).toContain("last:rounded-e-sm");
     });
 
-    test("IconButton inside connected xs/sm group has min-w-12", () => {
+    test("IconButton inside connected extra-small/small group has min-w-12", () => {
       render(
-        <ButtonGroup variant="connected" size="xs" aria-label="Group">
+        <ButtonGroup variant="connected" size="extra-small" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>
@@ -808,9 +808,9 @@ describe("IconButton", () => {
       });
     });
 
-    test("IconButton inside connected sm group has min-w-12", () => {
+    test("IconButton inside connected small group has min-w-12", () => {
       render(
-        <ButtonGroup variant="connected" size="sm" aria-label="Group">
+        <ButtonGroup variant="connected" size="small" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>
@@ -819,9 +819,9 @@ describe("IconButton", () => {
       expect(screen.getByRole("button")).toHaveClass("min-w-12");
     });
 
-    test("IconButton inside connected md group does NOT have min-w-12", () => {
+    test("IconButton inside connected medium group does NOT have min-w-12", () => {
       render(
-        <ButtonGroup variant="connected" size="md" aria-label="Group">
+        <ButtonGroup variant="connected" size="medium" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>
@@ -832,7 +832,7 @@ describe("IconButton", () => {
 
     test("IconButton inside standard group does NOT apply connected radius classes", () => {
       render(
-        <ButtonGroup variant="standard" size="md" aria-label="Group">
+        <ButtonGroup variant="standard" size="medium" aria-label="Group">
           <IconButton aria-label="A">
             <IconDelete />
           </IconButton>

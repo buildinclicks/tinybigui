@@ -1,0 +1,27 @@
+/**
+ * @tinybigui/tokens — Elevation Tokens
+ * Material Design 3 elevation system.
+ * Elevation is primarily communicated through tonal surface color; shadows
+ * are added only when additional visual separation is needed.
+ *
+ * Token prefix: --md-sys-elevation-level-*
+ */
+
+:root {
+  /* ==========================================================================
+     ELEVATION LEVELS (box-shadow values)
+     Level 0 — flat surfaces, most resting components
+     Level 1 — elevated cards, modal sheets
+     Level 2 — menus, nav bar, scrolled app bar
+     Level 3 — FABs, dialogs, search, date/time pickers
+     Level 4 — hover/focus increase only
+     Level 5 — hover/focus increase only
+     ========================================================================== */
+
+  --md-sys-elevation-level-0: none;
+  --md-sys-elevation-level-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-2: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-3: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-4: 0 2px 3px 0 rgba(0, 0, 0, 0.3), 0 6px 10px 4px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level-5: 0 4px 4px 0 rgba(0, 0, 0, 0.3), 0 8px 12px 6px rgba(0, 0, 0, 0.15);
+}

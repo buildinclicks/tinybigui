@@ -29,7 +29,7 @@ import type { ButtonGroupProps } from "./ButtonGroup.types";
  * @example
  * ```tsx
  * // Standard icon-button group (no selection management)
- * <ButtonGroup variant="standard" size="md" aria-label="Quick settings">
+ * <ButtonGroup variant="standard" size="medium" aria-label="Quick settings">
  *   <IconButton aria-label="Bluetooth"><BluetoothIcon /></IconButton>
  *   <IconButton aria-label="Alarm"><AlarmIcon /></IconButton>
  * </ButtonGroup>
@@ -63,7 +63,7 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
   (
     {
       variant = "standard",
-      size = "md",
+      size = "medium",
       shape = "round",
       selectionMode,
       selectedValues,

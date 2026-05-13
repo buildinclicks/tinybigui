@@ -19,10 +19,10 @@ import type { ButtonGroupProps } from "./ButtonGroup.types";
  * @example
  * ```tsx
  * // Uncontrolled with default value
- * <ButtonGroupHeadless selectionMode="single" defaultValue="md" className="flex gap-2">
- *   <MyButton value="sm">Small</MyButton>
- *   <MyButton value="md">Medium</MyButton>
- *   <MyButton value="lg">Large</MyButton>
+ * <ButtonGroupHeadless selectionMode="single" defaultValue="medium" className="flex gap-2">
+ *   <MyButton value="small">Small</MyButton>
+ *   <MyButton value="medium">Medium</MyButton>
+ *   <MyButton value="large">Large</MyButton>
  * </ButtonGroupHeadless>
  *
  * // Controlled
@@ -42,7 +42,7 @@ export const ButtonGroupHeadless = forwardRef<HTMLDivElement, ButtonGroupProps>(
     {
       // Group configuration
       variant = "standard",
-      size = "md",
+      size = "medium",
       shape = "round",
       selectionMode,
 
@@ -131,7 +131,8 @@ export const ButtonGroupHeadless = forwardRef<HTMLDivElement, ButtonGroupProps>(
             onSelectionChange: handleSelectionChange,
             connectedInnerRadius: getInnerRadius(size),
             connectedOuterRadius: getOuterRadius(shape, size),
-            enforceMinWidth: variant === "connected" && (size === "xs" || size === "sm"),
+            enforceMinWidth:
+              variant === "connected" && (size === "extra-small" || size === "small"),
           }}
         >
           {children}

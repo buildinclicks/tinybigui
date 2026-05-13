@@ -17,11 +17,13 @@ export const iconButtonVariants = cva(
     // Base classes (always applied)
     "relative inline-flex items-center justify-center cursor-pointer",
     "overflow-hidden rounded-full", // Circular shape
-    "transition-all duration-200",
+    // Spatial (border-radius, transform): expressive fast spring — 350ms, visible overshoot
+    "transition-all duration-expressive-fast-spatial ease-expressive-fast-spatial",
     "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
 
-    // State layers (hover, focus, active)
-    "before:absolute before:inset-0 before:rounded-[inherit] before:transition-opacity before:duration-200",
+    // State layers — effects token: opacity only, no overshoot
+    "before:absolute before:inset-0 before:rounded-[inherit]",
+    "before:transition-opacity before:duration-spring-standard-fast-effects before:ease-spring-standard-fast-effects",
     "before:bg-current before:opacity-0",
     "hover:before:opacity-8",
     "focus-visible:before:opacity-12",

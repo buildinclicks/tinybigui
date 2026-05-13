@@ -492,7 +492,7 @@ describe("Button", () => {
 
     test("Button inside connected group applies inner radius class", () => {
       render(
-        <ButtonGroup variant="connected" size="md" aria-label="Group">
+        <ButtonGroup variant="connected" size="medium" aria-label="Group">
           <Button>One</Button>
           <Button>Two</Button>
         </ButtonGroup>
@@ -504,21 +504,21 @@ describe("Button", () => {
       });
     });
 
-    test("Button inside connected round group applies first:rounded-s-full", () => {
+    test("Button inside connected round group applies graduated outer radius", () => {
       render(
-        <ButtonGroup variant="connected" size="md" shape="round" aria-label="Group">
+        <ButtonGroup variant="connected" size="medium" shape="round" aria-label="Group">
           <Button>First</Button>
           <Button>Last</Button>
         </ButtonGroup>
       );
       const buttons = screen.getAllByRole("button");
-      expect(buttons[0].className).toContain("first:rounded-s-full");
-      expect(buttons[0].className).toContain("last:rounded-e-full");
+      expect(buttons[0].className).toContain("first:rounded-s-3xl");
+      expect(buttons[0].className).toContain("last:rounded-e-3xl");
     });
 
-    test("Button inside connected group has correct inner radius for lg size", () => {
+    test("Button inside connected group has correct inner radius for large size", () => {
       render(
-        <ButtonGroup variant="connected" size="lg" aria-label="Group">
+        <ButtonGroup variant="connected" size="large" aria-label="Group">
           <Button>One</Button>
           <Button>Two</Button>
         </ButtonGroup>
@@ -529,9 +529,9 @@ describe("Button", () => {
       });
     });
 
-    test("Button inside connected round xl group applies rounded-[20px]", () => {
+    test("Button inside connected round extra-large group applies rounded-[20px]", () => {
       render(
-        <ButtonGroup variant="connected" size="xl" shape="round" aria-label="Group">
+        <ButtonGroup variant="connected" size="extra-large" shape="round" aria-label="Group">
           <Button>One</Button>
           <Button>Two</Button>
         </ButtonGroup>
@@ -544,7 +544,7 @@ describe("Button", () => {
 
     test("Button inside connected square group applies square outer radius", () => {
       render(
-        <ButtonGroup variant="connected" size="sm" shape="square" aria-label="Group">
+        <ButtonGroup variant="connected" size="small" shape="square" aria-label="Group">
           <Button>One</Button>
           <Button>Two</Button>
         </ButtonGroup>
@@ -554,9 +554,9 @@ describe("Button", () => {
       expect(buttons[0].className).toContain("last:rounded-e-sm");
     });
 
-    test("Button inside connected xs/sm group has min-w-12", () => {
+    test("Button inside connected extra-small/small group has min-w-12", () => {
       render(
-        <ButtonGroup variant="connected" size="xs" aria-label="Group">
+        <ButtonGroup variant="connected" size="extra-small" aria-label="Group">
           <Button>One</Button>
           <Button>Two</Button>
         </ButtonGroup>
@@ -567,18 +567,18 @@ describe("Button", () => {
       });
     });
 
-    test("Button inside connected sm group has min-w-12", () => {
+    test("Button inside connected small group has min-w-12", () => {
       render(
-        <ButtonGroup variant="connected" size="sm" aria-label="Group">
+        <ButtonGroup variant="connected" size="small" aria-label="Group">
           <Button>One</Button>
         </ButtonGroup>
       );
       expect(screen.getByRole("button")).toHaveClass("min-w-12");
     });
 
-    test("Button inside connected md group does NOT have min-w-12", () => {
+    test("Button inside connected medium group does NOT have min-w-12", () => {
       render(
-        <ButtonGroup variant="connected" size="md" aria-label="Group">
+        <ButtonGroup variant="connected" size="medium" aria-label="Group">
           <Button>One</Button>
         </ButtonGroup>
       );
@@ -587,7 +587,7 @@ describe("Button", () => {
 
     test("Button inside standard group does NOT apply connected radius classes", () => {
       render(
-        <ButtonGroup variant="standard" size="md" aria-label="Group">
+        <ButtonGroup variant="standard" size="medium" aria-label="Group">
           <Button>One</Button>
         </ButtonGroup>
       );

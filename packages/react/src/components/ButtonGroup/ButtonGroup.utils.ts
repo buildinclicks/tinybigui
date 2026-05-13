@@ -15,18 +15,18 @@ import type {
  * them during the build-time class scan.
  *
  * MD3 spec values (dp → Tailwind tokens):
- *   xs = 4dp  → rounded-xs   (--radius-xs = 4px)
- *   sm = 8dp  → rounded-sm   (--radius-sm = 8px)
- *   md = 8dp  → rounded-sm
- *   lg = 16dp → rounded-lg   (--radius-lg = 16px)
- *   xl = 20dp → rounded-[20px] (no matching token; --radius-xl is 28px)
+ *   extra-small = 4dp  → rounded-xs   (--radius-xs = 4px)
+ *   small       = 8dp  → rounded-sm   (--radius-sm = 8px)
+ *   medium      = 8dp  → rounded-sm
+ *   large       = 16dp → rounded-lg   (--radius-lg = 16px)
+ *   extra-large = 20dp → rounded-[20px] (no matching token; --radius-xl is 28px)
  */
 const INNER_RADIUS: Record<ButtonGroupSize, string> = {
-  xs: "rounded-xs",
-  sm: "rounded-sm",
-  md: "rounded-sm",
-  lg: "rounded-lg",
-  xl: "rounded-[20px]",
+  "extra-small": "rounded-xs",
+  small: "rounded-sm",
+  medium: "rounded-sm",
+  large: "rounded-lg",
+  "extra-large": "rounded-[20px]",
 };
 
 /**
@@ -39,11 +39,11 @@ const OUTER_RADIUS_ROUND = "rounded-full";
  * Outer corners are the same value as inner corners (no distinction in square mode).
  */
 const OUTER_RADIUS_SQUARE: Record<ButtonGroupSize, string> = {
-  xs: "rounded-xs",
-  sm: "rounded-sm",
-  md: "rounded-sm",
-  lg: "rounded-lg",
-  xl: "rounded-[20px]",
+  "extra-small": "rounded-xs",
+  small: "rounded-sm",
+  medium: "rounded-sm",
+  large: "rounded-lg",
+  "extra-large": "rounded-[20px]",
 };
 
 /**
@@ -52,7 +52,15 @@ const OUTER_RADIUS_SQUARE: Record<ButtonGroupSize, string> = {
  * Each array contains:
  *   [0] Inner radius class (applied to all corners of every button)
  *   … `first:` / `last:` overrides using **logical** `rounded-s-*` / `rounded-e-*` so
- *     outer vs inner corners stay correct in LTR and RTL (MD3 pill outer, inner lg tier).
+ *     outer vs inner corners stay correct in LTR and RTL.
+ *
+ * `round` shape: outer (exposed) corners use a graduated radius per size tier to avoid sharp
+ *   contrast at the join — xs→`rounded-s-lg`, sm→`rounded-s-xl`, md→`rounded-s-3xl`,
+ *   lg/xl→`rounded-s-4xl`. Inner (adjacent) corners shrink per size tier — xs=4dp, sm/md=8dp,
+ *   lg=16dp, xl=20dp.
+ *
+ * `square` shape: outer corners are the same as inner corners — uniform radius on all
+ *   four corners of every button. No distinction between outer and inner edges.
  *
  * Writing the full class strings statically (not via string concatenation) ensures
  * the Tailwind CSS v4 scanner can detect all classes at build time.
@@ -62,18 +70,18 @@ const CONNECTED_RADIUS_CLASSES: Record<
   Record<ButtonGroupSize, readonly string[]>
 > = {
   round: {
-    xs: ["rounded-xs", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    sm: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    md: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    lg: ["rounded-lg", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    xl: ["rounded-xl", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    "extra-small": ["rounded-xs", "first:rounded-s-lg", "last:rounded-e-lg"],
+    small: ["rounded-sm", "first:rounded-s-xl", "last:rounded-e-xl"],
+    medium: ["rounded-sm", "first:rounded-s-3xl", "last:rounded-e-3xl"],
+    large: ["rounded-lg", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    "extra-large": ["rounded-[20px]", "first:rounded-s-4xl", "last:rounded-e-4xl"],
   },
   square: {
-    xs: ["rounded-xs", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    sm: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    md: ["rounded-sm", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    lg: ["rounded-lg", "first:rounded-s-4xl", "last:rounded-e-4xl"],
-    xl: ["rounded-xl", "first:rounded-s-4xl", "last:rounded-e-4xl"],
+    "extra-small": ["rounded-xs", "first:rounded-s-xs", "last:rounded-e-xs"],
+    small: ["rounded-sm", "first:rounded-s-sm", "last:rounded-e-sm"],
+    medium: ["rounded-sm", "first:rounded-s-sm", "last:rounded-e-sm"],
+    large: ["rounded-lg", "first:rounded-s-lg", "last:rounded-e-lg"],
+    "extra-large": ["rounded-[20px]", "first:rounded-s-[20px]", "last:rounded-e-[20px]"],
   },
 };
 
@@ -94,7 +102,7 @@ const CONNECTED_RADIUS_CLASSES: Record<
  * const groupCtx = useOptionalButtonGroup();
  * if (groupCtx?.variant === 'connected') {
  *   const radiusClasses = getConnectedRadiusClasses(groupCtx);
- *   // → ['rounded-sm', 'first:rounded-s-full', 'last:rounded-e-full']
+ *   // → ['rounded-sm', 'first:rounded-s-3xl', 'last:rounded-e-3xl']
  * }
  * ```
  */
@@ -103,10 +111,10 @@ export function getConnectedRadiusClasses(
   value?: string
 ): readonly string[] {
   const connectedClasses = CONNECTED_RADIUS_CLASSES[ctx.shape][ctx.size];
-  if (value) {
-    return ctx.selectedValues.has(value)
-      ? [...connectedClasses, "rounded-full", "first:rounded-s-full", "last:rounded-e-full"]
-      : connectedClasses;
+  if (value && ctx.selectedValues.has(value)) {
+    // round: morph to full pill on selection (MD3 segmented button selected state)
+    // square: keep uniform inner radius — no pill morph in square mode
+    return ctx.shape === "round" ? ["rounded-full"] : [INNER_RADIUS[ctx.size]];
   }
   return connectedClasses;
 }

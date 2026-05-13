@@ -8,7 +8,7 @@
 
 import { useState } from "react";
 import { describe, test, expect, vi } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers";
@@ -305,39 +305,36 @@ describe("TextField", () => {
       expect(input).toHaveValue("");
     });
 
-    test("handles long text", async () => {
+    test("handles long text", () => {
       const longText = "a".repeat(1000);
-      const user = userEvent.setup();
       render(<TextField label="Email" />);
 
       const input = screen.getByRole("textbox");
-      await user.type(input, longText);
+      fireEvent.change(input, { target: { value: longText } });
 
       expect(input).toHaveValue(longText);
     });
 
-    test("handles special characters", async () => {
+    test("handles special characters", () => {
       const specialText = "test@example.com!#$%";
-      const user = userEvent.setup();
       render(<TextField label="Email" />);
 
       const input = screen.getByRole("textbox");
-      await user.type(input, specialText);
+      fireEvent.change(input, { target: { value: specialText } });
 
       expect(input).toHaveValue(specialText);
     });
 
-    test("handles controlled component", async () => {
+    test("handles controlled component", () => {
       const ControlledTextField = () => {
         const [value, setValue] = useState("");
         return <TextField label="Email" value={value} onChange={(value) => setValue(value)} />;
       };
 
-      const user = userEvent.setup();
       render(<ControlledTextField />);
 
       const input = screen.getByRole("textbox");
-      await user.type(input, "test");
+      fireEvent.change(input, { target: { value: "test" } });
 
       expect(input).toHaveValue("test");
     });

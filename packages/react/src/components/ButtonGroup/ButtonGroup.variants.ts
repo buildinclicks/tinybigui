@@ -8,13 +8,13 @@ import { cva, type VariantProps } from "class-variance-authority";
  * (display, width) and the inner gap between child buttons.
  *
  * MD3 Inner Gap Spec:
- * | Size | standard   | connected |
- * |------|------------|-----------|
- * | xs   | 18dp       | 2dp       |
- * | sm   | 12dp       | 2dp       |
- * | md   | 8dp        | 2dp       |
- * | lg   | 8dp        | 2dp       |
- * | xl   | 8dp        | 2dp       |
+ * | Size        | standard   | connected |
+ * |-------------|------------|-----------|
+ * | extra-small | 18dp       | 2dp       |
+ * | small       | 12dp       | 2dp       |
+ * | medium      | 8dp        | 2dp       |
+ * | large       | 8dp        | 2dp       |
+ * | extra-large | 8dp        | 2dp       |
  *
  * Note: xs/sm standard gaps are intentionally large to preserve 48dp touch targets.
  * Connected gap is always 2dp (`gap-0.5`) regardless of size.
@@ -40,11 +40,11 @@ export const buttonGroupVariants = cva(
        * For the connected variant, gap is always overridden to `gap-0.5`.
        */
       size: {
-        xs: "",
-        sm: "",
-        md: "",
-        lg: "",
-        xl: "",
+        "extra-small": "",
+        small: "",
+        medium: "",
+        large: "",
+        "extra-large": "",
       },
     },
 
@@ -53,23 +53,23 @@ export const buttonGroupVariants = cva(
      */
     compoundVariants: [
       // Standard variant — larger gaps preserve 48dp touch targets
-      { variant: "standard", size: "xs", className: "gap-[18px]" },
-      { variant: "standard", size: "sm", className: "gap-3" },
-      { variant: "standard", size: "md", className: "gap-2" },
-      { variant: "standard", size: "lg", className: "gap-2" },
-      { variant: "standard", size: "xl", className: "gap-2" },
+      { variant: "standard", size: "extra-small", className: "gap-[18px]" },
+      { variant: "standard", size: "small", className: "gap-3" },
+      { variant: "standard", size: "medium", className: "gap-2" },
+      { variant: "standard", size: "large", className: "gap-2" },
+      { variant: "standard", size: "extra-large", className: "gap-2" },
 
       // Connected variant — always 2dp gap (gap-0.5 = 2px at default spacing)
-      { variant: "connected", size: "xs", className: "gap-0.5" },
-      { variant: "connected", size: "sm", className: "gap-0.5" },
-      { variant: "connected", size: "md", className: "gap-0.5" },
-      { variant: "connected", size: "lg", className: "gap-0.5" },
-      { variant: "connected", size: "xl", className: "gap-0.5" },
+      { variant: "connected", size: "extra-small", className: "gap-0.5" },
+      { variant: "connected", size: "small", className: "gap-0.5" },
+      { variant: "connected", size: "medium", className: "gap-0.5" },
+      { variant: "connected", size: "large", className: "gap-0.5" },
+      { variant: "connected", size: "extra-large", className: "gap-0.5" },
     ],
 
     defaultVariants: {
       variant: "standard",
-      size: "md",
+      size: "medium",
     },
   }
 );

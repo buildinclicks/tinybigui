@@ -102,6 +102,13 @@ export interface IconButtonProps extends AriaButtonProps {
   className?: string;
 
   /**
+   * Value string used by ButtonGroup context for selection tracking and
+   * shape-morph logic in connected groups. Required when the IconButton is
+   * inside a `<ButtonGroup selectionMode="...">`.
+   */
+  value?: string;
+
+  /**
    * HTML title attribute for tooltip
    * Recommended for better UX on desktop
    */

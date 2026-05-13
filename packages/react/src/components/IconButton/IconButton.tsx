@@ -66,6 +66,7 @@ export const IconButton = forwardRef<
       size = "medium",
       // IconButton specific props
       children,
+      value,
       selected,
       disableRipple = false,
       className,
@@ -116,10 +117,13 @@ export const IconButton = forwardRef<
       isDisabled,
     });
 
-    // Connected group radius + min-width overrides
+    // Connected group radius + min-width overrides (pass value for selection-aware shape morph)
     const connectedClasses =
       isConnected && groupCtx
-        ? [...getConnectedRadiusClasses(groupCtx), groupCtx.enforceMinWidth ? "min-w-12" : ""]
+        ? [
+            ...getConnectedRadiusClasses(groupCtx, value),
+            groupCtx.enforceMinWidth ? "min-w-12" : "",
+          ]
         : [];
 
     return (
@@ -129,11 +133,13 @@ export const IconButton = forwardRef<
           // Base classes
           "relative inline-flex items-center justify-center",
           "overflow-hidden rounded-full", // Circular shape (overridden by connected group classes)
-          "transition-all duration-200",
+          // Spatial (border-radius, transform): expressive fast spring — 350ms, visible overshoot
+          "duration-expressive-fast-spatial ease-expressive-fast-spatial transition-all",
           "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
 
-          // State layers (hover, focus, active)
-          "before:absolute before:inset-0 before:rounded-[inherit] before:transition-opacity before:duration-200",
+          // State layers (hover, focus, active) — effects token: opacity, no overshoot
+          "before:absolute before:inset-0 before:rounded-[inherit]",
+          "before:duration-spring-standard-fast-effects before:ease-spring-standard-fast-effects before:transition-opacity",
           "before:bg-current before:opacity-0",
           "hover:before:opacity-8",
           "focus-visible:before:opacity-12",

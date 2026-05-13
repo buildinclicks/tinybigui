@@ -25,6 +25,12 @@
   "type": "module",
   "exports": {
     "./tokens.css": "./dist/tokens.css",
+    "./color.css": "./dist/color.css",
+    "./typography.css": "./dist/typography.css",
+    "./shape.css": "./dist/shape.css",
+    "./elevation.css": "./dist/elevation.css",
+    "./motion.css": "./dist/motion.css",
+    "./theme.css": "./dist/theme.css",
     "./package.json": "./package.json"
   },
   "files": [

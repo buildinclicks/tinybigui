@@ -1,0 +1,212 @@
+/**
+ * @tinybigui/tokens — Motion Tokens
+ * Material Design 3 motion system: legacy easing/duration tokens
+ * plus the modern spring-based physics system (as web cubic-bezier curves).
+ *
+ * ─── Two systems ────────────────────────────────────────────────────────────
+ *
+ * 1. LEGACY EASING + DURATION (--md-sys-motion-easing-* / --md-sys-motion-duration-*)
+ *    Still used for page transitions (enter/exit/shared-axis). Organized into
+ *    two families — standard and emphasized — each with decelerate/accelerate
+ *    variants for entering and exiting the screen.
+ *
+ * 2. SPRING-BASED PHYSICS — WEB CUBIC-BEZIER CONVERSIONS
+ *    M3 Expressive (May 2025) replaced fixed curves with spring physics for
+ *    component animations. On the web, springs are expressed as cubic-bezier
+ *    approximations paired with a recommended duration.
+ *
+ *    Two motion personalities:
+ *    - Expressive — playful, energetic; allows overshoot (spatial); for FABs,
+ *                   buttons, hero elements, and moments of delight.
+ *    - Standard   — calm, purposeful; no overshoot; for utility animations,
+ *                   content, and less prominent UI changes.
+ *
+ *    Two animation types within each personality:
+ *    - Spatial   — position / size / shape changes. Springs may overshoot
+ *                  slightly to feel alive and physical.
+ *    - Effects   — opacity / color / blur. Must NOT overshoot (opacity > 1
+ *                  or color exceeding bounds breaks visuals).
+ *
+ *    Three speed tiers: fast (small components), default (standard UI),
+ *                       slow (large/full-screen elements).
+ *
+ * Spec reference: https://m3.material.io/styles/motion/overview/specs
+ * ────────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+  /* ==========================================================================
+     LEGACY — DURATION TOKENS
+     Short through Extra-Long: 16 steps covering 50ms – 1000ms.
+     ========================================================================== */
+
+  /* Short (micro-interactions, feedback) */
+  --md-sys-motion-duration-short1: 50ms;
+  --md-sys-motion-duration-short2: 100ms;
+  --md-sys-motion-duration-short3: 150ms;
+  --md-sys-motion-duration-short4: 200ms;
+
+  /* Medium (most component animations) */
+  --md-sys-motion-duration-medium1: 250ms;
+  --md-sys-motion-duration-medium2: 300ms;
+  --md-sys-motion-duration-medium3: 350ms;
+  --md-sys-motion-duration-medium4: 400ms;
+
+  /* Long (large components, complex transitions) */
+  --md-sys-motion-duration-long1: 450ms;
+  --md-sys-motion-duration-long2: 500ms;
+  --md-sys-motion-duration-long3: 550ms;
+  --md-sys-motion-duration-long4: 600ms;
+
+  /* Extra-long (full-screen transitions, complex sequences) */
+  --md-sys-motion-duration-extra-long1: 700ms;
+  --md-sys-motion-duration-extra-long2: 800ms;
+  --md-sys-motion-duration-extra-long3: 900ms;
+  --md-sys-motion-duration-extra-long4: 1000ms;
+
+  /* ==========================================================================
+     LEGACY — EASING TOKENS
+     Standard family: for utility/functional animations (low prominence).
+     Emphasized family: for high-prominence, expressive transitions.
+     ========================================================================== */
+
+  /*
+   * Standard — elements moving within the same screen layer.
+   * Pair with: duration-medium2 (300ms) for on-screen movement.
+   */
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /*
+   * Standard decelerate — elements entering the screen.
+   * Starts fast, decelerates to rest. Pair with: duration-medium1 (250ms).
+   */
+  --md-sys-motion-easing-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+
+  /*
+   * Standard accelerate — elements exiting the screen.
+   * Starts slow, accelerates off screen. Pair with: duration-short4 (200ms).
+   */
+  --md-sys-motion-easing-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+  /*
+   * Emphasized — high-prominence on-screen movement.
+   * Pair with: duration-long2 (500ms) for on-screen movement.
+   */
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+  /*
+   * Emphasized decelerate — prominent elements entering the screen.
+   * Pair with: duration-medium4 (400ms).
+   */
+  --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+
+  /*
+   * Emphasized accelerate — prominent elements exiting the screen.
+   * Pair with: duration-short4 (200ms).
+   */
+  --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+
+  /* ==========================================================================
+     SPRING-BASED — EXPRESSIVE MOTION (spatial)
+     Spatial springs animate position, size, and shape. They allow a small
+     natural overshoot that makes motion feel physical and alive.
+     Use for: FABs, hero buttons, morphing shapes, card expansions,
+              prominent enter/exit, and moments of delight.
+     ========================================================================== */
+
+  /*
+   * Expressive fast spatial — small components (buttons, FABs, chips).
+   * Snappy with noticeable overshoot.
+   */
+  --md-sys-motion-expressive-fast-spatial-easing: cubic-bezier(0.42, 1.67, 0.21, 0.9);
+  --md-sys-motion-expressive-fast-spatial-duration: 350ms;
+
+  /*
+   * Expressive default spatial — standard component animations (dialogs,
+   * sheets, cards). Balanced overshoot.
+   */
+  --md-sys-motion-expressive-default-spatial-easing: cubic-bezier(0.38, 1.21, 0.22, 1);
+  --md-sys-motion-expressive-default-spatial-duration: 500ms;
+
+  /*
+   * Expressive slow spatial — large or full-screen transforms.
+   * Gentle overshoot for slow, weighty elements.
+   */
+  --md-sys-motion-expressive-slow-spatial-easing: cubic-bezier(0.39, 1.29, 0.35, 0.98);
+  --md-sys-motion-expressive-slow-spatial-duration: 650ms;
+
+  /* ==========================================================================
+     SPRING-BASED — EXPRESSIVE MOTION (effects)
+     Effects springs animate opacity, color, and blur. They must NOT overshoot
+     (opacity > 1 or color out of gamut would be visually broken).
+     Use for: fade-in of expressive elements, color transitions on hero components.
+     ========================================================================== */
+
+  /*
+   * Expressive fast effects — rapid fade/color change on small components.
+   */
+  --md-sys-motion-expressive-fast-effects-easing: cubic-bezier(0.31, 0.94, 0.34, 1);
+  --md-sys-motion-expressive-fast-effects-duration: 150ms;
+
+  /*
+   * Expressive default effects — standard fade/color on prominent elements.
+   */
+  --md-sys-motion-expressive-default-effects-easing: cubic-bezier(0.34, 0.8, 0.34, 1);
+  --md-sys-motion-expressive-default-effects-duration: 200ms;
+
+  /*
+   * Expressive slow effects — fade/color on large or full-screen elements.
+   */
+  --md-sys-motion-expressive-slow-effects-easing: cubic-bezier(0.34, 0.88, 0.34, 1);
+  --md-sys-motion-expressive-slow-effects-duration: 300ms;
+
+  /* ==========================================================================
+     SPRING-BASED — STANDARD MOTION (spatial)
+     Standard spatial springs are calm and controlled — no overshoot. They
+     feel purposeful without drawing attention to the animation itself.
+     Use for: navigation transitions, content loading, utility animations,
+              sidebars, drawers, and secondary UI elements.
+     ========================================================================== */
+
+  /*
+   * Standard fast spatial — small components or quick utility moves.
+   */
+  --md-sys-motion-standard-fast-spatial-easing: cubic-bezier(0.27, 1.06, 0.18, 1);
+  --md-sys-motion-standard-fast-spatial-duration: 350ms;
+
+  /*
+   * Standard default spatial — typical navigation and content animations.
+   */
+  --md-sys-motion-standard-default-spatial-easing: cubic-bezier(0.27, 1.06, 0.18, 1);
+  --md-sys-motion-standard-default-spatial-duration: 500ms;
+
+  /*
+   * Standard slow spatial — large layout shifts and full-screen transitions.
+   */
+  --md-sys-motion-standard-slow-spatial-easing: cubic-bezier(0.27, 1.06, 0.18, 1);
+  --md-sys-motion-standard-slow-spatial-duration: 750ms;
+
+  /* ==========================================================================
+     SPRING-BASED — STANDARD MOTION (effects)
+     Calm, no-overshoot effects for utility and secondary elements.
+     Use for: content fades, tab indicator opacity, snackbar entrance, etc.
+     ========================================================================== */
+
+  /*
+   * Standard fast effects — quick opacity/color on utility elements.
+   */
+  --md-sys-motion-standard-fast-effects-easing: cubic-bezier(0.31, 0.94, 0.34, 1);
+  --md-sys-motion-standard-fast-effects-duration: 150ms;
+
+  /*
+   * Standard default effects — opacity/color for navigation and content.
+   */
+  --md-sys-motion-standard-default-effects-easing: cubic-bezier(0.34, 0.8, 0.34, 1);
+  --md-sys-motion-standard-default-effects-duration: 200ms;
+
+  /*
+   * Standard slow effects — opacity/color for large or full-screen changes.
+   */
+  --md-sys-motion-standard-slow-effects-easing: cubic-bezier(0.34, 0.88, 0.34, 1);
+  --md-sys-motion-standard-slow-effects-duration: 300ms;
+}

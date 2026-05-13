@@ -39,66 +39,66 @@ const ContextConsumer = ({ value }: { value: string }): React.ReactElement => {
 
 describe("buttonGroupVariants", () => {
   describe("standard variant", () => {
-    test("default (standard, md) has inline-flex", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "md" });
+    test("default (standard, medium) has inline-flex", () => {
+      const cls = buttonGroupVariants({ variant: "standard", size: "medium" });
       expect(cls).toContain("inline-flex");
     });
 
-    test("standard+xs has gap-[18px]", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "xs" });
+    test("standard+extra-small has gap-[18px]", () => {
+      const cls = buttonGroupVariants({ variant: "standard", size: "extra-small" });
       expect(cls).toContain("gap-[18px]");
     });
 
-    test("standard+sm has gap-3", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "sm" });
+    test("standard+small has gap-3", () => {
+      const cls = buttonGroupVariants({ variant: "standard", size: "small" });
       expect(cls).toContain("gap-3");
     });
 
-    test("standard+md has gap-2", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "md" });
+    test("standard+medium has gap-2", () => {
+      const cls = buttonGroupVariants({ variant: "standard", size: "medium" });
       expect(cls).toContain("gap-2");
     });
 
-    test("standard+lg has gap-2", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "lg" });
+    test("standard+large has gap-2", () => {
+      const cls = buttonGroupVariants({ variant: "standard", size: "large" });
       expect(cls).toContain("gap-2");
     });
 
-    test("standard+xl has gap-2", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "xl" });
+    test("standard+extra-large has gap-2", () => {
+      const cls = buttonGroupVariants({ variant: "standard", size: "extra-large" });
       expect(cls).toContain("gap-2");
     });
   });
 
   describe("connected variant", () => {
     test("connected has flex and w-full", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "md" });
+      const cls = buttonGroupVariants({ variant: "connected", size: "medium" });
       expect(cls).toContain("flex");
       expect(cls).toContain("w-full");
     });
 
-    test("connected+xs has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "xs" });
+    test("connected+extra-small has gap-0.5", () => {
+      const cls = buttonGroupVariants({ variant: "connected", size: "extra-small" });
       expect(cls).toContain("gap-0.5");
     });
 
-    test("connected+sm has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "sm" });
+    test("connected+small has gap-0.5", () => {
+      const cls = buttonGroupVariants({ variant: "connected", size: "small" });
       expect(cls).toContain("gap-0.5");
     });
 
-    test("connected+md has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "md" });
+    test("connected+medium has gap-0.5", () => {
+      const cls = buttonGroupVariants({ variant: "connected", size: "medium" });
       expect(cls).toContain("gap-0.5");
     });
 
-    test("connected+lg has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "lg" });
+    test("connected+large has gap-0.5", () => {
+      const cls = buttonGroupVariants({ variant: "connected", size: "large" });
       expect(cls).toContain("gap-0.5");
     });
 
-    test("connected+xl has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "xl" });
+    test("connected+extra-large has gap-0.5", () => {
+      const cls = buttonGroupVariants({ variant: "connected", size: "extra-large" });
       expect(cls).toContain("gap-0.5");
     });
   });
@@ -121,7 +121,7 @@ describe("buttonGroupVariants", () => {
 describe("ButtonGroupContext", () => {
   const defaultContextValue: ButtonGroupContextValue = {
     variant: "standard",
-    size: "md",
+    size: "medium",
     shape: "round",
     selectionMode: undefined,
     selectedValues: new Set(),
@@ -151,7 +151,7 @@ describe("ButtonGroupContext", () => {
     );
 
     expect(capturedCtx?.variant).toBe("standard");
-    expect(capturedCtx?.size).toBe("md");
+    expect(capturedCtx?.size).toBe("medium");
     expect(capturedCtx?.shape).toBe("round");
     expect(capturedCtx?.selectionMode).toBeUndefined();
   });
@@ -246,11 +246,11 @@ describe("ButtonGroupHeadless", () => {
 
     test("provides size to children via context", () => {
       render(
-        <ButtonGroupHeadless size="lg">
+        <ButtonGroupHeadless size="large">
           <ContextConsumer value="a" />
         </ButtonGroupHeadless>
       );
-      expect(screen.getByRole("button")).toHaveAttribute("data-size", "lg");
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "large");
     });
 
     test("provides shape to children via context", () => {
@@ -486,36 +486,36 @@ describe("ButtonGroup", () => {
   });
 
   describe("Size + variant gap classes", () => {
-    test("standard+xs applies gap-[18px]", () => {
+    test("standard+extra-small applies gap-[18px]", () => {
       render(
-        <ButtonGroup variant="standard" size="xs">
+        <ButtonGroup variant="standard" size="extra-small">
           <button>A</button>
         </ButtonGroup>
       );
       expect(screen.getByRole("group")).toHaveClass("gap-[18px]");
     });
 
-    test("standard+sm applies gap-3", () => {
+    test("standard+small applies gap-3", () => {
       render(
-        <ButtonGroup variant="standard" size="sm">
+        <ButtonGroup variant="standard" size="small">
           <button>A</button>
         </ButtonGroup>
       );
       expect(screen.getByRole("group")).toHaveClass("gap-3");
     });
 
-    test("standard+md applies gap-2", () => {
+    test("standard+medium applies gap-2", () => {
       render(
-        <ButtonGroup variant="standard" size="md">
+        <ButtonGroup variant="standard" size="medium">
           <button>A</button>
         </ButtonGroup>
       );
       expect(screen.getByRole("group")).toHaveClass("gap-2");
     });
 
-    test("connected+md applies gap-0.5", () => {
+    test("connected+medium applies gap-0.5", () => {
       render(
-        <ButtonGroup variant="connected" size="md">
+        <ButtonGroup variant="connected" size="medium">
           <button>A</button>
         </ButtonGroup>
       );
@@ -535,11 +535,11 @@ describe("ButtonGroup", () => {
 
     test("provides size via context", () => {
       render(
-        <ButtonGroup size="xl">
+        <ButtonGroup size="extra-large">
           <ContextConsumer value="x" />
         </ButtonGroup>
       );
-      expect(screen.getByRole("button")).toHaveAttribute("data-size", "xl");
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "extra-large");
     });
   });
 
@@ -643,7 +643,7 @@ describe("useOptionalButtonGroup", () => {
   test("returns context value when called inside a provider", () => {
     const mockValue: ButtonGroupContextValue = {
       variant: "connected",
-      size: "md",
+      size: "medium",
       shape: "round",
       selectionMode: "single",
       selectedValues: new Set(),
@@ -688,50 +688,50 @@ describe("useOptionalButtonGroup", () => {
 
 describe("ButtonGroup.utils", () => {
   describe("getInnerRadius", () => {
-    test("returns rounded-xs for xs", () => {
-      expect(getInnerRadius("xs")).toBe("rounded-xs");
+    test("returns rounded-xs for extra-small", () => {
+      expect(getInnerRadius("extra-small")).toBe("rounded-xs");
     });
 
-    test("returns rounded-sm for sm", () => {
-      expect(getInnerRadius("sm")).toBe("rounded-sm");
+    test("returns rounded-sm for small", () => {
+      expect(getInnerRadius("small")).toBe("rounded-sm");
     });
 
-    test("returns rounded-sm for md", () => {
-      expect(getInnerRadius("md")).toBe("rounded-sm");
+    test("returns rounded-sm for medium", () => {
+      expect(getInnerRadius("medium")).toBe("rounded-sm");
     });
 
-    test("returns rounded-lg for lg", () => {
-      expect(getInnerRadius("lg")).toBe("rounded-lg");
+    test("returns rounded-lg for large", () => {
+      expect(getInnerRadius("large")).toBe("rounded-lg");
     });
 
-    test("returns rounded-[20px] for xl", () => {
-      expect(getInnerRadius("xl")).toBe("rounded-[20px]");
+    test("returns rounded-[20px] for extra-large", () => {
+      expect(getInnerRadius("extra-large")).toBe("rounded-[20px]");
     });
   });
 
   describe("getOuterRadius", () => {
     test("round shape always returns rounded-full regardless of size", () => {
-      const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+      const sizes = ["extra-small", "small", "medium", "large", "extra-large"] as const;
       sizes.forEach((size) => {
         expect(getOuterRadius("round", size)).toBe("rounded-full");
       });
     });
 
-    test("square shape returns rounded-xs for xs", () => {
-      expect(getOuterRadius("square", "xs")).toBe("rounded-xs");
+    test("square shape returns rounded-xs for extra-small", () => {
+      expect(getOuterRadius("square", "extra-small")).toBe("rounded-xs");
     });
 
-    test("square shape returns rounded-sm for sm/md", () => {
-      expect(getOuterRadius("square", "sm")).toBe("rounded-sm");
-      expect(getOuterRadius("square", "md")).toBe("rounded-sm");
+    test("square shape returns rounded-sm for small/medium", () => {
+      expect(getOuterRadius("square", "small")).toBe("rounded-sm");
+      expect(getOuterRadius("square", "medium")).toBe("rounded-sm");
     });
 
-    test("square shape returns rounded-lg for lg", () => {
-      expect(getOuterRadius("square", "lg")).toBe("rounded-lg");
+    test("square shape returns rounded-lg for large", () => {
+      expect(getOuterRadius("square", "large")).toBe("rounded-lg");
     });
 
-    test("square shape returns rounded-[20px] for xl", () => {
-      expect(getOuterRadius("square", "xl")).toBe("rounded-[20px]");
+    test("square shape returns rounded-[20px] for extra-large", () => {
+      expect(getOuterRadius("square", "extra-large")).toBe("rounded-[20px]");
     });
   });
 
@@ -748,56 +748,54 @@ describe("ButtonGroup.utils", () => {
       onSelectionChange: vi.fn(),
       connectedInnerRadius: getInnerRadius(size),
       connectedOuterRadius: getOuterRadius(shape, size),
-      enforceMinWidth: size === "xs" || size === "sm",
+      enforceMinWidth: size === "extra-small" || size === "small",
     });
 
-    test("round md returns inner rounded-sm + full outer pseudo classes", () => {
-      const classes = getConnectedRadiusClasses(makeCtx("md", "round"));
+    test("round medium returns inner rounded-sm + graduated outer pseudo classes", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("medium", "round"));
       expect(classes).toContain("rounded-sm");
-      expect(classes).toContain("first:rounded-s-full");
-      expect(classes).toContain("last:rounded-e-full");
+      expect(classes).toContain("first:rounded-s-3xl");
+      expect(classes).toContain("last:rounded-e-3xl");
     });
 
-    test("round xs returns rounded-xs inner radius", () => {
-      const classes = getConnectedRadiusClasses(makeCtx("xs", "round"));
+    test("round extra-small returns rounded-xs inner radius", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("extra-small", "round"));
       expect(classes).toContain("rounded-xs");
-      expect(classes).toContain("first:rounded-s-full");
+      expect(classes).toContain("first:rounded-s-lg");
     });
 
-    test("round lg returns rounded-lg inner + logical outer/inner corner overrides", () => {
-      const classes = getConnectedRadiusClasses(makeCtx("lg", "round"));
+    test("round large returns rounded-lg inner + graduated outer pseudo classes", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("large", "round"));
       expect(classes).toContain("rounded-lg");
-      expect(classes).toContain("first:rounded-s-full");
-      expect(classes).toContain("first:rounded-e-lg");
-      expect(classes).toContain("last:rounded-e-full");
-      expect(classes).toContain("last:rounded-s-lg");
+      expect(classes).toContain("first:rounded-s-4xl");
+      expect(classes).toContain("last:rounded-e-4xl");
     });
 
-    test("round lg returns same classes regardless of selection (no extra rounded-full)", () => {
+    test("round large returns same classes regardless of selection (no extra rounded-full)", () => {
       const withSelection: ButtonGroupContextValue = {
-        ...makeCtx("lg", "round"),
+        ...makeCtx("large", "round"),
         selectedValues: new Set(["a"]),
       };
-      expect(getConnectedRadiusClasses(makeCtx("lg", "round"))).toEqual(
+      expect(getConnectedRadiusClasses(makeCtx("large", "round"))).toEqual(
         getConnectedRadiusClasses(withSelection)
       );
     });
 
-    test("round xl returns rounded-[20px] inner radius", () => {
-      const classes = getConnectedRadiusClasses(makeCtx("xl", "round"));
+    test("round extra-large returns rounded-[20px] inner radius", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("extra-large", "round"));
       expect(classes).toContain("rounded-[20px]");
-      expect(classes).toContain("first:rounded-s-full");
+      expect(classes).toContain("first:rounded-s-4xl");
     });
 
-    test("square md returns inner rounded-sm + square outer pseudo classes", () => {
-      const classes = getConnectedRadiusClasses(makeCtx("md", "square"));
+    test("square medium returns inner rounded-sm + square outer pseudo classes", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("medium", "square"));
       expect(classes).toContain("rounded-sm");
       expect(classes).toContain("first:rounded-s-sm");
       expect(classes).toContain("last:rounded-e-sm");
     });
 
-    test("square xl returns rounded-[20px] for both inner and outer", () => {
-      const classes = getConnectedRadiusClasses(makeCtx("xl", "square"));
+    test("square extra-large returns rounded-[20px] for both inner and outer", () => {
+      const classes = getConnectedRadiusClasses(makeCtx("extra-large", "square"));
       expect(classes).toContain("rounded-[20px]");
       expect(classes).toContain("first:rounded-s-[20px]");
       expect(classes).toContain("last:rounded-e-[20px]");
@@ -821,9 +819,9 @@ describe("ButtonGroupHeadless enhanced context", () => {
     );
   };
 
-  test("provides connectedInnerRadius = rounded-sm for connected md", () => {
+  test("provides connectedInnerRadius = rounded-sm for connected medium", () => {
     render(
-      <ButtonGroupHeadless variant="connected" size="md" shape="round">
+      <ButtonGroupHeadless variant="connected" size="medium" shape="round">
         <ContextCapture />
       </ButtonGroupHeadless>
     );
@@ -834,7 +832,7 @@ describe("ButtonGroupHeadless enhanced context", () => {
 
   test("provides connectedOuterRadius = rounded-full for round shape", () => {
     render(
-      <ButtonGroupHeadless variant="connected" size="md" shape="round">
+      <ButtonGroupHeadless variant="connected" size="medium" shape="round">
         <ContextCapture />
       </ButtonGroupHeadless>
     );
@@ -842,9 +840,9 @@ describe("ButtonGroupHeadless enhanced context", () => {
     expect(el?.getAttribute("data-outer")).toBe("rounded-full");
   });
 
-  test("provides connectedOuterRadius = rounded-sm for square md", () => {
+  test("provides connectedOuterRadius = rounded-sm for square medium", () => {
     render(
-      <ButtonGroupHeadless variant="connected" size="md" shape="square">
+      <ButtonGroupHeadless variant="connected" size="medium" shape="square">
         <ContextCapture />
       </ButtonGroupHeadless>
     );
@@ -852,9 +850,9 @@ describe("ButtonGroupHeadless enhanced context", () => {
     expect(el?.getAttribute("data-outer")).toBe("rounded-sm");
   });
 
-  test("enforceMinWidth = true for connected xs", () => {
+  test("enforceMinWidth = true for connected extra-small", () => {
     render(
-      <ButtonGroupHeadless variant="connected" size="xs">
+      <ButtonGroupHeadless variant="connected" size="extra-small">
         <ContextCapture />
       </ButtonGroupHeadless>
     );
@@ -862,9 +860,9 @@ describe("ButtonGroupHeadless enhanced context", () => {
     expect(el?.getAttribute("data-min-width")).toBe("true");
   });
 
-  test("enforceMinWidth = true for connected sm", () => {
+  test("enforceMinWidth = true for connected small", () => {
     render(
-      <ButtonGroupHeadless variant="connected" size="sm">
+      <ButtonGroupHeadless variant="connected" size="small">
         <ContextCapture />
       </ButtonGroupHeadless>
     );
@@ -872,9 +870,9 @@ describe("ButtonGroupHeadless enhanced context", () => {
     expect(el?.getAttribute("data-min-width")).toBe("true");
   });
 
-  test("enforceMinWidth = false for connected md", () => {
+  test("enforceMinWidth = false for connected medium", () => {
     render(
-      <ButtonGroupHeadless variant="connected" size="md">
+      <ButtonGroupHeadless variant="connected" size="medium">
         <ContextCapture />
       </ButtonGroupHeadless>
     );
@@ -884,7 +882,7 @@ describe("ButtonGroupHeadless enhanced context", () => {
 
   test("enforceMinWidth = false for standard variant regardless of size", () => {
     render(
-      <ButtonGroupHeadless variant="standard" size="xs">
+      <ButtonGroupHeadless variant="standard" size="extra-small">
         <ContextCapture />
       </ButtonGroupHeadless>
     );

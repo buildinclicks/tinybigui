@@ -13,7 +13,7 @@ export type ButtonGroupVariant = "standard" | "connected";
  *
  * Maps to MD3 button height tiers. Controls inner gap between buttons.
  */
-export type ButtonGroupSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type ButtonGroupSize = "extra-small" | "small" | "medium" | "large" | "extra-large";
 
 /**
  * Corner shape applied to child buttons (Material Design 3)
@@ -73,8 +73,8 @@ export interface ButtonGroupContextValue {
    * Tailwind class for the inner (adjacent) corner radius in the connected variant.
    * Applied to all four corners of every button in a connected group.
    *
-   * @example 'rounded-sm' // for xs/sm/md sizes
-   * @example 'rounded-lg' // for lg size
+   * @example 'rounded-sm' // for extra-small/small/medium sizes
+   * @example 'rounded-lg' // for large size
    */
   connectedInnerRadius: string;
 
@@ -83,13 +83,13 @@ export interface ButtonGroupContextValue {
    * Applied to the start-side of the first button and end-side of the last button.
    *
    * @example 'rounded-full' // for round shape
-   * @example 'rounded-sm'   // for square shape + xs/sm/md sizes
+   * @example 'rounded-sm'   // for square shape + extra-small/small/medium sizes
    */
   connectedOuterRadius: string;
 
   /**
    * Whether child buttons should enforce a minimum width of `min-w-12` (48dp).
-   * `true` only for `connected` variant at `xs` or `sm` size — required by MD3
+   * `true` only for `connected` variant at `extra-small` or `small` size — required by MD3
    * to preserve the 48dp touch target at smaller sizes.
    *
    * @default false
@@ -108,7 +108,7 @@ export interface ButtonGroupContextValue {
  * @example
  * ```tsx
  * // Standard icon-button group (no selection)
- * <ButtonGroup variant="standard" size="md">
+ * <ButtonGroup variant="standard" size="medium">
  *   <IconButton aria-label="Bluetooth"><BluetoothIcon /></IconButton>
  *   <IconButton aria-label="Alarm"><AlarmIcon /></IconButton>
  * </ButtonGroup>
@@ -147,7 +147,7 @@ export interface ButtonGroupProps extends Omit<React.HTMLAttributes<HTMLDivEleme
    * Size tier shared across all child buttons.
    * Controls inner gap values per MD3 spec.
    *
-   * @default 'md'
+   * @default 'medium'
    */
   size?: ButtonGroupSize;
 
