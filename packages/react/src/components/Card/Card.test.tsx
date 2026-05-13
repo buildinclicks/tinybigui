@@ -4,6 +4,11 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { CardHeadless } from "./CardHeadless";
+import { Card } from "./Card";
+import { CardMedia } from "./CardMedia";
+import { CardHeader } from "./CardHeader";
+import { CardContent } from "./CardContent";
+import { CardActions } from "./CardActions";
 
 // ─── Non-interactive mode ─────────────────────────────────────────────────────
 
@@ -205,5 +210,148 @@ describe("CardHeadless — axe", () => {
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
+  });
+});
+
+// ─── Styled Card — Variant classes ────────────────────────────────────────────
+
+describe("Card — variant classes", () => {
+  test("17. elevated variant: applies bg-surface-container-low and shadow-elevation-1", () => {
+    const { container } = render(<Card variant="elevated">Card</Card>);
+    const card = container.firstChild as HTMLElement;
+    expect(card).toHaveClass("bg-surface-container-low");
+    expect(card).toHaveClass("shadow-elevation-1");
+  });
+
+  test("18. filled variant: applies bg-surface-container-highest", () => {
+    const { container } = render(<Card variant="filled">Card</Card>);
+    const card = container.firstChild as HTMLElement;
+    expect(card).toHaveClass("bg-surface-container-highest");
+  });
+
+  test("19. outlined variant: applies bg-surface, border, and border-outline-variant", () => {
+    const { container } = render(<Card variant="outlined">Card</Card>);
+    const card = container.firstChild as HTMLElement;
+    expect(card).toHaveClass("bg-surface");
+    expect(card).toHaveClass("border");
+    expect(card).toHaveClass("border-outline-variant");
+  });
+
+  test("20. all variants: applies rounded-md (MD3 medium corner)", () => {
+    const { container: c1 } = render(<Card variant="elevated">Card</Card>);
+    const { container: c2 } = render(<Card variant="filled">Card</Card>);
+    const { container: c3 } = render(<Card variant="outlined">Card</Card>);
+    expect(c1.firstChild).toHaveClass("rounded-md");
+    expect(c2.firstChild).toHaveClass("rounded-md");
+    expect(c3.firstChild).toHaveClass("rounded-md");
+  });
+});
+
+// ─── Styled Card — State layer ────────────────────────────────────────────────
+
+describe("Card — state layer", () => {
+  test("21. interactive elevated: state layer div is present", () => {
+    render(
+      <Card variant="elevated" onPress={vi.fn()} aria-label="Interactive card">
+        Card
+      </Card>
+    );
+    expect(screen.getByTestId("card-state-layer")).toBeInTheDocument();
+  });
+
+  test("22. interactive: state layer has opacity-0 by default", () => {
+    render(
+      <Card onPress={vi.fn()} aria-label="Interactive card">
+        Card
+      </Card>
+    );
+    expect(screen.getByTestId("card-state-layer")).toHaveClass("opacity-0");
+  });
+
+  test("23. interactive: state layer has hover:opacity-8 class", () => {
+    render(
+      <Card onPress={vi.fn()} aria-label="Interactive card">
+        Card
+      </Card>
+    );
+    expect(screen.getByTestId("card-state-layer")).toHaveClass("hover:opacity-8");
+  });
+
+  test("24. non-interactive: no ripple container present", () => {
+    const { container } = render(<Card variant="elevated">Static card</Card>);
+    expect(container.querySelector("[data-ripple-container]")).not.toBeInTheDocument();
+  });
+});
+
+// ─── Styled Card — Sub-components ─────────────────────────────────────────────
+
+describe("Card — sub-components", () => {
+  test("25. CardMedia renders img with correct src and alt", () => {
+    render(<CardMedia src="/test.jpg" alt="Test image" />);
+    const img = screen.getByRole("img", { name: "Test image" });
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute("src", "/test.jpg");
+    expect(img).toHaveAttribute("alt", "Test image");
+  });
+
+  test("26. CardMedia with empty alt has role=presentation", () => {
+    const { container } = render(<CardMedia src="/decorative.jpg" alt="" />);
+    const img = container.querySelector("img");
+    expect(img).toHaveAttribute("role", "presentation");
+    expect(img).toHaveAttribute("alt", "");
+  });
+
+  test("27. CardHeader renders headline text", () => {
+    render(<CardHeader headline="Card Title" />);
+    expect(screen.getByText("Card Title")).toBeInTheDocument();
+  });
+
+  test("28. CardHeader renders subheader text when provided", () => {
+    render(<CardHeader headline="Title" subheader="Supporting text" />);
+    expect(screen.getByText("Supporting text")).toBeInTheDocument();
+  });
+
+  test("29. CardContent renders children", () => {
+    render(<CardContent>Body content here</CardContent>);
+    expect(screen.getByText("Body content here")).toBeInTheDocument();
+  });
+
+  test("30. CardActions renders children in a flex container with justify-end", () => {
+    const { container } = render(
+      <CardActions>
+        <button>Action</button>
+      </CardActions>
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).toHaveClass("flex");
+    expect(wrapper).toHaveClass("justify-end");
+    expect(screen.getByRole("button", { name: "Action" })).toBeInTheDocument();
+  });
+});
+
+// ─── Styled Card — Composition ────────────────────────────────────────────────
+
+describe("Card — composition", () => {
+  test("31. full composition renders without errors", () => {
+    const { container } = render(
+      <Card variant="elevated" onPress={vi.fn()} aria-label="Full card">
+        <CardMedia src="/image.jpg" alt="Card image" aspectRatio="16/9" />
+        <CardHeader headline="Card Title" subheader="Subtitle" />
+        <CardContent>
+          <p>Body text content</p>
+        </CardContent>
+        <CardActions>
+          <button>Action</button>
+        </CardActions>
+      </Card>
+    );
+    expect(container.firstChild).toBeInTheDocument();
+    expect(screen.getByText("Card Title")).toBeInTheDocument();
+    expect(screen.getByText("Body text content")).toBeInTheDocument();
+  });
+
+  test("32. Card renders with no children without error", () => {
+    const { container } = render(<Card variant="filled" />);
+    expect(container.firstChild).toBeInTheDocument();
   });
 });

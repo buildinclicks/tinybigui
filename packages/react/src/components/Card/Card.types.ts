@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import type { AriaButtonProps, PressEvent } from "react-aria";
 
 // ─── CardVariant ──────────────────────────────────────────────────────────────
@@ -118,7 +118,10 @@ export interface CardProps {
  * </CardHeadless>
  * ```
  */
-export interface CardHeadlessProps extends AriaButtonProps {
+export interface CardHeadlessProps
+  extends
+    AriaButtonProps,
+    Pick<HTMLAttributes<HTMLDivElement>, "onMouseDown" | "onMouseUp" | "onMouseLeave"> {
   /**
    * Additional CSS classes merged onto the root div element.
    */
