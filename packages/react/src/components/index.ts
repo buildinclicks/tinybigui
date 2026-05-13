@@ -156,6 +156,16 @@ export type {
   SnackbarItem,
 } from "./Snackbar";
 
+export { Chip, ChipSet, ChipHeadless, chipVariants } from "./Chip";
+export type {
+  ChipType,
+  ChipSurface,
+  ChipProps,
+  ChipHeadlessProps,
+  ChipSetProps,
+  ChipVariants,
+} from "./Chip";
+
 export {
   Dialog,
   DialogHeadline,

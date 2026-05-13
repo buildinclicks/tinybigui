@@ -315,6 +315,14 @@ describe("Chip — filter checkmark", () => {
     const checkmarkContainer = container.querySelector(".w-0.opacity-0");
     expect(checkmarkContainer).toBeInTheDocument();
   });
+
+  test("37a. filter chip always has transition-[background-color,color] duration-short4 ease-standard", () => {
+    render(<Chip type="filter" label="Veg" />);
+    const chip = screen.getByRole("button", { name: "Veg" });
+    expect(chip).toHaveClass("transition-[background-color,color]");
+    expect(chip).toHaveClass("duration-short4");
+    expect(chip).toHaveClass("ease-standard");
+  });
 });
 
 // ---------------------------------------------------------------------------

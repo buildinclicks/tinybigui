@@ -26,8 +26,13 @@ export const chipVariants = cva(
        */
       chipType: {
         assist: "",
-        // Filter and Input chips have a fixed tonal surface style
-        filter: "bg-surface-container-low text-on-surface border border-outline",
+        // Filter and Input chips have a fixed tonal surface style.
+        // The transition is on the base class so deselection also animates
+        // (adding it only in the selected compound variant would mean the
+        // transition property disappears at the same moment the color reverts,
+        // causing an instant jump back to the unselected color).
+        filter:
+          "bg-surface-container-low text-on-surface border border-outline transition-[background-color,color] duration-short4 ease-standard",
         input: "bg-surface-container-low text-on-surface border border-outline",
         suggestion: "",
       },
@@ -114,10 +119,7 @@ export const chipVariants = cva(
       {
         chipType: "filter",
         selected: true,
-        className: [
-          "bg-secondary-container text-on-secondary-container border-0",
-          "transition-[background-color,color] duration-short4 ease-standard",
-        ],
+        className: "bg-secondary-container text-on-secondary-container border-0",
       },
 
       // ── Disabled overrides — placed last so they always win ────────────────
