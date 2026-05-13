@@ -161,6 +161,25 @@ export type {
 } from "./components/Divider";
 
 export {
+  Card,
+  CardMedia,
+  CardHeader,
+  CardContent,
+  CardActions,
+  CardHeadless,
+  cardVariants,
+} from "./components/Card";
+export type {
+  CardVariant,
+  CardProps,
+  CardHeadlessProps,
+  CardMediaProps,
+  CardHeaderProps,
+  CardContentProps,
+  CardActionsProps,
+} from "./components/Card";
+
+export {
   MenuTrigger,
   Menu,
   MenuItem,
@@ -204,6 +223,16 @@ export type {
   SnackbarAction,
   SnackbarItem,
 } from "./components/Snackbar";
+
+export { Chip, ChipSet, ChipHeadless, chipVariants } from "./components/Chip";
+export type {
+  ChipType,
+  ChipSurface,
+  ChipProps,
+  ChipHeadlessProps,
+  ChipSetProps,
+  ChipVariants,
+} from "./components/Chip";
 
 export {
   Dialog,

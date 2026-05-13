@@ -93,6 +93,25 @@ export type {
 } from "./Divider";
 
 export {
+  Card,
+  CardMedia,
+  CardHeader,
+  CardContent,
+  CardActions,
+  CardHeadless,
+  cardVariants,
+} from "./Card";
+export type {
+  CardVariant,
+  CardProps,
+  CardHeadlessProps,
+  CardMediaProps,
+  CardHeaderProps,
+  CardContentProps,
+  CardActionsProps,
+} from "./Card";
+
+export {
   MenuTrigger,
   Menu,
   MenuItem,
@@ -136,6 +155,16 @@ export type {
   SnackbarAction,
   SnackbarItem,
 } from "./Snackbar";
+
+export { Chip, ChipSet, ChipHeadless, chipVariants } from "./Chip";
+export type {
+  ChipType,
+  ChipSurface,
+  ChipProps,
+  ChipHeadlessProps,
+  ChipSetProps,
+  ChipVariants,
+} from "./Chip";
 
 export {
   Dialog,
