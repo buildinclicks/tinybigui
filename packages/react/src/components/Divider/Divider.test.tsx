@@ -76,10 +76,11 @@ describe("Divider", () => {
       expect(screen.getByText("Section")).toBeInTheDocument();
     });
 
-    test("label text element has text-on-surface-variant class", () => {
+    test("label text element has text-on-surface-variant and text-label-large classes", () => {
       render(<Divider label="Section" />);
       const labelEl = screen.getByText("Section");
       expect(labelEl).toHaveClass("text-on-surface-variant");
+      expect(labelEl).toHaveClass("text-label-large");
     });
 
     test("with label renders two separator elements plus label span", () => {

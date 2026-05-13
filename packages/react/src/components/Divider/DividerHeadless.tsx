@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import type { ForwardedRef } from "react";
 import { useSeparator } from "react-aria";
 
 import type { DividerHeadlessProps } from "./Divider.types";
@@ -34,11 +35,7 @@ export const DividerHeadless = forwardRef<HTMLElement, DividerHeadlessProps>(
 
     if (orientation === "vertical") {
       return (
-        <div
-          {...separatorProps}
-          ref={ref as React.ForwardedRef<HTMLDivElement>}
-          className={className}
-        />
+        <div {...separatorProps} ref={ref as ForwardedRef<HTMLDivElement>} className={className} />
       );
     }
 
@@ -46,7 +43,7 @@ export const DividerHeadless = forwardRef<HTMLElement, DividerHeadlessProps>(
       <hr
         {...separatorProps}
         aria-orientation="horizontal"
-        ref={ref as React.ForwardedRef<HTMLHRElement>}
+        ref={ref as ForwardedRef<HTMLHRElement>}
         className={className}
       />
     );

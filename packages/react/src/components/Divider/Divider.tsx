@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import type { ForwardedRef } from "react";
 
 import { cn } from "../../utils/cn";
 import { DividerHeadless } from "./DividerHeadless";
@@ -37,7 +38,7 @@ export const Divider = forwardRef<HTMLElement, DividerProps>(
     if (label) {
       return (
         <div
-          ref={ref as React.ForwardedRef<HTMLDivElement>}
+          ref={ref as ForwardedRef<HTMLDivElement>}
           role="group"
           aria-label={label}
           className={cn("flex items-center gap-4", className)}
