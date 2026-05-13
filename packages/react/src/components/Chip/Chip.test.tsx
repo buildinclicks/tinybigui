@@ -1,8 +1,10 @@
 import { describe, test, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { ChipHeadless } from "./ChipHeadless";
+import { Chip } from "./Chip";
+import { ChipSet } from "./ChipSet";
 
 // ---------------------------------------------------------------------------
 // Assist chip (type="assist")
@@ -213,5 +215,209 @@ describe("ChipHeadless — General", () => {
     const { container } = render(<ChipHeadless type="assist" label="Set alarm" isDisabled />);
     const results = await axe(container);
     expect(results).toHaveNoViolations();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Chip (Styled) — base classes
+// ---------------------------------------------------------------------------
+
+describe("Chip — base classes", () => {
+  test("26. applies rounded-sm, h-8, text-label-large", () => {
+    render(<Chip type="assist" label="Help" />);
+    const chip = screen.getByRole("button", { name: "Help" });
+    expect(chip).toHaveClass("rounded-sm");
+    expect(chip).toHaveClass("h-8");
+    expect(chip).toHaveClass("text-label-large");
+  });
+
+  test("27. applies bg-surface-container-low for filter chip (unselected)", () => {
+    render(<Chip type="filter" label="Veg" />);
+    const chip = screen.getByRole("button", { name: "Veg" });
+    expect(chip).toHaveClass("bg-surface-container-low");
+  });
+
+  test("28. applies bg-secondary-container for filter chip (selected)", () => {
+    render(<Chip type="filter" label="Veg" selected />);
+    const chip = screen.getByRole("button", { name: "Veg" });
+    expect(chip).toHaveClass("bg-secondary-container");
+  });
+
+  test("29. applies border border-outline for filter chip (unselected)", () => {
+    render(<Chip type="filter" label="Veg" />);
+    const chip = screen.getByRole("button", { name: "Veg" });
+    expect(chip).toHaveClass("border");
+    expect(chip).toHaveClass("border-outline");
+  });
+
+  test("30. applies border-0 for filter chip (selected)", () => {
+    render(<Chip type="filter" label="Veg" selected />);
+    const chip = screen.getByRole("button", { name: "Veg" });
+    expect(chip).toHaveClass("border-0");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Chip — Assist chip surface
+// ---------------------------------------------------------------------------
+
+describe("Chip — Assist chip surface", () => {
+  test("31. tonal: applies bg-surface-container-low and border border-outline", () => {
+    render(<Chip type="assist" label="Help" surface="tonal" />);
+    const chip = screen.getByRole("button", { name: "Help" });
+    expect(chip).toHaveClass("bg-surface-container-low");
+    expect(chip).toHaveClass("border");
+    expect(chip).toHaveClass("border-outline");
+  });
+
+  test("32. elevated: applies shadow-elevation-1 and hover:shadow-elevation-2", () => {
+    render(<Chip type="assist" label="Help" surface="elevated" />);
+    const chip = screen.getByRole("button", { name: "Help" });
+    expect(chip).toHaveClass("shadow-elevation-1");
+    expect(chip).toHaveClass("hover:shadow-elevation-2");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Chip — disabled state
+// ---------------------------------------------------------------------------
+
+describe("Chip — disabled state", () => {
+  test("33. applies text-on-surface/38 and border-on-surface/12 when disabled", () => {
+    render(<Chip type="assist" label="Help" surface="tonal" isDisabled />);
+    const chip = screen.getByRole("button", { name: "Help" });
+    expect(chip).toHaveClass("text-on-surface/38");
+    expect(chip).toHaveClass("border-on-surface/12");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Chip — filter checkmark animation
+// ---------------------------------------------------------------------------
+
+describe("Chip — filter checkmark", () => {
+  test("34. checkmark container is present in DOM for filter chips", () => {
+    const { container } = render(<Chip type="filter" label="Veg" />);
+    // The checkmark span is a sibling of the label inside the chip
+    const spans = container.querySelectorAll("span");
+    // At least one span manages the checkmark width/opacity transition
+    expect(spans.length).toBeGreaterThan(0);
+  });
+
+  test("35. when selected: checkmark container has w-4.5 and opacity-100", () => {
+    const { container } = render(<Chip type="filter" label="Veg" selected />);
+    const checkmarkContainer = container.querySelector(".w-4\\.5.opacity-100");
+    expect(checkmarkContainer).toBeInTheDocument();
+  });
+
+  test("36. when unselected: checkmark container has w-0 and opacity-0", () => {
+    const { container } = render(<Chip type="filter" label="Veg" />);
+    const checkmarkContainer = container.querySelector(".w-0.opacity-0");
+    expect(checkmarkContainer).toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Chip — Input removal animation
+// ---------------------------------------------------------------------------
+
+describe("Chip — Input removal animation", () => {
+  test("37. clicking remove button adds animate-md-fade-out to chip root", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+    const { container } = render(<Chip type="input" label="React" onRemove={onRemove} />);
+    const chipRoot = container.firstChild as HTMLElement;
+
+    await user.click(screen.getByRole("button", { name: "Remove React" }));
+
+    expect(chipRoot).toHaveClass("animate-md-fade-out");
+  });
+
+  test("38. onRemove is NOT called immediately — only after animationend", async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+    const { container } = render(<Chip type="input" label="React" onRemove={onRemove} />);
+    const chipRoot = container.firstChild as HTMLElement;
+
+    await user.click(screen.getByRole("button", { name: "Remove React" }));
+    // onRemove should NOT have been called yet
+    expect(onRemove).not.toHaveBeenCalled();
+
+    // Simulate the CSS animation completing
+    fireEvent.animationEnd(chipRoot);
+    expect(onRemove).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Chip — ripple
+// ---------------------------------------------------------------------------
+
+describe("Chip — ripple", () => {
+  test("39. ripple container is present for interactive chips", () => {
+    const { container } = render(<Chip type="assist" label="Help" />);
+    expect(container.querySelector("[data-ripple-container]")).toBeInTheDocument();
+  });
+
+  test("40. ripple container is clipped to rounded-sm via rounded-[inherit]", () => {
+    const { container } = render(<Chip type="assist" label="Help" />);
+    const rippleContainer = container.querySelector("[data-ripple-container]");
+    expect(rippleContainer).toHaveClass("rounded-[inherit]");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Chip — padding
+// ---------------------------------------------------------------------------
+
+describe("Chip — padding", () => {
+  test("41. no icon: applies px-4", () => {
+    render(<Chip type="assist" label="Help" />);
+    const chip = screen.getByRole("button", { name: "Help" });
+    expect(chip).toHaveClass("px-4");
+  });
+
+  test("42. with leadingIcon: applies pl-3 pr-4", () => {
+    render(<Chip type="assist" label="Help" leadingIcon={<span>★</span>} />);
+    const chip = screen.getByRole("button", { name: "Help" });
+    expect(chip).toHaveClass("pl-3");
+    expect(chip).toHaveClass("pr-4");
+  });
+
+  test("43. input chip: applies pl-3 pr-3", () => {
+    const { container } = render(<Chip type="input" label="React" onRemove={vi.fn()} />);
+    const chipRoot = container.firstChild as HTMLElement;
+    expect(chipRoot).toHaveClass("pl-3");
+    expect(chipRoot).toHaveClass("pr-3");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ChipSet
+// ---------------------------------------------------------------------------
+
+describe("ChipSet", () => {
+  test("44. renders as div with flex flex-wrap gap-2", () => {
+    const { container } = render(
+      <ChipSet>
+        <Chip type="filter" label="React" />
+      </ChipSet>
+    );
+    const chipSet = container.firstChild as HTMLElement;
+    expect(chipSet.tagName).toBe("DIV");
+    expect(chipSet).toHaveClass("flex");
+    expect(chipSet).toHaveClass("flex-wrap");
+    expect(chipSet).toHaveClass("gap-2");
+  });
+
+  test("45. renders all children", () => {
+    render(
+      <ChipSet>
+        <Chip type="filter" label="React" />
+        <Chip type="filter" label="TypeScript" />
+      </ChipSet>
+    );
+    expect(screen.getByRole("button", { name: "React" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "TypeScript" })).toBeInTheDocument();
   });
 });

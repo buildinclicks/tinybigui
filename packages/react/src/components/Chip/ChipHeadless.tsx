@@ -18,7 +18,7 @@ import type { ChipHeadlessProps } from "./Chip.types";
  * Assist chip implementation — uses `useButton` (Enter/Space → onPress).
  */
 const AssistChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
-  ({ label, onPress, isDisabled, className, children }, forwardedRef) => {
+  ({ label, onPress, isDisabled, className, onMouseDown, children }, forwardedRef) => {
     const internalRef = useRef<HTMLButtonElement>(null);
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
@@ -30,8 +30,10 @@ const AssistChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       ref
     );
 
+    const mergedProps = mergeProps(buttonProps, { onMouseDown });
+
     return (
-      <button {...buttonProps} type="button" ref={ref} className={className}>
+      <button {...mergedProps} type="button" ref={ref} className={className}>
         {children ?? label}
       </button>
     );
@@ -45,7 +47,16 @@ AssistChipImpl.displayName = "AssistChipImpl";
  */
 const FilterChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
   (
-    { label, selected, defaultSelected, onSelectionChange, isDisabled, className, children },
+    {
+      label,
+      selected,
+      defaultSelected,
+      onSelectionChange,
+      isDisabled,
+      className,
+      onMouseDown,
+      children,
+    },
     forwardedRef
   ) => {
     const internalRef = useRef<HTMLButtonElement>(null);
@@ -61,8 +72,10 @@ const FilterChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
     const state = useToggleState(toggleProps);
     const { buttonProps } = useToggleButton(toggleProps, state, ref);
 
+    const mergedProps = mergeProps(buttonProps, { onMouseDown });
+
     return (
-      <button {...buttonProps} type="button" ref={ref} className={className}>
+      <button {...mergedProps} type="button" ref={ref} className={className}>
         {children ?? label}
       </button>
     );
@@ -79,7 +92,19 @@ FilterChipImpl.displayName = "FilterChipImpl";
  * element), not the outer `<span>` wrapper.
  */
 const InputChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
-  ({ label, onRemove, isDisabled, className, children }, forwardedRef) => {
+  (
+    {
+      label,
+      onRemove,
+      isDisabled,
+      className,
+      onMouseDown,
+      removeIcon,
+      removeButtonClassName,
+      children,
+    },
+    forwardedRef
+  ) => {
     const chipRef = useRef<HTMLButtonElement>(null);
     const ref = (forwardedRef ?? chipRef) as React.RefObject<HTMLButtonElement>;
     const removeRef = useRef<HTMLButtonElement>(null);
@@ -108,14 +133,21 @@ const InputChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       }
     };
 
-    const mergedChipProps = mergeProps(chipButtonProps, { onKeyDown: handleKeyDown });
+    const mergedChipProps = mergeProps(chipButtonProps, { onKeyDown: handleKeyDown, onMouseDown });
 
     return (
       <span className={className}>
         <button {...mergedChipProps} type="button" ref={ref}>
           {children ?? label}
         </button>
-        <button {...removeButtonProps} type="button" ref={removeRef} />
+        <button
+          {...removeButtonProps}
+          type="button"
+          ref={removeRef}
+          className={removeButtonClassName}
+        >
+          {removeIcon}
+        </button>
       </span>
     );
   }
@@ -126,7 +158,7 @@ InputChipImpl.displayName = "InputChipImpl";
  * Suggestion chip implementation — uses `useButton` (identical to Assist).
  */
 const SuggestionChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
-  ({ label, onPress, isDisabled, className, children }, forwardedRef) => {
+  ({ label, onPress, isDisabled, className, onMouseDown, children }, forwardedRef) => {
     const internalRef = useRef<HTMLButtonElement>(null);
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
@@ -138,8 +170,10 @@ const SuggestionChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       ref
     );
 
+    const mergedProps = mergeProps(buttonProps, { onMouseDown });
+
     return (
-      <button {...buttonProps} type="button" ref={ref} className={className}>
+      <button {...mergedProps} type="button" ref={ref} className={className}>
         {children ?? label}
       </button>
     );

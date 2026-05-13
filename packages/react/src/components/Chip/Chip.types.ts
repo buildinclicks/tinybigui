@@ -168,9 +168,26 @@ export interface ChipHeadlessProps {
   className?: string;
 
   /**
-   * Slot content rendered inside the chip (icons, label text, etc.).
+   * Slot content rendered inside the chip body (icons, label text, etc.).
    */
   children?: React.ReactNode;
+
+  /**
+   * Icon rendered inside the remove button (Input chips only).
+   * Typically an ×/close SVG.
+   */
+  removeIcon?: React.ReactNode;
+
+  /**
+   * Additional CSS classes applied to the remove button (Input chips only).
+   */
+  removeButtonClassName?: string;
+
+  /**
+   * Mouse-down handler forwarded to the chip body button.
+   * Used by the styled layer to trigger the ripple effect.
+   */
+  onMouseDown?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 /**
