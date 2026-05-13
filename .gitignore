@@ -48,6 +48,11 @@ info.txt
 .github-issues/
 learning-docs/
 
+# Generated doc exports (source .md files are tracked)
+docs/*.html
+docs/*.pdf
+docs/*.print.css
+
 
 *storybook.log
 storybook-static
