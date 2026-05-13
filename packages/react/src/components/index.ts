@@ -93,6 +93,25 @@ export type {
 } from "./Divider";
 
 export {
+  Card,
+  CardMedia,
+  CardHeader,
+  CardContent,
+  CardActions,
+  CardHeadless,
+  cardVariants,
+} from "./Card";
+export type {
+  CardVariant,
+  CardProps,
+  CardHeadlessProps,
+  CardMediaProps,
+  CardHeaderProps,
+  CardContentProps,
+  CardActionsProps,
+} from "./Card";
+
+export {
   MenuTrigger,
   Menu,
   MenuItem,

@@ -118,7 +118,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
           aria-hidden="true"
           className={cn(
             "bg-on-surface pointer-events-none absolute inset-0 rounded-md",
-            "opacity-0 group-hover:opacity-8 hover:opacity-8 data-[pressed]:opacity-12",
+            "opacity-0 group-hover:opacity-8 data-[pressed]:opacity-12",
             "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-opacity"
           )}
         />

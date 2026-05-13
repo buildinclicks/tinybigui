@@ -268,13 +268,13 @@ describe("Card — state layer", () => {
     expect(screen.getByTestId("card-state-layer")).toHaveClass("opacity-0");
   });
 
-  test("23. interactive: state layer has hover:opacity-8 class", () => {
+  test("23. interactive: state layer has group-hover:opacity-8 class", () => {
     render(
       <Card onPress={vi.fn()} aria-label="Interactive card">
         Card
       </Card>
     );
-    expect(screen.getByTestId("card-state-layer")).toHaveClass("hover:opacity-8");
+    expect(screen.getByTestId("card-state-layer")).toHaveClass("group-hover:opacity-8");
   });
 
   test("24. non-interactive: no ripple container present", () => {

@@ -161,6 +161,25 @@ export type {
 } from "./components/Divider";
 
 export {
+  Card,
+  CardMedia,
+  CardHeader,
+  CardContent,
+  CardActions,
+  CardHeadless,
+  cardVariants,
+} from "./components/Card";
+export type {
+  CardVariant,
+  CardProps,
+  CardHeadlessProps,
+  CardMediaProps,
+  CardHeaderProps,
+  CardContentProps,
+  CardActionsProps,
+} from "./components/Card";
+
+export {
   MenuTrigger,
   Menu,
   MenuItem,
