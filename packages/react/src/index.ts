@@ -151,6 +151,14 @@ export type {
 export { Progress, ProgressHeadless } from "./components/Progress";
 export type { ProgressProps, ProgressHeadlessProps } from "./components/Progress";
 
+export { Divider, DividerHeadless } from "./components/Divider";
+export type {
+  DividerProps,
+  DividerHeadlessProps,
+  DividerOrientation,
+  DividerInset,
+} from "./components/Divider";
+
 export {
   MenuTrigger,
   Menu,
