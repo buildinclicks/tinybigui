@@ -1,5 +1,16 @@
 # @tinybigui/react
 
+## 0.3.0
+
+### Minor Changes
+
+- Add MD3 Dialog component with basic and fullscreen variants, composable `DialogHeadline`, `DialogContent`, and `DialogActions` slots, focus trap, Escape-to-dismiss, and WCAG 2.1 AA accessibility via React Aria `useDialog`/`useOverlay`.
+- Add MD3 Menu component with `MenuTrigger`, `Menu`, `MenuItem`, `MenuSection`, and `MenuDivider`; full keyboard navigation (arrows, Home/End, Enter/Space, type-ahead); single and multi-select modes; and WCAG 2.1 AA accessibility via React Aria collections.
+- 5f22cde: Add `ContextMenuTrigger`, `SubmenuTrigger`, and `MenuGap`; expand headless menu primitives and types; update menu styles and stories.
+- Add MD3 Progress Indicator component with linear and circular variants, determinate and indeterminate modes, full WCAG 2.1 AA accessibility via `role="progressbar"`, and three-layer architecture (React Aria → Headless → Styled).
+- Add MD3 Snackbar component with `SnackbarProvider`, imperative `useSnackbar` hook, auto-dismiss timer, pause-on-hover/focus, action button support, multi-position placement, and WCAG 2.1 AA live-region accessibility.
+- 7cfb578: Add snackbar stacking with per-position queues and configurable `maxVisible` on `SnackbarProvider`; move layout positioning into the portal stack container; refine enter and exit animations; expose `--spacing-snackbar-max` in token CSS.
+
 ## 0.2.0
 
 ### Minor Changes

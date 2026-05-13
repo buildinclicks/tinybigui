@@ -1,5 +1,11 @@
 # @tinybigui/tokens
 
+## 0.3.0
+
+### Patch Changes
+
+- 7cfb578: Add snackbar stacking with per-position queues and configurable `maxVisible` on `SnackbarProvider`; move layout positioning into the portal stack container; refine enter and exit animations; expose `--spacing-snackbar-max` in token CSS.
+
 ## 0.2.0
 
 ### Minor Changes
