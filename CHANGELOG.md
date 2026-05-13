@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-13
+
+### Added
+
+#### `@tinybigui/react`
+
+- **Progress** — MD3 Linear and Circular Progress Indicators; determinate and indeterminate modes; `role="progressbar"` with `aria-valuenow`/`min`/`max`; three-layer architecture (React Aria → Headless → Styled)
+- **Dialog** — MD3 Basic and Fullscreen dialog variants; composable `DialogHeadline`, `DialogContent`, and `DialogActions` slots; focus trap; Escape-to-dismiss; WCAG 2.1 AA via React Aria `useDialog`/`useOverlay`
+- **Snackbar** — MD3 Snackbar with `SnackbarProvider` and imperative `useSnackbar` hook; auto-dismiss timer with pause-on-hover/focus; action button support; multi-position placement; stacked queues with configurable `maxVisible`; WCAG 2.1 AA live-region accessibility
+- **Menu** — MD3 Menu with `MenuTrigger`, `Menu`, `MenuItem`, `MenuSection`, `MenuDivider`, `MenuGap`, `ContextMenuTrigger`, and `SubmenuTrigger`; full keyboard navigation (arrows, Home/End, Enter/Space, type-ahead); single and multi-select modes; WCAG 2.1 AA via React Aria collections
+
+#### `@tinybigui/tokens`
+
+- Snackbar spacing token (`--spacing-snackbar-max`) added to Tailwind `@theme`
+
 ## [0.2.0] - 2026-04-25
 
 ### Added
@@ -80,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Checkbox inline styles** — Replaced `style={{ fill: "var(--color-on-primary)" }}` with a Tailwind CSS class, eliminating the only inline style violation in the codebase
 - **Axe accessibility coverage** — Verified all 7 components pass automated axe checks; added axe test coverage across the test suite
 
-[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/buildinclicks/tinybigui/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/buildinclicks/tinybigui/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/buildinclicks/tinybigui/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/buildinclicks/tinybigui/releases/tag/v0.1.0
