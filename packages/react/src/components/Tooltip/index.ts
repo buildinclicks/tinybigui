@@ -1,5 +1,6 @@
 // Layer 3: MD3 Styled Components (most users use these)
 export { TooltipTrigger } from "./TooltipTrigger";
+export type { TooltipTriggerStyledProps } from "./TooltipTrigger";
 export { Tooltip } from "./Tooltip";
 export { RichTooltip } from "./RichTooltip";
 
@@ -7,7 +8,12 @@ export { RichTooltip } from "./RichTooltip";
 export { TooltipTriggerHeadless, TooltipOverlayHeadless } from "./TooltipHeadless";
 
 // CVA Variants
-export { tooltipVariants, richTooltipVariants, type TooltipVariants } from "./Tooltip.variants";
+export {
+  tooltipVariants,
+  richTooltipVariants,
+  type TooltipVariants,
+  type RichTooltipVariants,
+} from "./Tooltip.variants";
 
 // Types
 export type {

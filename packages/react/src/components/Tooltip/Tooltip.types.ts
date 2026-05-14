@@ -139,7 +139,7 @@ export interface TooltipHeadlessProps {
   placement?: TooltipPlacement;
   /**
    * Distance in pixels between the trigger and the tooltip.
-   * @default 8
+   * @default 4
    */
   offset?: number;
 }

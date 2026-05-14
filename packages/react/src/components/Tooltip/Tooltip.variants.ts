@@ -68,3 +68,6 @@ export const richTooltipVariants = cva(
 
 /** Variant prop types inferred from `tooltipVariants`. */
 export type TooltipVariants = VariantProps<typeof tooltipVariants>;
+
+/** Variant prop types inferred from `richTooltipVariants`. */
+export type RichTooltipVariants = VariantProps<typeof richTooltipVariants>;

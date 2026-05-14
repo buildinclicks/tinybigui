@@ -147,7 +147,7 @@ export function TooltipOverlayHeadless({
   tooltipProps: incomingTooltipProps = {},
   triggerRef,
   placement = "top",
-  offset = 8,
+  offset = 4,
   className,
   children,
 }: TooltipHeadlessProps): JSX.Element | null {

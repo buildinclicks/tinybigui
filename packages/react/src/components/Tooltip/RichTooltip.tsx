@@ -51,7 +51,7 @@ export const RichTooltip = forwardRef<HTMLDivElement, RichTooltipProps>(
       >
         {title && <p className="text-on-surface text-title-small mb-1">{title}</p>}
         <p className="text-on-surface-variant text-body-medium">{children}</p>
-        {action && action}
+        {action}
       </div>
     );
   }

@@ -117,8 +117,12 @@ export function TooltipTrigger({
   /**
    * Stable callback — called by the tooltip element's `onAnimationEnd` event.
    * Unmounts the overlay after the exit animation completes.
+   *
+   * The guard ensures the entry animation's `animationend` event is ignored —
+   * only the exit animation should trigger unmounting.
    */
   const handleAnimationEnd = useCallback(() => {
+    if (!isExitingRef.current) return;
     isExitingRef.current = false;
     setIsMounted(false);
     setIsExiting(false);
