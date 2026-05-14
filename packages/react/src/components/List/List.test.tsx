@@ -478,6 +478,30 @@ describe("List — state layer", () => {
     expect(item).toHaveClass("duration-short4");
     expect(item).toHaveClass("ease-standard");
   });
+
+  test("35a. State layer has transition-opacity duration-short2 ease-standard", () => {
+    render(
+      <List aria-label="Test" selectionMode="single">
+        <ListItem value="1" headline="Item 1" />
+      </List>
+    );
+    const item = screen.getByRole("option", { name: "Item 1" });
+    const stateLayer = item.querySelector(".bg-on-surface");
+    expect(stateLayer).toHaveClass("transition-opacity");
+    expect(stateLayer).toHaveClass("duration-short2");
+    expect(stateLayer).toHaveClass("ease-standard");
+  });
+
+  test("35b. State layer has group-active:opacity-12 for press state", () => {
+    render(
+      <List aria-label="Test" selectionMode="single">
+        <ListItem value="1" headline="Item 1" />
+      </List>
+    );
+    const item = screen.getByRole("option", { name: "Item 1" });
+    const stateLayer = item.querySelector(".bg-on-surface");
+    expect(stateLayer).toHaveClass("group-active:opacity-12");
+  });
 });
 
 // ---------------------------------------------------------------------------

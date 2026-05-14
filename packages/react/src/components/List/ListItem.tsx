@@ -184,7 +184,7 @@ const InteractiveStyledListItem = forwardRef<HTMLLIElement, InteractiveStyledLis
       >
         <div
           aria-hidden="true"
-          className="bg-on-surface pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-8"
+          className="bg-on-surface duration-short2 ease-standard pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-8 group-active:opacity-12"
         />
         {ripples}
 
