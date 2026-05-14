@@ -51,6 +51,14 @@ export interface TooltipTriggerProps {
   defaultOpen?: boolean;
   /** Called when the open state changes. */
   onOpenChange?: (isOpen: boolean) => void;
+  /**
+   * Force-mount the overlay in the DOM even when `state.isOpen` is false.
+   * Used by `TooltipTrigger` to keep the overlay alive during the exit animation
+   * without feeding a controlled `isOpen=true` back into React Aria's state
+   * machine (which would cause an open/close conflict and infinite flicker).
+   * @default false
+   */
+  forceMount?: boolean;
 }
 
 /**

@@ -53,6 +53,7 @@ export function TooltipTriggerHeadless({
   isOpen,
   defaultOpen,
   onOpenChange,
+  forceMount = false,
 }: TooltipTriggerProps): JSX.Element {
   const triggerRef = useRef<HTMLElement>(null);
 
@@ -93,9 +94,10 @@ export function TooltipTriggerHeadless({
     : triggerChild;
 
   // Inject tooltipProps (id, role) + triggerRef onto the overlay element.
-  // This is only rendered while the tooltip is open to avoid unnecessary DOM.
+  // forceMount keeps the overlay alive during exit animations without overriding
+  // React Aria's isOpen state (which would cause an open/close conflict).
   const overlay =
-    state.isOpen && isValidElement(tooltipChild)
+    (state.isOpen || forceMount) && isValidElement(tooltipChild)
       ? cloneElement(tooltipChild as ReactElement<Partial<TooltipHeadlessProps>>, {
           tooltipProps: tooltipProps as Record<string, unknown>,
           triggerRef,

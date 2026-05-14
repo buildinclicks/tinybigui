@@ -145,7 +145,7 @@ export function TooltipTrigger({
     <TooltipAnimationContext.Provider value={contextValue}>
       <TooltipTriggerHeadless
         delay={delay}
-        isOpen={isMounted}
+        forceMount={isMounted}
         onOpenChange={handleOpenChange}
         {...(isDisabled !== undefined && { isDisabled })}
       >
