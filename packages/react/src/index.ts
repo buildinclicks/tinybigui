@@ -274,3 +274,28 @@ export type {
   TooltipVariants,
   RichTooltipVariants,
 } from "./components/Tooltip";
+
+export {
+  List,
+  ListItem,
+  ListItemLeading,
+  ListItemTrailing,
+  ListItemText,
+  ListHeadless,
+  ListItemHeadless,
+  listVariants,
+  listItemVariants,
+} from "./components/List";
+export type {
+  ListDensity,
+  ListLeadingType,
+  ListTrailingType,
+  ListProps,
+  ListItemProps,
+  ListItemLeadingProps,
+  ListItemTrailingProps,
+  ListItemTextProps,
+  ListHeadlessProps,
+  ListVariants,
+  ListItemVariants,
+} from "./components/List";
