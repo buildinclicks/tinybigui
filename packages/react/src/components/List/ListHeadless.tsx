@@ -16,7 +16,7 @@ interface ListContextValue {
 
 const ListContext = createContext<ListContextValue | null>(null);
 
-function useListContext(): ListContextValue | null {
+export function useListContext(): ListContextValue | null {
   return useContext(ListContext);
 }
 
