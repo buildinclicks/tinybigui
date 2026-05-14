@@ -475,14 +475,14 @@ describe("Tooltip (Plain styled)", () => {
     expect(screen.getByText("Tooltip text")).toHaveClass("max-w-50");
   });
 
-  test("25. entry animation class animate-md-fade-in present on mount", async () => {
+  test("25. entry animation class animate-md-scale-in present on mount", async () => {
     const user = userEvent.setup();
     renderStyledTooltip();
     await user.tab();
-    expect(screen.getByText("Tooltip text")).toHaveClass("animate-md-fade-in");
+    expect(screen.getByText("Tooltip text")).toHaveClass("animate-md-scale-in");
   });
 
-  test("26. exit animation class animate-md-fade-out added before unmount", async () => {
+  test("26. exit animation class animate-md-scale-out added before unmount", async () => {
     const user = userEvent.setup();
     renderStyledTooltip();
 
@@ -493,7 +493,7 @@ describe("Tooltip (Plain styled)", () => {
     // Move focus away — RA fires onOpenChange(false), isExiting becomes true.
     // jsdom never fires animationend so the tooltip stays mounted with exit class.
     await user.tab();
-    expect(screen.getByText("Tooltip text")).toHaveClass("animate-md-fade-out");
+    expect(screen.getByText("Tooltip text")).toHaveClass("animate-md-scale-out");
   });
 });
 

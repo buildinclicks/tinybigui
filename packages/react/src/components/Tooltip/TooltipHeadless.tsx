@@ -152,6 +152,8 @@ export function TooltipOverlayHeadless({
   offset = 4,
   className,
   children,
+  onPointerEnter,
+  onPointerLeave,
 }: TooltipHeadlessProps): JSX.Element | null {
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -180,6 +182,8 @@ export function TooltipOverlayHeadless({
       data-computed-placement={computedPlacement}
       {...mergeProps(tooltipProps, overlayProps)}
       className={className}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
     >
       {children}
     </div>,

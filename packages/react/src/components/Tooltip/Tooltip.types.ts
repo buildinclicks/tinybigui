@@ -150,4 +150,8 @@ export interface TooltipHeadlessProps {
    * @default 4
    */
   offset?: number;
+  /** Called when the pointer enters the overlay surface. */
+  onPointerEnter?: () => void;
+  /** Called when the pointer leaves the overlay surface. */
+  onPointerLeave?: () => void;
 }

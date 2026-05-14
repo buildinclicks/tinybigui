@@ -13,8 +13,8 @@ import type { TooltipProps } from "./Tooltip.types";
  * Renders a single-line text label with MD3 inverse-surface styling.
  * Animation is driven by the `TooltipAnimationContext` provided by
  * `TooltipTrigger`:
- * - Entry: `animate-md-fade-in`  (opacity 0 → 1)
- * - Exit:  `animate-md-fade-out` (opacity 1 → 0, kept mounted until animationend)
+ * - Entry: `animate-md-scale-in`  (scale 0.85 + fade → natural)
+ * - Exit:  `animate-md-scale-out` (natural → scale 0.85 + fade)
  *
  * MD3 Tokens applied:
  * - `bg-inverse-surface`     — inverted surface for max contrast

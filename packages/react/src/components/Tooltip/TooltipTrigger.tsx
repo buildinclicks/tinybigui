@@ -93,21 +93,26 @@ export function TooltipTrigger({
   const [isMounted, setIsMounted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
-  // Ref tracks isExiting without stale-closure risk inside stable callbacks.
   const isExitingRef = useRef(false);
+  const isPointerOverTooltipRef = useRef(false);
+  const pendingCloseRef = useRef(false);
 
   /**
    * Stable callback — React Aria calls this when it wants to open or close.
    *
-   * On open  → start entry animation (mount overlay, isExiting = false).
-   * On close → start exit animation (keep overlay, isExiting = true).
-   *            If already exiting, ignore to avoid double-triggering.
+   * On open  → cancel any pending close, mount overlay, play entry animation.
+   * On close → if pointer is over the tooltip surface, defer the close until
+   *            the pointer leaves (prevents flicker when hovering the portal).
+   *            Otherwise start exit animation immediately.
    */
   const handleOpenChange = useCallback((open: boolean) => {
     if (open) {
+      pendingCloseRef.current = false;
       isExitingRef.current = false;
       setIsMounted(true);
       setIsExiting(false);
+    } else if (isPointerOverTooltipRef.current) {
+      pendingCloseRef.current = true;
     } else if (!isExitingRef.current) {
       isExitingRef.current = true;
       setIsExiting(true);
@@ -124,8 +129,23 @@ export function TooltipTrigger({
   const handleAnimationEnd = useCallback(() => {
     if (!isExitingRef.current) return;
     isExitingRef.current = false;
+    pendingCloseRef.current = false;
     setIsMounted(false);
     setIsExiting(false);
+  }, []);
+
+  const handleOverlayPointerEnter = useCallback(() => {
+    isPointerOverTooltipRef.current = true;
+    pendingCloseRef.current = false;
+  }, []);
+
+  const handleOverlayPointerLeave = useCallback(() => {
+    isPointerOverTooltipRef.current = false;
+    if (pendingCloseRef.current && !isExitingRef.current) {
+      pendingCloseRef.current = false;
+      isExitingRef.current = true;
+      setIsExiting(true);
+    }
   }, []);
 
   const contextValue: TooltipAnimationContextValue = {
@@ -156,7 +176,13 @@ export function TooltipTrigger({
          *   - triggerRef   for useOverlayPosition
          * offset={4} = 4dp gap per MD3 spec.
          */}
-        <TooltipOverlayHeadless tooltipProps={{}} placement={placement} offset={4}>
+        <TooltipOverlayHeadless
+          tooltipProps={{}}
+          placement={placement}
+          offset={4}
+          onPointerEnter={handleOverlayPointerEnter}
+          onPointerLeave={handleOverlayPointerLeave}
+        >
           {tooltipChild}
         </TooltipOverlayHeadless>
       </TooltipTriggerHeadless>

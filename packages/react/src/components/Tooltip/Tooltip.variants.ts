@@ -10,8 +10,8 @@ import { cva, type VariantProps } from "class-variance-authority";
  * - text-body-small — MD3 body-small typography
  *
  * `isVisible` drives the entry/exit animation class:
- * - true  → animate-md-fade-in  (component entering)
- * - false → animate-md-fade-out (component exiting, kept mounted until animationend)
+ * - true  → animate-md-scale-in  (component entering with scale+fade)
+ * - false → animate-md-scale-out (component exiting with scale+fade)
  */
 export const tooltipVariants = cva(
   "absolute z-50 rounded-xs px-2 py-1 text-body-small bg-inverse-surface text-inverse-on-surface max-w-50",
@@ -23,8 +23,8 @@ export const tooltipVariants = cva(
        * @default true
        */
       isVisible: {
-        true: "animate-md-fade-in",
-        false: "animate-md-fade-out",
+        true: "animate-md-scale-in",
+        false: "animate-md-scale-out",
       },
     },
     defaultVariants: {
