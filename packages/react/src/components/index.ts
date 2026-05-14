@@ -103,6 +103,7 @@ export {
 } from "./Card";
 export type {
   CardVariant,
+  CardVariants,
   CardProps,
   CardHeadlessProps,
   CardMediaProps,

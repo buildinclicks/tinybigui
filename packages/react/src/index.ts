@@ -171,6 +171,7 @@ export {
 } from "./components/Card";
 export type {
   CardVariant,
+  CardVariants,
   CardProps,
   CardHeadlessProps,
   CardMediaProps,

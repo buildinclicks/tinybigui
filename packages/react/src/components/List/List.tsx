@@ -1,6 +1,7 @@
 "use client";
 
 import { Children, forwardRef } from "react";
+import type React from "react";
 import { cn } from "../../utils/cn";
 import { ListHeadless } from "./ListHeadless";
 import { listVariants } from "./List.variants";
