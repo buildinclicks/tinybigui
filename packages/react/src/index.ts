@@ -253,3 +253,24 @@ export type {
   DialogActionsProps,
   DialogContextValue,
 } from "./components/Dialog";
+
+export {
+  TooltipTrigger,
+  Tooltip,
+  RichTooltip,
+  TooltipTriggerHeadless,
+  TooltipOverlayHeadless,
+  tooltipVariants,
+  richTooltipVariants,
+} from "./components/Tooltip";
+export type {
+  TooltipVariant,
+  TooltipPlacement,
+  TooltipTriggerProps,
+  TooltipTriggerStyledProps,
+  TooltipProps,
+  RichTooltipProps,
+  TooltipHeadlessProps,
+  TooltipVariants,
+  RichTooltipVariants,
+} from "./components/Tooltip";
