@@ -6,6 +6,7 @@ export { SplitButtonHeadless } from "./SplitButtonHeadless";
 
 // ─── CVA Variants ─────────────────────────────────────────────────────────────
 export {
+  splitButtonVariants,
   splitButtonContainerVariants,
   splitButtonPrimaryVariants,
   splitButtonDropdownVariants,

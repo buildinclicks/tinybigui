@@ -287,6 +287,7 @@ export type {
 export {
   SplitButton,
   SplitButtonHeadless,
+  splitButtonVariants,
   splitButtonContainerVariants,
   splitButtonPrimaryVariants,
   splitButtonDropdownVariants,

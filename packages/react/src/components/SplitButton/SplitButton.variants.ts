@@ -111,3 +111,13 @@ export const splitButtonDropdownVariants = cva(
 export type SplitButtonContainerVariants = VariantProps<typeof splitButtonContainerVariants>;
 export type SplitButtonPrimaryVariants = VariantProps<typeof splitButtonPrimaryVariants>;
 export type SplitButtonDropdownVariants = VariantProps<typeof splitButtonDropdownVariants>;
+
+/**
+ * Convenience bundle of all three Split Button CVA functions.
+ * Useful for consumers that want a single import point.
+ */
+export const splitButtonVariants = {
+  container: splitButtonContainerVariants,
+  primary: splitButtonPrimaryVariants,
+  dropdown: splitButtonDropdownVariants,
+};
