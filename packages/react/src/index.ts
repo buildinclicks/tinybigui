@@ -171,6 +171,7 @@ export {
 } from "./components/Card";
 export type {
   CardVariant,
+  CardVariants,
   CardProps,
   CardHeadlessProps,
   CardMediaProps,
@@ -275,6 +276,30 @@ export type {
   RichTooltipVariants,
 } from "./components/Tooltip";
 
+export {
+  List,
+  ListItem,
+  ListItemLeading,
+  ListItemTrailing,
+  ListItemText,
+  ListHeadless,
+  ListItemHeadless,
+  listVariants,
+  listItemVariants,
+} from "./components/List";
+export type {
+  ListDensity,
+  ListLeadingType,
+  ListTrailingType,
+  ListProps,
+  ListItemProps,
+  ListItemLeadingProps,
+  ListItemTrailingProps,
+  ListItemTextProps,
+  ListHeadlessProps,
+  ListVariants,
+  ListItemVariants,
+} from "./components/List";
 export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./components/Badge";
 export type {
   BadgeProps,
