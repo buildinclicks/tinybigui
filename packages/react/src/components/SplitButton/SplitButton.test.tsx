@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { createRef } from "react";
 import { SplitButtonHeadless } from "./SplitButtonHeadless";
+import { SplitButton } from "./SplitButton";
 import type { SplitButtonMenuItem } from "./SplitButton.types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -267,6 +268,145 @@ describe("SplitButtonHeadless", () => {
 
       const results = await axe(container);
       expect(results).toHaveNoViolations();
+    });
+  });
+});
+
+// ─── SplitButton (Styled Layer 3) ────────────────────────────────────────────
+
+const styledDefaultItems: SplitButtonMenuItem[] = [
+  { label: "Save as PDF", onAction: vi.fn() },
+  { label: "Save as PNG", onAction: vi.fn() },
+];
+
+function renderStyledSplitButton(props: Partial<React.ComponentProps<typeof SplitButton>> = {}) {
+  const defaultProps = {
+    primaryLabel: "Save",
+    onPrimaryAction: vi.fn(),
+    items: styledDefaultItems,
+  };
+
+  return render(<SplitButton {...defaultProps} {...props} />);
+}
+
+describe("SplitButton (Styled)", () => {
+  describe("Variant Classes", () => {
+    // Test 19: variant="filled" applies bg-primary class to container
+    test('variant="filled" applies bg-primary class to container', () => {
+      renderStyledSplitButton({ variant: "filled" });
+      const container = screen.getByRole("group");
+      expect(container).toHaveClass("bg-primary");
+    });
+
+    // Test 20: variant="tonal" applies bg-secondary-container class
+    test('variant="tonal" applies bg-secondary-container class', () => {
+      renderStyledSplitButton({ variant: "tonal" });
+      const container = screen.getByRole("group");
+      expect(container).toHaveClass("bg-secondary-container");
+    });
+
+    // Test 21: variant="outlined" applies border border-outline class
+    test('variant="outlined" applies border border-outline class', () => {
+      renderStyledSplitButton({ variant: "outlined" });
+      const container = screen.getByRole("group");
+      expect(container).toHaveClass("border");
+      expect(container).toHaveClass("border-outline");
+    });
+  });
+
+  describe("Visual Divider", () => {
+    // Test 22: Visual divider present between segments
+    test("visual divider present between segments", () => {
+      renderStyledSplitButton();
+      const divider = screen.getByTestId("split-button-divider");
+      expect(divider).toBeInTheDocument();
+    });
+  });
+
+  describe("Chevron Icon", () => {
+    // Test 23: Dropdown trigger shows chevron icon
+    test("dropdown trigger shows chevron icon", () => {
+      renderStyledSplitButton();
+      const chevron = screen.getByTestId("split-button-chevron");
+      expect(chevron).toBeInTheDocument();
+    });
+
+    // Test 24: Chevron rotates when menu is open
+    test("chevron rotates when menu is open", async () => {
+      const user = userEvent.setup();
+      renderStyledSplitButton();
+
+      const chevron = screen.getByTestId("split-button-chevron");
+      expect(chevron).not.toHaveClass("rotate-180");
+
+      const buttons = screen.getAllByRole("button");
+      const dropdownTrigger = buttons.find((btn) => btn.getAttribute("aria-haspopup") === "menu")!;
+      await user.click(dropdownTrigger);
+
+      expect(chevron).toHaveClass("rotate-180");
+    });
+  });
+
+  describe("State Layers", () => {
+    // Test 25: State layer present inside primary segment
+    test("state layer present inside primary segment", () => {
+      renderStyledSplitButton();
+      const stateLayer = screen.getByTestId("primary-state-layer");
+      expect(stateLayer).toBeInTheDocument();
+      expect(stateLayer).toHaveClass("pointer-events-none");
+      expect(stateLayer).toHaveClass("absolute");
+      expect(stateLayer).toHaveClass("inset-0");
+    });
+
+    // Test 26: State layer present inside dropdown trigger
+    test("state layer present inside dropdown trigger", () => {
+      renderStyledSplitButton();
+      const stateLayer = screen.getByTestId("dropdown-state-layer");
+      expect(stateLayer).toBeInTheDocument();
+      expect(stateLayer).toHaveClass("pointer-events-none");
+      expect(stateLayer).toHaveClass("absolute");
+      expect(stateLayer).toHaveClass("inset-0");
+    });
+  });
+
+  describe("Menu Integration", () => {
+    // Test 27: Menu renders when dropdown is clicked (menu items visible)
+    test("menu renders when dropdown is clicked", async () => {
+      const user = userEvent.setup();
+      renderStyledSplitButton();
+
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+
+      const buttons = screen.getAllByRole("button");
+      const dropdownTrigger = buttons.find((btn) => btn.getAttribute("aria-haspopup") === "menu")!;
+      await user.click(dropdownTrigger);
+
+      expect(screen.getByRole("menu")).toBeInTheDocument();
+      expect(screen.getByRole("menuitem", { name: "Save as PDF" })).toBeInTheDocument();
+      expect(screen.getByRole("menuitem", { name: "Save as PNG" })).toBeInTheDocument();
+    });
+
+    // Test 28: Menu closes after menu item is selected
+    test("menu closes after menu item is selected", async () => {
+      const user = userEvent.setup();
+      const onAction = vi.fn();
+      const items: SplitButtonMenuItem[] = [
+        { label: "Export PDF", onAction },
+        { label: "Export PNG", onAction: vi.fn() },
+      ];
+      renderStyledSplitButton({ items });
+
+      const buttons = screen.getAllByRole("button");
+      const dropdownTrigger = buttons.find((btn) => btn.getAttribute("aria-haspopup") === "menu")!;
+      await user.click(dropdownTrigger);
+
+      const menuItem = screen.getByRole("menuitem", { name: "Export PDF" });
+      await user.click(menuItem);
+
+      expect(onAction).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
     });
   });
 });

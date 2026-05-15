@@ -283,3 +283,21 @@ export type {
   BadgeColor,
   BadgeVariants,
 } from "./components/Badge";
+
+export {
+  SplitButton,
+  SplitButtonHeadless,
+  splitButtonContainerVariants,
+  splitButtonPrimaryVariants,
+  splitButtonDropdownVariants,
+} from "./components/SplitButton";
+export type {
+  SplitButtonProps,
+  SplitButtonHeadlessProps,
+  SplitButtonVariant,
+  SplitButtonSize,
+  SplitButtonMenuItem,
+  SplitButtonContainerVariants,
+  SplitButtonPrimaryVariants,
+  SplitButtonDropdownVariants,
+} from "./components/SplitButton";
