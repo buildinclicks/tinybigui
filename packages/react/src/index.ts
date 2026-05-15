@@ -302,3 +302,22 @@ export type {
   SplitButtonPrimaryVariants,
   SplitButtonDropdownVariants,
 } from "./components/SplitButton";
+
+export {
+  FABMenu,
+  FABMenuItem,
+  FABMenuHeadless,
+  FABMenuContext,
+  useFABMenuContext,
+  fabMenuVariants,
+  fabMenuItemVariants,
+} from "./components/FABMenu";
+export type {
+  FABMenuDirection,
+  FABMenuProps,
+  FABMenuItemProps,
+  FABMenuHeadlessProps,
+  FABMenuContextValue,
+  FABMenuVariants,
+  FABMenuItemVariants,
+} from "./components/FABMenu";

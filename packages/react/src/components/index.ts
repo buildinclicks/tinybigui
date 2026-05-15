@@ -215,3 +215,22 @@ export type {
   BadgeColor,
   BadgeVariants,
 } from "./Badge";
+
+export {
+  FABMenu,
+  FABMenuItem,
+  FABMenuHeadless,
+  FABMenuContext,
+  useFABMenuContext,
+  fabMenuVariants,
+  fabMenuItemVariants,
+} from "./FABMenu";
+export type {
+  FABMenuDirection,
+  FABMenuProps,
+  FABMenuItemProps,
+  FABMenuHeadlessProps,
+  FABMenuContextValue,
+  FABMenuVariants,
+  FABMenuItemVariants,
+} from "./FABMenu";
