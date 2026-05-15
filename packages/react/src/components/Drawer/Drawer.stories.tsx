@@ -431,6 +431,14 @@ export const WithBadgeConfig: Story = {
 
 export const IconOnlyMode: Story = {
   name: "Standard — Icon-only mode",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Drawer with `iconOnly={true}` narrows to 80dp — a Navigation Rail prep step. Labels are hidden but each item receives a native browser `title` tooltip; hover an icon to see its label name. Active indicator, ripple, and disabled states all remain functional.",
+      },
+    },
+  },
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open iconOnly aria-label="App navigation">
@@ -504,6 +512,182 @@ export const HeadlessPrimitive: Story = {
       </HeadlessDrawer>
     </div>
   ),
+};
+
+// ─── WithSectionDividers ─────────────────────────────────────────────────────
+
+export const WithSectionDividers: Story = {
+  name: "Standard — Section dividers (auto-suppressed on first)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two `DrawerSection` components both with `showDivider`. The `Drawer` wrapper automatically suppresses the divider on the first section, so only the second section renders the horizontal `Divider` — matching the MD3 Navigation Drawer spec for visual grouping.",
+      },
+    },
+  },
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open aria-label="App navigation">
+        <div className="px-4 pt-6 pb-4">
+          <span className="text-headline-small text-on-surface">Mail</span>
+        </div>
+        <DrawerSection showDivider>
+          <DrawerItem icon={<InboxIcon />} label="Inbox" isActive />
+          <DrawerItem icon={<StarredIcon />} label="Starred" />
+          <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
+          <DrawerItem icon={<DraftsIcon />} label="Drafts" />
+        </DrawerSection>
+        <DrawerSection header="More" showDivider>
+          <DrawerItem icon={<SettingsIcon />} label="Settings" />
+          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
+        </DrawerSection>
+      </Drawer>
+    </div>
+  ),
+};
+
+// ─── WithBadgeItems ───────────────────────────────────────────────────────────
+
+export const WithBadgeItems: Story = {
+  name: "Standard — Badge items (realistic counts)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "DrawerItem components using the `badge` prop with realistic email client counts: Inbox with 5 unread messages and Drafts with 12 unsent — demonstrating the MD3 trailing badge slot in a real-world context.",
+      },
+    },
+  },
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open aria-label="App navigation">
+        <div className="px-4 pt-6 pb-4">
+          <span className="text-headline-small text-on-surface">Mail</span>
+        </div>
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={{ count: 5 }} />
+        <DrawerItem icon={<StarredIcon />} label="Starred" />
+        <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
+        <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={{ count: 12 }} />
+        <DrawerSection header="More" showDivider>
+          <DrawerItem icon={<SettingsIcon />} label="Settings" />
+          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
+        </DrawerSection>
+      </Drawer>
+    </div>
+  ),
+};
+
+// ─── BadgePrimaryColor ────────────────────────────────────────────────────────
+
+export const BadgePrimaryColor: Story = {
+  name: "Standard — Badge with primary color",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "DrawerItem with `badge={{ color: 'primary', count: 2 }}` demonstrating the primary color role for badge indicators — useful for app-level notifications or priority-flagged destinations.",
+      },
+    },
+  },
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open aria-label="App navigation">
+        <div className="px-4 pt-6 pb-4">
+          <span className="text-headline-small text-on-surface">Mail</span>
+        </div>
+        <DrawerItem
+          icon={<InboxIcon />}
+          label="Inbox"
+          isActive
+          badge={{ color: "primary", count: 2 }}
+        />
+        <DrawerItem icon={<StarredIcon />} label="Starred" />
+        <DrawerItem icon={<DraftsIcon />} label="Drafts" />
+        <DrawerSection header="More" showDivider>
+          <DrawerItem icon={<SettingsIcon />} label="Settings" />
+        </DrawerSection>
+      </Drawer>
+    </div>
+  ),
+};
+
+// ─── ActiveIndicatorShowcase ──────────────────────────────────────────────────
+
+export const ActiveIndicatorShowcase: Story = {
+  name: "Standard — Active indicator pill",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Highlights the MD3 active indicator: a 336dp-wide `rounded-full` pill rendered via CSS `after:` pseudo-element with `bg-secondary-container`. The active item receives `aria-current="page"` and `text-on-secondary-container` for accessible contrast against the surface.',
+      },
+    },
+  },
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open aria-label="App navigation">
+        <div className="px-4 pt-6 pb-4">
+          <span className="text-headline-small text-on-surface">Active Indicator</span>
+        </div>
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive />
+        <DrawerItem icon={<StarredIcon />} label="Starred" />
+        <DrawerItem icon={<DraftsIcon />} label="Drafts" />
+        <DrawerItem icon={<SettingsIcon />} label="Settings" />
+      </Drawer>
+    </div>
+  ),
+};
+
+// ─── ModalScrimAnimation ──────────────────────────────────────────────────────
+
+const ModalScrimAnimationDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="bg-surface relative h-screen">
+      <div className="flex flex-col items-start gap-4 p-8">
+        <p className="text-body-medium text-on-surface-variant">
+          Click the button below to open the modal drawer and observe the scrim fade-in animation.
+        </p>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="bg-surface-container-high text-on-surface flex items-center gap-2 rounded-full px-4 py-2"
+        >
+          <MenuIcon />
+          Open Modal Drawer
+        </button>
+      </div>
+
+      <Drawer variant="modal" open={open} onOpenChange={setOpen} aria-label="App navigation">
+        <div className="px-4 pt-6 pb-4">
+          <span className="text-headline-small text-on-surface">Mail</span>
+        </div>
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive onPress={() => setOpen(false)} />
+        <DrawerItem icon={<StarredIcon />} label="Starred" onPress={() => setOpen(false)} />
+        <DrawerItem icon={<SnoozedIcon />} label="Snoozed" onPress={() => setOpen(false)} />
+        <DrawerItem icon={<DraftsIcon />} label="Drafts" onPress={() => setOpen(false)} />
+        <DrawerSection header="More" showDivider>
+          <DrawerItem icon={<SettingsIcon />} label="Settings" onPress={() => setOpen(false)} />
+          <DrawerItem icon={<HelpIcon />} label="Help & feedback" onPress={() => setOpen(false)} />
+        </DrawerSection>
+      </Drawer>
+    </div>
+  );
+};
+
+export const ModalScrimAnimation: Story = {
+  name: "Modal — Scrim animation",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Toggle the modal drawer open to observe the MD3 scrim fade-in: `bg-scrim` at `opacity-32` with `duration-short4 ease-standard` transition. The drawer panel slides in with `duration-medium4 ease-emphasized-decelerate`. Click the scrim or any nav item to close.",
+      },
+    },
+  },
+  render: () => <ModalScrimAnimationDemo />,
 };
 
 // ─── Dark mode ────────────────────────────────────────────────────────────────
