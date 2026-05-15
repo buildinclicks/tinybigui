@@ -14,7 +14,7 @@ export interface BadgeContentProps {
   /**
    * Numeric count to display. When omitted, renders a small dot indicator.
    */
-  count?: number;
+  count?: number | undefined;
 
   /**
    * Maximum displayable count. Values exceeding this render as `"${max}+"`.
@@ -38,7 +38,7 @@ export interface BadgeContentProps {
    * Accessible label override. Defaults to `"New"` for dot badges
    * or `"${count} notifications"` for count badges.
    */
-  "aria-label"?: string;
+  "aria-label"?: string | undefined;
 
   /**
    * Whether to skip transition animations (reduced motion).
@@ -72,7 +72,7 @@ export interface BadgeHeadlessProps {
   /**
    * Additional CSS classes merged via `cn()`.
    */
-  className?: string;
+  className?: string | undefined;
 
   /**
    * The host element(s) to badge — typically an icon, IconButton, or avatar.

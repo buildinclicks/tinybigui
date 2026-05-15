@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef } from "react";
 import { badgeVariants } from "./Badge.variants";
 import { cn } from "../../utils/cn";

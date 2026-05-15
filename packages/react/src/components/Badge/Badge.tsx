@@ -51,14 +51,14 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
     const shouldShow = !invisible && (count === undefined || count > 0);
 
     return (
-      <BadgeHeadless ref={ref} {...(className ? { className } : {})}>
+      <BadgeHeadless ref={ref} className={className}>
         {children}
         <BadgeContent
-          {...(count !== undefined ? { count } : {})}
+          count={count}
           max={max}
           color={color}
           invisible={!shouldShow}
-          {...(ariaLabel ? { "aria-label": ariaLabel } : {})}
+          aria-label={ariaLabel}
           reducedMotion={isReduced}
         />
       </BadgeHeadless>
