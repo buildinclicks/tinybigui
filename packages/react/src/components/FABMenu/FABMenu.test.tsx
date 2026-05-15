@@ -6,6 +6,8 @@ import { vi } from "vitest";
 import { axe } from "vitest-axe";
 import React, { useContext } from "react";
 import { FABMenuHeadless, FABMenuContext } from "./FABMenuHeadless";
+import { FABMenu } from "./FABMenu";
+import { FABMenuItem } from "./FABMenuItem";
 import type { FABMenuContextValue } from "./FABMenu.types";
 
 const IconAdd = (): React.ReactElement => <svg data-testid="icon-add" aria-hidden="true" />;
@@ -233,6 +235,188 @@ describe("FABMenuHeadless", () => {
 
       const results = await axe(container);
       expect(results).toHaveNoViolations();
+    });
+  });
+});
+
+describe("FABMenu (Styled)", () => {
+  describe("Styled + Variants", () => {
+    test("17. FABMenu renders the existing FAB component as trigger", () => {
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      expect(trigger).toBeInTheDocument();
+    });
+
+    test("18. Action items hidden by default (pointer-events-none opacity-0)", () => {
+      const { container } = render(
+        <FABMenu aria-label="Actions" defaultOpen={false}>
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      expect(container.querySelector("[role='group']")).not.toBeInTheDocument();
+    });
+
+    test("19. Action items visible when open (opacity-100)", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const group = screen.getByRole("group");
+      expect(group).toBeInTheDocument();
+
+      const itemContainer = screen.getByRole("button", { name: "Add" }).parentElement;
+      expect(itemContainer).toHaveClass("opacity-100");
+    });
+
+    test("20. direction='up' applies flex-col-reverse", () => {
+      render(
+        <FABMenu aria-label="Actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      const root = trigger.parentElement;
+      expect(root).toHaveClass("flex-col-reverse");
+    });
+
+    test("21. direction='left' applies flex-row-reverse", () => {
+      render(
+        <FABMenu aria-label="Actions" direction="left" defaultOpen>
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      const root = trigger.parentElement;
+      expect(root).toHaveClass("flex-row-reverse");
+    });
+  });
+
+  describe("Animation", () => {
+    test("22. animate-md-scale-in applied to items when opening", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const miniFab = screen.getByRole("button", { name: "Add" });
+      expect(miniFab).toHaveClass("animate-md-scale-in");
+    });
+
+    test("23. animate-md-scale-out applied to items when closing", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions" defaultOpen>
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      expect(screen.queryByRole("button", { name: "Add" })).not.toBeInTheDocument();
+    });
+
+    test("24. Stagger: second item has animation-delay greater than first", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="First" />
+          <FABMenuItem icon={<IconEdit />} aria-label="Second" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const firstItem = screen.getByRole("button", { name: "First" });
+      const secondItem = screen.getByRole("button", { name: "Second" });
+
+      const firstDelay = parseInt(firstItem.style.animationDelay || "0", 10);
+      const secondDelay = parseInt(secondItem.style.animationDelay || "0", 10);
+
+      expect(secondDelay).toBeGreaterThan(firstDelay);
+    });
+  });
+
+  describe("FABMenuItem", () => {
+    test("25. FABMenuItem renders mini FAB (40dp size)", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const miniFab = screen.getByRole("button", { name: "Add" });
+      expect(miniFab).toHaveClass("size-10");
+    });
+
+    test("26. FABMenuItem with label renders label chip", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} label="Create" aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      expect(screen.getByText("Create")).toBeInTheDocument();
+      expect(screen.getByText("Create")).toHaveClass("rounded-full");
+    });
+
+    test("27. FABMenuItem state layer present inside mini FAB", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const miniFab = screen.getByRole("button", { name: "Add" });
+      const stateLayer = miniFab.querySelector("[data-state-layer]");
+      expect(stateLayer).toBeInTheDocument();
+    });
+
+    test("28. FABMenuItem aria-label applied correctly", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="Create item" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const miniFab = screen.getByRole("button", { name: "Create item" });
+      expect(miniFab).toHaveAttribute("aria-label", "Create item");
     });
   });
 });
