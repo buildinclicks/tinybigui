@@ -285,6 +285,25 @@ export type {
 } from "./components/Badge";
 
 export {
+  SplitButton,
+  SplitButtonHeadless,
+  splitButtonVariants,
+  splitButtonContainerVariants,
+  splitButtonPrimaryVariants,
+  splitButtonDropdownVariants,
+} from "./components/SplitButton";
+export type {
+  SplitButtonProps,
+  SplitButtonHeadlessProps,
+  SplitButtonVariant,
+  SplitButtonSize,
+  SplitButtonMenuItem,
+  SplitButtonContainerVariants,
+  SplitButtonPrimaryVariants,
+  SplitButtonDropdownVariants,
+} from "./components/SplitButton";
+
+export {
   FABMenu,
   FABMenuItem,
   FABMenuHeadless,
