@@ -45,6 +45,7 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
   ) => {
     const primaryRef = useRef<HTMLButtonElement>(null);
     const dropdownRef = useRef<HTMLButtonElement>(null);
+    const menuRef = useRef<HTMLUListElement>(null);
 
     const menuState = useMenuTriggerState({});
 
@@ -102,13 +103,56 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
 
     const handleMenuKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLUListElement>) => {
-        if (e.key === "Escape") {
-          menuState.close();
-          dropdownRef.current?.focus();
+        const menuItems = Array.from(
+          e.currentTarget.querySelectorAll<HTMLElement>(
+            '[role="menuitem"]:not([aria-disabled="true"])'
+          )
+        );
+        const currentIndex = menuItems.indexOf(document.activeElement as HTMLElement);
+
+        switch (e.key) {
+          case "ArrowDown": {
+            e.preventDefault();
+            menuItems[(currentIndex + 1) % menuItems.length]?.focus();
+            break;
+          }
+          case "ArrowUp": {
+            e.preventDefault();
+            menuItems[(currentIndex - 1 + menuItems.length) % menuItems.length]?.focus();
+            break;
+          }
+          case "Home": {
+            e.preventDefault();
+            menuItems[0]?.focus();
+            break;
+          }
+          case "End": {
+            e.preventDefault();
+            menuItems[menuItems.length - 1]?.focus();
+            break;
+          }
+          case "Escape": {
+            menuState.close();
+            dropdownRef.current?.focus();
+            break;
+          }
+          default:
+            break;
         }
       },
       [menuState]
     );
+
+    // Auto-focus the first enabled menu item when the menu opens so keyboard
+    // users can navigate immediately without an extra Tab press.
+    useEffect(() => {
+      if (menuState.isOpen && menuRef.current) {
+        const firstItem = menuRef.current.querySelector<HTMLElement>(
+          '[role="menuitem"]:not([aria-disabled="true"])'
+        );
+        firstItem?.focus();
+      }
+    }, [menuState.isOpen]);
 
     const handleMenuItemKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLLIElement>, item: SplitButtonMenuItem) => {
@@ -165,7 +209,12 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
 
         {/* Dropdown menu */}
         {menuState.isOpen && (
-          <ul role="menu" aria-label={`${primaryLabel} options`} onKeyDown={handleMenuKeyDown}>
+          <ul
+            ref={menuRef}
+            role="menu"
+            aria-label={`${primaryLabel} options`}
+            onKeyDown={handleMenuKeyDown}
+          >
             {items.map((item) => (
               <li
                 key={item.label}

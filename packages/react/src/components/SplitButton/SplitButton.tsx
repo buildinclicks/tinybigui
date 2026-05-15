@@ -63,6 +63,7 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
   (
     {
       variant = "filled",
+      size = "medium",
       primaryLabel,
       onPrimaryAction,
       items,
@@ -74,6 +75,7 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
   ) => {
     const primaryRef = useRef<HTMLButtonElement>(null);
     const dropdownRef = useRef<HTMLButtonElement>(null);
+    const menuRef = useRef<HTMLUListElement>(null);
 
     const menuState = useMenuTriggerState({});
 
@@ -131,13 +133,56 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
 
     const handleMenuKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLUListElement>) => {
-        if (e.key === "Escape") {
-          menuState.close();
-          dropdownRef.current?.focus();
+        const menuItems = Array.from(
+          e.currentTarget.querySelectorAll<HTMLElement>(
+            '[role="menuitem"]:not([aria-disabled="true"])'
+          )
+        );
+        const currentIndex = menuItems.indexOf(document.activeElement as HTMLElement);
+
+        switch (e.key) {
+          case "ArrowDown": {
+            e.preventDefault();
+            menuItems[(currentIndex + 1) % menuItems.length]?.focus();
+            break;
+          }
+          case "ArrowUp": {
+            e.preventDefault();
+            menuItems[(currentIndex - 1 + menuItems.length) % menuItems.length]?.focus();
+            break;
+          }
+          case "Home": {
+            e.preventDefault();
+            menuItems[0]?.focus();
+            break;
+          }
+          case "End": {
+            e.preventDefault();
+            menuItems[menuItems.length - 1]?.focus();
+            break;
+          }
+          case "Escape": {
+            menuState.close();
+            dropdownRef.current?.focus();
+            break;
+          }
+          default:
+            break;
         }
       },
       [menuState]
     );
+
+    // Auto-focus the first enabled menu item when the menu opens so keyboard
+    // users can navigate immediately without an extra Tab press.
+    useEffect(() => {
+      if (menuState.isOpen && menuRef.current) {
+        const firstItem = menuRef.current.querySelector<HTMLElement>(
+          '[role="menuitem"]:not([aria-disabled="true"])'
+        );
+        firstItem?.focus();
+      }
+    }, [menuState.isOpen]);
 
     const handleMenuItemKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLLIElement>, item: SplitButtonMenuItem) => {
@@ -181,67 +226,71 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
     );
 
     return (
-      <div
-        ref={forwardedRef}
-        role="group"
-        aria-label={ariaLabel ?? `${primaryLabel} split button`}
-        className={cn(splitButtonContainerVariants({ variant, isDisabled }), className)}
-      >
-        {/* Primary action segment */}
-        <button
-          {...primaryButtonProps}
-          ref={primaryRef}
-          type="button"
-          tabIndex={isDisabled ? -1 : 0}
-          onMouseDown={onPrimaryMouseDown}
-          className={splitButtonPrimaryVariants({ variant })}
+      <div className="relative inline-flex">
+        <div
+          ref={forwardedRef}
+          role="group"
+          aria-label={ariaLabel ?? `${primaryLabel} split button`}
+          className={cn(splitButtonContainerVariants({ variant, size, isDisabled }), className)}
         >
-          <span
-            data-testid="primary-state-layer"
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute inset-0 bg-current opacity-0",
-              "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-opacity",
-              "group-hover/primary:opacity-8"
-            )}
-          />
-          {primaryRipples}
-          <span className="relative z-10">{primaryLabel}</span>
-        </button>
+          {/* Primary action segment */}
+          <button
+            {...primaryButtonProps}
+            ref={primaryRef}
+            type="button"
+            tabIndex={isDisabled ? -1 : 0}
+            onMouseDown={onPrimaryMouseDown}
+            className={splitButtonPrimaryVariants({ variant, size })}
+          >
+            <span
+              data-testid="primary-state-layer"
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute inset-0 bg-current opacity-0",
+                "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-opacity",
+                "group-hover/primary:opacity-8"
+              )}
+            />
+            {primaryRipples}
+            <span className="relative z-10">{primaryLabel}</span>
+          </button>
 
-        {/* Visual divider — already rendered via border-l on dropdown segment */}
-        <span data-testid="split-button-divider" aria-hidden="true" />
+          {/* Visual divider — rendered via border-l on the dropdown segment */}
+          <span data-testid="split-button-divider" aria-hidden="true" />
 
-        {/* Dropdown trigger segment */}
-        <button
-          {...dropdownButtonProps}
-          ref={dropdownRef}
-          type="button"
-          tabIndex={isDisabled ? -1 : 0}
-          aria-haspopup="menu"
-          aria-expanded={menuState.isOpen}
-          aria-label={`${primaryLabel} options, expand`}
-          onMouseDown={onDropdownMouseDown}
-          className={splitButtonDropdownVariants({ variant })}
-        >
-          <span
-            data-testid="dropdown-state-layer"
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute inset-0 bg-current opacity-0",
-              "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-opacity",
-              "group-hover/dropdown:opacity-8"
-            )}
-          />
-          {dropdownRipples}
-          <span className="relative z-10">
-            <ChevronIcon isOpen={menuState.isOpen} />
-          </span>
-        </button>
+          {/* Dropdown trigger segment */}
+          <button
+            {...dropdownButtonProps}
+            ref={dropdownRef}
+            type="button"
+            tabIndex={isDisabled ? -1 : 0}
+            aria-haspopup="menu"
+            aria-expanded={menuState.isOpen}
+            aria-label={`${primaryLabel} options, expand`}
+            onMouseDown={onDropdownMouseDown}
+            className={splitButtonDropdownVariants({ variant, size })}
+          >
+            <span
+              data-testid="dropdown-state-layer"
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute inset-0 bg-current opacity-0",
+                "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-opacity",
+                "group-hover/dropdown:opacity-8"
+              )}
+            />
+            {dropdownRipples}
+            <span className="relative z-10">
+              <ChevronIcon isOpen={menuState.isOpen} />
+            </span>
+          </button>
+        </div>
 
-        {/* Dropdown menu */}
+        {/* Dropdown menu — sibling to the group container so it is NOT clipped
+            by `overflow-hidden`; positioned relative to the outer wrapper. */}
         {menuState.isOpen && (
           <ul
+            ref={menuRef}
             role="menu"
             aria-label={`${primaryLabel} options`}
             onKeyDown={handleMenuKeyDown}
