@@ -1,13 +1,14 @@
 "use client";
 
 import {
+  Children,
+  cloneElement,
   forwardRef,
+  isValidElement,
   useCallback,
+  useEffect,
   useRef,
   useState,
-  Children,
-  isValidElement,
-  cloneElement,
 } from "react";
 import type React from "react";
 
@@ -59,6 +60,13 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
     const isOpen = isControlled ? controlledOpen : internalOpen;
 
+    const [isExiting, setIsExiting] = useState(false);
+    const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const itemCountRef = useRef(0);
+
+    const itemCount = Children.count(children);
+    itemCountRef.current = itemCount;
+
     const setIsOpen = useCallback(
       (next: boolean) => {
         if (!isControlled) {
@@ -77,21 +85,75 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
       setIsOpen(false);
     }, [setIsOpen]);
 
+    // Manage exit animation: keep items mounted while scale-out plays, then unmount.
+    const prevIsOpenRef = useRef<boolean | undefined>(undefined);
+    useEffect(() => {
+      if (prevIsOpenRef.current === undefined) {
+        prevIsOpenRef.current = isOpen;
+        return;
+      }
+      const wasOpen = prevIsOpenRef.current;
+      prevIsOpenRef.current = isOpen;
+
+      if (wasOpen && !isOpen) {
+        setIsExiting(true);
+        if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+        const maxDelay = Math.max(0, itemCountRef.current - 1) * 30;
+        exitTimerRef.current = setTimeout(() => {
+          setIsExiting(false);
+        }, maxDelay + 250);
+      } else if (isOpen) {
+        setIsExiting(false);
+        if (exitTimerRef.current) {
+          clearTimeout(exitTimerRef.current);
+          exitTimerRef.current = null;
+        }
+      }
+    }, [isOpen]);
+
+    useEffect(() => {
+      return () => {
+        if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+      };
+    }, []);
+
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === "Escape" && isOpen) {
           e.stopPropagation();
           close();
           triggerRef.current?.focus();
+          return;
+        }
+        if (isOpen && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+          e.preventDefault();
+          const group = rootRef.current?.querySelector<HTMLElement>('[role="group"]');
+          if (!group) return;
+          const items = Array.from(
+            group.querySelectorAll<HTMLButtonElement>("button:not([disabled])")
+          );
+          if (items.length === 0) return;
+          const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+          const nextIndex =
+            e.key === "ArrowUp"
+              ? currentIndex <= 0
+                ? items.length - 1
+                : currentIndex - 1
+              : currentIndex >= items.length - 1
+                ? 0
+                : currentIndex + 1;
+          items[nextIndex]?.focus();
         }
       },
-      [isOpen, close]
+      [isOpen, close, rootRef]
     );
 
     const contextValue: FABMenuContextValue = {
       isOpen,
+      isExiting,
       direction,
       reducedMotion,
+      itemCount,
     };
 
     const indexedChildren = Children.map(children, (child, index) => {
@@ -109,7 +171,7 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
           className={cn(fabMenuVariants({ direction }), className)}
           onKeyDown={handleKeyDown}
         >
-          {isOpen && (
+          {(isOpen || isExiting) && (
             <div
               className={cn(
                 "inline-flex items-center gap-3",

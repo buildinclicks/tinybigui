@@ -1,13 +1,13 @@
 "use client";
 
 import { forwardRef, useRef } from "react";
+import type React from "react";
 import { useButton } from "react-aria";
 import { mergeProps } from "@react-aria/utils";
 
 import { cn } from "../../utils/cn";
 import { useRipple } from "../../hooks/useRipple";
 import { useFABMenuContext } from "./FABMenuHeadless";
-import { fabMenuItemVariants } from "./FABMenu.variants";
 import type { FABMenuItemProps } from "./FABMenu.types";
 
 /**
@@ -37,7 +37,7 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
     const internalRef = useRef<HTMLButtonElement>(null);
     const buttonRef = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
-    const { isOpen, direction, reducedMotion } = useFABMenuContext();
+    const { isOpen, isExiting, direction, reducedMotion, itemCount } = useFABMenuContext();
 
     const { buttonProps } = useButton(
       {
@@ -57,13 +57,21 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
       onMouseDown: handleRipple,
     });
 
-    const staggerDelay = index * 30;
+    // Entry: stagger forward (0ms, 30ms, 60ms…)
+    // Exit: stagger in reverse so the last item exits first
+    const staggerDelay = reducedMotion
+      ? 0
+      : isExiting
+        ? Math.max(0, itemCount - 1 - index) * 30
+        : index * 30;
 
     const animationClass = reducedMotion
       ? undefined
       : isOpen
         ? "animate-md-scale-in"
-        : "animate-md-scale-out";
+        : isExiting
+          ? "animate-md-scale-out"
+          : undefined;
 
     const labelPosition = direction === "right" ? "after" : "before";
 
@@ -73,10 +81,17 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
       </span>
     ) : null;
 
+    // Keep item visible (opacity-100) during exit animation; hide only when fully closed.
+    const isVisible = isOpen || isExiting;
+
     return (
       <div
-        className={cn(fabMenuItemVariants({ isOpen }), className)}
-        style={reducedMotion ? undefined : { animationDelay: `${staggerDelay}ms` }}
+        className={cn(
+          "relative flex cursor-pointer items-center gap-3",
+          isVisible ? "opacity-100" : "opacity-0",
+          isOpen ? "pointer-events-auto" : "pointer-events-none",
+          className
+        )}
       >
         {labelPosition === "before" && labelChip}
 
@@ -89,7 +104,7 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
             "bg-primary-container text-on-primary-container shadow-elevation-3",
             animationClass
           )}
-          style={reducedMotion ? undefined : { animationDelay: `${staggerDelay}ms` }}
+          style={staggerDelay > 0 ? { animationDelay: `${staggerDelay}ms` } : undefined}
         >
           {/* State layer */}
           <span

@@ -321,7 +321,7 @@ describe("FABMenu (Styled)", () => {
       expect(miniFab).toHaveClass("animate-md-scale-in");
     });
 
-    test("23. animate-md-scale-out applied to items when closing", async () => {
+    test("23. animate-md-scale-out applied to items when closing (isExiting phase)", async () => {
       const user = userEvent.setup();
       render(
         <FABMenu aria-label="Actions" defaultOpen>
@@ -330,9 +330,14 @@ describe("FABMenu (Styled)", () => {
       );
 
       const trigger = screen.getByRole("button", { name: "Actions" });
+      // Item is visible on mount (defaultOpen)
+      expect(screen.getByRole("button", { name: "Add" })).toHaveClass("animate-md-scale-in");
+
+      // Close the menu — item stays mounted during exit animation
       await user.click(trigger);
 
-      expect(screen.queryByRole("button", { name: "Add" })).not.toBeInTheDocument();
+      const miniFab = screen.getByRole("button", { name: "Add" });
+      expect(miniFab).toHaveClass("animate-md-scale-out");
     });
 
     test("24. Stagger: second item has animation-delay greater than first", async () => {
@@ -417,6 +422,46 @@ describe("FABMenu (Styled)", () => {
 
       const miniFab = screen.getByRole("button", { name: "Create item" });
       expect(miniFab).toHaveAttribute("aria-label", "Create item");
+    });
+  });
+
+  describe("Keyboard — Arrow Navigation", () => {
+    test("29. ArrowDown moves focus to next action item", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="First" />
+          <FABMenuItem icon={<IconEdit />} aria-label="Second" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const firstItem = screen.getByRole("button", { name: "First" });
+      firstItem.focus();
+      await user.keyboard("{ArrowDown}");
+
+      expect(screen.getByRole("button", { name: "Second" })).toHaveFocus();
+    });
+
+    test("30. ArrowUp moves focus to previous action item", async () => {
+      const user = userEvent.setup();
+      render(
+        <FABMenu aria-label="Actions">
+          <FABMenuItem icon={<IconAdd />} aria-label="First" />
+          <FABMenuItem icon={<IconEdit />} aria-label="Second" />
+        </FABMenu>
+      );
+
+      const trigger = screen.getByRole("button", { name: "Actions" });
+      await user.click(trigger);
+
+      const secondItem = screen.getByRole("button", { name: "Second" });
+      secondItem.focus();
+      await user.keyboard("{ArrowUp}");
+
+      expect(screen.getByRole("button", { name: "First" })).toHaveFocus();
     });
   });
 });

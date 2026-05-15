@@ -136,9 +136,21 @@ export interface FABMenuContextValue {
   /** Whether the menu is currently open. */
   isOpen: boolean;
 
+  /**
+   * Whether the menu is currently playing the exit animation.
+   * Items remain mounted during this phase so `animate-md-scale-out` can run.
+   */
+  isExiting: boolean;
+
   /** Direction in which action items expand. */
   direction: FABMenuDirection;
 
   /** Whether the user prefers reduced motion. */
   reducedMotion: boolean;
+
+  /**
+   * Total number of action items.
+   * Used by `FABMenuItem` to compute reverse stagger delays during exit.
+   */
+  itemCount: number;
 }

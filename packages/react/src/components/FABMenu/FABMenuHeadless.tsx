@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, forwardRef, useCallback, useContext, useRef, useState } from "react";
+import {
+  Children,
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import { useButton } from "react-aria";
 import { mergeProps } from "@react-aria/utils";
 
@@ -14,8 +22,10 @@ import type { FABMenuContextValue, FABMenuHeadlessProps } from "./FABMenu.types"
  */
 export const FABMenuContext = createContext<FABMenuContextValue>({
   isOpen: false,
+  isExiting: false,
   direction: "up",
   reducedMotion: false,
+  itemCount: 0,
 });
 
 /**
@@ -83,6 +93,8 @@ export const FABMenuHeadless = forwardRef<HTMLDivElement, FABMenuHeadlessProps>(
     const [internalOpen, setInternalOpen] = useState(defaultOpen);
     const isOpen = isControlled ? controlledOpen : internalOpen;
 
+    const itemCount = Children.count(children);
+
     const setIsOpen = useCallback(
       (next: boolean) => {
         if (!isControlled) {
@@ -116,15 +128,37 @@ export const FABMenuHeadless = forwardRef<HTMLDivElement, FABMenuHeadlessProps>(
           e.stopPropagation();
           close();
           triggerRef.current?.focus();
+          return;
+        }
+        if (isOpen && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+          e.preventDefault();
+          const group = rootRef.current?.querySelector<HTMLElement>('[role="group"]');
+          if (!group) return;
+          const items = Array.from(
+            group.querySelectorAll<HTMLButtonElement>("button:not([disabled])")
+          );
+          if (items.length === 0) return;
+          const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+          const nextIndex =
+            e.key === "ArrowUp"
+              ? currentIndex <= 0
+                ? items.length - 1
+                : currentIndex - 1
+              : currentIndex >= items.length - 1
+                ? 0
+                : currentIndex + 1;
+          items[nextIndex]?.focus();
         }
       },
-      [isOpen, close]
+      [isOpen, close, rootRef]
     );
 
     const contextValue: FABMenuContextValue = {
       isOpen,
+      isExiting: false,
       direction,
       reducedMotion,
+      itemCount,
     };
 
     const triggerProps = mergeProps(buttonProps, {
