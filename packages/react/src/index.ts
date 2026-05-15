@@ -274,3 +274,12 @@ export type {
   TooltipVariants,
   RichTooltipVariants,
 } from "./components/Tooltip";
+
+export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./components/Badge";
+export type {
+  BadgeProps,
+  BadgeHeadlessProps,
+  BadgeContentProps,
+  BadgeColor,
+  BadgeVariants,
+} from "./components/Badge";

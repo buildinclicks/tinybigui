@@ -206,3 +206,12 @@ export type {
   TooltipVariants,
   RichTooltipVariants,
 } from "./Tooltip";
+
+export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./Badge";
+export type {
+  BadgeProps,
+  BadgeHeadlessProps,
+  BadgeContentProps,
+  BadgeColor,
+  BadgeVariants,
+} from "./Badge";
