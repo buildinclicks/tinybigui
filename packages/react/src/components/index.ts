@@ -232,3 +232,30 @@ export type {
   ListVariants,
   ListItemVariants,
 } from "./List";
+export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./Badge";
+export type {
+  BadgeProps,
+  BadgeHeadlessProps,
+  BadgeContentProps,
+  BadgeColor,
+  BadgeVariants,
+} from "./Badge";
+
+export {
+  FABMenu,
+  FABMenuItem,
+  FABMenuHeadless,
+  FABMenuContext,
+  useFABMenuContext,
+  fabMenuVariants,
+  fabMenuItemVariants,
+} from "./FABMenu";
+export type {
+  FABMenuDirection,
+  FABMenuProps,
+  FABMenuItemProps,
+  FABMenuHeadlessProps,
+  FABMenuContextValue,
+  FABMenuVariants,
+  FABMenuItemVariants,
+} from "./FABMenu";

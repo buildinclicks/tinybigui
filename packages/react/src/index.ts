@@ -300,3 +300,49 @@ export type {
   ListVariants,
   ListItemVariants,
 } from "./components/List";
+export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./components/Badge";
+export type {
+  BadgeProps,
+  BadgeHeadlessProps,
+  BadgeContentProps,
+  BadgeColor,
+  BadgeVariants,
+} from "./components/Badge";
+
+export {
+  SplitButton,
+  SplitButtonHeadless,
+  splitButtonVariants,
+  splitButtonContainerVariants,
+  splitButtonPrimaryVariants,
+  splitButtonDropdownVariants,
+} from "./components/SplitButton";
+export type {
+  SplitButtonProps,
+  SplitButtonHeadlessProps,
+  SplitButtonVariant,
+  SplitButtonSize,
+  SplitButtonMenuItem,
+  SplitButtonContainerVariants,
+  SplitButtonPrimaryVariants,
+  SplitButtonDropdownVariants,
+} from "./components/SplitButton";
+
+export {
+  FABMenu,
+  FABMenuItem,
+  FABMenuHeadless,
+  FABMenuContext,
+  useFABMenuContext,
+  fabMenuVariants,
+  fabMenuItemVariants,
+} from "./components/FABMenu";
+export type {
+  FABMenuDirection,
+  FABMenuProps,
+  FABMenuItemProps,
+  FABMenuHeadlessProps,
+  FABMenuContextValue,
+  FABMenuVariants,
+  FABMenuItemVariants,
+} from "./components/FABMenu";
