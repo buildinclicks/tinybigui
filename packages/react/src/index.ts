@@ -137,10 +137,12 @@ export {
   DrawerSection,
   HeadlessDrawer,
   HeadlessDrawerItem,
+  DrawerIconOnlyContext,
 } from "./components/Drawer";
 export type {
   DrawerProps,
   DrawerItemProps,
+  DrawerItemBadgeConfig,
   DrawerSectionProps,
   DrawerVariant,
   HeadlessDrawerProps,

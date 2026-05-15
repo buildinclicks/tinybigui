@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { AriaButtonProps, AriaDialogProps, AriaLinkOptions } from "react-aria";
+import type { BadgeColor } from "../Badge/Badge.types";
 
 /**
  * Structural variant of the Navigation Drawer.
@@ -10,6 +11,19 @@ import type { AriaButtonProps, AriaDialogProps, AriaLinkOptions } from "react-ar
  *   focus trap, and `Escape` to close.
  */
 export type DrawerVariant = "standard" | "modal";
+
+/**
+ * Structured badge configuration for `DrawerItem`.
+ *
+ * When provided instead of a `ReactNode`, the `DrawerItem` renders a `Badge`
+ * component automatically.
+ */
+export interface DrawerItemBadgeConfig {
+  /** Numeric count to display. Omit for a dot indicator. */
+  count?: number;
+  /** Badge color role. @default 'error' */
+  color?: BadgeColor;
+}
 
 /**
  * Material Design 3 Navigation Drawer props.
@@ -79,6 +93,14 @@ export interface DrawerProps extends AriaDialogProps {
    * @default false
    */
   disableRipple?: boolean;
+
+  /**
+   * When `true`, narrows the drawer to 80dp (`w-20`) and hides all
+   * `DrawerItem` labels. Each item gains a native `title` tooltip.
+   * Prep step for `NavigationRail`.
+   * @default false
+   */
+  iconOnly?: boolean;
 }
 
 /**
@@ -125,9 +147,22 @@ export interface DrawerItemProps extends AriaButtonProps, Pick<AriaLinkOptions, 
   label: string;
 
   /**
-   * Optional trailing badge or secondary indicator element.
+   * Optional trailing badge.
+   *
+   * Accepts either a `ReactNode` rendered as-is in the trailing slot,
+   * or a `DrawerItemBadgeConfig` object which renders a `Badge` component
+   * with `count` and `color`.
+   *
+   * @example
+   * ```tsx
+   * // ReactNode badge (backward compatible)
+   * <DrawerItem label="Inbox" badge={<span>3</span>} />
+   *
+   * // Config badge (renders Badge component)
+   * <DrawerItem label="Inbox" badge={{ count: 3, color: 'primary' }} />
+   * ```
    */
-  badge?: ReactNode;
+  badge?: ReactNode | DrawerItemBadgeConfig;
 
   /**
    * Optional secondary descriptive text rendered below the label.
@@ -243,6 +278,12 @@ export interface HeadlessDrawerProps {
    * @default false
    */
   disableRipple?: boolean;
+
+  /**
+   * Icon-only compact mode — hides labels and narrows the rail.
+   * @default false
+   */
+  iconOnly?: boolean;
 }
 
 /**
@@ -274,6 +315,11 @@ export interface HeadlessDrawerItemProps extends AriaButtonProps, Pick<AriaLinkO
    * Mouse down handler (for ripple effect).
    */
   onMouseDown?: (e: React.MouseEvent<HTMLElement>) => void;
+
+  /**
+   * Native tooltip text for icon-only mode.
+   */
+  title?: string | undefined;
 }
 
 /**
@@ -287,4 +333,6 @@ export interface DrawerContextValue {
   close: () => void;
   /** Whether ripple is disabled for all items. */
   disableRipple: boolean;
+  /** Whether the drawer is in icon-only compact mode. */
+  iconOnly: boolean;
 }

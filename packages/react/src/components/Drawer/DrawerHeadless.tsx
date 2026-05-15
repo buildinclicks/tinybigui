@@ -28,6 +28,13 @@ import type {
 export const DrawerContext = createContext<DrawerContextValue | null>(null);
 
 /**
+ * Icon-only mode context consumed by `DrawerItem` to hide labels
+ * and apply `title` attributes.
+ * @internal
+ */
+export const DrawerIconOnlyContext = createContext<boolean>(false);
+
+/**
  * Hook to access DrawerContext inside drawer children.
  * @internal
  */
@@ -77,6 +84,7 @@ export const HeadlessDrawer = forwardRef<HTMLElement, HeadlessDrawerProps>(
       className,
       scrimClassName,
       disableRipple = false,
+      iconOnly = false,
     },
     ref
   ) => {
@@ -98,6 +106,7 @@ export const HeadlessDrawer = forwardRef<HTMLElement, HeadlessDrawerProps>(
       isOpen,
       close,
       disableRipple,
+      iconOnly,
     };
 
     if (variant === "modal") {
@@ -240,6 +249,7 @@ export const HeadlessDrawerItem = forwardRef<HTMLElement, HeadlessDrawerItemProp
       onPressEnd,
       onPressChange,
       onPressUp,
+      title,
       ...restProps
     },
     forwardedRef
@@ -267,6 +277,7 @@ export const HeadlessDrawerItem = forwardRef<HTMLElement, HeadlessDrawerItemProp
           ref={linkRef}
           href={href}
           className={className}
+          title={title}
           aria-current={isActive ? "page" : undefined}
           data-focus-visible={isFocusVisible || undefined}
           data-active={isActive || undefined}
@@ -300,6 +311,7 @@ export const HeadlessDrawerItem = forwardRef<HTMLElement, HeadlessDrawerItemProp
         {...mergeProps(buttonProps, focusProps, { onMouseDown })}
         ref={buttonRef}
         className={className}
+        title={title}
         aria-current={isActive ? "page" : undefined}
         data-focus-visible={isFocusVisible || undefined}
         data-active={isActive || undefined}

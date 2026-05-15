@@ -1,7 +1,8 @@
 "use client";
 
-import { forwardRef } from "react";
-import { HeadlessDrawer } from "./DrawerHeadless";
+import React, { forwardRef } from "react";
+import { HeadlessDrawer, DrawerIconOnlyContext } from "./DrawerHeadless";
+import { DrawerSection } from "./DrawerSection";
 import { drawerVariants, scrimVariants } from "./Drawer.variants";
 import { cn } from "../../utils/cn";
 import type { DrawerProps } from "./Drawer.types";
@@ -23,7 +24,7 @@ import type { DrawerProps } from "./Drawer.types";
  * - `role="navigation"` on the outer wrapper
  * - `rounded-r-xl` (28px per MD3 shape extra-large on right side only)
  * - Slide-in animation: `translate-x` driven by MD3 motion tokens
- * - `w-drawer` (360dp per MD3 spec)
+ * - `w-drawer` (360dp) or `w-20` (80dp) in `iconOnly` mode
  *
  * Modal-only:
  * - `role="dialog"` + `aria-modal="true"` on the panel
@@ -47,15 +48,9 @@ import type { DrawerProps } from "./Drawer.types";
  *   </DrawerSection>
  * </Drawer>
  *
- * // Modal variant (overlay)
- * <Drawer
- *   variant="modal"
- *   open={drawerOpen}
- *   onOpenChange={setDrawerOpen}
- *   aria-label="App navigation"
- * >
- *   <DrawerItem label="Home" isActive />
- *   <DrawerItem label="Inbox" badge={<span>5</span>} />
+ * // Icon-only mode (prep for NavigationRail)
+ * <Drawer variant="standard" open iconOnly aria-label="App navigation">
+ *   <DrawerItem icon={<HomeIcon />} label="Home" isActive />
  * </Drawer>
  * ```
  *
@@ -72,6 +67,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       children,
       className,
       disableRipple = false,
+      iconOnly = false,
       ...restProps
     },
     ref
@@ -82,27 +78,45 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       drawerVariants({
         variant,
         open: isOpen,
+        iconOnly,
       }),
       className
     );
 
     const scrimClass = scrimVariants();
 
+    // Mark the first DrawerSection to suppress its divider
+    let foundFirstSection = false;
+    const processedChildren = React.Children.map(children, (child) => {
+      if (React.isValidElement(child) && child.type === DrawerSection) {
+        if (!foundFirstSection) {
+          foundFirstSection = true;
+          return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, {
+            _isFirstSection: true,
+          });
+        }
+      }
+      return child;
+    });
+
     return (
-      <HeadlessDrawer
-        ref={ref}
-        variant={variant}
-        {...(open !== undefined ? { open } : {})}
-        {...(defaultOpen !== undefined ? { defaultOpen } : {})}
-        {...(onOpenChange !== undefined ? { onOpenChange } : {})}
-        aria-label={ariaLabel}
-        className={drawerPanelClass}
-        scrimClassName={scrimClass}
-        disableRipple={disableRipple}
-        {...restProps}
-      >
-        {children}
-      </HeadlessDrawer>
+      <DrawerIconOnlyContext.Provider value={iconOnly}>
+        <HeadlessDrawer
+          ref={ref}
+          variant={variant}
+          {...(open !== undefined ? { open } : {})}
+          {...(defaultOpen !== undefined ? { defaultOpen } : {})}
+          {...(onOpenChange !== undefined ? { onOpenChange } : {})}
+          aria-label={ariaLabel}
+          className={drawerPanelClass}
+          scrimClassName={scrimClass}
+          disableRipple={disableRipple}
+          iconOnly={iconOnly}
+          {...restProps}
+        >
+          {processedChildren}
+        </HeadlessDrawer>
+      </DrawerIconOnlyContext.Provider>
     );
   }
 );

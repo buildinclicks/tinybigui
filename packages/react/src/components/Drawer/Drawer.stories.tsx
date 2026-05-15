@@ -405,6 +405,76 @@ export const MultipleSections: Story = {
   ),
 };
 
+// ─── Badge config items ──────────────────────────────────────────────────────
+
+export const WithBadgeConfig: Story = {
+  name: "Standard — Badge config (count + color)",
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open aria-label="App navigation">
+        <div className="px-4 pt-6 pb-4">
+          <span className="text-headline-small text-on-surface">Mail</span>
+        </div>
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={{ count: 24 }} />
+        <DrawerItem icon={<StarredIcon />} label="Starred" />
+        <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={{ count: 3, color: "primary" }} />
+        <DrawerSection header="More" showDivider>
+          <DrawerItem icon={<SettingsIcon />} label="Settings" />
+          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
+        </DrawerSection>
+      </Drawer>
+    </div>
+  ),
+};
+
+// ─── Icon-only mode ──────────────────────────────────────────────────────────
+
+export const IconOnlyMode: Story = {
+  name: "Standard — Icon-only mode",
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open iconOnly aria-label="App navigation">
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive />
+        <DrawerItem icon={<StarredIcon />} label="Starred" />
+        <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
+        <DrawerItem icon={<DraftsIcon />} label="Drafts" />
+        <DrawerItem icon={<SettingsIcon />} label="Settings" />
+        <DrawerItem icon={<HelpIcon />} label="Help" />
+      </Drawer>
+    </div>
+  ),
+};
+
+// ─── Automatic section dividers ──────────────────────────────────────────────
+
+export const AutoSectionDividers: Story = {
+  name: "Standard — Auto section dividers (first suppressed)",
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open aria-label="App navigation">
+        <div className="px-4 pt-6 pb-4">
+          <span className="text-headline-small text-on-surface">Mail</span>
+        </div>
+        <DrawerSection showDivider>
+          <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={{ count: 24 }} />
+          <DrawerItem icon={<StarredIcon />} label="Starred" />
+          <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
+          <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={{ count: 3 }} />
+        </DrawerSection>
+        <DrawerSection header="Labels" showDivider>
+          <DrawerItem label="Work" />
+          <DrawerItem label="Travel" />
+          <DrawerItem label="Finance" />
+        </DrawerSection>
+        <DrawerSection header="More" showDivider>
+          <DrawerItem icon={<SettingsIcon />} label="Settings" />
+          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
+        </DrawerSection>
+      </Drawer>
+    </div>
+  ),
+};
+
 // ─── Headless primitives ──────────────────────────────────────────────────────
 
 export const HeadlessPrimitive: Story = {

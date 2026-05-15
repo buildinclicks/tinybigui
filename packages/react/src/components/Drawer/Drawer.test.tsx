@@ -491,6 +491,124 @@ describe("HeadlessDrawerItem", () => {
   });
 });
 
+// ─── Enhancement Tests ────────────────────────────────────────────────────────
+
+describe("DrawerSection — section dividers", () => {
+  test("renders Divider between two adjacent sections", () => {
+    render(
+      <Drawer variant="standard" open aria-label="Nav">
+        <DrawerSection showDivider>
+          <DrawerItem label="Home" />
+        </DrawerSection>
+        <DrawerSection showDivider>
+          <DrawerItem label="Settings" />
+        </DrawerSection>
+      </Drawer>
+    );
+    const separators = screen.getAllByRole("separator");
+    expect(separators).toHaveLength(1);
+  });
+
+  test("does NOT render Divider when showDivider={false}", () => {
+    render(
+      <Drawer variant="standard" open aria-label="Nav">
+        <DrawerSection showDivider={false}>
+          <DrawerItem label="Home" />
+        </DrawerSection>
+        <DrawerSection showDivider={false}>
+          <DrawerItem label="Settings" />
+        </DrawerSection>
+      </Drawer>
+    );
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+  });
+
+  test("does NOT render Divider for the first section", () => {
+    render(
+      <Drawer variant="standard" open aria-label="Nav">
+        <DrawerSection showDivider>
+          <DrawerItem label="Home" />
+        </DrawerSection>
+      </Drawer>
+    );
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+  });
+});
+
+describe("DrawerItem — Badge support", () => {
+  test("renders Badge with count when badge config has count", () => {
+    render(<DrawerItem label="Inbox" badge={{ count: 3 }} />);
+    expect(screen.getByText("3")).toBeInTheDocument();
+  });
+
+  test("renders Badge with primary color when badge config specifies primary", () => {
+    render(<DrawerItem label="Inbox" badge={{ count: 1, color: "primary" }} />);
+    const badge = screen.getByRole("status");
+    expect(badge.className).toContain("bg-primary");
+  });
+});
+
+describe("DrawerItem — active indicator", () => {
+  test("active indicator has rounded-full class", () => {
+    render(<DrawerItem label="Home" isActive />);
+    const item = screen.getByRole("button");
+    expect(item.className).toContain("rounded-full");
+  });
+
+  test("active indicator has correct width token class", () => {
+    render(<DrawerItem label="Home" isActive />);
+    const item = screen.getByRole("button");
+    expect(item.className).toContain("after:max-w-[336px]");
+  });
+});
+
+describe("Modal variant — scrim animation", () => {
+  test("scrim has transition-opacity class", () => {
+    renderModalDrawer();
+    const scrim = screen.getByTestId("drawer-scrim");
+    expect(scrim.className).toContain("transition-opacity");
+  });
+
+  test("scrim has duration-short4 and ease-standard classes", () => {
+    renderModalDrawer();
+    const scrim = screen.getByTestId("drawer-scrim");
+    expect(scrim.className).toContain("duration-short4");
+    expect(scrim.className).toContain("ease-standard");
+  });
+});
+
+describe("Drawer — iconOnly mode", () => {
+  test("iconOnly applies w-20 to the drawer", () => {
+    render(
+      <Drawer variant="standard" open iconOnly aria-label="Nav">
+        <DrawerItem icon={<HomeIcon />} label="Home" />
+      </Drawer>
+    );
+    const nav = screen.getByRole("navigation");
+    expect(nav.className).toContain("w-20");
+  });
+
+  test("DrawerItem in iconOnly mode hides label text", () => {
+    render(
+      <Drawer variant="standard" open iconOnly aria-label="Nav">
+        <DrawerItem icon={<HomeIcon />} label="Home" />
+      </Drawer>
+    );
+    const label = screen.getByText("Home");
+    expect(label.closest("span")?.parentElement?.className).toContain("hidden");
+  });
+
+  test("DrawerItem in iconOnly mode has title attribute", () => {
+    render(
+      <Drawer variant="standard" open iconOnly aria-label="Nav">
+        <DrawerItem icon={<HomeIcon />} label="Home" />
+      </Drawer>
+    );
+    const item = screen.getByRole("button");
+    expect(item).toHaveAttribute("title", "Home");
+  });
+});
+
 // ─── Focus Management (Modal) ─────────────────────────────────────────────────
 
 describe("Modal drawer focus management", () => {
