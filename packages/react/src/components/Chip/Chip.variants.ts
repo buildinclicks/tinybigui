@@ -32,8 +32,8 @@ export const chipVariants = cva(
         // transition property disappears at the same moment the color reverts,
         // causing an instant jump back to the unselected color).
         filter:
-          "bg-surface-container-low text-on-surface border border-outline transition-[background-color,color] duration-short4 ease-standard",
-        input: "bg-surface-container-low text-on-surface border border-outline",
+          "bg-surface-container-low text-on-surface border border-outline-variant transition-[background-color,color] duration-short4 ease-standard",
+        input: "bg-surface-container-low text-on-surface border border-outline-variant",
         suggestion: "",
       },
 
@@ -89,7 +89,7 @@ export const chipVariants = cva(
       {
         chipType: "assist",
         surface: "tonal",
-        className: "bg-surface-container-low text-on-surface border border-outline",
+        className: "bg-surface-container-low text-on-surface border border-outline-variant",
       },
       {
         chipType: "assist",
@@ -104,7 +104,7 @@ export const chipVariants = cva(
       {
         chipType: "suggestion",
         surface: "tonal",
-        className: "bg-surface-container-low text-on-surface border border-outline",
+        className: "bg-surface-container-low text-on-surface border border-outline-variant",
       },
       {
         chipType: "suggestion",
