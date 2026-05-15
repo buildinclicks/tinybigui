@@ -1,13 +1,21 @@
 "use client";
 
 import { forwardRef } from "react";
-import {
-  drawerSectionVariants,
-  drawerSectionHeaderVariants,
-  drawerDividerVariants,
-} from "./Drawer.variants";
+import { Divider } from "../Divider";
+import { drawerSectionVariants, drawerSectionHeaderVariants } from "./Drawer.variants";
 import { cn } from "../../utils/cn";
 import type { DrawerSectionProps } from "./Drawer.types";
+
+/**
+ * Internal props extending the public DrawerSectionProps.
+ * `_isFirstSection` is injected by the parent `Drawer` to suppress
+ * the top divider on the first section.
+ * @internal
+ */
+interface DrawerSectionInternalProps extends DrawerSectionProps {
+  /** @internal Injected by Drawer — suppresses the divider on the first section. */
+  _isFirstSection?: boolean;
+}
 
 /**
  * Material Design 3 Navigation Drawer Section (Layer 3: Styled).
@@ -18,8 +26,8 @@ import type { DrawerSectionProps } from "./Drawer.types";
  *
  * Features:
  * - Optional header label: `text-title-small text-on-surface-variant`
- * - Optional top divider: `border-outline-variant`
- * - Semantic `<hr role="separator">` for the divider
+ * - Optional top divider via `Divider` component
+ * - Divider auto-hidden on the first section inside a `Drawer`
  *
  * @example
  * ```tsx
@@ -37,14 +45,13 @@ import type { DrawerSectionProps } from "./Drawer.types";
  *
  * @see https://m3.material.io/components/navigation-drawer/specs
  */
-export const DrawerSection = forwardRef<HTMLDivElement, DrawerSectionProps>(
-  ({ header, children, showDivider = false, className }, ref) => {
+export const DrawerSection = forwardRef<HTMLDivElement, DrawerSectionInternalProps>(
+  ({ header, children, showDivider = true, _isFirstSection = false, className }, ref) => {
+    const shouldShowDivider = showDivider && !_isFirstSection;
+
     return (
-      <div ref={ref} className={cn(drawerSectionVariants(), className)}>
-        {/* Divider above the section */}
-        {showDivider && (
-          <hr role="separator" aria-hidden="true" className={drawerDividerVariants()} />
-        )}
+      <div ref={ref} className={cn(drawerSectionVariants(), className)} data-drawer-section>
+        {shouldShowDivider && <Divider orientation="horizontal" className="my-1" />}
 
         {/* Section header label */}
         {header && <span className={drawerSectionHeaderVariants()}>{header}</span>}

@@ -4,7 +4,12 @@ export { DrawerItem } from "./DrawerItem";
 export { DrawerSection } from "./DrawerSection";
 
 // Layer 2: Headless Primitives (for advanced customization)
-export { HeadlessDrawer, HeadlessDrawerItem, DrawerContext } from "./DrawerHeadless";
+export {
+  HeadlessDrawer,
+  HeadlessDrawerItem,
+  DrawerContext,
+  DrawerIconOnlyContext,
+} from "./DrawerHeadless";
 
 // CVA Variants
 export {
@@ -25,6 +30,7 @@ export type {
   DrawerVariant,
   DrawerProps,
   DrawerItemProps,
+  DrawerItemBadgeConfig,
   DrawerSectionProps,
   HeadlessDrawerProps,
   HeadlessDrawerItemProps,

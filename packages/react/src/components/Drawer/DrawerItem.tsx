@@ -1,11 +1,26 @@
 "use client";
 
-import { forwardRef } from "react";
-import { HeadlessDrawerItem } from "./DrawerHeadless";
+import type React from "react";
+import { forwardRef, isValidElement, useContext } from "react";
+import { HeadlessDrawerItem, DrawerIconOnlyContext } from "./DrawerHeadless";
+import { Badge } from "../Badge";
 import { drawerItemVariants } from "./Drawer.variants";
 import { cn } from "../../utils/cn";
 import { useRipple } from "../../hooks/useRipple";
-import type { DrawerItemProps } from "./Drawer.types";
+import type { DrawerItemProps, DrawerItemBadgeConfig } from "./Drawer.types";
+
+/**
+ * Runtime type guard for the structured `DrawerItemBadgeConfig`.
+ * Distinguishes config objects from React elements / primitives.
+ */
+function isBadgeConfig(badge: unknown): badge is DrawerItemBadgeConfig {
+  return (
+    typeof badge === "object" &&
+    badge !== null &&
+    !isValidElement(badge) &&
+    ("count" in badge || "color" in badge)
+  );
+}
 
 /**
  * Material Design 3 Navigation Drawer Item (Layer 3: Styled).
@@ -16,12 +31,13 @@ import type { DrawerItemProps } from "./Drawer.types";
  * Renders as `<a>` when `href` is provided, `<button>` otherwise.
  *
  * Features:
- * - Active indicator: `bg-secondary-container` / `text-on-secondary-container`
+ * - Active indicator: 336dp pill, `bg-secondary-container` / `text-on-secondary-container`
  * - `aria-current="page"` on active item
  * - Ripple effect on interaction
  * - Hover/focus/pressed state layers (MD3 spec: 8% / 12%)
  * - Optional leading icon (24dp slot)
- * - Optional trailing badge or secondary text
+ * - Optional trailing badge — `ReactNode` or `{ count, color }` config
+ * - Icon-only mode: label hidden, `title` tooltip via `DrawerIconOnlyContext`
  * - Disabled state: `opacity-38`, non-interactive
  *
  * @example
@@ -29,11 +45,8 @@ import type { DrawerItemProps } from "./Drawer.types";
  * // Active item with icon
  * <DrawerItem icon={<HomeIcon />} label="Home" isActive onPress={() => navigate('/')} />
  *
- * // Link item
- * <DrawerItem href="/settings" icon={<SettingsIcon />} label="Settings" />
- *
- * // Item with badge
- * <DrawerItem label="Inbox" badge={<span>3</span>} />
+ * // Item with Badge config
+ * <DrawerItem label="Inbox" badge={{ count: 5, color: 'primary' }} />
  *
  * // Disabled
  * <DrawerItem label="Disabled Feature" isDisabled />
@@ -63,10 +76,34 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
     ref
   ) => {
     const isItemDisabled = isDisabled;
+    const isIconOnly = useContext(DrawerIconOnlyContext);
 
     const { onMouseDown: handleRipple, ripples } = useRipple({
       disabled: isItemDisabled || disableRipple,
     });
+
+    const renderBadge = (): React.ReactElement | null => {
+      if (!badge) return null;
+
+      if (isBadgeConfig(badge)) {
+        return (
+          <span className="relative z-10 ml-auto flex shrink-0 items-center pr-2">
+            <Badge
+              {...(badge.count !== undefined ? { count: badge.count } : {})}
+              {...(badge.color !== undefined ? { color: badge.color } : {})}
+            >
+              <span />
+            </Badge>
+          </span>
+        );
+      }
+
+      return (
+        <span className="relative z-10 ml-auto flex shrink-0 items-center pr-2" aria-hidden="true">
+          {badge}
+        </span>
+      );
+    };
 
     return (
       <HeadlessDrawerItem
@@ -81,6 +118,7 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
         {...(onPressChange !== undefined ? { onPressChange } : {})}
         {...(onPressUp !== undefined ? { onPressUp } : {})}
         onMouseDown={handleRipple}
+        title={isIconOnly ? label : undefined}
         className={cn(
           drawerItemVariants({
             isActive,
@@ -103,7 +141,12 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
         )}
 
         {/* Label and optional secondary text */}
-        <span className="relative z-10 flex min-w-0 flex-1 flex-col text-left">
+        <span
+          className={cn(
+            "relative z-10 flex min-w-0 flex-1 flex-col text-left",
+            isIconOnly && "hidden"
+          )}
+        >
           <span className="truncate">{label}</span>
           {secondaryText && (
             <span className="text-body-small truncate opacity-70">{secondaryText}</span>
@@ -111,14 +154,7 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
         </span>
 
         {/* Trailing badge */}
-        {badge && (
-          <span
-            className="relative z-10 ml-auto flex shrink-0 items-center pr-2"
-            aria-hidden="true"
-          >
-            {badge}
-          </span>
-        )}
+        {!isIconOnly && renderBadge()}
       </HeadlessDrawerItem>
     );
   }

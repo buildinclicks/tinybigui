@@ -15,7 +15,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 export const drawerVariants = cva(
   [
     // Layout
-    "fixed top-0 left-0 h-full w-drawer",
+    "fixed top-0 left-0 h-full",
     "flex flex-col overflow-y-auto",
     // Stacking and shape
     "z-50",
@@ -48,11 +48,22 @@ export const drawerVariants = cva(
         true: ["translate-x-0"],
         false: ["-translate-x-full"],
       },
+
+      /**
+       * Icon-only compact mode — 80dp rail instead of 360dp drawer.
+       * - `true`:  `w-20` (80dp), items centered
+       * - `false`: `w-drawer` (360dp), standard layout
+       */
+      iconOnly: {
+        true: ["w-20", "items-center"],
+        false: ["w-drawer"],
+      },
     },
 
     defaultVariants: {
       variant: "standard",
       open: false,
+      iconOnly: false,
     },
   }
 );
@@ -78,8 +89,8 @@ export const drawerItemVariants = cva(
     "text-label-large",
     // Interaction
     "cursor-pointer select-none outline-none",
-    // State layer pseudo-element
-    "before:absolute before:inset-0 before:rounded-full",
+    // State layer pseudo-element (z-[1] above active indicator)
+    "before:absolute before:inset-0 before:rounded-full before:z-[1]",
     "before:transition-opacity before:duration-short2 before:ease-standard",
     "before:opacity-0",
     // Hover and focus visible state layers
@@ -94,13 +105,17 @@ export const drawerItemVariants = cva(
     variants: {
       /**
        * Whether this item is the currently active destination.
-       * Controls background, text color, and icon color per MD3 spec.
+       *
+       * Active indicator is a 336dp pill rendered via `after:` pseudo-element
+       * per MD3 Navigation Drawer spec.
        */
       isActive: {
         true: [
-          "bg-secondary-container",
           "text-on-secondary-container",
           "before:bg-on-secondary-container",
+          // Active indicator — 336dp pill via after: pseudo
+          "after:absolute after:inset-0 after:mx-auto after:max-w-[336px]",
+          "after:rounded-full after:bg-secondary-container",
         ],
         false: ["bg-transparent", "text-on-surface-variant", "before:bg-on-surface-variant"],
       },
@@ -133,7 +148,7 @@ export const drawerItemVariants = cva(
 export const scrimVariants = cva([
   "fixed inset-0 z-40",
   "bg-scrim opacity-32",
-  "transition-opacity duration-medium2 ease-standard",
+  "transition-opacity duration-short4 ease-standard",
 ]);
 
 /**
