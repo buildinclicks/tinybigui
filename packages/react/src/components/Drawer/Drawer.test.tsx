@@ -343,17 +343,16 @@ describe("DrawerSection", () => {
         <DrawerItem label="Profile" />
       </DrawerSection>
     );
-    // The <hr> has aria-hidden="true" so we need to query with hidden: true
-    expect(screen.getByRole("separator", { hidden: true })).toBeInTheDocument();
+    expect(screen.getByRole("separator")).toBeInTheDocument();
   });
 
   test("does NOT render divider when showDivider=false", () => {
     render(
-      <DrawerSection>
+      <DrawerSection showDivider={false}>
         <DrawerItem label="Profile" />
       </DrawerSection>
     );
-    expect(screen.queryByRole("separator", { hidden: true })).not.toBeInTheDocument();
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
   });
 
   test("passes axe audit", async () => {

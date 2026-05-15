@@ -46,7 +46,7 @@ interface DrawerSectionInternalProps extends DrawerSectionProps {
  * @see https://m3.material.io/components/navigation-drawer/specs
  */
 export const DrawerSection = forwardRef<HTMLDivElement, DrawerSectionInternalProps>(
-  ({ header, children, showDivider = false, _isFirstSection = false, className }, ref) => {
+  ({ header, children, showDivider = true, _isFirstSection = false, className }, ref) => {
     const shouldShowDivider = showDivider && !_isFirstSection;
 
     return (

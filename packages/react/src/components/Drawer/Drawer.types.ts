@@ -216,7 +216,7 @@ export interface DrawerSectionProps {
 
   /**
    * When `true`, renders a top divider line above the section.
-   * @default false
+   * @default true
    */
   showDivider?: boolean;
 
