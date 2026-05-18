@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { SearchBarHeadless, SearchViewHeadless } from "./SearchHeadless";
+import { SearchBar } from "./SearchBar";
+import { SearchView } from "./SearchView";
 
 describe("SearchBarHeadless", () => {
   describe("Rendering", () => {
@@ -258,5 +260,304 @@ describe("SearchViewHeadless", () => {
       const results = await axe(document.body);
       expect(results).toHaveNoViolations();
     });
+  });
+});
+
+// ─── Layer 3: Styled Component Tests ──────────────────────────────────────────
+
+describe("SearchBar (Styled)", () => {
+  test("has rounded-full class", () => {
+    render(<SearchBar placeholder="Search" />);
+    const container = screen.getByRole("search").closest("[class*=rounded-full]");
+    expect(container).toBeInTheDocument();
+  });
+
+  test("has h-14 class (56dp height)", () => {
+    render(<SearchBar placeholder="Search" />);
+    const container = screen.getByRole("search").closest("[class*=h-14]");
+    expect(container).toBeInTheDocument();
+  });
+
+  test("has bg-surface-container-high class", () => {
+    render(<SearchBar placeholder="Search" />);
+    const container = screen.getByRole("search").closest("[class*=bg-surface-container-high]");
+    expect(container).toBeInTheDocument();
+  });
+
+  test("contained style with trailing actions has px-1 and gap-1 (4dp spacing)", () => {
+    render(
+      <SearchBar
+        placeholder="Search"
+        searchStyle="contained"
+        trailingActions={[<button key="mic">mic</button>]}
+      />
+    );
+    const container = screen.getByRole("search").closest("[class*=px-1]");
+    expect(container).toBeInTheDocument();
+    expect(container?.className).toContain("gap-1");
+  });
+
+  test("contained style without trailing actions has px-4 (16dp no-actions spacing)", () => {
+    render(<SearchBar placeholder="Search" searchStyle="contained" />);
+    const container = screen.getByRole("search").closest("[class*=px-4]");
+    expect(container).toBeInTheDocument();
+  });
+
+  test("divided style has px-4 and gap-4 (16dp spacing)", () => {
+    render(<SearchBar placeholder="Search" searchStyle="divided" />);
+    const container = screen.getByRole("search").closest("[class*=px-4]");
+    expect(container).toBeInTheDocument();
+    expect(container?.className).toContain("gap-4");
+  });
+
+  test("state layer has hover:opacity-8 class", () => {
+    render(<SearchBar placeholder="Search" />);
+    const stateLayer = document.querySelector("[data-slot=state-layer]");
+    expect(stateLayer).toBeInTheDocument();
+    expect(stateLayer?.className).toContain("group-hover:opacity-8");
+  });
+
+  test("state layer uses spring motion tokens for opacity transition", () => {
+    render(<SearchBar placeholder="Search" />);
+    const stateLayer = document.querySelector("[data-slot=state-layer]");
+    expect(stateLayer?.className).toContain("duration-spring-standard-fast-effects");
+    expect(stateLayer?.className).toContain("ease-spring-standard-fast-effects");
+  });
+
+  test("pressed state renders ripple container (from useRipple)", async () => {
+    const user = userEvent.setup();
+    render(<SearchBar placeholder="Search" />);
+    const container = screen.getByRole("search").parentElement;
+    expect(container).toBeInTheDocument();
+    if (container) {
+      await user.click(container);
+    }
+    const rippleContainer = document.querySelector("[data-ripple-container]");
+    expect(rippleContainer).toBeInTheDocument();
+  });
+
+  test("focus indicator ring applied to container via has-[:focus-visible]", () => {
+    render(<SearchBar placeholder="Search" />);
+    const container = screen.getByRole("search").parentElement;
+    expect(container?.className).toContain("ring-secondary");
+  });
+
+  test("avatar only (Config 1) renders in trailing slot at 30dp size", () => {
+    render(
+      <SearchBar
+        placeholder="Search"
+        avatar={<img data-testid="avatar-img" src="" alt="User avatar" />}
+      />
+    );
+    expect(screen.getByTestId("avatar-img")).toBeInTheDocument();
+    const avatarWrapper = screen.getByTestId("avatar-img").closest("[class*=rounded-full]");
+    expect(avatarWrapper).toBeInTheDocument();
+  });
+
+  test("one trailing icon button (Config 2) renders in trailing slot", () => {
+    render(
+      <SearchBar
+        placeholder="Search"
+        trailingActions={[
+          <button key="mic" data-testid="mic-btn" aria-label="Voice search">
+            mic
+          </button>,
+        ]}
+      />
+    );
+    expect(screen.getByTestId("mic-btn")).toBeInTheDocument();
+  });
+
+  test("two trailing icon buttons (Config 3) both render in trailing slot", () => {
+    render(
+      <SearchBar
+        placeholder="Search"
+        trailingActions={[
+          <button key="mic" data-testid="mic-btn" aria-label="Voice search">
+            mic
+          </button>,
+          <button key="more" data-testid="more-btn" aria-label="More options">
+            more
+          </button>,
+        ]}
+      />
+    );
+    expect(screen.getByTestId("mic-btn")).toBeInTheDocument();
+    expect(screen.getByTestId("more-btn")).toBeInTheDocument();
+  });
+
+  test("one trailing icon + avatar (Config 4) both render", () => {
+    render(
+      <SearchBar
+        placeholder="Search"
+        trailingActions={[
+          <button key="mic" data-testid="mic-btn" aria-label="Voice search">
+            mic
+          </button>,
+        ]}
+        avatar={<img data-testid="avatar-img" src="" alt="User avatar" />}
+      />
+    );
+    expect(screen.getByTestId("mic-btn")).toBeInTheDocument();
+    expect(screen.getByTestId("avatar-img")).toBeInTheDocument();
+  });
+});
+
+describe("SearchView (Styled)", () => {
+  test("clear button appears when input has a value", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search" defaultValue="hello">
+        <p>results</p>
+      </SearchView>
+    );
+    expect(screen.getByRole("button", { name: "Clear search" })).toBeInTheDocument();
+  });
+
+  test("clear button is not rendered when input is empty", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search">
+        <p>results</p>
+      </SearchView>
+    );
+    expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
+  });
+
+  test("contained+fullscreen has bg-surface-container-low class", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        searchStyle="contained"
+        layout="fullscreen"
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("bg-surface-container-low");
+  });
+
+  test("contained+docked has bg-surface-container-high class", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        searchStyle="contained"
+        layout="docked"
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("bg-surface-container-high");
+  });
+
+  test("divided style renders border-outline divider", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search" searchStyle="divided">
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("border-outline");
+  });
+
+  test("docked layout has min-w-[360px] and max-w-[720px] constraint classes", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search" layout="docked">
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("min-w-[360px]");
+    expect(view.className).toContain("max-w-[720px]");
+  });
+
+  test("divided+fullscreen header has h-[72px] class", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        searchStyle="divided"
+        layout="fullscreen"
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("h-[72px]");
+  });
+
+  test("divided+fullscreen has bg-surface-container-high class", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        searchStyle="divided"
+        layout="fullscreen"
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("bg-surface-container-high");
+  });
+
+  test("divided+docked has bg-surface-container-high and rounded-[28px] class", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        searchStyle="divided"
+        layout="docked"
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("bg-surface-container-high");
+    expect(view.className).toContain("rounded-[28px]");
+  });
+
+  test("contained+docked has gap-0.5 (2dp) between header and results", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        searchStyle="contained"
+        layout="docked"
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("gap-0.5");
+  });
+
+  test("has animate-md-scale-in class on mount", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search">
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    expect(view.className).toContain("animate-md-scale-in");
+  });
+
+  test("renders children inside the content area", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search">
+        <p data-testid="search-result">Result 1</p>
+      </SearchView>
+    );
+    const content = screen.getByRole("search").querySelector("[data-slot=content]");
+    expect(content).toBeInTheDocument();
+    expect(screen.getByTestId("search-result")).toBeInTheDocument();
   });
 });
