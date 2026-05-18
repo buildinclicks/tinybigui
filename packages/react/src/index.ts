@@ -302,6 +302,26 @@ export type {
   ListVariants,
   ListItemVariants,
 } from "./components/List";
+export {
+  Search,
+  SearchBar,
+  SearchView,
+  SearchBarHeadless,
+  SearchViewHeadless,
+  searchBarVariants,
+  searchViewVariants,
+  searchViewHeaderVariants,
+} from "./components/Search";
+export type {
+  SearchStyle,
+  SearchLayout,
+  SearchBarProps,
+  SearchViewProps,
+  SearchProps,
+  SearchBarHeadlessProps,
+  SearchViewHeadlessProps,
+} from "./components/Search";
+
 export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./components/Badge";
 export type {
   BadgeProps,
