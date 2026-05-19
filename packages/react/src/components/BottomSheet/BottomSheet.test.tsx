@@ -1,18 +1,26 @@
 /**
- * BottomSheet — Milestone 1 + Milestone 2 + Milestone 3
+ * BottomSheet — Milestone 1–6
  *
  * M01: Compile-time type assertions (no rendering).
  * M02: Portal, state management, animation state machine, and context tests.
  * M03: Modal variant — dialog semantics, focus trap, scrim, Escape dismissal.
+ * M04: Drag handle interaction and snap behavior.
+ * M05: Styled layer — CVA tokens, scrim classes, handle classes.
+ * M06: Motion and animation — slide animations, snap spring, reduced-motion guard.
  */
 
 import { createRef, useState } from "react";
-import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi, afterEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BottomSheetHeadless, useBottomSheetContext } from "./BottomSheetHeadless";
 import { BottomSheet } from "./BottomSheet";
 import { BottomSheetHandle } from "./BottomSheetHandle";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
+
+vi.mock("../../hooks/useReducedMotion", () => ({
+  useReducedMotion: vi.fn(() => false),
+}));
 
 import type {
   BottomSheetAnimationState,
@@ -718,5 +726,192 @@ describe("BottomSheet — styled layer", () => {
     expect(BottomSheet).toBeDefined();
     expect(BottomSheetHandle).toBeDefined();
     expect(BottomSheetHeadless).toBeDefined();
+  });
+});
+
+// ─── BottomSheet — motion and animation ───────────────────────────────────────
+
+describe("BottomSheet — motion and animation", () => {
+  afterEach(() => {
+    vi.mocked(useReducedMotion).mockReturnValue(false);
+  });
+
+  // Test 45
+  it("sheet panel has animate-md-slide-in-bottom class when visible", async () => {
+    vi.mocked(useReducedMotion).mockReturnValue(false);
+    render(<BottomSheet open aria-label="Test" />);
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toHaveClass("animate-md-slide-in-bottom");
+    });
+  });
+
+  // Test 46
+  it("sheet panel has animate-md-slide-out-bottom class when exiting", async () => {
+    vi.mocked(useReducedMotion).mockReturnValue(false);
+    const { rerender } = render(<BottomSheet open aria-label="Test" />);
+    // Wait for 'visible' state (after the zero-delay timer)
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toHaveClass("animate-md-slide-in-bottom");
+    });
+    // Trigger close → state transitions to 'exiting'
+    rerender(<BottomSheet open={false} aria-label="Test" />);
+    await waitFor(() => {
+      const panel = document.querySelector('[data-animation-state="exiting"]');
+      expect(panel).not.toBeNull();
+      expect(panel).toHaveClass("animate-md-slide-out-bottom");
+    });
+  });
+
+  // Test 47
+  it("scrim has transition-opacity class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByTestId("bottom-sheet-scrim")).toHaveClass("transition-opacity");
+  });
+
+  // Test 48
+  it("scrim has duration-short4 class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByTestId("bottom-sheet-scrim")).toHaveClass("duration-short4");
+  });
+
+  // Test 49
+  it("scrim has ease-standard class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByTestId("bottom-sheet-scrim")).toHaveClass("ease-standard");
+  });
+
+  // Test 50
+  it("sheet panel has transition-transform class for snap spring", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("transition-transform");
+  });
+
+  // Test 51
+  it("sheet panel has duration-spring-standard-default-spatial class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("duration-spring-standard-default-spatial");
+  });
+
+  // Test 52
+  it("sheet panel has ease-spring-standard-default-spatial class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("ease-spring-standard-default-spatial");
+  });
+
+  // Test 53
+  it("reduced motion: no animation classes applied when useReducedMotion returns true", async () => {
+    vi.mocked(useReducedMotion).mockReturnValue(true);
+    render(<BottomSheet open aria-label="Test" />);
+    await waitFor(() => {
+      const panel = screen.getByRole("dialog");
+      expect(panel).not.toHaveClass("animate-md-slide-in-bottom");
+    });
+  });
+
+  // Test 54
+  it("reduced motion: sheet appears without transform when reduced motion preferred", () => {
+    vi.mocked(useReducedMotion).mockReturnValue(true);
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("transition-none");
+  });
+});
+
+// ─── BottomSheet — accessibility ──────────────────────────────────────────────
+
+import { axe } from "vitest-axe";
+
+describe("BottomSheet — accessibility", () => {
+  // Test 55
+  it('drag handle has role="button"', () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    expect(screen.getByRole("button", { name: /adjust sheet height/i })).toBeInTheDocument();
+  });
+
+  // Test 56
+  it('drag handle has default aria-label "Adjust sheet height"', () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).toHaveAttribute("aria-label", "Adjust sheet height");
+  });
+
+  // Test 57
+  it("drag handle accepts custom aria-label override", () => {
+    render(
+      <BottomSheet open aria-label="Test sheet">
+        <BottomSheetHandle aria-label="Adjust player height" />
+      </BottomSheet>
+    );
+    expect(screen.getByRole("button", { name: "Adjust player height" })).toBeInTheDocument();
+  });
+
+  // Test 58
+  it("drag handle has tabIndex={0}", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).toHaveAttribute("tabindex", "0");
+  });
+
+  // Test 59
+  it("drag handle has focus-visible:ring-3 class", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).toHaveClass("focus-visible:ring-3");
+  });
+
+  // Test 60
+  it("drag handle has focus-visible:ring-secondary class", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).toHaveClass("focus-visible:ring-secondary");
+  });
+
+  // Test 61
+  it("drag handle has aria-valuenow reflecting currentSnapIndex", () => {
+    render(<BottomSheet open aria-label="Test sheet" snapPoints={["25%", "50%", "100%"]} />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).toHaveAttribute("aria-valuenow", "0");
+  });
+
+  // Test 62
+  it("drag handle has aria-valuemin={0} and aria-valuemax={snapPoints.length - 1}", () => {
+    render(<BottomSheet open aria-label="Test sheet" snapPoints={["25%", "50%", "100%"]} />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).toHaveAttribute("aria-valuemin", "0");
+    expect(handle).toHaveAttribute("aria-valuemax", "2");
+  });
+
+  // Test 63
+  it('drag handle has aria-orientation="vertical"', () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).toHaveAttribute("aria-orientation", "vertical");
+  });
+
+  // Test 64
+  it("Tab key moves focus to drag handle on sheet open (modal variant)", async () => {
+    const user = userEvent.setup();
+    render(<BottomSheet variant="modal" open aria-label="Test sheet" />);
+    // FocusScope autoFocus focuses the dialog container first (tabIndex=-1 from useDialog).
+    // One Tab keystroke moves to the first tabbable element: the drag handle (tabIndex=0).
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByTestId("bottom-sheet-handle"));
+  });
+
+  // Test 65
+  it("axe: modal variant open — zero violations", async () => {
+    const { container } = render(
+      <BottomSheet variant="modal" open aria-label="Test modal sheet" />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  // Test 66
+  it("axe: standard variant open — zero violations", async () => {
+    const { container } = render(
+      <BottomSheet variant="standard" open aria-label="Test standard sheet" />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 });

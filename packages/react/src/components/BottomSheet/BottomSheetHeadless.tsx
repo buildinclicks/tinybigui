@@ -260,12 +260,9 @@ export const BottomSheetHeadless = forwardRef<HTMLDivElement, BottomSheetHeadles
       handleProps: dragHandleProps,
     } = useBottomSheetDrag({ snapPoints, onClose: close });
 
-    // Override the hook's generic aria-label with the sheet's own label so
-    // assistive technology announces the handle in context of this sheet.
-    const handleProps: BottomSheetContextValue["handleProps"] = {
-      ...dragHandleProps,
-      "aria-label": ariaLabel,
-    };
+    // The hook's default aria-label "Adjust sheet height" is the correct label per MD3 spec.
+    // Consumers can override via BottomSheetHandleProps["aria-label"] on <BottomSheetHandle />.
+    const handleProps = dragHandleProps;
 
     // ── Context value ─────────────────────────────────────────────────────────
 

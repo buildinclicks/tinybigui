@@ -222,11 +222,17 @@ export function useBottomSheetDrag({
       onKeyDown,
       tabIndex: 0,
       role: "button" as const,
-      // Default label — the styled layer (Layer 3) or BottomSheetHeadless
-      // overrides this with the sheet's aria-label
-      "aria-label": "Drag to resize",
+      // MD3 spec: "Label only the drag handle." Default communicates the action
+      // without referencing touch gesture terminology. Override via BottomSheetHandleProps.
+      "aria-label": "Adjust sheet height",
+      // Slider-pattern ARIA — communicates current snap position like a range slider.
+      // Screen readers announce: "Adjust sheet height, 0 of 2" (e.g. with 3 snap points).
+      "aria-valuemin": 0,
+      "aria-valuenow": currentSnapIndex,
+      "aria-valuemax": snapPoints.length - 1,
+      "aria-orientation": "vertical" as const,
     }),
-    [onPointerDown, onPointerUp, onKeyDown]
+    [onPointerDown, onPointerUp, onKeyDown, currentSnapIndex, snapPoints.length]
   );
 
   return {

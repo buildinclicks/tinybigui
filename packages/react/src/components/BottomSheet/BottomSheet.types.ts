@@ -66,6 +66,14 @@ export interface BottomSheetContextValue {
     tabIndex: number;
     role: "button";
     "aria-label": string;
+    /** Slider-pattern ARIA: always 0 (lowest snap index). */
+    "aria-valuemin": number;
+    /** Slider-pattern ARIA: index of the currently active snap point. */
+    "aria-valuenow": number;
+    /** Slider-pattern ARIA: highest snap index (snapPoints.length - 1). */
+    "aria-valuemax": number;
+    /** Vertical orientation — communicates directional arrow-key semantics. */
+    "aria-orientation": "vertical";
   };
 }
 
@@ -249,6 +257,11 @@ export interface BottomSheetProps {
  *   <BottomSheetHandle />
  *   <p>Content</p>
  * </BottomSheet>
+ *
+ * // With context-specific label override:
+ * <BottomSheet variant="standard" defaultOpen aria-label="Now playing">
+ *   <BottomSheetHandle aria-label="Adjust player height" />
+ * </BottomSheet>
  * ```
  */
 export interface BottomSheetHandleProps {
@@ -256,4 +269,16 @@ export interface BottomSheetHandleProps {
    * Additional CSS classes merged onto the handle wrapper element.
    */
   className?: string;
+
+  /**
+   * Optional accessible label override for the drag handle.
+   *
+   * Defaults to `"Adjust sheet height"` (set by `useBottomSheetDrag`).
+   * Override to provide a context-specific label — e.g. `"Adjust player height"`.
+   *
+   * Per MD3 spec: "Label only the drag handle."
+   *
+   * @default "Adjust sheet height"
+   */
+  "aria-label"?: string;
 }
