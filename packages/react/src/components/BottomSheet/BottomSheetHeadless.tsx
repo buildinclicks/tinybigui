@@ -20,6 +20,7 @@ import type {
   BottomSheetContextValue,
   BottomSheetHeadlessProps,
 } from "./BottomSheet.types";
+import { useBottomSheetDrag } from "./useBottomSheetDrag";
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -250,13 +251,19 @@ export const BottomSheetHeadless = forwardRef<HTMLDivElement, BottomSheetHeadles
       }
     }, [animationState]);
 
-    // ── Stub handle props (expanded in M04 with real drag logic) ──────────────
+    // ── Drag handle interaction and snap logic (M04) ──────────────────────────
 
-    const stubHandleProps: BottomSheetContextValue["handleProps"] = {
-      onPointerDown: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
-      onKeyDown: () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
-      tabIndex: 0,
-      role: "button",
+    const {
+      currentSnapIndex,
+      isDragging,
+      dragTranslateY,
+      handleProps: dragHandleProps,
+    } = useBottomSheetDrag({ snapPoints, onClose: close });
+
+    // Override the hook's generic aria-label with the sheet's own label so
+    // assistive technology announces the handle in context of this sheet.
+    const handleProps: BottomSheetContextValue["handleProps"] = {
+      ...dragHandleProps,
       "aria-label": ariaLabel,
     };
 
@@ -266,10 +273,11 @@ export const BottomSheetHeadless = forwardRef<HTMLDivElement, BottomSheetHeadles
       isOpen,
       variant,
       snapPoints,
-      currentSnapIndex: 0,
-      isDragging: false,
+      currentSnapIndex,
+      isDragging,
+      dragTranslateY,
       close,
-      handleProps: stubHandleProps,
+      handleProps,
     };
 
     // ── Scrim dismissal (modal always dismissable per MD3 spec) ───────────────

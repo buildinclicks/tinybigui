@@ -51,11 +51,17 @@ export interface BottomSheetContextValue {
   currentSnapIndex: number;
   /** Whether a drag gesture is in progress. */
   isDragging: boolean;
+  /**
+   * Current inline translateY offset in pixels during a drag gesture.
+   * `null` when the sheet is snapped (not being dragged).
+   */
+  dragTranslateY: number | null;
   /** Callback to programmatically close the sheet. */
   close: () => void;
   /** Props to spread onto the drag handle element — includes pointer and keyboard handlers. */
   handleProps: {
     onPointerDown: (e: React.PointerEvent<HTMLElement>) => void;
+    onPointerUp: (e: React.PointerEvent<HTMLElement>) => void;
     onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => void;
     tabIndex: number;
     role: "button";

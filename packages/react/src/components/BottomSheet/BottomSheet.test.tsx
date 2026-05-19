@@ -437,6 +437,11 @@ describe("BottomSheetHeadless — modal variant behavior", () => {
     }
   });
 
+  it("BottomSheetContextValue has dragTranslateY field", () => {
+    expectTypeOf<BottomSheetContextValue>().toHaveProperty("dragTranslateY");
+    expectTypeOf<BottomSheetContextValue["dragTranslateY"]>().toEqualTypeOf<number | null>();
+  });
+
   it("modal variant: focus returns to trigger element after close", async () => {
     const user = userEvent.setup();
 
@@ -470,5 +475,165 @@ describe("BottomSheetHeadless — modal variant behavior", () => {
     await waitFor(() => {
       expect(document.activeElement).toBe(trigger);
     });
+  });
+});
+
+// ─── useBottomSheetDrag — drag and snap behavior ──────────────────────────────
+
+describe("useBottomSheetDrag — drag and snap behavior", () => {
+  function Handle() {
+    const { handleProps } = useBottomSheetContext();
+    return <div {...handleProps} data-testid="handle" />;
+  }
+
+  function ContextReader() {
+    const ctx = useBottomSheetContext();
+    return (
+      <>
+        <span data-testid="snapIndex">{ctx.currentSnapIndex}</span>
+        <span data-testid="isDragging">{String(ctx.isDragging)}</span>
+        <span data-testid="dragTranslateY">{String(ctx.dragTranslateY)}</span>
+      </>
+    );
+  }
+
+  // Test 24
+  it("isDragging is false before any pointer interaction", () => {
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet">
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByTestId("isDragging").textContent).toBe("false");
+  });
+
+  // Test 25
+  it("currentSnapIndex starts at 0 (first snap point)", () => {
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet" snapPoints={["25%", "50%", "100%"]}>
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByTestId("snapIndex").textContent).toBe("0");
+  });
+
+  // Test 26
+  it("keyboard Space cycles to next snap point", async () => {
+    const user = userEvent.setup();
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet" snapPoints={["25%", "50%", "100%"]}>
+        <Handle />
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    screen.getByTestId("handle").focus();
+    await user.keyboard(" ");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("1");
+  });
+
+  // Test 27
+  it("keyboard Space wraps back to 0 from last snap point", async () => {
+    const user = userEvent.setup();
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet" snapPoints={["25%", "50%"]}>
+        <Handle />
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    screen.getByTestId("handle").focus();
+    await user.keyboard(" ");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("1");
+    await user.keyboard(" ");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("0");
+  });
+
+  // Test 28
+  it("keyboard Enter cycles to next snap point (same as Space)", async () => {
+    const user = userEvent.setup();
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet" snapPoints={["25%", "50%", "100%"]}>
+        <Handle />
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    screen.getByTestId("handle").focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("1");
+  });
+
+  // Test 29
+  it("keyboard ArrowUp moves to higher snap point", async () => {
+    const user = userEvent.setup();
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet" snapPoints={["25%", "50%", "100%"]}>
+        <Handle />
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    screen.getByTestId("handle").focus();
+    await user.keyboard(" ");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("1");
+    await user.keyboard("{ArrowUp}");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("2");
+  });
+
+  // Test 30
+  it("keyboard ArrowDown moves to lower snap point", async () => {
+    const user = userEvent.setup();
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet" snapPoints={["25%", "50%", "100%"]}>
+        <Handle />
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    screen.getByTestId("handle").focus();
+    await user.keyboard(" ");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("1");
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("0");
+  });
+
+  // Test 31
+  it("keyboard ArrowDown at lowest snap point calls close", async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <BottomSheetHeadless
+        open
+        onOpenChange={onOpenChange}
+        aria-label="Test sheet"
+        snapPoints={["25%", "50%", "100%"]}
+      >
+        <Handle />
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    screen.getByTestId("handle").focus();
+    await user.keyboard("{ArrowDown}");
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  // Test 32
+  it("single snap point: Space does not change index (stays at 0)", async () => {
+    const user = userEvent.setup();
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet" snapPoints={["50%"]}>
+        <Handle />
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    screen.getByTestId("handle").focus();
+    await user.keyboard(" ");
+    expect(screen.getByTestId("snapIndex").textContent).toBe("0");
+  });
+
+  // Test 33
+  it("dragTranslateY is null when not dragging", () => {
+    render(
+      <BottomSheetHeadless open aria-label="Test sheet">
+        <ContextReader />
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByTestId("dragTranslateY").textContent).toBe("null");
   });
 });
