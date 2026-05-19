@@ -1,9 +1,12 @@
 "use client";
 
+import type React from "react";
 import { forwardRef, useCallback, useState } from "react";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { cn } from "../../utils/cn";
 import { SliderHeadless } from "./SliderHeadless";
+import { SliderStops } from "./SliderStops";
+import { SliderValueIndicator } from "./SliderValueIndicator";
 import {
   sliderContainerVariants,
   sliderActiveTrackVariants,
@@ -11,6 +14,7 @@ import {
   sliderHandleVariants,
   sliderHandleStateLayerVariants,
   sliderTrackLayoutVariants,
+  sliderTrackStopVariants,
 } from "./Slider.variants";
 import type { SliderProps, SliderThumbState } from "./Slider.types";
 
@@ -64,13 +68,15 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       orientation = "horizontal",
       minValue = 0,
       maxValue = 100,
+      step,
       value,
       defaultValue,
       onChange,
       onChangeEnd,
       isDisabled = false,
-      showStops: _showStops,
-      showValueIndicator: _showValueIndicator,
+      showStops = false,
+      showValueIndicator = false,
+      formatValue,
       icon: _icon,
       className,
       ...headlessProps
@@ -111,7 +117,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const isCentered = variant === "centered";
 
     // ── Standard track render ──────────────────────────────────────────────────
-    const renderStandardTrack = () => {
+    const renderStandardTrack = (): React.JSX.Element => {
       const pct = clampPercent(currentValues[0] ?? minValue, minValue, maxValue);
       const thumb0State: SliderThumbState = isDisabled ? "disabled" : (thumbStates[0] ?? "enabled");
 
@@ -126,7 +132,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             )}
             style={{ flexBasis: `${pct}%` }}
           />
-          {/* Visual handle — decorative; keyboard/pointer behaviour is in SliderThumbInternal */}
+          {/* Visual handle — decorative; keyboard/pointer behaviour is in SliderThumbInternal.
+               stopPropagation prevents pointer events from bubbling to the React Aria track
+               which would trigger a position calculation (NaN in JSDOM / no-layout envs). */}
           <div
             data-slot="handle"
             className={cn(
@@ -136,15 +144,32 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 pressed: thumb0State === "pressed",
               })
             )}
-            onPointerEnter={() => !isDisabled && setThumbStates(["hovered"])}
-            onPointerLeave={() => !isDisabled && setThumbStates(["enabled"])}
-            onPointerDown={() => !isDisabled && setThumbStates(["pressed"])}
-            onPointerUp={() => !isDisabled && setThumbStates(["enabled"])}
+            onPointerEnter={() => {
+              if (!isDisabled) setThumbStates(["hovered"]);
+            }}
+            onPointerLeave={() => {
+              if (!isDisabled) setThumbStates(["enabled"]);
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              if (!isDisabled) setThumbStates(["pressed"]);
+            }}
+            onPointerUp={(e) => {
+              e.stopPropagation();
+              if (!isDisabled) setThumbStates(["enabled"]);
+            }}
           >
             <div
               data-slot="state-layer"
               className={cn(sliderHandleStateLayerVariants({ state: thumb0State }))}
             />
+            {showValueIndicator && (
+              <SliderValueIndicator
+                value={currentValues[0] ?? minValue}
+                isVisible={thumb0State === "pressed"}
+                {...(formatValue !== undefined ? { formatValue } : {})}
+              />
+            )}
           </div>
           {/* Inactive track — fills remaining width */}
           <div
@@ -154,21 +179,28 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               trackTransition
             )}
             style={{ flexBasis: `${100 - pct}%` }}
-          />
+          >
+            {showStops && (
+              <span
+                data-slot="track-stop-end"
+                className={cn(sliderTrackStopVariants({ position: "end" }))}
+              />
+            )}
+          </div>
         </>
       );
     };
 
     // ── Range track render ─────────────────────────────────────────────────────
-    const renderRangeTrack = () => {
+    const renderRangeTrack = (): React.JSX.Element => {
       const leftPct = clampPercent(currentValues[0] ?? minValue, minValue, maxValue);
       const rightPct = clampPercent(currentValues[1] ?? maxValue, minValue, maxValue);
       const thumb0State: SliderThumbState = isDisabled ? "disabled" : (thumbStates[0] ?? "enabled");
       const thumb1State: SliderThumbState = isDisabled ? "disabled" : (thumbStates[1] ?? "enabled");
 
-      const setThumb0 = (next: SliderThumbState) =>
+      const setThumb0 = (next: SliderThumbState): void =>
         setThumbStates((s) => [next, s[1] ?? "enabled"] as SliderThumbState[]);
-      const setThumb1 = (next: SliderThumbState) =>
+      const setThumb1 = (next: SliderThumbState): void =>
         setThumbStates((s) => [s[0] ?? "enabled", next] as SliderThumbState[]);
 
       return (
@@ -181,7 +213,14 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               trackTransition
             )}
             style={{ flexBasis: `${leftPct}%` }}
-          />
+          >
+            {showStops && (
+              <span
+                data-slot="track-stop-start"
+                className={cn(sliderTrackStopVariants({ position: "start" }))}
+              />
+            )}
+          </div>
           {/* Left handle */}
           <div
             data-slot="handle"
@@ -193,15 +232,32 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 pressed: thumb0State === "pressed",
               })
             )}
-            onPointerEnter={() => !isDisabled && setThumb0("hovered")}
-            onPointerLeave={() => !isDisabled && setThumb0("enabled")}
-            onPointerDown={() => !isDisabled && setThumb0("pressed")}
-            onPointerUp={() => !isDisabled && setThumb0("enabled")}
+            onPointerEnter={() => {
+              if (!isDisabled) setThumb0("hovered");
+            }}
+            onPointerLeave={() => {
+              if (!isDisabled) setThumb0("enabled");
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              if (!isDisabled) setThumb0("pressed");
+            }}
+            onPointerUp={(e) => {
+              e.stopPropagation();
+              if (!isDisabled) setThumb0("enabled");
+            }}
           >
             <div
               data-slot="state-layer"
               className={cn(sliderHandleStateLayerVariants({ state: thumb0State }))}
             />
+            {showValueIndicator && (
+              <SliderValueIndicator
+                value={currentValues[0] ?? minValue}
+                isVisible={thumb0State === "pressed"}
+                {...(formatValue !== undefined ? { formatValue } : {})}
+              />
+            )}
           </div>
           {/* Active track — area between the two handles */}
           <div
@@ -224,15 +280,32 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 pressed: thumb1State === "pressed",
               })
             )}
-            onPointerEnter={() => !isDisabled && setThumb1("hovered")}
-            onPointerLeave={() => !isDisabled && setThumb1("enabled")}
-            onPointerDown={() => !isDisabled && setThumb1("pressed")}
-            onPointerUp={() => !isDisabled && setThumb1("enabled")}
+            onPointerEnter={() => {
+              if (!isDisabled) setThumb1("hovered");
+            }}
+            onPointerLeave={() => {
+              if (!isDisabled) setThumb1("enabled");
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              if (!isDisabled) setThumb1("pressed");
+            }}
+            onPointerUp={(e) => {
+              e.stopPropagation();
+              if (!isDisabled) setThumb1("enabled");
+            }}
           >
             <div
               data-slot="state-layer"
               className={cn(sliderHandleStateLayerVariants({ state: thumb1State }))}
             />
+            {showValueIndicator && (
+              <SliderValueIndicator
+                value={currentValues[1] ?? maxValue}
+                isVisible={thumb1State === "pressed"}
+                {...(formatValue !== undefined ? { formatValue } : {})}
+              />
+            )}
           </div>
           {/* Right inactive track */}
           <div
@@ -242,13 +315,20 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               trackTransition
             )}
             style={{ flexBasis: `${100 - rightPct}%` }}
-          />
+          >
+            {showStops && (
+              <span
+                data-slot="track-stop-end"
+                className={cn(sliderTrackStopVariants({ position: "end" }))}
+              />
+            )}
+          </div>
         </>
       );
     };
 
     // ── Centered track render ──────────────────────────────────────────────────
-    const renderCenteredTrack = () => {
+    const renderCenteredTrack = (): React.JSX.Element => {
       const thumbPct = clampPercent(currentValues[0] ?? minValue, minValue, maxValue);
       const zeroPct =
         minValue >= 0 ? 0 : maxValue <= 0 ? 100 : ((0 - minValue) / (maxValue - minValue)) * 100;
@@ -265,15 +345,32 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               pressed: thumb0State === "pressed",
             })
           )}
-          onPointerEnter={() => !isDisabled && setThumbStates(["hovered"])}
-          onPointerLeave={() => !isDisabled && setThumbStates(["enabled"])}
-          onPointerDown={() => !isDisabled && setThumbStates(["pressed"])}
-          onPointerUp={() => !isDisabled && setThumbStates(["enabled"])}
+          onPointerEnter={() => {
+            if (!isDisabled) setThumbStates(["hovered"]);
+          }}
+          onPointerLeave={() => {
+            if (!isDisabled) setThumbStates(["enabled"]);
+          }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            if (!isDisabled) setThumbStates(["pressed"]);
+          }}
+          onPointerUp={(e) => {
+            e.stopPropagation();
+            if (!isDisabled) setThumbStates(["enabled"]);
+          }}
         >
           <div
             data-slot="state-layer"
             className={cn(sliderHandleStateLayerVariants({ state: thumb0State }))}
           />
+          {showValueIndicator && (
+            <SliderValueIndicator
+              value={currentValues[0] ?? minValue}
+              isVisible={thumb0State === "pressed"}
+              {...(formatValue !== undefined ? { formatValue } : {})}
+            />
+          )}
         </div>
       );
 
@@ -344,6 +441,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       }
     };
 
+    const canShowStops = showStops && step !== undefined && step > 0;
+
     return (
       <SliderHeadless
         {...headlessProps}
@@ -352,8 +451,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         orientation={orientation}
         minValue={minValue}
         maxValue={maxValue}
+        {...(step !== undefined ? { step } : {})}
         isDisabled={isDisabled}
         onChange={handleChange}
+        {...(formatValue !== undefined ? { formatValue } : {})}
         {...(value !== undefined ? { value } : {})}
         {...(defaultValue !== undefined ? { defaultValue } : {})}
         {...(onChangeEnd !== undefined ? { onChangeEnd } : {})}
@@ -365,6 +466,16 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             : isCentered
               ? renderCenteredTrack()
               : renderStandardTrack()}
+          {canShowStops && (
+            <SliderStops
+              minValue={minValue}
+              maxValue={maxValue}
+              step={step}
+              values={currentValues}
+              variant={variant}
+              isDisabled={isDisabled}
+            />
+          )}
         </div>
       </SliderHeadless>
     );

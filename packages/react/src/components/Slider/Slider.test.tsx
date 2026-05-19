@@ -864,3 +864,158 @@ describe("Slider — styled layer", () => {
     expect(SliderIndex.sliderTrackLayoutVariants).toBeDefined();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Slider — stop indicators and value indicator (Milestone 6)
+// ---------------------------------------------------------------------------
+
+describe("Slider — stop indicators and value indicator", () => {
+  // 74. stop indicators not rendered when showStops is false
+  test("stop indicators not rendered when showStops is false", () => {
+    const { container } = render(<Slider label="Vol" step={10} defaultValue={[50]} />);
+    const dots = container.querySelectorAll('[data-slot="stop-dot"]');
+    expect(dots).toHaveLength(0);
+  });
+
+  // 75. stop indicators rendered when showStops and step are provided
+  test("stop indicators rendered when showStops and step are provided", () => {
+    const { container } = render(
+      <Slider label="Vol" showStops step={10} minValue={0} maxValue={100} defaultValue={[50]} />
+    );
+    const dots = container.querySelectorAll('[data-slot="stop-dot"]');
+    expect(dots).toHaveLength(11); // 0, 10, 20, ..., 100
+  });
+
+  // 76. stop dots have correct count based on step
+  test("stop dots have correct count based on step", () => {
+    const { container } = render(
+      <Slider label="Vol" showStops step={25} minValue={0} maxValue={100} defaultValue={[50]} />
+    );
+    const dots = container.querySelectorAll('[data-slot="stop-dot"]');
+    expect(dots).toHaveLength(5); // 0, 25, 50, 75, 100
+  });
+
+  // 77. stop dots on active track have bg-on-primary class
+  test("stop dots on active track have bg-on-primary class", () => {
+    const { container } = render(
+      <Slider label="Vol" showStops step={25} minValue={0} maxValue={100} defaultValue={[50]} />
+    );
+    const dots = container.querySelectorAll('[data-slot="stop-dot"]');
+    // dots at 0 and 25 are on active track (value is 50, so stopValue <= 50)
+    expect(dots[0]).toHaveClass("bg-on-primary");
+    expect(dots[1]).toHaveClass("bg-on-primary");
+  });
+
+  // 78. stop dots on inactive track have bg-on-secondary-container class
+  test("stop dots on inactive track have bg-on-secondary-container class", () => {
+    const { container } = render(
+      <Slider label="Vol" showStops step={25} minValue={0} maxValue={100} defaultValue={[50]} />
+    );
+    const dots = container.querySelectorAll('[data-slot="stop-dot"]');
+    // dots at 75 and 100 are on inactive track (> 50)
+    expect(dots[3]).toHaveClass("bg-on-secondary-container");
+    expect(dots[4]).toHaveClass("bg-on-secondary-container");
+  });
+
+  // 79. stops container has justify-between and px-[4px]
+  test("stops container has justify-between and px-[4px]", () => {
+    const { container } = render(<Slider label="Vol" showStops step={10} defaultValue={[50]} />);
+    const stopsContainer = container.querySelector('[data-slot="stops-container"]');
+    expect(stopsContainer).toHaveClass("justify-between");
+    expect(stopsContainer).toHaveClass("px-[4px]");
+  });
+
+  // 80. stops container is aria-hidden
+  test("stops container is aria-hidden", () => {
+    const { container } = render(<Slider label="Vol" showStops step={10} defaultValue={[50]} />);
+    const stopsContainer = container.querySelector('[data-slot="stops-container"]');
+    expect(stopsContainer).toHaveAttribute("aria-hidden", "true");
+  });
+
+  // 81. value indicator not rendered when showValueIndicator is false
+  test("value indicator not rendered when showValueIndicator is false", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).not.toBeInTheDocument();
+  });
+
+  // 82. value indicator appears when thumb is pressed and showValueIndicator is true
+  test("value indicator appears when thumb is pressed and showValueIndicator is true", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).not.toHaveClass("opacity-0");
+    expect(tooltip).not.toHaveClass("scale-0");
+  });
+
+  // 83. value indicator has bg-inverse-surface class
+  test("value indicator has bg-inverse-surface class", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).toHaveClass("bg-inverse-surface");
+  });
+
+  // 84. value indicator has rounded-full class (pill shape)
+  test("value indicator has rounded-full class (pill shape)", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).toHaveClass("rounded-full");
+  });
+
+  // 85. value indicator text has text-inverse-on-surface class
+  test("value indicator text has text-inverse-on-surface class", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const textSpan = container.querySelector('[role="tooltip"] span');
+    expect(textSpan).toHaveClass("text-inverse-on-surface");
+  });
+
+  // 86. value indicator text has text-label-large class
+  test("value indicator text has text-label-large class", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const textSpan = container.querySelector('[role="tooltip"] span');
+    expect(textSpan).toHaveClass("text-label-large");
+  });
+
+  // 87. value indicator displays formatted value
+  test("value indicator displays formatted value", () => {
+    const { container } = render(
+      <Slider label="Vol" showValueIndicator formatValue={(v) => `$${v}`} defaultValue={[50]} />
+    );
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).toHaveTextContent("$50");
+  });
+
+  // 88. value indicator has min-w-[48px] class
+  test("value indicator has min-w-[48px] class", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).toHaveClass("min-w-[48px]");
+  });
+
+  // 89. end track stop on inactive track has right-[4px] position
+  test("end track stop on inactive track has right-[4px] position", () => {
+    const { container } = render(<Slider label="Vol" showStops step={10} defaultValue={[50]} />);
+    const trackStop = container.querySelector('[data-slot="track-stop-end"]');
+    expect(trackStop).toHaveClass("right-[4px]");
+  });
+
+  // 90. end track stop has bg-on-secondary-container class
+  test("end track stop has bg-on-secondary-container class", () => {
+    const { container } = render(<Slider label="Vol" showStops step={10} defaultValue={[50]} />);
+    const trackStop = container.querySelector('[data-slot="track-stop-end"]');
+    expect(trackStop).toHaveClass("bg-on-secondary-container");
+  });
+});

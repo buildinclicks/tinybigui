@@ -4,6 +4,10 @@ export { Slider } from "./Slider";
 // Layer 2 — Headless Primitive
 export { SliderHeadless } from "./SliderHeadless";
 
+// Styled Sub-components
+export { SliderStops } from "./SliderStops";
+export { SliderValueIndicator } from "./SliderValueIndicator";
+
 // CVA Variants
 export {
   sliderContainerVariants,
@@ -12,6 +16,11 @@ export {
   sliderHandleVariants,
   sliderHandleStateLayerVariants,
   sliderTrackLayoutVariants,
+  sliderStopsContainerVariants,
+  sliderStopDotVariants,
+  sliderTrackStopVariants,
+  sliderValueIndicatorVariants,
+  sliderValueIndicatorTextVariants,
 } from "./Slider.variants";
 
 // Types

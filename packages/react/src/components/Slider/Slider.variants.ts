@@ -186,9 +186,11 @@ export const sliderHandleStateLayerVariants = cva(
  *
  * MD3 spec §7, §10.2: Flex row with 6dp gap between handle and track segments.
  * The 6dp gap is the `thumbTrackGapSize` token from MD3 spec.
+ * `relative` is required so the absolute stops overlay is positioned within.
  */
 export const sliderTrackLayoutVariants = cva(
   [
+    "relative",
     "flex",
     "items-center",
     "w-full",
@@ -207,6 +209,148 @@ export const sliderTrackLayoutVariants = cva(
   }
 );
 
+/**
+ * CVA for the stops overlay container.
+ *
+ * An absolute overlay positioned within the track layout, spanning its full area.
+ * Dots are distributed with justify-between.
+ * Padding from track edges: 4dp.
+ * MD3 spec §5.2, §10.5.
+ */
+export const sliderStopsContainerVariants = cva([
+  "absolute",
+  "inset-0",
+  "flex",
+  "items-center",
+  "justify-between",
+  "px-[4px]", // NOTE: measurement-derived value from MD3 spec §10.5 (stopPadding: 4dp); permitted exception
+  "pointer-events-none",
+  "z-0",
+]);
+
+/**
+ * CVA for individual stop indicator dots.
+ *
+ * MD3 spec §5.2, §10.5: 4dp circular dots, color depends on whether dot is on
+ * active or inactive track.
+ */
+export const sliderStopDotVariants = cva(
+  [
+    "rounded-full",
+    "flex-shrink-0",
+    "w-[4px]", // NOTE: measurement-derived value from MD3 spec §10.5 (stopIndicatorSize: 4dp); permitted exception
+    "h-[4px]",
+  ],
+  {
+    variants: {
+      /**
+       * Whether this dot is positioned on the active track portion.
+       * Determines the dot color per MD3 spec §5.2.
+       */
+      onActiveTrack: {
+        true: "bg-on-primary", // Light dots on primary background
+        false: "bg-on-secondary-container", // Dark dots on secondary-container background
+      },
+      disabled: {
+        true: "opacity-38",
+        false: "",
+      },
+    },
+    defaultVariants: {
+      onActiveTrack: false,
+      disabled: false,
+    },
+  }
+);
+
+/**
+ * CVA for end track stops (4dp dots at track endpoints).
+ *
+ * MD3 spec §10.6: positioned 4dp from track edge, vertically centered.
+ */
+export const sliderTrackStopVariants = cva(
+  [
+    "absolute",
+    "top-1/2",
+    "-translate-y-1/2",
+    "w-[4px]", // NOTE: measurement-derived value from MD3 spec §10.6 (trackStopDiameter: 4dp); permitted exception
+    "h-[4px]",
+    "rounded-full",
+    "bg-on-secondary-container",
+    "pointer-events-none",
+  ],
+  {
+    variants: {
+      position: {
+        start: "left-[4px]", // NOTE: measurement-derived (trackStopOffset: 4dp); permitted exception
+        end: "right-[4px]",
+      },
+    },
+    defaultVariants: {
+      position: "end",
+    },
+  }
+);
+
+/**
+ * CVA for the value indicator (floating pill label above the handle).
+ *
+ * MD3 spec §5.3, §10.4:
+ * - Shape: pill (border-radius 1000dp = rounded-full)
+ * - Background: inverse-surface
+ * - Min-width: 48dp
+ * - Padding: 16dp horizontal, 12dp vertical
+ * - Position: centered above handle via absolute + left-1/2 + -translate-x-1/2
+ * - Only visible during Pressed state; hidden with opacity-0 + scale-0
+ * Motion: standard fast effects (small component, utility tooltip).
+ */
+export const sliderValueIndicatorVariants = cva(
+  [
+    "absolute",
+    "left-1/2",
+    "-translate-x-1/2",
+    "bottom-[calc(100%+4px)]", // NOTE: measurement-derived (4dp gap above handle); permitted exception
+    "bg-inverse-surface",
+    "rounded-full", // pill shape (1000dp radius)
+    "px-[16px]", // NOTE: measurement-derived (valueIndicatorPaddingH: 16dp); permitted exception
+    "py-[12px]", // NOTE: measurement-derived (valueIndicatorPaddingV: 12dp); permitted exception
+    "min-w-[48px]", // NOTE: measurement-derived (valueIndicatorWidth: 48dp); permitted exception
+    "flex",
+    "items-center",
+    "justify-center",
+    "pointer-events-none",
+    "z-20",
+    // Motion — value indicator appear/disappear (MD3 §9.3: standard fast effects for small tooltip)
+    "transition-[opacity,transform]",
+    "duration-spring-standard-fast-effects",
+    "ease-spring-standard-fast-effects",
+  ],
+  {
+    variants: {
+      visible: {
+        true: "opacity-100 scale-100",
+        false: "opacity-0 scale-0",
+      },
+    },
+    defaultVariants: {
+      visible: false,
+    },
+  }
+);
+
+/**
+ * CVA for value indicator text content.
+ *
+ * MD3 spec §5.3: Label Large typography — 14px, weight 500, line-height 20px, tracking 0.1px.
+ * Color: inverse-on-surface.
+ */
+export const sliderValueIndicatorTextVariants = cva([
+  "text-inverse-on-surface",
+  "text-label-large", // MD3 Label Large typescale token
+  "whitespace-nowrap",
+  "text-center",
+]);
+
 // ─── Variant Prop Types ────────────────────────────────────────────────────────
 
 export type SliderContainerVariants = VariantProps<typeof sliderContainerVariants>;
@@ -215,3 +359,7 @@ export type SliderInactiveTrackVariants = VariantProps<typeof sliderInactiveTrac
 export type SliderHandleVariants = VariantProps<typeof sliderHandleVariants>;
 export type SliderHandleStateLayerVariants = VariantProps<typeof sliderHandleStateLayerVariants>;
 export type SliderTrackLayoutVariants = VariantProps<typeof sliderTrackLayoutVariants>;
+export type SliderStopsContainerVariants = VariantProps<typeof sliderStopsContainerVariants>;
+export type SliderStopDotVariants = VariantProps<typeof sliderStopDotVariants>;
+export type SliderTrackStopVariants = VariantProps<typeof sliderTrackStopVariants>;
+export type SliderValueIndicatorVariants = VariantProps<typeof sliderValueIndicatorVariants>;
