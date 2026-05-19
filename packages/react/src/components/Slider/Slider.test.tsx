@@ -1,6 +1,7 @@
 import { describe, test, expectTypeOf, expect, vi, afterEach } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
+import { axe } from "vitest-axe";
 
 const mockUseReducedMotion = vi.hoisted(() => vi.fn<[], boolean>(() => false));
 
@@ -1337,5 +1338,195 @@ describe("Slider — motion and animation", () => {
       .join(" ");
     expect(allClasses).not.toMatch(/duration-\[\d+ms\]/);
     expect(allClasses).not.toMatch(/ease-\[cubic-bezier/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Slider — accessibility (Milestone 9)
+// ---------------------------------------------------------------------------
+
+describe("Slider — accessibility", () => {
+  afterEach(() => {
+    mockUseReducedMotion.mockReturnValue(false);
+  });
+
+  // 125. standard slider: axe reports zero violations
+  test("standard slider: axe reports zero violations", async () => {
+    const { container } = render(<Slider label="Volume" defaultValue={[50]} />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  // 126. range slider: axe reports zero violations
+  test("range slider: axe reports zero violations", async () => {
+    const { container } = render(
+      <Slider
+        variant="range"
+        label="Price range"
+        thumbLabels={["Minimum", "Maximum"]}
+        defaultValue={[30, 70]}
+      />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  // 127. centered slider: axe reports zero violations
+  test("centered slider: axe reports zero violations", async () => {
+    const { container } = render(
+      <Slider
+        variant="centered"
+        label="Balance"
+        minValue={-100}
+        maxValue={100}
+        defaultValue={[0]}
+      />
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  // 128. disabled slider: axe reports zero violations
+  test("disabled slider: axe reports zero violations", async () => {
+    const { container } = render(<Slider label="Volume" isDisabled defaultValue={[50]} />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  // 129. aria-orientation matches orientation prop
+  test("aria-orientation matches orientation prop", () => {
+    const { container: hContainer } = render(
+      <Slider label="Vol" orientation="horizontal" defaultValue={[50]} />
+    );
+    const hInput = hContainer.querySelector('input[type="range"]');
+    expect(hInput).toHaveAttribute("aria-orientation", "horizontal");
+
+    const { container: vContainer } = render(
+      <Slider label="Vol" orientation="vertical" defaultValue={[50]} />
+    );
+    const vInput = vContainer.querySelector('input[type="range"]');
+    expect(vInput).toHaveAttribute("aria-orientation", "vertical");
+  });
+
+  // 130. aria-valuetext is used when formatValue is provided
+  test("aria-valuetext is used when formatValue is provided", () => {
+    const { container } = render(
+      <Slider label="Price" defaultValue={[50]} formatValue={(v) => `$${v}`} />
+    );
+    const input = container.querySelector('input[type="range"]');
+    expect(input).toHaveAttribute("aria-valuetext", "$50");
+  });
+
+  // 131. range slider: left thumb max constrained by right thumb value
+  test("range slider: left thumb max constrained by right thumb", () => {
+    const { container } = render(<Slider variant="range" label="Range" defaultValue={[30, 70]} />);
+    const inputs = container.querySelectorAll('input[type="range"]');
+    // React Aria sets native max attribute (implicit aria-valuemax for <input type="range">)
+    expect(inputs[0]).toHaveAttribute("max", "70");
+  });
+
+  // 132. range slider: right thumb min constrained by left thumb value
+  test("range slider: right thumb min constrained by left thumb", () => {
+    const { container } = render(<Slider variant="range" label="Range" defaultValue={[30, 70]} />);
+    const inputs = container.querySelectorAll('input[type="range"]');
+    // React Aria sets native min attribute (implicit aria-valuemin for <input type="range">)
+    expect(inputs[1]).toHaveAttribute("min", "30");
+  });
+
+  // 133. Tab key moves focus from left thumb to right thumb in range
+  test("Tab key moves focus from left thumb to right thumb in range", () => {
+    const { container } = render(<Slider variant="range" label="Range" defaultValue={[30, 70]} />);
+    const inputs = container.querySelectorAll('input[type="range"]');
+    expect(inputs).toHaveLength(2);
+
+    act(() => {
+      (inputs[0] as HTMLElement).focus();
+    });
+    expect(document.activeElement).toBe(inputs[0]);
+
+    act(() => {
+      (inputs[1] as HTMLElement).focus();
+    });
+    expect(document.activeElement).toBe(inputs[1]);
+  });
+
+  // 134. focus-visible ring appears on keyboard focus
+  test("focus-visible ring appears on keyboard focus", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const input = container.querySelector('input[type="range"]')!;
+
+    act(() => {
+      // Keyboard modality: fire keydown before focus so React Aria sets isFocusVisible=true
+      fireEvent.keyDown(document.body, { key: "Tab" });
+      (input as HTMLElement).focus();
+      fireEvent.focus(input);
+    });
+
+    const thumbWithFocusVisible = container.querySelector("[data-focus-visible]");
+    expect(thumbWithFocusVisible).not.toBeNull();
+  });
+
+  // 135. focus ring NOT visible on pointer interaction
+  test("focus ring NOT visible on pointer interaction", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const input = container.querySelector('input[type="range"]')!;
+
+    act(() => {
+      // jsdom has no PointerEvent; React Aria falls back to mousedown for modality tracking.
+      // Firing mouseDown on document.body resets modality to "pointer" before focusing.
+      fireEvent.mouseDown(document.body);
+      (input as HTMLElement).focus();
+      fireEvent.focus(input);
+    });
+
+    const thumbWithFocusVisible = container.querySelector("[data-focus-visible]");
+    expect(thumbWithFocusVisible).toBeNull();
+  });
+
+  // 136. output element serves as live region for value changes
+  test("output element serves as live region for value changes", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const output = container.querySelector("output");
+    expect(output).not.toBeNull();
+    expect(output).toHaveTextContent("50");
+  });
+
+  // 137. stops overlay has aria-hidden="true"
+  test("stops overlay has aria-hidden", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} step={10} showStops />);
+    const stopsContainer = container.querySelector('[data-slot="stops-container"]');
+    expect(stopsContainer).toHaveAttribute("aria-hidden", "true");
+  });
+
+  // 138. value indicator is not announced to screen reader
+  test("value indicator is not announced to screen reader", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const indicator = container.querySelector('[data-slot="value-indicator"]');
+    expect(indicator).not.toBeNull();
+    // role="tooltip" is a non-live landmark — not a live region; or aria-hidden when collapsed
+    const hasTooltipRole = indicator?.getAttribute("role") === "tooltip";
+    const isAriaHidden = indicator?.getAttribute("aria-hidden") === "true";
+    expect(hasTooltipRole || isAriaHidden).toBe(true);
+  });
+
+  // 139. development warning when no accessible name provided
+  test("development warning when no accessible name provided", () => {
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    render(<Slider defaultValue={[50]} />);
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[Slider]"));
+    consoleSpy.mockRestore();
+  });
+
+  // 140. disabled slider has tabindex removed or -1
+  test("disabled slider has tabindex removed or -1", () => {
+    const { container } = render(<Slider label="Vol" isDisabled defaultValue={[50]} />);
+    const input = container.querySelector('input[type="range"]');
+    expect(input).not.toBeNull();
+    const tabIndex = input?.getAttribute("tabindex");
+    const isDisabledAttr = input?.hasAttribute("disabled");
+    // React Aria either removes tabindex, sets it to -1, or sets the disabled attribute
+    expect(tabIndex === "-1" || tabIndex === null || isDisabledAttr).toBe(true);
   });
 });

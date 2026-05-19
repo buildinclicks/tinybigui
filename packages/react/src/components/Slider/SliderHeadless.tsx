@@ -5,6 +5,7 @@ import type React from "react";
 import { mergeProps, useFocusRing, useSlider, useSliderThumb, VisuallyHidden } from "react-aria";
 import { useSliderState } from "react-stately";
 import type { SliderState } from "react-stately";
+import { cn } from "../../utils/cn";
 import type { SliderHeadlessProps } from "./Slider.types";
 
 // ─── Centered Variant Utilities ───────────────────────────────────────────────
@@ -48,8 +49,8 @@ function SliderThumbInternal({
   state,
   trackRef,
   isDisabled,
-  formatValue: _formatValue,
-  className: _className,
+  formatValue,
+  className,
   "data-direction": dataDirection,
   ...ariaProps
 }: SliderThumbInternalProps): React.JSX.Element {
@@ -68,6 +69,11 @@ function SliderThumbInternal({
 
   const { isFocusVisible, focusProps } = useFocusRing();
 
+  // Override aria-valuetext with the custom formatter when provided.
+  // React Stately v3.7 does not support getValueLabel; we patch the attribute directly.
+  const currentValue = state.getThumbValue(index);
+  const ariaValueText = formatValue ? formatValue(currentValue) : undefined;
+
   return (
     <div
       {...thumbProps}
@@ -76,9 +82,21 @@ function SliderThumbInternal({
       data-focus-visible={isFocusVisible || undefined}
       data-disabled={isDisabled || undefined}
       {...(dataDirection !== undefined ? { "data-direction": dataDirection } : {})}
+      className={cn(
+        "outline-none",
+        // Focus ring visible only on keyboard focus — matches project pattern (md3-design.mdc §Accessibility)
+        "data-[focus-visible]:ring-3",
+        "data-[focus-visible]:ring-secondary",
+        "data-[focus-visible]:ring-offset-2",
+        className
+      )}
     >
       <VisuallyHidden>
-        <input ref={inputRef} {...mergeProps(inputProps, focusProps)} />
+        <input
+          ref={inputRef}
+          {...mergeProps(inputProps, focusProps)}
+          {...(ariaValueText !== undefined ? { "aria-valuetext": ariaValueText } : {})}
+        />
       </VisuallyHidden>
     </div>
   );
@@ -142,6 +160,14 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
     const trackRef = useRef<HTMLDivElement>(null);
     const internalRef = useRef<HTMLDivElement>(null);
     const containerRef = (forwardedRef ?? internalRef) as React.RefObject<HTMLDivElement>;
+
+    if (process.env.NODE_ENV !== "production") {
+      if (!label && !ariaProps["aria-label"] && !ariaProps["aria-labelledby"]) {
+        console.warn(
+          "[Slider] Slider must have an accessible name. Provide a `label`, `aria-label`, or `aria-labelledby` prop."
+        );
+      }
+    }
 
     // Stable formatter for React Stately value announcements
     const numberFormatter = useMemo(() => new Intl.NumberFormat(), []);
