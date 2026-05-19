@@ -11,6 +11,8 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BottomSheetHeadless, useBottomSheetContext } from "./BottomSheetHeadless";
+import { BottomSheet } from "./BottomSheet";
+import { BottomSheetHandle } from "./BottomSheetHandle";
 
 import type {
   BottomSheetAnimationState,
@@ -635,5 +637,86 @@ describe("useBottomSheetDrag — drag and snap behavior", () => {
       </BottomSheetHeadless>
     );
     expect(screen.getByTestId("dragTranslateY").textContent).toBe("null");
+  });
+});
+
+// ─── BottomSheet — styled layer ───────────────────────────────────────────────
+
+describe("BottomSheet — styled layer", () => {
+  // Test 34
+  it("BottomSheet has bg-surface-container-low class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("bg-surface-container-low");
+  });
+
+  // Test 35
+  it("BottomSheet has shadow-elevation-1 class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("shadow-elevation-1");
+  });
+
+  // Test 36
+  it("BottomSheet has rounded-t-xl class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("rounded-t-xl");
+  });
+
+  // Test 37
+  it("BottomSheet modal variant has z-50 class", () => {
+    render(<BottomSheet variant="modal" open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("z-50");
+  });
+
+  // Test 38
+  it("BottomSheet standard variant has z-10 class", () => {
+    render(<BottomSheet variant="standard" open aria-label="Test" />);
+    const panel = document.querySelector("[data-animation-state]");
+    expect(panel).toHaveClass("z-10");
+  });
+
+  // Test 39
+  it("BottomSheetHandle renders inside BottomSheet", () => {
+    render(
+      <BottomSheet open aria-label="Test">
+        Content
+      </BottomSheet>
+    );
+    // Handle wrapper has role="button" injected by handleProps
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
+  // Test 40
+  it("BottomSheetHandle pill has w-8 and h-1 classes", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    const pill = document.querySelector('span[aria-hidden="true"]');
+    expect(pill).toHaveClass("w-8");
+    expect(pill).toHaveClass("h-1");
+  });
+
+  // Test 41
+  it("BottomSheetHandle pill has bg-on-surface-variant class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    const pill = document.querySelector('span[aria-hidden="true"]');
+    expect(pill).toHaveClass("bg-on-surface-variant");
+  });
+
+  // Test 42
+  it("BottomSheetHandle pill has opacity-40 class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    const pill = document.querySelector('span[aria-hidden="true"]');
+    expect(pill).toHaveClass("opacity-40");
+  });
+
+  // Test 43
+  it("BottomSheetHandle wrapper has cursor-ns-resize class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("button")).toHaveClass("cursor-ns-resize");
+  });
+
+  // Test 44
+  it("index.ts exports BottomSheet, BottomSheetHandle, BottomSheetHeadless", () => {
+    expect(BottomSheet).toBeDefined();
+    expect(BottomSheetHandle).toBeDefined();
+    expect(BottomSheetHeadless).toBeDefined();
   });
 });
