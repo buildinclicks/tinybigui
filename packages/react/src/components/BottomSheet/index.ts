@@ -18,6 +18,7 @@ export {
   bottomSheetScrimVariants,
   bottomSheetHandleWrapperVariants,
   bottomSheetHandlePillVariants,
+  bottomSheetAnimationVariants,
 } from "./BottomSheet.variants";
 
 // Types

@@ -4,14 +4,19 @@
 //
 // Wraps BottomSheetHeadless with CVA styling, renders BottomSheetHandle
 // automatically as the first child inside the sheet panel.
-// getAnimationClassName is deferred to M06 — passed as undefined here.
+// M06: Wires getAnimationClassName (slide in/out) and useReducedMotion guard.
 
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 import { cn } from "../../utils/cn";
 import { BottomSheetHeadless } from "./BottomSheetHeadless";
 import { BottomSheetHandle } from "./BottomSheetHandle";
-import { bottomSheetVariants, bottomSheetScrimVariants } from "./BottomSheet.variants";
-import type { BottomSheetProps } from "./BottomSheet.types";
+import {
+  bottomSheetVariants,
+  bottomSheetScrimVariants,
+  bottomSheetAnimationVariants,
+} from "./BottomSheet.variants";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
+import type { BottomSheetProps, BottomSheetAnimationState } from "./BottomSheet.types";
 
 /**
  * `BottomSheet` — Layer 3 MD3 Styled Bottom Sheet Component.
@@ -66,7 +71,29 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
   },
   ref
 ) {
-  const panelClassName = cn(bottomSheetVariants({ variant }), className);
+  const reducedMotion = useReducedMotion();
+
+  /**
+   * Returns the CVA animation class for the current animation state.
+   * Returns empty string when the user prefers reduced motion, suppressing
+   * all JS-driven slide animations per WCAG 2.1 AA and MD3 reduce-motion spec.
+   */
+  const getAnimationClassName = useCallback(
+    (state: BottomSheetAnimationState): string => {
+      if (reducedMotion) return "";
+      return bottomSheetAnimationVariants({ animationState: state });
+    },
+    [reducedMotion]
+  );
+
+  // When reducedMotion is true, append transition-none to override the snap
+  // spring transition-transform added in bottomSheetVariants base.
+  // tailwind-merge resolves the conflict and keeps transition-none.
+  const panelClassName = cn(
+    bottomSheetVariants({ variant }),
+    reducedMotion && "transition-none",
+    className
+  );
   const scrimClassName = bottomSheetScrimVariants();
 
   return (
@@ -80,6 +107,7 @@ export const BottomSheet = forwardRef<HTMLDivElement, BottomSheetProps>(function
       aria-label={ariaLabel}
       className={panelClassName}
       scrimClassName={scrimClassName}
+      getAnimationClassName={getAnimationClassName}
     >
       <BottomSheetHandle />
       {children}

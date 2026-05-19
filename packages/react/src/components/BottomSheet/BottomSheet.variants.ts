@@ -1,5 +1,39 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
+// ─── Animation variants ───────────────────────────────────────────────────────
+
+/**
+ * CVA animation state variants for the Bottom Sheet panel.
+ *
+ * Motion decision rationale:
+ * - Bottom sheet is a standard-size component → `default` speed tier
+ * - Slides in/out of screen → composite `animate-md-*` utilities (not manual spring tokens)
+ * - Scrim opacity is an effects property → `duration-short4 ease-standard` (legacy screen-level token)
+ * - Snap spring is a spatial on-screen transition → `ease-spring-standard-default-spatial` +
+ *   `duration-spring-standard-default-spatial` (applied in bottomSheetVariants base)
+ * - Standard personality (not expressive) — sheets are utility UI, not moments of delight
+ */
+export const bottomSheetAnimationVariants = cva("", {
+  variants: {
+    animationState: {
+      // entering: initial mount frame — sheet starts below viewport (translateY(100%))
+      // The CSS is handled inside animate-md-slide-in-bottom keyframes
+      entering: ["opacity-0"],
+      // visible: entry animation active — animate-md-slide-in-bottom runs once
+      visible: ["animate-md-slide-in-bottom"],
+      // exiting: exit animation active — animate-md-slide-out-bottom runs once
+      exiting: ["animate-md-slide-out-bottom"],
+      // exited: portal gate removes element — no classes needed
+      exited: ["opacity-0", "pointer-events-none"],
+    },
+  },
+  defaultVariants: {
+    animationState: "entering",
+  },
+});
+
+export type BottomSheetAnimationVariants = VariantProps<typeof bottomSheetAnimationVariants>;
+
 // ─── Sheet container ──────────────────────────────────────────────────────────
 
 /**
@@ -36,6 +70,15 @@ export const bottomSheetVariants = cva(
     "mx-auto",
     // NOTE: measurement-derived value from MD3 spec; permitted exception
     "max-w-[640px]",
+
+    // Transition: snap spring for drag-release snap (spatial property — transform)
+    // Standard personality, default speed tier, spatial: no overshoot
+    // During drag, data-[dragging=true]:transition-none suppresses this so the
+    // sheet follows the pointer without lag.
+    "transition-transform",
+    "duration-spring-standard-default-spatial",
+    "ease-spring-standard-default-spatial",
+    "data-[dragging=true]:transition-none",
 
     // Transition: transform for snap spring (applied in M06)
     "will-change-transform",
