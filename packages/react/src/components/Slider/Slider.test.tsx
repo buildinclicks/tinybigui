@@ -1019,3 +1019,177 @@ describe("Slider — stop indicators and value indicator", () => {
     expect(trackStop).toHaveClass("bg-on-secondary-container");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Slider — vertical orientation (Milestone 7)
+// ---------------------------------------------------------------------------
+
+describe("Slider — vertical orientation", () => {
+  // 91. Track layout has flex-col-reverse in vertical orientation
+  test("vertical orientation: track layout has flex-col-reverse class", () => {
+    const { container } = render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
+    const trackLayout = container.querySelector('[data-slot="track-layout"]');
+    expect(trackLayout).toHaveClass("flex-col-reverse");
+  });
+
+  // 92. Container has data-orientation="vertical"
+  test("vertical orientation: data-orientation='vertical' on container", () => {
+    const { container } = render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
+    const group = container.querySelector('[role="group"]');
+    expect(group).toHaveAttribute("data-orientation", "vertical");
+  });
+
+  // 93. ArrowUp increases value in vertical
+  test("vertical orientation: ArrowUp increases value", () => {
+    render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
+    const input = screen.getByRole("slider");
+
+    act(() => {
+      input.focus();
+    });
+    fireEvent.keyDown(input, { key: "ArrowUp" });
+
+    expect(Number((input as HTMLInputElement).value)).toBeGreaterThan(50);
+  });
+
+  // 94. ArrowDown decreases value in vertical
+  test("vertical orientation: ArrowDown decreases value", () => {
+    render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
+    const input = screen.getByRole("slider");
+
+    act(() => {
+      input.focus();
+    });
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+
+    expect(Number((input as HTMLInputElement).value)).toBeLessThan(50);
+  });
+
+  // 95. aria-orientation="vertical" on slider input
+  test("vertical orientation: aria-orientation='vertical' on slider input", () => {
+    render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
+    const input = screen.getByRole("slider");
+    expect(input).toHaveAttribute("aria-orientation", "vertical");
+  });
+
+  // 96. Container has fixed width based on size for vertical
+  test("vertical orientation: container has w-[52px] for medium size", () => {
+    render(<Slider label="Vol" orientation="vertical" size="medium" defaultValue={[50]} />);
+    const group = screen.getByRole("group");
+    expect(group).toHaveClass("w-[52px]");
+  });
+
+  // 97. Handle dimensions are swapped in vertical
+  test("vertical orientation: handle has h-[4px] and w-full", () => {
+    const { container } = render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("h-[4px]");
+    expect(handle).toHaveClass("w-full");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Slider — inset icon (Milestone 7)
+// ---------------------------------------------------------------------------
+
+describe("Slider — inset icon", () => {
+  // 98. Inset icon not rendered for xsmall size
+  test("inset icon not rendered for xsmall size", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="xsmall" defaultValue={[50]} />
+    );
+    expect(container.querySelector('[data-slot="inset-icon"]')).not.toBeInTheDocument();
+  });
+
+  // 99. Inset icon not rendered for small size
+  test("inset icon not rendered for small size", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="small" defaultValue={[50]} />
+    );
+    expect(container.querySelector('[data-slot="inset-icon"]')).not.toBeInTheDocument();
+  });
+
+  // 100. Inset icon rendered for medium size
+  test("inset icon rendered for medium size", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="medium" defaultValue={[50]} />
+    );
+    expect(container.querySelector('[data-slot="inset-icon"]')).toBeInTheDocument();
+  });
+
+  // 101. Inset icon rendered for large size
+  test("inset icon rendered for large size", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="large" defaultValue={[50]} />
+    );
+    expect(container.querySelector('[data-slot="inset-icon"]')).toBeInTheDocument();
+  });
+
+  // 102. Inset icon rendered for xlarge size
+  test("inset icon rendered for xlarge size", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="xlarge" defaultValue={[50]} />
+    );
+    expect(container.querySelector('[data-slot="inset-icon"]')).toBeInTheDocument();
+  });
+
+  // 103. Inset icon has text-on-primary class
+  test("inset icon has text-on-primary class", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="medium" defaultValue={[50]} />
+    );
+    const iconEl = container.querySelector('[data-slot="inset-icon"]');
+    expect(iconEl).toHaveClass("text-on-primary");
+  });
+
+  // 104. Inset icon has left-[8px] position in horizontal orientation
+  test("inset icon has left-[8px] position in horizontal orientation", () => {
+    const { container } = render(
+      <Slider
+        label="Vol"
+        icon={<svg />}
+        size="medium"
+        orientation="horizontal"
+        defaultValue={[50]}
+      />
+    );
+    const iconEl = container.querySelector('[data-slot="inset-icon"]');
+    expect(iconEl).toHaveClass("left-[8px]");
+  });
+
+  // 105. Inset icon medium/large has w-[24px] h-[24px]
+  test("inset icon medium/large has w-[24px] and h-[24px]", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="medium" defaultValue={[50]} />
+    );
+    const iconEl = container.querySelector('[data-slot="inset-icon"]');
+    expect(iconEl).toHaveClass("w-[24px]");
+    expect(iconEl).toHaveClass("h-[24px]");
+  });
+
+  // 106. Inset icon xlarge has w-[32px] h-[32px]
+  test("inset icon xlarge has w-[32px] and h-[32px]", () => {
+    const { container } = render(
+      <Slider label="Vol" icon={<svg />} size="xlarge" defaultValue={[50]} />
+    );
+    const iconEl = container.querySelector('[data-slot="inset-icon"]');
+    expect(iconEl).toHaveClass("w-[32px]");
+    expect(iconEl).toHaveClass("h-[32px]");
+  });
+
+  // 107. Inset icon not rendered for range variant
+  test("inset icon not rendered for range variant", () => {
+    const { container } = render(
+      <Slider label="Vol" variant="range" icon={<svg />} size="large" defaultValue={[25, 75]} />
+    );
+    expect(container.querySelector('[data-slot="inset-icon"]')).not.toBeInTheDocument();
+  });
+
+  // 108. Inset icon not rendered for centered variant
+  test("inset icon not rendered for centered variant", () => {
+    const { container } = render(
+      <Slider label="Vol" variant="centered" icon={<svg />} size="large" defaultValue={[0]} />
+    );
+    expect(container.querySelector('[data-slot="inset-icon"]')).not.toBeInTheDocument();
+  });
+});

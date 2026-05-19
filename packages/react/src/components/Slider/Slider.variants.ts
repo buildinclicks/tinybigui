@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
  * CVA variants for the Slider container (root element — the `role="group"` div).
  *
  * MD3 spec §4.2: Container height equals handle height for each size.
+ * MD3 spec §4.1, §10.9: In vertical orientation, container width = handle height (dimensions transposed).
  * Applied via className on SliderHeadless so the groupProps div receives these classes.
  */
 export const sliderContainerVariants = cva(
@@ -25,13 +26,32 @@ export const sliderContainerVariants = cva(
         large: "h-[68px]",
         xlarge: "h-[108px]",
       },
+      orientation: {
+        // Horizontal: w-full already in base; flex-row is default flex direction
+        horizontal: "",
+        // Vertical: transposed — container height fills parent, width = handle height (per size)
+        // flex-col stacks label → track → output vertically
+        // NOTE: h-full requires a parent with defined height; w-[...] set via compound variants
+        vertical: "h-full flex-col",
+      },
       disabled: {
         true: "cursor-not-allowed pointer-events-none",
         false: "cursor-pointer",
       },
     },
+    compoundVariants: [
+      // Vertical: container WIDTH = handle height (MD3 §10.9 — dimensions transposed)
+      // Overrides w-full from base via tailwind-merge in cn()
+      // NOTE: measurement-derived values from MD3 spec §4.2; permitted exception
+      { orientation: "vertical", size: "xsmall", className: "w-[44px]" },
+      { orientation: "vertical", size: "small", className: "w-[44px]" },
+      { orientation: "vertical", size: "medium", className: "w-[52px]" },
+      { orientation: "vertical", size: "large", className: "w-[68px]" },
+      { orientation: "vertical", size: "xlarge", className: "w-[108px]" },
+    ],
     defaultVariants: {
       size: "xsmall",
+      orientation: "horizontal",
       disabled: false,
     },
   }
@@ -42,6 +62,7 @@ export const sliderContainerVariants = cva(
  *
  * MD3 spec §6, §8.1, §10.2: `bg-primary`, size-dependent outer corners, 2dp inner corners.
  * Inner corner (near handle) is always 2dp regardless of size.
+ * MD3 spec §10.9: In vertical orientation, track thickness becomes width (not height).
  * Transition: flex-basis spatial spring (md3-motion spring-standard-fast-spatial).
  */
 export const sliderActiveTrackVariants = cva(
@@ -50,19 +71,60 @@ export const sliderActiveTrackVariants = cva(
     variants: {
       size: {
         // NOTE: measurement-derived values from MD3 spec §4.2, §6 Corner tokens; permitted exception
+        // Corner classes are in compound variants to avoid conflicts with vertical orientation corners
         xsmall: "h-[16px] rounded-l-[16px] rounded-r-[2px]", // corner.large outer (16dp), 2dp inner
         small: "h-[16px] rounded-l-[16px] rounded-r-[2px]",
         medium: "h-[40px] rounded-l-[12px] rounded-r-[2px]", // corner.medium outer (12dp), 2dp inner
         large: "h-[56px] rounded-l-[16px] rounded-r-[2px]", // corner.large outer (16dp), 2dp inner
         xlarge: "h-[96px] rounded-l-[28px] rounded-r-[2px]", // corner.extra-large outer (28dp), 2dp inner
       },
+      orientation: {
+        horizontal: "",
+        // Vertical: track thickness is now width; flex-basis (inline style) controls height.
+        // h-[...] from size variant is overridden by flex-basis in a flex-col container.
+        // Individual corner classes (rounded-tl/tr/bl/br) override the horizontal rounded-l/r
+        // via tailwind-merge conflict resolution in cn().
+        vertical: "",
+      },
       disabled: {
         true: "bg-on-surface opacity-38",
         false: "",
       },
     },
+    compoundVariants: [
+      // Vertical: width = track thickness, corners transposed (bottom = outer, top = inner near handle)
+      // Using individual corner utilities so tailwind-merge correctly resolves conflicts with
+      // the horizontal rounded-l/rounded-r classes from size variants.
+      // NOTE: measurement-derived values from MD3 spec §4.2, §6 Corner tokens; permitted exception
+      {
+        orientation: "vertical",
+        size: "xsmall",
+        className: "w-[16px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[16px] rounded-br-[16px]",
+      },
+      {
+        orientation: "vertical",
+        size: "small",
+        className: "w-[16px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[16px] rounded-br-[16px]",
+      },
+      {
+        orientation: "vertical",
+        size: "medium",
+        className: "w-[40px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[12px] rounded-br-[12px]",
+      },
+      {
+        orientation: "vertical",
+        size: "large",
+        className: "w-[56px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[16px] rounded-br-[16px]",
+      },
+      {
+        orientation: "vertical",
+        size: "xlarge",
+        className: "w-[96px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[28px] rounded-br-[28px]",
+      },
+    ],
     defaultVariants: {
       size: "xsmall",
+      orientation: "horizontal",
       disabled: false,
     },
   }
@@ -72,6 +134,7 @@ export const sliderActiveTrackVariants = cva(
  * CVA for the inactive track (unfilled portion).
  *
  * MD3 spec §6, §8.1, §10.2: `bg-secondary-container`, 2dp inner corners, size-dependent outer corners.
+ * MD3 spec §10.9: In vertical orientation, track thickness becomes width (not height).
  * Disabled: `bg-on-surface` at 10% opacity via Tailwind alpha modifier.
  */
 export const sliderInactiveTrackVariants = cva(
@@ -86,13 +149,49 @@ export const sliderInactiveTrackVariants = cva(
         large: "h-[56px] rounded-l-[2px] rounded-r-[16px]",
         xlarge: "h-[96px] rounded-l-[2px] rounded-r-[28px]",
       },
+      orientation: {
+        horizontal: "",
+        // Vertical: track thickness is width; flex-1 controls height growth.
+        // Individual corner classes override horizontal rounded-l/r via tailwind-merge.
+        vertical: "",
+      },
       disabled: {
         true: "bg-on-surface/10", // MD3 §8.2: 10% opacity via background alpha
         false: "",
       },
     },
+    compoundVariants: [
+      // Vertical: width = track thickness, corners transposed (top = outer, bottom = inner near handle)
+      // NOTE: measurement-derived values from MD3 spec §4.2, §6 Corner tokens; permitted exception
+      {
+        orientation: "vertical",
+        size: "xsmall",
+        className: "w-[16px] rounded-tl-[16px] rounded-tr-[16px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "small",
+        className: "w-[16px] rounded-tl-[16px] rounded-tr-[16px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "medium",
+        className: "w-[40px] rounded-tl-[12px] rounded-tr-[12px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "large",
+        className: "w-[56px] rounded-tl-[16px] rounded-tr-[16px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "xlarge",
+        className: "w-[96px] rounded-tl-[28px] rounded-tr-[28px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+    ],
     defaultVariants: {
       size: "xsmall",
+      orientation: "horizontal",
       disabled: false,
     },
   }
@@ -102,6 +201,8 @@ export const sliderInactiveTrackVariants = cva(
  * CVA for the handle/thumb element.
  *
  * MD3 spec §6, §9, §10.3: 4dp wide, full container height, 2dp border-radius.
+ * MD3 spec §10.9: In vertical orientation, width and height are transposed —
+ *   handle becomes 4dp tall (main axis) × full width (cross axis).
  * Width narrows to 2dp on press (md3 spec §9.3).
  * Motion: transition-[width] with duration-short2 + ease-standard (Appendix E).
  */
@@ -128,6 +229,13 @@ export const sliderHandleVariants = cva(
         large: "w-[4px] h-[68px]",
         xlarge: "w-[4px] h-[108px]",
       },
+      orientation: {
+        horizontal: "",
+        // Vertical: dimensions transposed. h-[4px] overrides size-variant h-[...] via tailwind-merge;
+        // w-full overrides size-variant w-[4px] via tailwind-merge (both in cn() call at styled layer).
+        // NOTE: measurement-derived value from MD3 spec §10.3 (4dp handle width); permitted exception
+        vertical: "h-[4px] w-full",
+      },
       pressed: {
         true: "w-[2px]", // NOTE: measurement-derived value from MD3 spec §10.3 (2dp pressed width); permitted exception
         false: "",
@@ -139,6 +247,7 @@ export const sliderHandleVariants = cva(
     },
     defaultVariants: {
       size: "xsmall",
+      orientation: "horizontal",
       pressed: false,
       disabled: false,
     },
@@ -186,6 +295,7 @@ export const sliderHandleStateLayerVariants = cva(
  *
  * MD3 spec §7, §10.2: Flex row with 6dp gap between handle and track segments.
  * The 6dp gap is the `thumbTrackGapSize` token from MD3 spec.
+ * MD3 spec §10.9: Vertical orientation uses flex-col-reverse for bottom-to-top fill.
  * `relative` is required so the absolute stops overlay is positioned within.
  */
 export const sliderTrackLayoutVariants = cva(
@@ -193,14 +303,15 @@ export const sliderTrackLayoutVariants = cva(
     "relative",
     "flex",
     "items-center",
-    "w-full",
     "gap-[6px]", // NOTE: measurement-derived value from MD3 spec §2, §6 (thumbTrackGapSize: 6dp); permitted exception
   ],
   {
     variants: {
       orientation: {
-        horizontal: "flex-row",
-        vertical: "flex-col-reverse", // Bottom-to-top fill for vertical orientation
+        // Horizontal: full width, left-to-right fill
+        horizontal: "flex-row w-full",
+        // Vertical: full height, bottom-to-top fill (flex-col-reverse places active track at bottom)
+        vertical: "flex-col-reverse h-full",
       },
     },
     defaultVariants: {
@@ -351,6 +462,42 @@ export const sliderValueIndicatorTextVariants = cva([
   "text-center",
 ]);
 
+/**
+ * CVA for the inset icon element rendered inside the active track.
+ *
+ * MD3 spec §5.1, §10.7:
+ * - Only available for Medium, Large, XLarge sizes (Standard variant only)
+ * - Positioned absolutely inside the active track
+ * - Horizontal: 8dp from left edge, vertically centered
+ * - Vertical: 8dp from bottom edge, horizontally centered
+ * - Icon sizes: 24×24dp (Medium, Large), 32×32dp (XLarge)
+ * - Color: on-primary (icon sits on primary-colored active track)
+ */
+export const sliderInsetIconVariants = cva(
+  ["absolute", "text-on-primary", "pointer-events-none", "flex", "items-center", "justify-center"],
+  {
+    variants: {
+      size: {
+        // NOTE: measurement-derived values from MD3 spec §10.7 (icon sizes); permitted exception
+        medium: "w-[24px] h-[24px]",
+        large: "w-[24px] h-[24px]",
+        xlarge: "w-[32px] h-[32px]",
+      },
+      orientation: {
+        // Horizontal: 8dp from active track left edge, vertically centered
+        // NOTE: measurement-derived value from MD3 spec §10.7 (iconOffset: 8dp); permitted exception
+        horizontal: "left-[8px] top-1/2 -translate-y-1/2",
+        // Vertical: 8dp from active track bottom edge (outer end), horizontally centered
+        vertical: "bottom-[8px] left-1/2 -translate-x-1/2",
+      },
+    },
+    defaultVariants: {
+      size: "medium",
+      orientation: "horizontal",
+    },
+  }
+);
+
 // ─── Variant Prop Types ────────────────────────────────────────────────────────
 
 export type SliderContainerVariants = VariantProps<typeof sliderContainerVariants>;
@@ -363,3 +510,4 @@ export type SliderStopsContainerVariants = VariantProps<typeof sliderStopsContai
 export type SliderStopDotVariants = VariantProps<typeof sliderStopDotVariants>;
 export type SliderTrackStopVariants = VariantProps<typeof sliderTrackStopVariants>;
 export type SliderValueIndicatorVariants = VariantProps<typeof sliderValueIndicatorVariants>;
+export type SliderInsetIconVariants = VariantProps<typeof sliderInsetIconVariants>;

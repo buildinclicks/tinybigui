@@ -15,6 +15,7 @@ import {
   sliderHandleStateLayerVariants,
   sliderTrackLayoutVariants,
   sliderTrackStopVariants,
+  sliderInsetIconVariants,
 } from "./Slider.variants";
 import type { SliderProps, SliderThumbState } from "./Slider.types";
 
@@ -77,7 +78,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       showStops = false,
       showValueIndicator = false,
       formatValue,
-      icon: _icon,
+      icon,
       className,
       ...headlessProps
     },
@@ -116,6 +117,13 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const isRange = variant === "range";
     const isCentered = variant === "centered";
 
+    // Only Standard variant supports the inset icon, and only for Medium/Large/XLarge sizes
+    // (MD3 spec §5.1: icon not available for XSmall and Small)
+    const showIcon =
+      icon !== undefined &&
+      variant === "standard" &&
+      (size === "medium" || size === "large" || size === "xlarge");
+
     // ── Standard track render ──────────────────────────────────────────────────
     const renderStandardTrack = (): React.JSX.Element => {
       const pct = clampPercent(currentValues[0] ?? minValue, minValue, maxValue);
@@ -123,15 +131,29 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
       return (
         <>
-          {/* Active track — width driven by current value percentage */}
+          {/* Active track — width/height driven by current value percentage */}
           <div
             data-slot="active-track"
             className={cn(
-              sliderActiveTrackVariants({ size, disabled: isDisabled }),
+              sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
               trackTransition
             )}
             style={{ flexBasis: `${pct}%` }}
-          />
+          >
+            {showIcon && (
+              <span
+                data-slot="inset-icon"
+                className={cn(
+                  sliderInsetIconVariants({
+                    size,
+                    orientation,
+                  })
+                )}
+              >
+                {icon}
+              </span>
+            )}
+          </div>
           {/* Visual handle — decorative; keyboard/pointer behaviour is in SliderThumbInternal.
                stopPropagation prevents pointer events from bubbling to the React Aria track
                which would trigger a position calculation (NaN in JSDOM / no-layout envs). */}
@@ -142,6 +164,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 size,
                 disabled: isDisabled,
                 pressed: thumb0State === "pressed",
+                orientation,
               })
             )}
             onPointerEnter={() => {
@@ -171,11 +194,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               />
             )}
           </div>
-          {/* Inactive track — fills remaining width */}
+          {/* Inactive track — fills remaining flex space */}
           <div
             data-slot="inactive-track"
             className={cn(
-              sliderInactiveTrackVariants({ size, disabled: isDisabled }),
+              sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
               trackTransition
             )}
             style={{ flexBasis: `${100 - pct}%` }}
@@ -209,7 +232,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           <div
             data-slot="inactive-track-left"
             className={cn(
-              sliderInactiveTrackVariants({ size, disabled: isDisabled }),
+              sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
               trackTransition
             )}
             style={{ flexBasis: `${leftPct}%` }}
@@ -230,6 +253,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 size,
                 disabled: isDisabled,
                 pressed: thumb0State === "pressed",
+                orientation,
               })
             )}
             onPointerEnter={() => {
@@ -263,7 +287,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           <div
             data-slot="active-track"
             className={cn(
-              sliderActiveTrackVariants({ size, disabled: isDisabled }),
+              sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
               "rounded-[2px]", // Both ends near handles: 2dp (MD3 §10.2)
               trackTransition
             )}
@@ -278,6 +302,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 size,
                 disabled: isDisabled,
                 pressed: thumb1State === "pressed",
+                orientation,
               })
             )}
             onPointerEnter={() => {
@@ -311,7 +336,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           <div
             data-slot="inactive-track-right"
             className={cn(
-              sliderInactiveTrackVariants({ size, disabled: isDisabled }),
+              sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
               trackTransition
             )}
             style={{ flexBasis: `${100 - rightPct}%` }}
@@ -343,6 +368,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               size,
               disabled: isDisabled,
               pressed: thumb0State === "pressed",
+              orientation,
             })
           )}
           onPointerEnter={() => {
@@ -382,7 +408,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             <div
               data-slot="inactive-track-left"
               className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled }),
+                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
                 trackTransition
               )}
               style={{ flexBasis: `${zeroPct}%` }}
@@ -391,7 +417,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             <div
               data-slot="active-track"
               className={cn(
-                sliderActiveTrackVariants({ size, disabled: isDisabled }),
+                sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
                 trackTransition
               )}
               style={{ flexBasis: `${activePct}%` }}
@@ -399,7 +425,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             <div
               data-slot="inactive-track-right"
               className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled }),
+                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
                 trackTransition
               )}
               style={{ flexBasis: `${100 - zeroPct - activePct}%` }}
@@ -414,7 +440,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             <div
               data-slot="inactive-track-left"
               className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled }),
+                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
                 trackTransition
               )}
               style={{ flexBasis: `${thumbPct}%` }}
@@ -422,7 +448,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             <div
               data-slot="active-track"
               className={cn(
-                sliderActiveTrackVariants({ size, disabled: isDisabled }),
+                sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
                 trackTransition
               )}
               style={{ flexBasis: `${activePct}%` }}
@@ -431,7 +457,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             <div
               data-slot="inactive-track-right"
               className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled }),
+                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
                 trackTransition
               )}
               style={{ flexBasis: `${100 - zeroPct}%` }}
@@ -458,7 +484,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         {...(value !== undefined ? { value } : {})}
         {...(defaultValue !== undefined ? { defaultValue } : {})}
         {...(onChangeEnd !== undefined ? { onChangeEnd } : {})}
-        className={cn(sliderContainerVariants({ size, disabled: isDisabled }), className)}
+        className={cn(
+          sliderContainerVariants({ size, disabled: isDisabled, orientation }),
+          className
+        )}
       >
         <div data-slot="track-layout" className={cn(sliderTrackLayoutVariants({ orientation }))}>
           {isRange

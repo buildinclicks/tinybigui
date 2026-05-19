@@ -21,6 +21,7 @@ export {
   sliderTrackStopVariants,
   sliderValueIndicatorVariants,
   sliderValueIndicatorTextVariants,
+  sliderInsetIconVariants,
 } from "./Slider.variants";
 
 // Types
