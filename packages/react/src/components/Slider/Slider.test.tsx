@@ -13,6 +13,8 @@ import type {
   SliderRangeThumbLabels,
 } from "./Slider.types";
 import { SliderHeadless } from "./SliderHeadless";
+import { Slider } from "./Slider";
+import * as SliderIndex from "./index";
 
 // ---------------------------------------------------------------------------
 // Type compile-time assertions (Milestone 1 — types scaffold only)
@@ -724,5 +726,141 @@ describe("SliderHeadless — centered variant behavior", () => {
   test("centered variant renders single thumb (not two)", () => {
     render(<SliderHeadless variant="centered" label="Balance" minValue={-100} maxValue={100} />);
     expect(screen.getAllByRole("slider")).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Slider — styled layer (Milestone 5)
+// ---------------------------------------------------------------------------
+
+describe("Slider — styled layer", () => {
+  // 57. Active track has bg-primary class
+  test("Slider renders with bg-primary class on active track", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toBeInTheDocument();
+    expect(activeTrack).toHaveClass("bg-primary");
+  });
+
+  // 58. Inactive track has bg-secondary-container class
+  test("Slider renders with bg-secondary-container on inactive track", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const inactiveTrack = container.querySelector('[data-slot="inactive-track"]');
+    expect(inactiveTrack).toBeInTheDocument();
+    expect(inactiveTrack).toHaveClass("bg-secondary-container");
+  });
+
+  // 59. Handle has bg-primary class
+  test("Slider handle has bg-primary class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toBeInTheDocument();
+    expect(handle).toHaveClass("bg-primary");
+  });
+
+  // 60. Handle has w-[4px] class (enabled state, not pressed)
+  test("Slider handle has w-[4px] class (enabled state)", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("w-[4px]");
+  });
+
+  // 61. Handle has rounded-[2px] class
+  test("Slider handle has rounded-[2px] class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("rounded-[2px]");
+  });
+
+  // 62. xsmall size: container has h-[44px]
+  test("Slider xsmall size: container has h-[44px]", () => {
+    render(<Slider size="xsmall" label="Vol" defaultValue={[50]} />);
+    const group = screen.getByRole("group");
+    expect(group).toHaveClass("h-[44px]");
+  });
+
+  // 63. medium size: container has h-[52px]
+  test("Slider medium size: container has h-[52px]", () => {
+    render(<Slider size="medium" label="Vol" defaultValue={[50]} />);
+    const group = screen.getByRole("group");
+    expect(group).toHaveClass("h-[52px]");
+  });
+
+  // 64. large size: container has h-[68px]
+  test("Slider large size: container has h-[68px]", () => {
+    render(<Slider size="large" label="Vol" defaultValue={[50]} />);
+    const group = screen.getByRole("group");
+    expect(group).toHaveClass("h-[68px]");
+  });
+
+  // 65. xlarge size: container has h-[108px]
+  test("Slider xlarge size: container has h-[108px]", () => {
+    render(<Slider size="xlarge" label="Vol" defaultValue={[50]} />);
+    const group = screen.getByRole("group");
+    expect(group).toHaveClass("h-[108px]");
+  });
+
+  // 66. xsmall active track has h-[16px]
+  test("Slider xsmall active track has h-[16px]", () => {
+    const { container } = render(<Slider size="xsmall" label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("h-[16px]");
+  });
+
+  // 67. medium active track has h-[40px]
+  test("Slider medium active track has h-[40px]", () => {
+    const { container } = render(<Slider size="medium" label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("h-[40px]");
+  });
+
+  // 68. xlarge active track has h-[96px]
+  test("Slider xlarge active track has h-[96px]", () => {
+    const { container } = render(<Slider size="xlarge" label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("h-[96px]");
+  });
+
+  // 69. Track layout has gap-[6px] class
+  test("Slider track layout has gap-[6px] class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const trackLayout = container.querySelector('[data-slot="track-layout"]');
+    expect(trackLayout).toBeInTheDocument();
+    expect(trackLayout).toHaveClass("gap-[6px]");
+  });
+
+  // 70. Disabled: active track has bg-on-surface and opacity-38
+  test("Slider disabled: active track has bg-on-surface and opacity-38", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} isDisabled />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("bg-on-surface");
+    expect(activeTrack).toHaveClass("opacity-38");
+  });
+
+  // 71. Disabled: inactive track has bg-on-surface/10
+  test("Slider disabled: inactive track has bg-on-surface/10", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} isDisabled />);
+    const inactiveTrack = container.querySelector('[data-slot="inactive-track"]');
+    expect(inactiveTrack).toHaveClass("bg-on-surface/10");
+  });
+
+  // 72. Disabled: handle has bg-on-surface and opacity-38
+  test("Slider disabled: handle has bg-on-surface and opacity-38", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} isDisabled />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("bg-on-surface");
+    expect(handle).toHaveClass("opacity-38");
+  });
+
+  // 73. index.ts exports Slider, SliderHeadless, and all variants
+  test("index.ts exports Slider, SliderHeadless, and all variants", () => {
+    expect(SliderIndex.Slider).toBeDefined();
+    expect(SliderIndex.SliderHeadless).toBeDefined();
+    expect(SliderIndex.sliderContainerVariants).toBeDefined();
+    expect(SliderIndex.sliderActiveTrackVariants).toBeDefined();
+    expect(SliderIndex.sliderInactiveTrackVariants).toBeDefined();
+    expect(SliderIndex.sliderHandleVariants).toBeDefined();
+    expect(SliderIndex.sliderHandleStateLayerVariants).toBeDefined();
+    expect(SliderIndex.sliderTrackLayoutVariants).toBeDefined();
   });
 });
