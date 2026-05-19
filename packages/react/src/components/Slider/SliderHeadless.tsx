@@ -7,6 +7,29 @@ import { useSliderState } from "react-stately";
 import type { SliderState } from "react-stately";
 import type { SliderHeadlessProps } from "./Slider.types";
 
+// ─── Centered Variant Utilities ───────────────────────────────────────────────
+
+/**
+ * Calculate the percentage position of zero within the slider range.
+ * For range [-100, 100]: zeroPercent = 50
+ * For range [-50, 150]: zeroPercent = 25
+ * For range [0, 100]:   zeroPercent = 0  (degenerates to standard)
+ */
+function getZeroPercent(minValue: number, maxValue: number): number {
+  if (minValue >= 0) return 0;
+  if (maxValue <= 0) return 100;
+  return ((0 - minValue) / (maxValue - minValue)) * 100;
+}
+
+/**
+ * Determine which side of center the thumb sits on.
+ */
+function getValueDirection(value: number): "negative" | "positive" | "zero" {
+  if (value < 0) return "negative";
+  if (value > 0) return "positive";
+  return "zero";
+}
+
 // ─── Internal Thumb ───────────────────────────────────────────────────────────
 
 interface SliderThumbInternalProps {
@@ -17,6 +40,7 @@ interface SliderThumbInternalProps {
   formatValue?: (value: number) => string;
   "aria-label"?: string;
   className?: string;
+  "data-direction"?: "negative" | "positive" | "zero";
 }
 
 function SliderThumbInternal({
@@ -26,6 +50,7 @@ function SliderThumbInternal({
   isDisabled,
   formatValue: _formatValue,
   className: _className,
+  "data-direction": dataDirection,
   ...ariaProps
 }: SliderThumbInternalProps): React.JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,6 +75,7 @@ function SliderThumbInternal({
       data-focused={isFocused || undefined}
       data-focus-visible={isFocusVisible || undefined}
       data-disabled={isDisabled || undefined}
+      {...(dataDirection !== undefined ? { "data-direction": dataDirection } : {})}
     >
       <VisuallyHidden>
         <input ref={inputRef} {...mergeProps(inputProps, focusProps)} />
@@ -120,7 +146,8 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
     // Stable formatter for React Stately value announcements
     const numberFormatter = useMemo(() => new Intl.NumberFormat(), []);
 
-    const resolvedDefaultValue = defaultValue ?? (variant === "range" ? [25, 75] : [0]);
+    const resolvedDefaultValue =
+      defaultValue ?? (variant === "range" ? [25, 75] : variant === "centered" ? [0] : [minValue]);
 
     // Build state options — omit optional props when undefined to satisfy exactOptionalPropertyTypes
     const state = useSliderState({
@@ -156,6 +183,10 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
     );
 
     const isRange = variant === "range";
+    const isCentered = variant === "centered";
+
+    const zeroPercent = isCentered ? getZeroPercent(minValue, maxValue) : undefined;
+    const direction = isCentered ? getValueDirection(state.getThumbValue(0)) : undefined;
 
     // For range, each thumb needs its own distinct aria-label so screen readers
     // can distinguish between the minimum and maximum handle.
@@ -170,9 +201,16 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
         data-orientation={orientation}
         data-disabled={isDisabled || undefined}
         data-variant={variant}
+        {...(zeroPercent !== undefined ? { "data-zero-percent": zeroPercent } : {})}
       >
         {label && <label {...labelProps}>{label}</label>}
-        <div {...trackProps} ref={trackRef} data-orientation={orientation} data-track>
+        <div
+          {...trackProps}
+          ref={trackRef}
+          data-orientation={orientation}
+          data-track
+          {...(zeroPercent !== undefined ? { "data-zero-percent": zeroPercent } : {})}
+        >
           {children}
           <SliderThumbInternal
             index={0}
@@ -181,6 +219,7 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
             isDisabled={isDisabled}
             {...(formatValue !== undefined ? { formatValue } : {})}
             {...(thumb0Label !== undefined ? { "aria-label": thumb0Label } : {})}
+            {...(direction !== undefined ? { "data-direction": direction } : {})}
           />
           {isRange && (
             <SliderThumbInternal

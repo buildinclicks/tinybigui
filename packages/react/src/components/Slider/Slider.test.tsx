@@ -537,3 +537,192 @@ describe("SliderHeadless — range variant behavior", () => {
     expect(second).toBeDisabled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// SliderHeadless — centered variant behavior (Milestone 4)
+// ---------------------------------------------------------------------------
+
+describe("SliderHeadless — centered variant behavior", () => {
+  // 44. Container has data-variant="centered"
+  test("centered variant renders with data-variant='centered'", () => {
+    const { container } = render(
+      <SliderHeadless variant="centered" label="Balance" minValue={-100} maxValue={100} />
+    );
+    const group = container.firstChild as HTMLElement;
+    expect(group).toHaveAttribute("data-variant", "centered");
+  });
+
+  // 45. Default value is [0]
+  test("centered variant default value is [0]", () => {
+    render(<SliderHeadless variant="centered" label="Balance" minValue={-100} maxValue={100} />);
+    const input = screen.getByRole("slider");
+    expect(input).toHaveValue("0");
+  });
+
+  // 46. data-zero-percent is 50 for symmetric range [-100, 100]
+  test("centered variant: data-zero-percent is 50 for symmetric range [-100, 100]", () => {
+    const { container } = render(
+      <SliderHeadless variant="centered" label="Balance" minValue={-100} maxValue={100} />
+    );
+    const group = container.firstChild as HTMLElement;
+    expect(group).toHaveAttribute("data-zero-percent", "50");
+  });
+
+  // 47. data-zero-percent is 25 for asymmetric range [-50, 150]
+  test("centered variant: data-zero-percent is 25 for asymmetric range [-50, 150]", () => {
+    const { container } = render(
+      <SliderHeadless variant="centered" label="Balance" minValue={-50} maxValue={150} />
+    );
+    const group = container.firstChild as HTMLElement;
+    expect(group).toHaveAttribute("data-zero-percent", "25");
+  });
+
+  // 48. data-zero-percent is 0 when minValue >= 0
+  test("centered variant: data-zero-percent is 0 when minValue >= 0", () => {
+    const { container } = render(
+      <SliderHeadless variant="centered" label="Balance" minValue={0} maxValue={100} />
+    );
+    const group = container.firstChild as HTMLElement;
+    expect(group).toHaveAttribute("data-zero-percent", "0");
+  });
+
+  // 49. Thumb data-direction is "positive" when value > 0
+  test("centered variant: thumb data-direction is 'positive' when value > 0", () => {
+    const { container } = render(
+      <SliderHeadless
+        variant="centered"
+        label="Balance"
+        minValue={-100}
+        maxValue={100}
+        defaultValue={[50]}
+      />
+    );
+    const thumb = container.querySelector<HTMLElement>("[data-direction]");
+    expect(thumb).toHaveAttribute("data-direction", "positive");
+  });
+
+  // 50. Thumb data-direction is "negative" when value < 0
+  test("centered variant: thumb data-direction is 'negative' when value < 0", () => {
+    const { container } = render(
+      <SliderHeadless
+        variant="centered"
+        label="Balance"
+        minValue={-100}
+        maxValue={100}
+        defaultValue={[-30]}
+      />
+    );
+    const thumb = container.querySelector<HTMLElement>("[data-direction]");
+    expect(thumb).toHaveAttribute("data-direction", "negative");
+  });
+
+  // 51. Thumb data-direction is "zero" when value = 0
+  test("centered variant: thumb data-direction is 'zero' when value = 0", () => {
+    const { container } = render(
+      <SliderHeadless
+        variant="centered"
+        label="Balance"
+        minValue={-100}
+        maxValue={100}
+        defaultValue={[0]}
+      />
+    );
+    const thumb = container.querySelector<HTMLElement>("[data-direction]");
+    expect(thumb).toHaveAttribute("data-direction", "zero");
+  });
+
+  // 52. ArrowRight increases value (moves toward positive)
+  test("centered variant: ArrowRight increases value (moves toward positive)", () => {
+    render(
+      <SliderHeadless
+        variant="centered"
+        label="Balance"
+        minValue={-100}
+        maxValue={100}
+        defaultValue={[0]}
+      />
+    );
+    const input = screen.getByRole("slider");
+
+    act(() => {
+      input.focus();
+    });
+    fireEvent.keyDown(input, { key: "ArrowRight" });
+
+    expect(Number((input as HTMLInputElement).value)).toBeGreaterThan(0);
+  });
+
+  // 53. ArrowLeft decreases value (moves toward negative)
+  test("centered variant: ArrowLeft decreases value (moves toward negative)", () => {
+    render(
+      <SliderHeadless
+        variant="centered"
+        label="Balance"
+        minValue={-100}
+        maxValue={100}
+        defaultValue={[0]}
+      />
+    );
+    const input = screen.getByRole("slider");
+
+    act(() => {
+      input.focus();
+    });
+    fireEvent.keyDown(input, { key: "ArrowLeft" });
+
+    expect(Number((input as HTMLInputElement).value)).toBeLessThan(0);
+  });
+
+  // 54. Supports step for discrete centered slider
+  test("centered variant: supports step for discrete centered slider", () => {
+    render(
+      <SliderHeadless
+        variant="centered"
+        label="Balance"
+        minValue={-50}
+        maxValue={50}
+        step={10}
+        defaultValue={[0]}
+      />
+    );
+    const input = screen.getByRole("slider");
+
+    act(() => {
+      input.focus();
+    });
+    fireEvent.keyDown(input, { key: "ArrowRight" });
+
+    expect(input).toHaveValue("10");
+  });
+
+  // 55. onChange called with negative values
+  test("centered variant: onChange called with negative values", () => {
+    const onChange = vi.fn();
+    render(
+      <SliderHeadless
+        variant="centered"
+        label="Balance"
+        minValue={-100}
+        maxValue={100}
+        defaultValue={[0]}
+        onChange={onChange}
+      />
+    );
+    const input = screen.getByRole("slider");
+
+    act(() => {
+      input.focus();
+    });
+    fireEvent.keyDown(input, { key: "ArrowLeft" });
+
+    expect(onChange).toHaveBeenCalledWith(expect.arrayContaining([expect.any(Number)]));
+    const calledWith = onChange.mock.calls[0][0] as number[];
+    expect(calledWith[0]).toBeLessThan(0);
+  });
+
+  // 56. Renders single thumb (not two)
+  test("centered variant renders single thumb (not two)", () => {
+    render(<SliderHeadless variant="centered" label="Balance" minValue={-100} maxValue={100} />);
+    expect(screen.getAllByRole("slider")).toHaveLength(1);
+  });
+});
