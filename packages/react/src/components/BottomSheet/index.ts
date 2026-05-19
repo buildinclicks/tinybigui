@@ -30,3 +30,10 @@ export type {
   BottomSheetProps,
   BottomSheetHandleProps,
 } from "./BottomSheet.types";
+export type { UseBottomSheetDragOptions, UseBottomSheetDragReturn } from "./useBottomSheetDrag";
+export type {
+  BottomSheetAnimationVariants,
+  BottomSheetVariants,
+  BottomSheetScrimVariants,
+  BottomSheetHandleVariants,
+} from "./BottomSheet.variants";

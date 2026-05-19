@@ -380,6 +380,7 @@ export {
   bottomSheetScrimVariants,
   bottomSheetHandleWrapperVariants,
   bottomSheetHandlePillVariants,
+  bottomSheetAnimationVariants,
 } from "./components/BottomSheet";
 export type {
   BottomSheetVariant,
@@ -388,4 +389,10 @@ export type {
   BottomSheetHeadlessProps,
   BottomSheetProps,
   BottomSheetHandleProps,
+  UseBottomSheetDragOptions,
+  UseBottomSheetDragReturn,
+  BottomSheetAnimationVariants,
+  BottomSheetVariants,
+  BottomSheetScrimVariants,
+  BottomSheetHandleVariants,
 } from "./components/BottomSheet";

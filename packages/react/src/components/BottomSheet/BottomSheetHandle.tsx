@@ -1,11 +1,5 @@
 "use client";
 
-// BottomSheetHandle — Layer 3 styled drag handle sub-component.
-//
-// Reads handleProps, isDragging from BottomSheetContext.
-// Renders: wrapper (touch target) + pill (visual indicator).
-// aria-label and role are injected by handleProps from context.
-
 import type { ReactElement } from "react";
 import { cn } from "../../utils/cn";
 import { useBottomSheetContext } from "./BottomSheetHeadless";

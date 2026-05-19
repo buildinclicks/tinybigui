@@ -1,11 +1,5 @@
 "use client";
 
-// BottomSheet — Layer 3 MD3 styled Bottom Sheet component.
-//
-// Wraps BottomSheetHeadless with CVA styling, renders BottomSheetHandle
-// automatically as the first child inside the sheet panel.
-// M06: Wires getAnimationClassName (slide in/out) and useReducedMotion guard.
-
 import { forwardRef, useCallback } from "react";
 import { cn } from "../../utils/cn";
 import { BottomSheetHeadless } from "./BottomSheetHeadless";
