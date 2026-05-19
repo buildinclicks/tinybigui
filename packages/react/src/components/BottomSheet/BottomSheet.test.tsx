@@ -368,7 +368,12 @@ describe("BottomSheetHeadless — modal variant behavior", () => {
       </BottomSheetHeadless>
     );
 
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+    // Explicitly focus the dialog panel (tabIndex=-1 from useDialog) so that the
+    // useOverlay keydown listener — which is attached to the panel element — receives
+    // the Escape event consistently across environments.
+    dialog.focus();
     await user.keyboard("{Escape}");
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
