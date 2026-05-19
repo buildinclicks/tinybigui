@@ -1,6 +1,12 @@
-import { describe, test, expectTypeOf, expect, vi } from "vitest";
+import { describe, test, expectTypeOf, expect, vi, afterEach } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
+
+const mockUseReducedMotion = vi.hoisted(() => vi.fn<[], boolean>(() => false));
+
+vi.mock("../../hooks/useReducedMotion", () => ({
+  useReducedMotion: mockUseReducedMotion,
+}));
 import type {
   SliderVariant,
   SliderSize,
@@ -1191,5 +1197,145 @@ describe("Slider — inset icon", () => {
       <Slider label="Vol" variant="centered" icon={<svg />} size="large" defaultValue={[0]} />
     );
     expect(container.querySelector('[data-slot="inset-icon"]')).not.toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Slider — motion and animation (Milestone 8)
+// ---------------------------------------------------------------------------
+
+describe("Slider — motion and animation", () => {
+  afterEach(() => {
+    mockUseReducedMotion.mockReturnValue(false);
+  });
+
+  // 109. active track has transition-[flex-basis] class
+  test("active track has transition-[flex-basis] class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("transition-[flex-basis]");
+  });
+
+  // 110. active track has duration-spring-standard-fast-spatial class
+  test("active track has duration-spring-standard-fast-spatial class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("duration-spring-standard-fast-spatial");
+  });
+
+  // 111. active track has ease-spring-standard-fast-spatial class
+  test("active track has ease-spring-standard-fast-spatial class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("ease-spring-standard-fast-spatial");
+  });
+
+  // 112. handle has transition-[width] class
+  test("handle has transition-[width] class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("transition-[width]");
+  });
+
+  // 113. handle has duration-short2 class
+  test("handle has duration-short2 class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("duration-short2");
+  });
+
+  // 114. handle has ease-standard class for width transition
+  test("handle has ease-standard class for width transition", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("ease-standard");
+  });
+
+  // 115. state layer has transition-opacity class
+  test("state layer has transition-opacity class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const stateLayer = container.querySelector('[data-slot="state-layer"]');
+    expect(stateLayer).toHaveClass("transition-opacity");
+  });
+
+  // 116. state layer has duration-short1 class
+  test("state layer has duration-short1 class", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const stateLayer = container.querySelector('[data-slot="state-layer"]');
+    expect(stateLayer).toHaveClass("duration-short1");
+  });
+
+  // 117. value indicator has transition-[transform,opacity] class
+  test("value indicator has transition-[transform,opacity] class", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).toHaveClass("transition-[transform,opacity]");
+  });
+
+  // 118. value indicator entry: has duration-short3 and ease-standard-decelerate
+  test("value indicator entry: has duration-short3 and ease-standard-decelerate", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).toHaveClass("duration-short3");
+    expect(tooltip).toHaveClass("ease-standard-decelerate");
+  });
+
+  // 119. value indicator exit: has duration-short2 and ease-standard-accelerate
+  test("value indicator exit: has duration-short2 and ease-standard-accelerate", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    fireEvent.pointerUp(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).toHaveClass("duration-short2");
+    expect(tooltip).toHaveClass("ease-standard-accelerate");
+  });
+
+  // 120. reduced motion: no transition classes on active track
+  test("reduced motion: no transition classes on active track", () => {
+    mockUseReducedMotion.mockReturnValue(true);
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).not.toHaveClass("transition-[flex-basis]");
+  });
+
+  // 121. reduced motion: no transition classes on handle
+  test("reduced motion: no transition classes on handle", () => {
+    mockUseReducedMotion.mockReturnValue(true);
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).not.toHaveClass("transition-[width]");
+  });
+
+  // 122. reduced motion: value indicator appears instantly (no scale transition)
+  test("reduced motion: value indicator appears instantly (no scale transition)", () => {
+    mockUseReducedMotion.mockReturnValue(true);
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const tooltip = container.querySelector('[role="tooltip"]');
+    expect(tooltip).not.toHaveClass("transition-[transform,opacity]");
+  });
+
+  // 123. drag state: active track suppresses transition (transition-none)
+  test("drag state: active track suppresses spring transition", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const handle = container.querySelector('[data-slot="handle"]')!;
+    fireEvent.pointerDown(handle);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).not.toHaveClass("transition-[flex-basis]");
+  });
+
+  // 124. no hardcoded duration-[Xms] or ease-[cubic-bezier] values
+  test("no hardcoded duration-[Xms] or ease-[cubic-bezier] values", () => {
+    const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
+    const allClasses = Array.from(container.querySelectorAll("*"))
+      .map((el) => el.className)
+      .filter((c) => typeof c === "string")
+      .join(" ");
+    expect(allClasses).not.toMatch(/duration-\[\d+ms\]/);
+    expect(allClasses).not.toMatch(/ease-\[cubic-bezier/);
   });
 });

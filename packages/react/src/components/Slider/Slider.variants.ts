@@ -204,7 +204,8 @@ export const sliderInactiveTrackVariants = cva(
  * MD3 spec §10.9: In vertical orientation, width and height are transposed —
  *   handle becomes 4dp tall (main axis) × full width (cross axis).
  * Width narrows to 2dp on press (md3 spec §9.3).
- * Motion: transition-[width] with duration-short2 + ease-standard (Appendix E).
+ * Motion: transition-[width] with duration-short2 + ease-standard applied conditionally
+ * in Slider.tsx based on useReducedMotion() guard (MD3 Appendix E).
  */
 export const sliderHandleVariants = cva(
   [
@@ -214,10 +215,7 @@ export const sliderHandleVariants = cva(
     "relative",
     "z-10",
     "outline-none",
-    // Motion — handle width change on press (MD3 Appendix E: duration-short2 + ease-standard)
-    "transition-[width]",
-    "duration-short2",
-    "ease-standard",
+    // Motion classes applied conditionally in Slider.tsx via useReducedMotion guard
   ],
   {
     variants: {
@@ -260,7 +258,8 @@ export const sliderHandleVariants = cva(
  * MD3 spec §8.3: Inset overlay within the handle.
  * - Hover: on-primary at 8% opacity
  * - Focus/Pressed: on-primary at 10% opacity
- * Motion: transition-opacity with duration-short1 + ease-standard (Appendix E).
+ * Motion: transition-opacity with duration-short1 + ease-standard applied conditionally
+ * in Slider.tsx based on useReducedMotion() guard (MD3 Appendix E).
  */
 export const sliderHandleStateLayerVariants = cva(
   [
@@ -269,10 +268,7 @@ export const sliderHandleStateLayerVariants = cva(
     "rounded-[4px]", // NOTE: measurement-derived value from MD3 spec §10.3 (4dp state layer border-radius); permitted exception
     "bg-on-primary",
     "pointer-events-none",
-    // Motion — state layer opacity (MD3 Appendix E: duration-short1 + ease-standard)
-    "transition-opacity",
-    "duration-short1",
-    "ease-standard",
+    // Motion classes applied conditionally in Slider.tsx via useReducedMotion guard
   ],
   {
     variants: {
@@ -431,10 +427,8 @@ export const sliderValueIndicatorVariants = cva(
     "justify-center",
     "pointer-events-none",
     "z-20",
-    // Motion — value indicator appear/disappear (MD3 §9.3: standard fast effects for small tooltip)
-    "transition-[opacity,transform]",
-    "duration-spring-standard-fast-effects",
-    "ease-spring-standard-fast-effects",
+    // Motion classes (transition-[transform,opacity] with directional easing) applied
+    // conditionally in SliderValueIndicator.tsx via useReducedMotion guard.
   ],
   {
     variants: {

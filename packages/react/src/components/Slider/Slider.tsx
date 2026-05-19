@@ -108,11 +108,26 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       Array<SliderThumbState>(thumbCount).fill("enabled")
     );
 
-    // Track flex-basis transitions — spatial spring, guarded by reducedMotion
-    // MD3 Appendix E: duration-spring-standard-fast-spatial + ease-spring-standard-fast-spatial
-    const trackTransition = reducedMotion
+    // Pointer-pressed on any thumb means the user is actively dragging.
+    // During drag: track fill suppresses transition for immediate pointer response.
+    const isDragging = thumbStates.some((s) => s === "pressed");
+
+    // MD3 Appendix E: Track fill — spring-standard-fast-spatial (spatial, standard, fast).
+    // Suppressed during drag (follows pointer immediately) and when reduced motion is preferred.
+    const trackTransition =
+      reducedMotion || isDragging
+        ? ""
+        : "transition-[flex-basis] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
+
+    // MD3 Appendix E: Handle width change — standard, fast (duration-short2 + ease-standard).
+    // Spatial property (width), guarded by reduced motion.
+    const handleMotion = reducedMotion ? "" : "transition-[width] duration-short2 ease-standard";
+
+    // MD3 Appendix E: State layer opacity — effects, standard, fast (duration-short1 + ease-standard).
+    // Effects property (opacity), guarded by reduced motion.
+    const stateLayerMotion = reducedMotion
       ? ""
-      : "transition-[flex-basis] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
+      : "transition-opacity duration-short1 ease-standard";
 
     const isRange = variant === "range";
     const isCentered = variant === "centered";
@@ -165,7 +180,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 disabled: isDisabled,
                 pressed: thumb0State === "pressed",
                 orientation,
-              })
+              }),
+              handleMotion
             )}
             onPointerEnter={() => {
               if (!isDisabled) setThumbStates(["hovered"]);
@@ -184,7 +200,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           >
             <div
               data-slot="state-layer"
-              className={cn(sliderHandleStateLayerVariants({ state: thumb0State }))}
+              className={cn(
+                sliderHandleStateLayerVariants({ state: thumb0State }),
+                stateLayerMotion
+              )}
             />
             {showValueIndicator && (
               <SliderValueIndicator
@@ -254,7 +273,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 disabled: isDisabled,
                 pressed: thumb0State === "pressed",
                 orientation,
-              })
+              }),
+              handleMotion
             )}
             onPointerEnter={() => {
               if (!isDisabled) setThumb0("hovered");
@@ -273,7 +293,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           >
             <div
               data-slot="state-layer"
-              className={cn(sliderHandleStateLayerVariants({ state: thumb0State }))}
+              className={cn(
+                sliderHandleStateLayerVariants({ state: thumb0State }),
+                stateLayerMotion
+              )}
             />
             {showValueIndicator && (
               <SliderValueIndicator
@@ -303,7 +326,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 disabled: isDisabled,
                 pressed: thumb1State === "pressed",
                 orientation,
-              })
+              }),
+              handleMotion
             )}
             onPointerEnter={() => {
               if (!isDisabled) setThumb1("hovered");
@@ -322,7 +346,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           >
             <div
               data-slot="state-layer"
-              className={cn(sliderHandleStateLayerVariants({ state: thumb1State }))}
+              className={cn(
+                sliderHandleStateLayerVariants({ state: thumb1State }),
+                stateLayerMotion
+              )}
             />
             {showValueIndicator && (
               <SliderValueIndicator
@@ -369,7 +396,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               disabled: isDisabled,
               pressed: thumb0State === "pressed",
               orientation,
-            })
+            }),
+            handleMotion
           )}
           onPointerEnter={() => {
             if (!isDisabled) setThumbStates(["hovered"]);
@@ -388,7 +416,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         >
           <div
             data-slot="state-layer"
-            className={cn(sliderHandleStateLayerVariants({ state: thumb0State }))}
+            className={cn(sliderHandleStateLayerVariants({ state: thumb0State }), stateLayerMotion)}
           />
           {showValueIndicator && (
             <SliderValueIndicator

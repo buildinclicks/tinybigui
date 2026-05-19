@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { cn } from "../../utils/cn";
 import { sliderValueIndicatorVariants, sliderValueIndicatorTextVariants } from "./Slider.variants";
 
@@ -63,11 +64,31 @@ export function SliderValueIndicator({
   className,
 }: SliderValueIndicatorProps): React.JSX.Element {
   const displayValue = formatValue ? formatValue(value) : `${Math.round(value)}`;
+  const reducedMotion = useReducedMotion();
+
+  // MD3 Appendix E: Value indicator uses directional legacy easing for enter/exit —
+  // enter (scale in): ease-standard-decelerate + duration-short3 (150ms)
+  // exit  (scale out): ease-standard-accelerate + duration-short2 (100ms)
+  // The -translate-x-1/2 from CVA is inherited as part of the transform; scale is
+  // added via the visible/false variant (scale-100 / scale-0).
+  // When reduced motion is preferred, all transitions are suppressed for instant state change.
+  const transitionClasses = reducedMotion
+    ? ""
+    : cn(
+        "transition-[transform,opacity]",
+        isVisible
+          ? "duration-short3 ease-standard-decelerate"
+          : "duration-short2 ease-standard-accelerate"
+      );
 
   return (
     <div
       data-slot="value-indicator"
-      className={cn(sliderValueIndicatorVariants({ visible: isVisible }), className)}
+      className={cn(
+        sliderValueIndicatorVariants({ visible: isVisible }),
+        transitionClasses,
+        className
+      )}
       role="tooltip"
       aria-hidden={!isVisible}
     >
