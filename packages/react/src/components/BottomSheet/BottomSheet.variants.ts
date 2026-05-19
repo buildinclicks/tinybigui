@@ -43,7 +43,13 @@ export type BottomSheetAnimationVariants = VariantProps<typeof bottomSheetAnimat
  * - Surface: bg-surface-container-low
  * - Elevation: shadow-elevation-1
  * - Shape: rounded-t-xl (top-left + top-right 28dp, bottom 0)
- * - Width: full width up to 640dp; side margins at wider viewports
+ * - Width: full width up to 640dp; centered at max-width 640dp on wider viewports
+ *   (`mx-auto + max-w-[640px]` — at 752dp viewport this naturally produces the MD3-spec 56dp side margins)
+ * - Height: constrained by max-height (72dp top margin by default, 56dp on > 640dp viewport)
+ *   The sheet is always anchored to `bottom-0`; "top margin" is expressed as max-height so
+ *   the sheet cannot overlap the top portion of the screen.
+ * - Drag resize: height animates via `transition-[height]`; the sheet grows/shrinks from the
+ *   bottom edge, always staying anchored — matching the MD3 spec "resize to another height" behaviour.
  */
 export const bottomSheetVariants = cva(
   [
@@ -71,23 +77,30 @@ export const bottomSheetVariants = cva(
     // NOTE: measurement-derived value from MD3 spec; permitted exception
     "max-w-[640px]",
 
-    // Transition: snap spring for drag-release snap (spatial property — transform)
-    // Standard personality, default speed tier, spatial: no overshoot
+    // Clip content during height transitions (sheet shrinks/grows from bottom edge)
+    "overflow-hidden",
+
+    // Transition: height for snap spring (MD3 spec — sheet "resizes" between heights)
+    // Standard personality, default speed tier, spatial: no overshoot.
     // During drag, data-[dragging=true]:transition-none suppresses this so the
-    // sheet follows the pointer without lag.
-    "transition-transform",
+    // sheet height follows the pointer 1:1 without transition lag.
+    // After drag release, the spring transition animates height to the new snap position.
+    "transition-[height]",
     "duration-spring-standard-default-spatial",
     "ease-spring-standard-default-spatial",
     "data-[dragging=true]:transition-none",
+    "will-change-[height]",
 
-    // Transition: transform for snap spring (applied in M06)
-    "will-change-transform",
-
-    // Responsive layout: when viewport > 640dp, apply side margins and top margin per MD3 spec
-    // NOTE: measurement-derived value from MD3 spec; permitted exception (56dp = 3.5rem = 14 in Tailwind scale)
-    "sm:mx-14",
-    "sm:top-14",
-    "sm:bottom-auto",
+    // Responsive layout: when viewport > 640dp, apply wider top margin per MD3 spec.
+    // The sheet remains bottom-anchored at all sizes. Side centering is handled by
+    // mx-auto + max-w-[640px] — at 752dp viewport this naturally produces 56dp side
+    // margins on each side (exactly matching MD3 measurements).
+    // Top margin is expressed as max-height so the sheet cannot overlap the top edge:
+    // - Default: 72dp top margin (max-h-[calc(100vh-72px)])
+    // - Wide viewport (> 640dp): 56dp top margin (sm:max-h-[calc(100vh-56px)])
+    // NOTE: measurement-derived values from MD3 spec; permitted exception
+    "max-h-[calc(100vh-72px)]",
+    "sm:max-h-[calc(100vh-56px)]",
     // All corners rounded at wide layout (sheet floats away from screen edge)
     "sm:rounded-xl",
   ],

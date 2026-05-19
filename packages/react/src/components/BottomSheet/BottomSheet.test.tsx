@@ -11,7 +11,7 @@
 
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi, afterEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BottomSheetHeadless, useBottomSheetContext } from "./BottomSheetHeadless";
 import { BottomSheet } from "./BottomSheet";
@@ -781,9 +781,9 @@ describe("BottomSheet — motion and animation", () => {
   });
 
   // Test 50
-  it("sheet panel has transition-transform class for snap spring", () => {
+  it("sheet panel has transition-[height] class for snap spring", () => {
     render(<BottomSheet open aria-label="Test" />);
-    expect(screen.getByRole("dialog")).toHaveClass("transition-transform");
+    expect(screen.getByRole("dialog")).toHaveClass("transition-[height]");
   });
 
   // Test 51
@@ -913,5 +913,150 @@ describe("BottomSheet — accessibility", () => {
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
+  });
+});
+
+// ─── BottomSheet — panel snap height and drag style ───────────────────────────
+
+describe("BottomSheet — panel snap height and drag style", () => {
+  // Test 67
+  it("modal panel has height style equal to first snap point on open", () => {
+    render(<BottomSheet open aria-label="Test" snapPoints={["50%"]} />);
+    expect(screen.getByRole("dialog")).toHaveStyle({ height: "50%" });
+  });
+
+  // Test 68
+  it("standard panel has height style equal to first snap point on open", () => {
+    render(<BottomSheet variant="standard" open aria-label="Test" snapPoints={["40%"]} />);
+    const panel = document.querySelector("[data-animation-state]");
+    expect(panel).toHaveStyle({ height: "40%" });
+  });
+
+  // Test 69
+  it("modal panel has data-dragging=true while handle is being dragged", () => {
+    render(<BottomSheet open aria-label="Test" snapPoints={["50%"]} />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    handle.setPointerCapture = vi.fn();
+    // Wrap in act so React flushes setIsDragging(true) before the assertion
+    act(() => {
+      handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+    });
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "true");
+  });
+
+  // Test 70
+  it("standard panel has data-dragging=true while handle is being dragged", () => {
+    render(<BottomSheet variant="standard" open aria-label="Test" snapPoints={["50%"]} />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    handle.setPointerCapture = vi.fn();
+    act(() => {
+      handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+    });
+    const panel = document.querySelector("[data-animation-state]");
+    expect(panel).toHaveAttribute("data-dragging", "true");
+  });
+
+  // Test 71: Verify dragTranslateY in context becomes a finite number during drag.
+  // We dispatch events as MouseEvent (not PointerEvent) because JSDOM correctly
+  // propagates clientY through MouseEventInit, whereas PointerEventInit support is incomplete.
+  it("dragTranslateY in context updates to a finite number during active drag", async () => {
+    function DragYReader() {
+      const { dragTranslateY } = useBottomSheetContext();
+      return <span data-testid="drag-y">{String(dragTranslateY)}</span>;
+    }
+
+    render(
+      <BottomSheet open aria-label="Test" snapPoints={["50%"]}>
+        <DragYReader />
+      </BottomSheet>
+    );
+
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    handle.setPointerCapture = vi.fn();
+
+    // Before drag: dragTranslateY is null
+    expect(screen.getByTestId("drag-y").textContent).toBe("null");
+
+    // Start drag — clientY=200 correctly sets startYRef via MouseEventInit
+    act(() => {
+      handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, clientY: 200 }));
+    });
+
+    // Wait for isDragging to propagate to the panel
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "true");
+    });
+
+    // Dispatch pointermove — deltaY = 300 - 200 = 100 → dragTranslateY = 100
+    act(() => {
+      window.dispatchEvent(new MouseEvent("pointermove", { bubbles: true, clientY: 300 }));
+    });
+
+    // dragTranslateY should now be a finite number
+    await waitFor(() => {
+      const dragY = screen.getByTestId("drag-y").textContent;
+      expect(dragY).not.toBe("null");
+      expect(Number.isFinite(Number(dragY))).toBe(true);
+    });
+
+    // Panel height reflects the drag offset using height: calc(snapHeight - delta)
+    await waitFor(() => {
+      const heightStyle = screen.getByRole("dialog").style.height;
+      expect(heightStyle).toContain("calc(");
+    });
+  });
+
+  // Test 72
+  it("panel data-dragging is absent after pointer is released", () => {
+    render(<BottomSheet open aria-label="Test" snapPoints={["50%"]} />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    handle.setPointerCapture = vi.fn();
+    handle.releasePointerCapture = vi.fn();
+    act(() => {
+      handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+    });
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "true");
+    fireEvent.pointerUp(handle, { clientY: 200, pointerId: 1 });
+    expect(screen.getByRole("dialog")).not.toHaveAttribute("data-dragging");
+  });
+});
+
+// ─── BottomSheet — bottom anchoring and max-height ────────────────────────────
+
+describe("BottomSheet — bottom anchoring and max-height", () => {
+  // Test 73
+  it("sheet panel does NOT have sm:top-14 class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).not.toHaveClass("sm:top-14");
+  });
+
+  // Test 74
+  it("sheet panel does NOT have sm:bottom-auto class", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).not.toHaveClass("sm:bottom-auto");
+  });
+
+  // Test 75
+  it("sheet panel has max-h-[calc(100vh-72px)] class for default top margin", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("max-h-[calc(100vh-72px)]");
+  });
+
+  // Test 76
+  it("sheet panel has sm:max-h-[calc(100vh-56px)] class for wide-viewport top margin", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("sm:max-h-[calc(100vh-56px)]");
+  });
+
+  // Test 77 — centering
+  it("sheet panel does NOT have sm:mx-14 class (uses mx-auto for centering)", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).not.toHaveClass("sm:mx-14");
+  });
+
+  // Test 78
+  it("sheet panel has mx-auto class for horizontal centering", () => {
+    render(<BottomSheet open aria-label="Test" />);
+    expect(screen.getByRole("dialog")).toHaveClass("mx-auto");
   });
 });

@@ -69,6 +69,10 @@ interface BottomSheetModalPanelProps {
   getAnimationClassName: ((state: BottomSheetAnimationState) => string) | undefined;
   onTransitionEnd: () => void;
   forwardedRef: React.Ref<HTMLDivElement> | null;
+  /** Whether a drag gesture is in progress — applied as data-dragging on the panel. */
+  isDragging: boolean;
+  /** Inline style providing snap-point height and drag translateY transform. */
+  panelStyle: React.CSSProperties;
   children: React.ReactNode;
 }
 
@@ -80,6 +84,8 @@ const BottomSheetModalPanel = ({
   getAnimationClassName,
   onTransitionEnd,
   forwardedRef,
+  isDragging,
+  panelStyle,
   children,
 }: BottomSheetModalPanelProps): React.ReactElement => {
   // Internal ref for React Aria hooks — always an object ref
@@ -120,6 +126,8 @@ const BottomSheetModalPanel = ({
       aria-modal="true"
       className={cn(className, getAnimationClassName?.(animationState))}
       data-animation-state={animationState}
+      data-dragging={isDragging || undefined}
+      style={panelStyle}
       onTransitionEnd={onTransitionEnd}
     >
       {children}
@@ -264,6 +272,33 @@ export const BottomSheetHeadless = forwardRef<HTMLDivElement, BottomSheetHeadles
     // Consumers can override via BottomSheetHandleProps["aria-label"] on <BottomSheetHandle />.
     const handleProps = dragHandleProps;
 
+    // ── Panel inline style ────────────────────────────────────────────────────
+    //
+    // The sheet's visible height is driven by the active snap point. Since the
+    // panel is `position: fixed; bottom: 0`, percentage heights are relative to
+    // the viewport, which is exactly what snap points represent (e.g. "50%" = 50vh).
+    //
+    // During a drag gesture, the height is adjusted by the pointer delta so the
+    // sheet resizes from the bottom edge — matching MD3 spec behaviour:
+    // "A bottom sheet can automatically resize to another height after interacting
+    // with the drag handle" (detail.md §Dragging).
+    //
+    // dragTranslateY > 0: dragging DOWN → height decreases (sheet shrinks from top)
+    // dragTranslateY < 0: dragging UP   → height increases (sheet grows from top)
+    // calc(50% - 50px)  → sheet is 50px shorter than its snap height
+    // calc(50% + 50px)  → sheet is 50px taller  than its snap height
+    //
+    // The `data-[dragging=true]:transition-none` CVA class suppresses the height
+    // spring while dragging is active so the sheet follows the pointer without lag.
+    // After release, the transition animates height to the nearest snap position.
+    const snapHeight = snapPoints[currentSnapIndex] ?? "50%";
+    const panelStyle: React.CSSProperties = {
+      height:
+        isDragging && dragTranslateY !== null
+          ? `calc(${snapHeight} - ${dragTranslateY}px)`
+          : snapHeight,
+    };
+
     // ── Context value ─────────────────────────────────────────────────────────
 
     const contextValue: BottomSheetContextValue = {
@@ -316,6 +351,8 @@ export const BottomSheetHeadless = forwardRef<HTMLDivElement, BottomSheetHeadles
               getAnimationClassName={getAnimationClassName}
               onTransitionEnd={handleTransitionEnd}
               forwardedRef={ref}
+              isDragging={isDragging}
+              panelStyle={panelStyle}
             >
               {children}
             </BottomSheetModalPanel>
@@ -328,6 +365,8 @@ export const BottomSheetHeadless = forwardRef<HTMLDivElement, BottomSheetHeadles
             ref={ref}
             className={cn(className, getAnimationClassName?.(animationState))}
             data-animation-state={animationState}
+            data-dragging={isDragging || undefined}
+            style={panelStyle}
             onTransitionEnd={handleTransitionEnd}
           >
             {children}

@@ -634,3 +634,84 @@ export const Playground: Story = {
   },
   render: (args) => <PlaygroundDemo {...args} />,
 };
+
+// ─── 11. DragInteraction ──────────────────────────────────────────────────────
+
+/**
+ * Inline indicator that reads snap position from context.
+ * Renders the active snap index and the current drag offset for visibility.
+ */
+const DragStateIndicator = (): JSX.Element => {
+  const { currentSnapIndex, snapPoints, isDragging, dragTranslateY } = useBottomSheetContext();
+  return (
+    <div className="flex flex-col gap-1 px-4 pb-3">
+      <p className="text-label-medium text-on-surface-variant">
+        Snap:{" "}
+        <span className="text-on-surface font-medium">
+          {currentSnapIndex + 1} of {snapPoints.length} ({snapPoints[currentSnapIndex]})
+        </span>
+      </p>
+      <p className="text-label-medium text-on-surface-variant">
+        Dragging: <span className="text-on-surface font-medium">{isDragging ? "yes" : "no"}</span>
+      </p>
+      {isDragging && dragTranslateY !== null && (
+        <p className="text-label-medium text-on-surface-variant">
+          Offset:{" "}
+          <span className="text-on-surface font-medium">{Math.round(dragTranslateY)}px</span>
+        </p>
+      )}
+    </div>
+  );
+};
+
+const DragInteractionDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex min-h-svh items-center justify-center p-8">
+      <Button variant="filled" onPress={() => setOpen(true)} data-testid="open-drag-sheet">
+        Open draggable sheet
+      </Button>
+      <BottomSheet
+        variant="modal"
+        open={open}
+        onOpenChange={setOpen}
+        snapPoints={["25%", "50%", "90%"]}
+        aria-label="Drag demo"
+      >
+        <DragStateIndicator />
+        <div className="px-4 pb-6">
+          <h2 className="text-title-medium text-on-surface mb-2">Drag the handle</h2>
+          <p className="text-body-medium text-on-surface-variant mb-4">
+            Grab the handle above and drag up or down. Release to snap to the nearest height. You
+            can also press Tab to focus the handle, then use Space / Enter to cycle through snap
+            points, or Arrow keys to move one step at a time.
+          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-label-medium text-on-surface-variant">
+              Snap points: 25% · 50% · 90%
+            </p>
+            <p className="text-label-medium text-on-surface-variant">
+              Keyboard: Tab → handle, Space/Enter → cycle, ↑↓ → step, ↓ at min → close
+            </p>
+          </div>
+        </div>
+      </BottomSheet>
+    </div>
+  );
+};
+
+/**
+ * Drag interaction story — demonstrates the draggable handle with three snap points.
+ * A live indicator shows the active snap position, drag state, and pointer offset.
+ */
+export const DragInteraction: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates the draggable handle with three snap points (25%, 50%, 90%). A live indicator shows the current snap position and drag offset. Grab the handle and drag up or down to resize — the sheet snaps to the nearest point on release. Keyboard: Tab to focus the handle, Space/Enter to cycle through snap points, ArrowUp/ArrowDown to move one step, ArrowDown at the lowest point closes the sheet.",
+      },
+    },
+  },
+  render: () => <DragInteractionDemo />,
+};
