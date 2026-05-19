@@ -45,6 +45,17 @@ export type SliderSize = "xsmall" | "small" | "medium" | "large" | "xlarge";
  */
 export type SliderOrientation = "horizontal" | "vertical";
 
+// ─── SliderRangeThumbLabels ───────────────────────────────────────────────────
+
+/**
+ * Custom aria-label values for range slider thumbs.
+ * Tuple of [leftThumbLabel, rightThumbLabel].
+ *
+ * @default ['Minimum', 'Maximum']
+ * @example ['Min price', 'Max price']
+ */
+export type SliderRangeThumbLabels = [string, string];
+
 // ─── SliderHeadlessProps ──────────────────────────────────────────────────────
 
 /**
@@ -188,6 +199,15 @@ export interface SliderHeadlessProps {
    * @example (value) => `$${value}` // "$50"
    */
   formatValue?: (value: number) => string;
+
+  /**
+   * Custom aria-labels for range slider thumbs (left and right).
+   * Only applicable when variant="range".
+   *
+   * @default ['Minimum', 'Maximum']
+   * @example ['Min price', 'Max price']
+   */
+  thumbLabels?: SliderRangeThumbLabels;
 }
 
 // ─── SliderThumbProps ─────────────────────────────────────────────────────────

@@ -106,6 +106,7 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
       isDisabled = false,
       label,
       formatValue,
+      thumbLabels,
       className,
       style,
       children,
@@ -154,6 +155,12 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
       trackRef
     );
 
+    const isRange = variant === "range";
+
+    // For range, each thumb needs its own distinct aria-label so screen readers
+    // can distinguish between the minimum and maximum handle.
+    const thumb0Label = isRange ? (thumbLabels?.[0] ?? "Minimum") : ariaProps["aria-label"];
+
     return (
       <div
         {...groupProps}
@@ -173,13 +180,27 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
             trackRef={trackRef}
             isDisabled={isDisabled}
             {...(formatValue !== undefined ? { formatValue } : {})}
-            {...(ariaProps["aria-label"] !== undefined
-              ? { "aria-label": ariaProps["aria-label"] }
-              : {})}
+            {...(thumb0Label !== undefined ? { "aria-label": thumb0Label } : {})}
           />
+          {isRange && (
+            <SliderThumbInternal
+              index={1}
+              state={state}
+              trackRef={trackRef}
+              isDisabled={isDisabled}
+              {...(formatValue !== undefined ? { formatValue } : {})}
+              aria-label={thumbLabels?.[1] ?? "Maximum"}
+            />
+          )}
         </div>
         <output {...outputProps}>
-          {formatValue ? formatValue(state.getThumbValue(0)) : state.getThumbValueLabel(0)}
+          {isRange
+            ? formatValue
+              ? `${formatValue(state.getThumbValue(0))} \u2013 ${formatValue(state.getThumbValue(1))}`
+              : `${state.getThumbValueLabel(0)} \u2013 ${state.getThumbValueLabel(1)}`
+            : formatValue
+              ? formatValue(state.getThumbValue(0))
+              : state.getThumbValueLabel(0)}
         </output>
       </div>
     );

@@ -10,6 +10,7 @@ import type {
   SliderProps,
   SliderThumbState,
   SliderRenderState,
+  SliderRangeThumbLabels,
 } from "./Slider.types";
 import { SliderHeadless } from "./SliderHeadless";
 
@@ -351,5 +352,188 @@ describe("SliderHeadless — standard variant behavior", () => {
     render(<SliderHeadless label="Price" formatValue={(v) => `$${v}`} defaultValue={[50]} />);
     const output = document.querySelector("output");
     expect(output).toHaveTextContent("$50");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SliderRangeThumbLabels — type assertions
+// ---------------------------------------------------------------------------
+
+describe("SliderRangeThumbLabels", () => {
+  test("is a tuple of two strings", () => {
+    expectTypeOf<SliderRangeThumbLabels>().toEqualTypeOf<[string, string]>();
+  });
+
+  test("SliderHeadlessProps accepts thumbLabels", () => {
+    expectTypeOf<SliderHeadlessProps>().toHaveProperty("thumbLabels");
+    expectTypeOf<SliderHeadlessProps["thumbLabels"]>().toEqualTypeOf<
+      SliderRangeThumbLabels | undefined
+    >();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SliderHeadless — range variant behavior (Milestone 3)
+// ---------------------------------------------------------------------------
+
+describe("SliderHeadless — range variant behavior", () => {
+  // 30. Two role="slider" inputs rendered
+  test("range variant renders two slider inputs", () => {
+    render(<SliderHeadless variant="range" label="Price" />);
+    expect(screen.getAllByRole("slider")).toHaveLength(2);
+  });
+
+  // 31. Default values are [25, 75]
+  test("range variant has correct default values [25, 75]", () => {
+    render(<SliderHeadless variant="range" label="Price" />);
+    const [first, second] = screen.getAllByRole("slider");
+    expect(first).toHaveValue("25");
+    expect(second).toHaveValue("75");
+  });
+
+  // 32. Each thumb has a distinct default aria-label
+  test("range variant: each thumb has distinct aria-label", () => {
+    render(<SliderHeadless variant="range" label="Price" />);
+    const [first, second] = screen.getAllByRole("slider");
+    expect(first).toHaveAttribute("aria-label", "Minimum");
+    expect(second).toHaveAttribute("aria-label", "Maximum");
+  });
+
+  // 33. thumbLabels prop overrides default aria-labels
+  test("range variant: thumbLabels prop overrides default aria-labels", () => {
+    render(
+      <SliderHeadless variant="range" label="Price" thumbLabels={["Min price", "Max price"]} />
+    );
+    const [first, second] = screen.getAllByRole("slider");
+    expect(first).toHaveAttribute("aria-label", "Min price");
+    expect(second).toHaveAttribute("aria-label", "Max price");
+  });
+
+  // 34. Left thumb max is constrained to right thumb's value
+  test("range variant: left thumb max is constrained by right thumb value", () => {
+    render(<SliderHeadless variant="range" label="Price" value={[30, 70]} onChange={() => {}} />);
+    const [first] = screen.getAllByRole("slider");
+    expect(first).toHaveAttribute("max", "70");
+  });
+
+  // 35. Right thumb min is constrained to left thumb's value
+  test("range variant: right thumb min is constrained by left thumb value", () => {
+    render(<SliderHeadless variant="range" label="Price" value={[30, 70]} onChange={() => {}} />);
+    const [, second] = screen.getAllByRole("slider");
+    expect(second).toHaveAttribute("min", "30");
+  });
+
+  // 36. Thumbs cannot cross (left cannot exceed right)
+  test("range variant: thumbs cannot cross (left cannot exceed right)", () => {
+    render(<SliderHeadless variant="range" label="Price" defaultValue={[50, 50]} />);
+    const [first, second] = screen.getAllByRole("slider");
+
+    act(() => {
+      first.focus();
+    });
+    fireEvent.keyDown(first, { key: "ArrowRight" });
+
+    const leftValue = Number(first.getAttribute("value") ?? (first as HTMLInputElement).value);
+    const rightValue = Number(second.getAttribute("value") ?? (second as HTMLInputElement).value);
+    expect(leftValue).toBeLessThanOrEqual(rightValue);
+  });
+
+  // 37. Tab moves focus between thumbs
+  test("range variant: Tab moves focus between thumbs", () => {
+    render(<SliderHeadless variant="range" label="Price" />);
+    const [first, second] = screen.getAllByRole("slider");
+
+    act(() => {
+      first.focus();
+    });
+    expect(document.activeElement).toBe(first);
+
+    act(() => {
+      second.focus();
+    });
+    expect(document.activeElement).toBe(second);
+  });
+
+  // 38. ArrowRight on left thumb increases its value
+  test("range variant: ArrowRight on left thumb increases its value", () => {
+    render(<SliderHeadless variant="range" label="Price" defaultValue={[25, 75]} />);
+    const [first] = screen.getAllByRole("slider");
+
+    act(() => {
+      first.focus();
+    });
+    fireEvent.keyDown(first, { key: "ArrowRight" });
+
+    expect(first).toHaveValue("26");
+  });
+
+  // 39. Click on track calls onChange (JSDOM has no layout so we verify wiring only)
+  test("range variant: click on track moves nearest thumb", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <SliderHeadless variant="range" label="Price" defaultValue={[20, 80]} onChange={onChange} />
+    );
+
+    const track = container.querySelector<HTMLElement>("[data-track]")!;
+    expect(track).toBeInTheDocument();
+
+    track.setPointerCapture = vi.fn();
+    track.releasePointerCapture = vi.fn();
+
+    fireEvent.pointerDown(track, {
+      clientX: 90,
+      clientY: 10,
+      pointerId: 1,
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+    });
+
+    expect(onChange).toHaveBeenCalled();
+  });
+
+  // 40. Output shows both values formatted
+  test("range variant: output displays both values formatted", () => {
+    render(
+      <SliderHeadless
+        variant="range"
+        label="Price"
+        formatValue={(v) => `$${v}`}
+        defaultValue={[20, 80]}
+      />
+    );
+    const output = document.querySelector("output");
+    expect(output).toHaveTextContent("$20 – $80");
+  });
+
+  // 41. data-variant attribute is "range"
+  test("range variant: data-variant attribute is 'range'", () => {
+    const { container } = render(<SliderHeadless variant="range" label="Price" />);
+    const group = container.firstChild as HTMLElement;
+    expect(group).toHaveAttribute("data-variant", "range");
+  });
+
+  // 42. Controlled value prop with two values
+  test("range variant: controlled value prop with two values", () => {
+    function ControlledRange({ values }: { values: number[] }) {
+      return <SliderHeadless variant="range" label="Price" value={values} onChange={() => {}} />;
+    }
+
+    const { rerender } = render(<ControlledRange values={[10, 90]} />);
+    const [first, second] = screen.getAllByRole("slider");
+    expect(first).toHaveValue("10");
+    expect(second).toHaveValue("90");
+
+    rerender(<ControlledRange values={[20, 80]} />);
+    expect(first).toHaveValue("20");
+    expect(second).toHaveValue("80");
+  });
+
+  // 43. Disabled state disables both thumbs
+  test("range variant: disabled state disables both thumbs", () => {
+    render(<SliderHeadless variant="range" label="Price" isDisabled />);
+    const [first, second] = screen.getAllByRole("slider");
+    expect(first).toBeDisabled();
+    expect(second).toBeDisabled();
   });
 });
