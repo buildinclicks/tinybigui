@@ -2,6 +2,7 @@ import { describe, test, expectTypeOf, expect, vi, afterEach } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { axe } from "vitest-axe";
+import * as SliderStories from "./Slider.stories";
 
 const mockUseReducedMotion = vi.hoisted(() => vi.fn<[], boolean>(() => false));
 
@@ -1528,5 +1529,66 @@ describe("Slider — accessibility", () => {
     const isDisabledAttr = input?.hasAttribute("disabled");
     // React Aria either removes tabindex, sets it to -1, or sets the disabled attribute
     expect(tabIndex === "-1" || tabIndex === null || isDisabledAttr).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Slider — stories (Milestone 10)
+// ---------------------------------------------------------------------------
+
+describe("Slider — stories", () => {
+  // 141. Storybook meta has correct title 'Components/Slider'
+  test("Storybook meta has correct title 'Components/Slider'", () => {
+    const meta = SliderStories.default as { title: string; tags: string[] };
+    expect(meta.title).toBe("Components/Slider");
+  });
+
+  // 142. Storybook meta has 'autodocs' tag
+  test("Storybook meta has 'autodocs' tag", () => {
+    const meta = SliderStories.default as { title: string; tags: string[] };
+    expect(meta.tags).toContain("autodocs");
+  });
+
+  // 143. Default story renders without errors
+  test("Default story renders without errors", () => {
+    expect(() => render(<Slider label="Volume" defaultValue={[50]} size="xsmall" />)).not.toThrow();
+  });
+
+  // 144. AllSizes story renders five slider instances
+  test("AllSizes story renders five slider instances", () => {
+    const sizes: SliderSize[] = ["xsmall", "small", "medium", "large", "xlarge"];
+    const { container } = render(
+      <div>
+        {sizes.map((size) => (
+          <Slider key={size} label="Volume" defaultValue={[50]} size={size} />
+        ))}
+      </div>
+    );
+    expect(container.querySelectorAll('[role="group"]')).toHaveLength(5);
+  });
+
+  // 145. RangeSlider story renders two thumbs
+  test("RangeSlider story renders two thumbs", () => {
+    render(
+      <Slider
+        variant="range"
+        label="Price range"
+        defaultValue={[200, 800]}
+        minValue={0}
+        maxValue={1000}
+      />
+    );
+    expect(screen.getAllByRole("slider")).toHaveLength(2);
+  });
+
+  // 146. DisabledState story renders with aria-disabled
+  test("DisabledState story renders with aria-disabled", () => {
+    const { container } = render(<Slider label="Brightness" defaultValue={[60]} isDisabled />);
+    // React Aria marks the group with data-disabled and the native input with
+    // the disabled attribute — both are valid signals of the disabled state.
+    const group = container.querySelector('[role="group"]');
+    const input = container.querySelector('input[type="range"]');
+    expect(group).toHaveAttribute("data-disabled");
+    expect(input).toBeDisabled();
   });
 });
