@@ -1,13 +1,15 @@
 /**
- * BottomSheet — Milestone 1 + Milestone 2
+ * BottomSheet — Milestone 1 + Milestone 2 + Milestone 3
  *
  * M01: Compile-time type assertions (no rendering).
  * M02: Portal, state management, animation state machine, and context tests.
+ * M03: Modal variant — dialog semantics, focus trap, scrim, Escape dismissal.
  */
 
-import { createRef } from "react";
+import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { BottomSheetHeadless, useBottomSheetContext } from "./BottomSheetHeadless";
 
 import type {
@@ -313,5 +315,160 @@ describe("BottomSheetHeadless — portal and state", () => {
       </BottomSheetHeadless>
     );
     expect(screen.getByTestId("snaps").textContent).toBe("50%");
+  });
+});
+
+// ─── BottomSheetHeadless — modal variant behavior ─────────────────────────────
+
+describe("BottomSheetHeadless — modal variant behavior", () => {
+  it("modal variant: sheet panel has role='dialog'", () => {
+    render(
+      <BottomSheetHeadless variant="modal" open aria-label="Test sheet">
+        Content
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("modal variant: sheet panel has aria-modal='true'", () => {
+    render(
+      <BottomSheetHeadless variant="modal" open aria-label="Test sheet">
+        Content
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+  });
+
+  it("modal variant: aria-label prop is applied to the dialog", () => {
+    render(
+      <BottomSheetHeadless variant="modal" open aria-label="Share options">
+        Content
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByRole("dialog", { name: "Share options" })).toBeInTheDocument();
+  });
+
+  it("modal variant: Escape key calls onOpenChange(false)", async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <BottomSheetHeadless variant="modal" open onOpenChange={onOpenChange} aria-label="Test sheet">
+        Content
+      </BottomSheetHeadless>
+    );
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("modal variant: scrim is rendered when open", () => {
+    render(
+      <BottomSheetHeadless variant="modal" open aria-label="Test sheet" scrimClassName="test-scrim">
+        Content
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByTestId("bottom-sheet-scrim")).toBeInTheDocument();
+  });
+
+  it("modal variant: scrim click calls onOpenChange(false)", async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <BottomSheetHeadless variant="modal" open onOpenChange={onOpenChange} aria-label="Test sheet">
+        Content
+      </BottomSheetHeadless>
+    );
+
+    await user.click(screen.getByTestId("bottom-sheet-scrim"));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("modal variant: scrim is aria-hidden", () => {
+    render(
+      <BottomSheetHeadless variant="modal" open aria-label="Test sheet">
+        Content
+      </BottomSheetHeadless>
+    );
+    expect(screen.getByTestId("bottom-sheet-scrim")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("standard variant: does NOT have role='dialog'", () => {
+    render(
+      <BottomSheetHeadless variant="standard" open aria-label="Test sheet">
+        Content
+      </BottomSheetHeadless>
+    );
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("standard variant: does NOT render a scrim", () => {
+    render(
+      <BottomSheetHeadless
+        variant="standard"
+        open
+        aria-label="Test sheet"
+        scrimClassName="test-scrim"
+      >
+        Content
+      </BottomSheetHeadless>
+    );
+    expect(screen.queryByTestId("bottom-sheet-scrim")).toBeNull();
+  });
+
+  it("modal variant: focus is trapped inside the sheet", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <BottomSheetHeadless variant="modal" open aria-label="Test sheet">
+        <button type="button">Button 1</button>
+        <button type="button">Button 2</button>
+      </BottomSheetHeadless>
+    );
+
+    const dialog = screen.getByRole("dialog");
+    const buttons = screen.getAllByRole("button");
+
+    for (const _btn of buttons) {
+      await user.tab();
+      expect(dialog.contains(document.activeElement)).toBe(true);
+    }
+  });
+
+  it("modal variant: focus returns to trigger element after close", async () => {
+    const user = userEvent.setup();
+
+    function TestComponent() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            Open Sheet
+          </button>
+          <BottomSheetHeadless
+            variant="modal"
+            open={open}
+            onOpenChange={setOpen}
+            aria-label="Test sheet"
+          >
+            <button type="button">Inside Sheet</button>
+          </BottomSheetHeadless>
+        </>
+      );
+    }
+
+    render(<TestComponent />);
+
+    const trigger = screen.getByText("Open Sheet");
+    await user.click(trigger);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(trigger);
+    });
   });
 });
