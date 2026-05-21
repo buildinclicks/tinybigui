@@ -345,6 +345,139 @@ export interface CalendarCellProps {
   className?: string;
 }
 
+// ─── Date Field Props ────────────────────────────────────────────────────────
+
+/**
+ * Props for the DateField headless component (Layer 2).
+ *
+ * Provides segmented date input (MM/DD/YYYY) with individually
+ * editable segments using React Aria's `useDateField` and `useDateSegment`.
+ *
+ * @example
+ * ```tsx
+ * <DateField
+ *   label="Start date"
+ *   value={new CalendarDate(2025, 8, 17)}
+ *   onChange={(date) => console.log(date)}
+ * />
+ * ```
+ */
+export interface DateFieldProps {
+  /** Controlled value */
+  value?: DateValue | null;
+  /** Default value for uncontrolled usage */
+  defaultValue?: DateValue | null;
+  /** Called when the value changes */
+  onChange?: (value: DateValue | null) => void;
+  /** Visible label text */
+  label?: string;
+  /** Accessible label */
+  "aria-label"?: string;
+  /** ID of labelling element */
+  "aria-labelledby"?: string;
+  /** Whether the field is disabled. @default false */
+  isDisabled?: boolean;
+  /** Whether the field is read-only. @default false */
+  isReadOnly?: boolean;
+  /** Whether the field is required. @default false */
+  isRequired?: boolean;
+  /** Minimum allowed date */
+  minValue?: DateValue;
+  /** Maximum allowed date */
+  maxValue?: DateValue;
+  /** Placeholder value */
+  placeholderValue?: DateValue;
+  /** Date granularity. @default 'day' */
+  granularity?: "day" | "month" | "year";
+  /** Additional CSS classes */
+  className?: string;
+}
+
+// ─── Date Picker Docked Props ────────────────────────────────────────────────
+
+/**
+ * Props for the DatePickerDocked headless component (Layer 2).
+ *
+ * Provides the docked date picker behavior: a segmented date field trigger,
+ * calendar icon toggle button, popover calendar, and action buttons.
+ *
+ * @example
+ * ```tsx
+ * <DatePickerDocked
+ *   label="Departure date"
+ *   onChange={(date) => console.log(date)}
+ * />
+ * ```
+ */
+export interface DatePickerDockedProps {
+  /** Controlled selected date value */
+  value?: DateValue | null;
+  /** Default selected date for uncontrolled usage */
+  defaultValue?: DateValue | null;
+  /** Called when the selected date changes */
+  onChange?: (value: DateValue | null) => void;
+  /** Visible label text for the date picker */
+  label?: string;
+  /** Accessible label */
+  "aria-label"?: string;
+  /** ID of labelling element */
+  "aria-labelledby"?: string;
+  /** Whether the picker is disabled. @default false */
+  isDisabled?: boolean;
+  /** Whether the picker is read-only. @default false */
+  isReadOnly?: boolean;
+  /** Whether the field is required. @default false */
+  isRequired?: boolean;
+  /** Minimum selectable date */
+  minValue?: DateValue;
+  /** Maximum selectable date */
+  maxValue?: DateValue;
+  /** Whether a specific date is unavailable */
+  isDateUnavailable?: (date: DateValue) => boolean;
+  /** Placeholder date shown before selection */
+  placeholderValue?: DateValue;
+  /** Date granularity. @default 'day' */
+  granularity?: "day" | "month" | "year";
+  /** Whether the picker is open (controlled) */
+  isOpen?: boolean;
+  /** Default open state (uncontrolled). @default false */
+  defaultOpen?: boolean;
+  /** Called when the open state changes */
+  onOpenChange?: (isOpen: boolean) => void;
+  /** Text for the cancel action button. @default 'Cancel' */
+  cancelLabel?: string;
+  /** Text for the confirm action button. @default 'OK' */
+  confirmLabel?: string;
+  /** Called when the cancel button is pressed */
+  onCancel?: () => void;
+  /** Called when the confirm button is pressed */
+  onConfirm?: (value: DateValue | null) => void;
+  /** Additional CSS classes */
+  className?: string;
+}
+
+// ─── Date Picker Actions Props ───────────────────────────────────────────────
+
+/**
+ * Props for the DatePickerActions sub-component.
+ *
+ * Renders Cancel and OK text buttons for confirming or reverting selection.
+ *
+ * @internal
+ */
+export interface DatePickerActionsProps {
+  /** Text for the cancel button. @default 'Cancel' */
+  cancelLabel?: string;
+  /** Text for the confirm button. @default 'OK' */
+  confirmLabel?: string;
+  /** Called when cancel is pressed */
+  onCancel?: () => void;
+  /** Called when confirm is pressed */
+  onConfirm?: () => void;
+  /** Additional CSS classes */
+  className?: string;
+}
+
 // ─── Internal Render State ───────────────────────────────────────────────────
 
 /**
