@@ -282,9 +282,51 @@ export interface ClockDialProps {
   hourCycle: TimeFormat;
 
   /**
+   * Minute step for snapping. @default 1
+   */
+  minuteStep?: number;
+
+  /**
    * Called when a value is selected on the dial.
    */
   onSelect?: (value: number) => void;
+
+  /**
+   * Whether the dial is disabled. @default false
+   */
+  isDisabled?: boolean;
+
+  /**
+   * Additional CSS classes.
+   */
+  className?: string;
+}
+
+// ─── Clock Hand Props ────────────────────────────────────────────────────────
+
+/**
+ * Props for the ClockHand sub-component (internal).
+ *
+ * Renders the selector track (line from center), center dot, and handle circle.
+ *
+ * @internal
+ */
+export interface ClockHandProps {
+  /**
+   * Angle of the clock hand in degrees (0-360 from 12 o'clock).
+   */
+  angle: number;
+
+  /**
+   * Current selection mode.
+   */
+  mode: ClockSelectionMode;
+
+  /**
+   * Whether the hand points to the inner ring (24h mode, hours 0/13-23).
+   * @default false
+   */
+  isInnerRing?: boolean;
 
   /**
    * Additional CSS classes.
@@ -337,12 +379,12 @@ export interface PeriodSelectorProps {
  */
 export interface TimeSelectorProps {
   /**
-   * Current hour value displayed.
+   * Current hour value displayed (0-23 internal).
    */
   hour: number;
 
   /**
-   * Current minute value displayed.
+   * Current minute value displayed (0-59).
    */
   minute: number;
 
@@ -357,13 +399,187 @@ export interface TimeSelectorProps {
   onFieldChange: (field: ClockSelectionMode) => void;
 
   /**
+   * Called when the hour value changes via keyboard interaction.
+   */
+  onHourChange?: (hour: number) => void;
+
+  /**
+   * Called when the minute value changes via keyboard interaction.
+   */
+  onMinuteChange?: (minute: number) => void;
+
+  /**
    * Hour cycle for display formatting.
    */
   hourCycle: TimeFormat;
 
   /**
+   * Whether the selector is disabled. @default false
+   */
+  isDisabled?: boolean;
+
+  /**
    * Additional CSS classes.
    */
+  className?: string;
+}
+
+// ─── useClockDial Hook Types ─────────────────────────────────────────────────
+
+/**
+ * Options for the `useClockDial` custom hook.
+ */
+export interface UseClockDialOptions {
+  /** Current selection mode ('hour' or 'minute'). */
+  selectionMode: ClockSelectionMode;
+  /** Hour cycle (12 or 24). */
+  hourCycle: TimeFormat;
+  /** Called when a value is selected on the dial. */
+  onSelect?: (value: number) => void;
+  /** Ref to the clock dial container element. */
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  /** Whether the dial interaction is disabled. @default false */
+  isDisabled?: boolean;
+  /** Minute step for snapping in minute mode. @default 1 */
+  minuteStep?: number;
+}
+
+/**
+ * Return value of the `useClockDial` custom hook.
+ */
+export interface UseClockDialReturn {
+  /** Props to spread on the clock dial container. */
+  dialProps: React.HTMLAttributes<HTMLDivElement>;
+  /** Angle of the clock hand in degrees (0-360 from 12 o'clock). */
+  handAngle: number;
+  /** Whether the user is currently dragging. */
+  isDragging: boolean;
+  /** Whether selection is on inner ring (24h mode). */
+  isInnerRing: boolean;
+}
+
+// ─── TimePickerDial Props ────────────────────────────────────────────────────
+
+/**
+ * Props for the TimePickerDial orchestrator component (Layer 2).
+ *
+ * Composes TimeSelector, PeriodSelector, ClockDial, ClockHand, and action buttons
+ * into the full time picker dial experience.
+ *
+ * @example
+ * ```tsx
+ * <TimePickerDial
+ *   hourCycle={12}
+ *   defaultValue={{ hour: 7, minute: 0 }}
+ *   onConfirm={(time) => console.log(time)}
+ * />
+ * ```
+ */
+export interface TimePickerDialProps {
+  /** Hour cycle (12 or 24). @default 12 */
+  hourCycle?: TimeFormat;
+  /** Layout orientation. @default 'vertical' */
+  orientation?: TimePickerOrientation;
+  /** Controlled time value. */
+  value?: TimeValue | null;
+  /** Default time value for uncontrolled usage. */
+  defaultValue?: TimeValue | null;
+  /** Called when the time value changes. */
+  onChange?: (value: TimeValue) => void;
+  /** Minute increment step. @default 1 */
+  minuteStep?: number;
+  /** Whether the picker is disabled. @default false */
+  isDisabled?: boolean;
+  /** Headline text. @default 'Select time' */
+  headline?: string;
+  /** Text for the cancel action button. @default 'Cancel' */
+  cancelLabel?: string;
+  /** Text for the confirm action button. @default 'OK' */
+  confirmLabel?: string;
+  /** Called when the cancel button is pressed. */
+  onCancel?: () => void;
+  /** Called when the confirm button is pressed. */
+  onConfirm?: (value: TimeValue) => void;
+  /** Called when the mode toggle (to keyboard input) is pressed. */
+  onModeToggle?: () => void;
+  /** Additional CSS classes. */
+  className?: string;
+}
+
+// ─── TimeInputField Props ────────────────────────────────────────────────────
+
+/**
+ * Props for the TimeInputField sub-component (individual spin button input).
+ *
+ * Provides a large numeric display with spin button semantics for entering
+ * a single time value (hour or minute).
+ *
+ * @internal
+ */
+export interface TimeInputFieldProps {
+  /** The field type — determines label and validation range. */
+  field: "hour" | "minute";
+  /** Current numeric value. */
+  value: number;
+  /** Called when value changes via keyboard input or arrow keys. */
+  onChange: (value: number) => void;
+  /** Called when the field is focused. */
+  onFocus?: () => void;
+  /** Called when the field loses focus. */
+  onBlur?: () => void;
+  /** Called when auto-advance should move focus to the next field. */
+  onAutoAdvance?: () => void;
+  /** Minimum valid value (0 or 1). */
+  min: number;
+  /** Maximum valid value (12, 23, or 59). */
+  max: number;
+  /** Whether the field is disabled. @default false */
+  isDisabled?: boolean;
+  /** Additional CSS classes. */
+  className?: string;
+}
+
+// ─── TimePickerInput Props ───────────────────────────────────────────────────
+
+/**
+ * Props for the TimePickerInput orchestrator component (Layer 2).
+ *
+ * Composes TimeInputField (hour/minute), PeriodSelector, and action buttons
+ * into the full time picker input (keyboard-entry) experience.
+ *
+ * @example
+ * ```tsx
+ * <TimePickerInput
+ *   hourCycle={12}
+ *   defaultValue={{ hour: 7, minute: 0 }}
+ *   onConfirm={(time) => console.log(time)}
+ * />
+ * ```
+ */
+export interface TimePickerInputProps {
+  /** Hour cycle (12 or 24). @default 12 */
+  hourCycle?: TimeFormat;
+  /** Controlled time value. */
+  value?: TimeValue | null;
+  /** Default time value for uncontrolled usage. */
+  defaultValue?: TimeValue | null;
+  /** Called when the time value changes. */
+  onChange?: (value: TimeValue) => void;
+  /** Whether the picker is disabled. @default false */
+  isDisabled?: boolean;
+  /** Headline text. @default 'Enter time' */
+  headline?: string;
+  /** Text for the cancel action button. @default 'Cancel' */
+  cancelLabel?: string;
+  /** Text for the confirm action button. @default 'OK' */
+  confirmLabel?: string;
+  /** Called when the cancel button is pressed. */
+  onCancel?: () => void;
+  /** Called when the confirm button is pressed. */
+  onConfirm?: (value: TimeValue) => void;
+  /** Called when the mode toggle (to clock dial) is pressed. */
+  onModeToggle?: () => void;
+  /** Additional CSS classes. */
   className?: string;
 }
 
