@@ -368,3 +368,31 @@ export type {
   FABMenuVariants,
   FABMenuItemVariants,
 } from "./components/FABMenu";
+
+export {
+  BottomSheet,
+  BottomSheetHandle,
+  BottomSheetHeadless,
+  BottomSheetContext,
+  useBottomSheetContext,
+  useBottomSheetDrag,
+  bottomSheetVariants,
+  bottomSheetScrimVariants,
+  bottomSheetHandleWrapperVariants,
+  bottomSheetHandlePillVariants,
+  bottomSheetAnimationVariants,
+} from "./components/BottomSheet";
+export type {
+  BottomSheetVariant,
+  BottomSheetAnimationState,
+  BottomSheetContextValue,
+  BottomSheetHeadlessProps,
+  BottomSheetProps,
+  BottomSheetHandleProps,
+  UseBottomSheetDragOptions,
+  UseBottomSheetDragReturn,
+  BottomSheetAnimationVariants,
+  BottomSheetVariants,
+  BottomSheetScrimVariants,
+  BottomSheetHandleVariants,
+} from "./components/BottomSheet";
