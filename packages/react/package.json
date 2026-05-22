@@ -60,6 +60,7 @@
     "chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
   "dependencies": {
+    "@internationalized/date": "^3.12.1",
     "@material/material-color-utilities": "^0.3.0",
     "@react-aria/collections": "^3.0.1",
     "@react-aria/live-announcer": "^3.4.4",
