@@ -77,6 +77,18 @@ function PickerDateField({
 }
 
 /**
+ * Calendar SVG icon for the trigger button.
+ * @internal
+ */
+function CalendarTriggerIcon(): JSX.Element {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" />
+    </svg>
+  );
+}
+
+/**
  * Internal popover content that uses usePopover for proper dismiss handling.
  * Handles Escape key, focus trapping, and click-outside dismiss.
  * @internal
@@ -269,11 +281,15 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
         data-open={state.isOpen ?? undefined}
         data-disabled={datePickerProps.isDisabled ?? undefined}
       >
-        {datePickerProps.label && <label {...labelProps}>{datePickerProps.label}</label>}
-        <div {...groupProps}>
+        {datePickerProps.label && (
+          <label {...labelProps} data-label>
+            {datePickerProps.label}
+          </label>
+        )}
+        <div {...groupProps} data-field-group>
           <PickerDateField fieldProps={fieldProps as Record<string, unknown>} />
           <button {...iconButtonProps} ref={triggerRef} type="button" data-trigger>
-            📅
+            <CalendarTriggerIcon />
           </button>
         </div>
         {state.isOpen && (

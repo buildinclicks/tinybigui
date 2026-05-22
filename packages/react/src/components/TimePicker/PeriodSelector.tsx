@@ -1,10 +1,49 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
+import { useFocusRing, mergeProps } from "react-aria";
 
 import type { PeriodSelectorProps, TimePeriod } from "./TimePicker.types";
 
 const PERIODS: readonly TimePeriod[] = ["AM", "PM"] as const;
+
+/**
+ * Internal radio item with focus-visible support.
+ * @internal
+ */
+function PeriodRadio({
+  period,
+  isSelected,
+  isDisabled,
+  onClick,
+  onKeyDown,
+}: {
+  period: TimePeriod;
+  isSelected: boolean;
+  isDisabled: boolean;
+  onClick: () => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+}): JSX.Element {
+  const ref = useRef<HTMLDivElement>(null);
+  const { focusProps, isFocusVisible } = useFocusRing();
+
+  return (
+    <div
+      {...mergeProps(focusProps, { onClick, onKeyDown })}
+      ref={ref}
+      role="radio"
+      tabIndex={isDisabled ? -1 : isSelected ? 0 : -1}
+      aria-checked={isSelected}
+      aria-label={period}
+      aria-disabled={isDisabled || undefined}
+      data-period={period}
+      {...(isSelected ? { "data-selected": "" } : {})}
+      {...(isFocusVisible ? { "data-focus-visible": "" } : {})}
+    >
+      {period}
+    </div>
+  );
+}
 
 /**
  * Headless PeriodSelector (Layer 2)
@@ -29,7 +68,12 @@ export function PeriodSelector({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, period: TimePeriod) => {
       if (isDisabled) return;
-      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      if (
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight" ||
+        e.key === "ArrowUp" ||
+        e.key === "ArrowDown"
+      ) {
         e.preventDefault();
         const next = period === "AM" ? "PM" : "AM";
         onChange(next);
@@ -58,20 +102,14 @@ export function PeriodSelector({
       {PERIODS.map((period) => {
         const isSelected = value === period;
         return (
-          <div
+          <PeriodRadio
             key={period}
-            role="radio"
-            tabIndex={isDisabled ? -1 : isSelected ? 0 : -1}
-            aria-checked={isSelected}
-            aria-label={period}
-            aria-disabled={isDisabled || undefined}
-            data-period={period}
-            {...(isSelected ? { "data-selected": "" } : {})}
+            period={period}
+            isSelected={isSelected}
+            isDisabled={isDisabled}
             onClick={() => handleClick(period)}
             onKeyDown={(e) => handleKeyDown(e, period)}
-          >
-            {period}
-          </div>
+          />
         );
       })}
     </div>

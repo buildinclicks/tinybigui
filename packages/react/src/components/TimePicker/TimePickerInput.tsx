@@ -193,6 +193,17 @@ export function TimePickerInput({
     modeToggleRef
   );
 
+  // ── aria-live announcement ──────────────────────────────────────────────────
+
+  const [announcement, setAnnouncement] = useState("");
+
+  useEffect(() => {
+    const h = displayHour;
+    const m = internalTime.minute;
+    const periodStr = hourCycle === 12 ? ` ${period}` : "";
+    setAnnouncement(`${h}:${String(m).padStart(2, "0")}${periodStr}`);
+  }, [internalTime, period, hourCycle, displayHour]);
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
@@ -254,6 +265,25 @@ export function TimePickerInput({
         <button {...confirmButtonProps} ref={confirmRef} type="button" data-action="confirm">
           {confirmLabel}
         </button>
+      </div>
+
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        data-live-region
+        style={{
+          position: "absolute",
+          width: "1px",
+          height: "1px",
+          padding: 0,
+          margin: "-1px",
+          overflow: "hidden",
+          clip: "rect(0, 0, 0, 0)",
+          whiteSpace: "nowrap",
+          borderWidth: 0,
+        }}
+      >
+        {announcement}
       </div>
     </div>
   );

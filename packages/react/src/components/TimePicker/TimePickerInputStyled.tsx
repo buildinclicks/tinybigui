@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { cn } from "../../utils/cn";
 import { TimePickerInput } from "./TimePickerInput";
 import { timePickerContainerVariants } from "./TimePicker.variants";
@@ -48,6 +49,10 @@ const INPUT_STYLES = [
   "[&_[data-time-input-field][data-focused]]:border-2",
   "[&_[data-time-input-field][data-focused]]:border-primary",
 
+  // Focus-visible ring
+  "[&_[data-time-input-field]:focus-visible]:ring-2",
+  "[&_[data-time-input-field]:focus-visible]:ring-primary",
+
   // Separator colon
   "[&_[data-time-separator]]:text-display-large",
   "[&_[data-time-separator]]:text-on-surface",
@@ -81,6 +86,8 @@ const INPUT_STYLES = [
   '[&_[data-period-selector]>[role="radio"][data-selected]]:text-on-tertiary-container',
   '[&_[data-period-selector]>[role="radio"][data-selected]]:border-transparent',
   '[&_[data-period-selector]>[role="radio"]:not([data-selected]):hover]:bg-on-surface-variant/8',
+  '[&_[data-period-selector]>[role="radio"][data-focus-visible]]:ring-2',
+  '[&_[data-period-selector]>[role="radio"][data-focus-visible]]:ring-primary',
 
   // ── Actions ───────────────────────────────────────────────────────────────────
   "[&_[data-actions]]:flex",
@@ -94,11 +101,14 @@ const INPUT_STYLES = [
   "[&_[data-action]]:rounded-full",
   "[&_[data-action]]:px-3",
   "[&_[data-action]]:py-2",
+  "[&_[data-action]]:min-h-12",
   "[&_[data-action]]:transition-colors",
   "[&_[data-action]]:duration-spring-standard-fast-effects",
   "[&_[data-action]]:ease-spring-standard-fast-effects",
   "[&_[data-action]:hover]:bg-primary/8",
   "[&_[data-action]:focus-visible]:bg-primary/10",
+  "[&_[data-action]:focus-visible]:ring-2",
+  "[&_[data-action]:focus-visible]:ring-primary",
 
   // Mode toggle
   '[&_[data-action="mode-toggle"]]:text-on-surface-variant',
@@ -112,6 +122,20 @@ const INPUT_STYLES = [
 ].join(" ");
 
 /**
+ * Motion-specific descendant selectors for the time picker input variant.
+ * Applied conditionally — omitted when `prefers-reduced-motion: reduce` is active.
+ */
+export const INPUT_MOTION_STYLES = [
+  // ── Time input field focus ───────────────────────────────────────────────────
+  "[&_[data-time-input-field][data-focused]]:duration-short2",
+  "[&_[data-time-input-field][data-focused]]:ease-standard",
+
+  // ── Period selector toggle ───────────────────────────────────────────────────
+  '[&_[data-period-selector]>[role="radio"][data-selected]]:duration-short2',
+  '[&_[data-period-selector]>[role="radio"][data-selected]]:ease-standard',
+].join(" ");
+
+/**
  * Styled TimePickerInput (Layer 3)
  *
  * Wraps the headless `TimePickerInput` with MD3 visual styling via CVA variants
@@ -122,6 +146,7 @@ const INPUT_STYLES = [
  */
 export function TimePickerInputStyled(props: TimePickerInputProps): JSX.Element {
   const { className, ...rest } = props;
+  const reducedMotion = useReducedMotion();
 
   return (
     <TimePickerInput
@@ -129,6 +154,7 @@ export function TimePickerInputStyled(props: TimePickerInputProps): JSX.Element 
       className={cn(
         timePickerContainerVariants({ variant: "input", orientation: "vertical" }),
         INPUT_STYLES,
+        !reducedMotion && INPUT_MOTION_STYLES,
         className
       )}
     />

@@ -8,7 +8,7 @@ import type { DatePickerActionsProps } from "./DatePicker.types";
 /**
  * Headless DatePickerActions (Layer 2)
  *
- * Renders Cancel and OK action buttons for the date picker.
+ * Renders Cancel, OK, and optionally Clear action buttons for the date picker.
  * Uses React Aria's `useButton` for accessibility and keyboard interaction.
  *
  * This is a headless component — it provides behavior, ARIA semantics, and
@@ -19,12 +19,25 @@ import type { DatePickerActionsProps } from "./DatePicker.types";
 export function DatePickerActions({
   cancelLabel = "Cancel",
   confirmLabel = "OK",
+  clearLabel = "Clear",
+  showClear = false,
+  isConfirmDisabled = false,
   onCancel,
   onConfirm,
+  onClear,
   className,
 }: DatePickerActionsProps): JSX.Element {
+  const clearRef = useRef<HTMLButtonElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
+
+  const { buttonProps: clearButtonProps } = useButton(
+    {
+      "aria-label": clearLabel,
+      ...(onClear ? { onPress: onClear } : {}),
+    },
+    clearRef
+  );
 
   const { buttonProps: cancelButtonProps } = useButton(
     {
@@ -37,6 +50,7 @@ export function DatePickerActions({
   const { buttonProps: confirmButtonProps } = useButton(
     {
       "aria-label": confirmLabel,
+      isDisabled: isConfirmDisabled,
       ...(onConfirm ? { onPress: onConfirm } : {}),
     },
     confirmRef
@@ -44,6 +58,11 @@ export function DatePickerActions({
 
   return (
     <div className={className} data-actions>
+      {showClear && (
+        <button {...clearButtonProps} ref={clearRef} type="button" data-action="clear">
+          {clearLabel}
+        </button>
+      )}
       <button {...cancelButtonProps} ref={cancelRef} type="button" data-action="cancel">
         {cancelLabel}
       </button>

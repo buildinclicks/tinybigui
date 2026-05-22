@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { cn } from "../../utils/cn";
 import { TimePickerDial } from "./TimePickerDial";
 import { timePickerContainerVariants } from "./TimePicker.variants";
@@ -37,6 +38,8 @@ const DIAL_STYLES = [
   "[&_[data-time-field][data-selected]]:text-on-primary-container",
   "[&_[data-time-field]:not([data-selected]):hover]:bg-surface-container-highest/80",
   "[&_[data-time-field][data-selected]:hover]:bg-primary-container/80",
+  "[&_[data-time-field][data-focus-visible]]:ring-2",
+  "[&_[data-time-field][data-focus-visible]]:ring-primary",
 
   // Separator colon
   "[&_[data-time-separator]]:text-display-large",
@@ -74,6 +77,8 @@ const DIAL_STYLES = [
   '[&_[data-period-selector]>[role="radio"][data-selected]]:text-on-tertiary-container',
   '[&_[data-period-selector]>[role="radio"][data-selected]]:border-transparent',
   '[&_[data-period-selector]>[role="radio"]:not([data-selected]):hover]:bg-on-surface-variant/8',
+  '[&_[data-period-selector]>[role="radio"][data-focus-visible]]:ring-2',
+  '[&_[data-period-selector]>[role="radio"][data-focus-visible]]:ring-primary',
 
   // ── Clock dial ────────────────────────────────────────────────────────────────
   "[&_[data-clock-dial]]:w-[256px]",
@@ -146,11 +151,14 @@ const DIAL_STYLES = [
   "[&_[data-action]]:rounded-full",
   "[&_[data-action]]:px-3",
   "[&_[data-action]]:py-2",
+  "[&_[data-action]]:min-h-12",
   "[&_[data-action]]:transition-colors",
   "[&_[data-action]]:duration-spring-standard-fast-effects",
   "[&_[data-action]]:ease-spring-standard-fast-effects",
   "[&_[data-action]:hover]:bg-primary/8",
   "[&_[data-action]:focus-visible]:bg-primary/10",
+  "[&_[data-action]:focus-visible]:ring-2",
+  "[&_[data-action]:focus-visible]:ring-primary",
 
   // Mode toggle
   '[&_[data-action="mode-toggle"]]:text-on-surface-variant',
@@ -164,6 +172,40 @@ const DIAL_STYLES = [
 ].join(" ");
 
 /**
+ * Motion-specific descendant selectors for the time picker dial.
+ * Applied conditionally — omitted when `prefers-reduced-motion: reduce` is active.
+ *
+ * Uses legacy MD3 motion tokens for clock hand rotation (spatial transform)
+ * and standard effects for focus/toggle state transitions.
+ */
+export const DIAL_MOTION_STYLES = [
+  // ── Clock hand rotation ──────────────────────────────────────────────────────
+  "[&_[data-clock-hand-track]]:transition-transform",
+  "[&_[data-clock-hand-track]]:duration-medium1",
+  "[&_[data-clock-hand-track]]:ease-standard-decelerate",
+
+  "[&_[data-clock-hand]]:transition-transform",
+  "[&_[data-clock-hand]]:duration-medium1",
+  "[&_[data-clock-hand]]:ease-standard-decelerate",
+
+  // ── Dragging suppresses transition ───────────────────────────────────────────
+  "[&_[data-clock-dial][data-dragging]_[data-clock-hand-track]]:!transition-none",
+  "[&_[data-clock-dial][data-dragging]_[data-clock-hand]]:!transition-none",
+
+  // ── Time selector focus ──────────────────────────────────────────────────────
+  "[&_[data-time-field][data-selected]]:duration-short2",
+  "[&_[data-time-field][data-selected]]:ease-standard",
+
+  // ── Period selector toggle ───────────────────────────────────────────────────
+  '[&_[data-period-selector]>[role="radio"][data-selected]]:duration-short2',
+  '[&_[data-period-selector]>[role="radio"][data-selected]]:ease-standard',
+
+  // ── Dial number highlight ────────────────────────────────────────────────────
+  "[&_[data-clock-number][data-selected]]:duration-short2",
+  "[&_[data-clock-number][data-selected]]:ease-standard",
+].join(" ");
+
+/**
  * Styled TimePickerDial (Layer 3)
  *
  * Wraps the headless `TimePickerDial` with MD3 visual styling via CVA variants
@@ -174,6 +216,7 @@ const DIAL_STYLES = [
  */
 export function TimePickerDialStyled(props: TimePickerDialProps): JSX.Element {
   const { className, orientation = "vertical", ...rest } = props;
+  const reducedMotion = useReducedMotion();
 
   return (
     <TimePickerDial
@@ -182,6 +225,7 @@ export function TimePickerDialStyled(props: TimePickerDialProps): JSX.Element {
       className={cn(
         timePickerContainerVariants({ variant: "dial", orientation }),
         DIAL_STYLES,
+        !reducedMotion && DIAL_MOTION_STYLES,
         className
       )}
     />

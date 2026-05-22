@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
+import { useFocusRing, mergeProps } from "react-aria";
 
 import type { TimeSelectorProps } from "./TimePicker.types";
 
@@ -50,6 +51,12 @@ export function TimeSelector({
   const hourMin = hourCycle === 24 ? 0 : 1;
   const hourMax = hourCycle === 24 ? 23 : 12;
 
+  const hourRef = useRef<HTMLDivElement>(null);
+  const minuteRef = useRef<HTMLDivElement>(null);
+
+  const { focusProps: hourFocusProps, isFocusVisible: hourFocusVisible } = useFocusRing();
+  const { focusProps: minuteFocusProps, isFocusVisible: minuteFocusVisible } = useFocusRing();
+
   const handleHourKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (isDisabled) return;
@@ -95,6 +102,8 @@ export function TimeSelector({
   return (
     <div className={className} data-time-selector>
       <div
+        {...mergeProps({ onKeyDown: handleHourKeyDown, onClick: handleHourClick }, hourFocusProps)}
+        ref={hourRef}
         role="spinbutton"
         tabIndex={isDisabled ? -1 : 0}
         aria-label="Hours"
@@ -104,8 +113,7 @@ export function TimeSelector({
         aria-disabled={isDisabled || undefined}
         data-time-field="hour"
         {...(activeField === "hour" ? { "data-selected": "" } : {})}
-        onClick={handleHourClick}
-        onKeyDown={handleHourKeyDown}
+        {...(hourFocusVisible ? { "data-focus-visible": "" } : {})}
       >
         {formatHour(hour, hourCycle)}
       </div>
@@ -113,6 +121,11 @@ export function TimeSelector({
         :
       </span>
       <div
+        {...mergeProps(
+          { onKeyDown: handleMinuteKeyDown, onClick: handleMinuteClick },
+          minuteFocusProps
+        )}
+        ref={minuteRef}
         role="spinbutton"
         tabIndex={isDisabled ? -1 : 0}
         aria-label="Minutes"
@@ -122,8 +135,7 @@ export function TimeSelector({
         aria-disabled={isDisabled || undefined}
         data-time-field="minute"
         {...(activeField === "minute" ? { "data-selected": "" } : {})}
-        onClick={handleMinuteClick}
-        onKeyDown={handleMinuteKeyDown}
+        {...(minuteFocusVisible ? { "data-focus-visible": "" } : {})}
       >
         {formatMinute(minute)}
       </div>

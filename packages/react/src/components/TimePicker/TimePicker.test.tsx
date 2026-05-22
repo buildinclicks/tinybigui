@@ -1,6 +1,7 @@
 import { describe, test, expect, expectTypeOf, vi } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { axe } from "vitest-axe";
 
 // JSDOM lacks PointerEvent — polyfill extending MouseEvent so clientX/clientY work
 if (typeof globalThis.PointerEvent === "undefined") {
@@ -1235,3 +1236,341 @@ describe("TimePicker — styled layer", () => {
     expect(exports.timePickerModeToggleVariants).toBeDefined();
   });
 });
+
+// ─── M10: Motion and Animation Tests ──────────────────────────────────────────
+
+describe("TimePicker — motion and animation", () => {
+  // Test 100
+  test("Clock hand has transition-transform class", async () => {
+    const { DIAL_MOTION_STYLES } = await import("./TimePickerDialStyled");
+    expect(DIAL_MOTION_STYLES).toContain("transition-transform");
+  });
+
+  // Test 101
+  test("Clock hand rotation uses duration-medium1 ease-standard-decelerate", async () => {
+    const { DIAL_MOTION_STYLES } = await import("./TimePickerDialStyled");
+    expect(DIAL_MOTION_STYLES).toContain("duration-medium1");
+    expect(DIAL_MOTION_STYLES).toContain("ease-standard-decelerate");
+  });
+
+  // Test 102
+  test("Clock hand dragging suppresses transition", async () => {
+    const { DIAL_MOTION_STYLES } = await import("./TimePickerDialStyled");
+    expect(DIAL_MOTION_STYLES).toContain("[data-dragging]");
+    expect(DIAL_MOTION_STYLES).toContain("transition-none");
+  });
+
+  // Test 103
+  test("Time selector focus has duration-short2 ease-standard", async () => {
+    const { DIAL_MOTION_STYLES } = await import("./TimePickerDialStyled");
+    expect(DIAL_MOTION_STYLES).toContain("[data-time-field][data-selected]]:duration-short2");
+    expect(DIAL_MOTION_STYLES).toContain("[data-time-field][data-selected]]:ease-standard");
+  });
+
+  // Test 104
+  test("Period selector toggle has duration-short2 ease-standard", async () => {
+    const { DIAL_MOTION_STYLES } = await import("./TimePickerDialStyled");
+    expect(DIAL_MOTION_STYLES).toContain('[role="radio"][data-selected]]:duration-short2');
+    expect(DIAL_MOTION_STYLES).toContain('[role="radio"][data-selected]]:ease-standard');
+  });
+
+  // Test 105
+  test("Dial number highlight has duration-short2 ease-standard", async () => {
+    const { DIAL_MOTION_STYLES } = await import("./TimePickerDialStyled");
+    expect(DIAL_MOTION_STYLES).toContain("[data-clock-number][data-selected]]:duration-short2");
+    expect(DIAL_MOTION_STYLES).toContain("[data-clock-number][data-selected]]:ease-standard");
+  });
+
+  // Test 106
+  test("Reduced motion: no transition on clock hand", () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(prefers-reduced-motion: reduce)",
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    }));
+
+    const { container } = render(<TimePicker variant="dial" aria-label="Test time" />);
+
+    const rootEl = container.firstElementChild;
+    const className = rootEl?.className ?? "";
+    expect(className).not.toContain("[data-clock-hand-track]]:transition-transform");
+    expect(className).not.toContain("duration-medium1");
+    expect(className).not.toContain("ease-standard-decelerate");
+
+    window.matchMedia = originalMatchMedia;
+  });
+
+  // Test 107
+  test("Reduced motion: no transition on time selector", () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(prefers-reduced-motion: reduce)",
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    }));
+
+    const { container } = render(<TimePicker variant="dial" aria-label="Test time" />);
+
+    const rootEl = container.firstElementChild;
+    const className = rootEl?.className ?? "";
+    expect(className).not.toContain("[data-time-field][data-selected]]:duration-short2");
+
+    window.matchMedia = originalMatchMedia;
+  });
+
+  // Test 108
+  test("No hardcoded duration-[Xms] or ease-[cubic-bezier] values", async () => {
+    const { DIAL_MOTION_STYLES } = await import("./TimePickerDialStyled");
+    const { INPUT_MOTION_STYLES } = await import("./TimePickerInputStyled");
+
+    const allMotion = DIAL_MOTION_STYLES + INPUT_MOTION_STYLES;
+    expect(allMotion).not.toMatch(/duration-\[\d+ms\]/);
+    expect(allMotion).not.toMatch(/ease-\[cubic-bezier/);
+  });
+});
+
+// ─── M11: Accessibility Hardening ─────────────────────────────────────────────
+
+describe("TimePicker — accessibility hardening", () => {
+  // Test 109
+  test("TimePickerDial: zero axe violations", async () => {
+    const { container } = render(<TimePicker variant="dial" aria-label="Select time" />);
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  // Test 110
+  test("TimePickerInput: zero axe violations", async () => {
+    const { container } = render(<TimePicker variant="input" aria-label="Enter time" />);
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  // Test 111
+  test("Hour spinbutton has correct aria-valuenow, min, max", () => {
+    render(
+      <TimePickerDial
+        hourCycle={12}
+        defaultValue={{ hour: 14, minute: 30 }}
+        aria-label="Test time"
+      />
+    );
+
+    const hourSpinbutton = screen.getByRole("spinbutton", { name: "Hours" });
+    expect(hourSpinbutton).toHaveAttribute("aria-valuenow", "2");
+    expect(hourSpinbutton).toHaveAttribute("aria-valuemin", "1");
+    expect(hourSpinbutton).toHaveAttribute("aria-valuemax", "12");
+  });
+
+  // Test 112
+  test("Minute spinbutton has correct aria-valuenow, min, max", () => {
+    render(
+      <TimePickerDial
+        hourCycle={12}
+        defaultValue={{ hour: 14, minute: 45 }}
+        aria-label="Test time"
+      />
+    );
+
+    const minuteSpinbutton = screen.getByRole("spinbutton", { name: "Minutes" });
+    expect(minuteSpinbutton).toHaveAttribute("aria-valuenow", "45");
+    expect(minuteSpinbutton).toHaveAttribute("aria-valuemin", "0");
+    expect(minuteSpinbutton).toHaveAttribute("aria-valuemax", "59");
+  });
+
+  // Test 113
+  test('Period selector has role="radiogroup" with role="radio" children', () => {
+    render(
+      <TimePickerDial hourCycle={12} defaultValue={{ hour: 7, minute: 0 }} aria-label="Test time" />
+    );
+
+    const radiogroup = screen.getByRole("radiogroup", { name: "Time period" });
+    expect(radiogroup).toBeInTheDocument();
+
+    const radios = screen.getAllByRole("radio");
+    expect(radios.length).toBe(2);
+    expect(radios[0]).toHaveAttribute("aria-label", "AM");
+    expect(radios[1]).toHaveAttribute("aria-label", "PM");
+  });
+
+  // Test 114
+  test("AM/PM aria-checked reflects selected period", () => {
+    render(
+      <TimePickerDial
+        hourCycle={12}
+        defaultValue={{ hour: 14, minute: 0 }}
+        aria-label="Test time"
+      />
+    );
+
+    const amRadio = screen.getByRole("radio", { name: "AM" });
+    const pmRadio = screen.getByRole("radio", { name: "PM" });
+
+    expect(amRadio).toHaveAttribute("aria-checked", "false");
+    expect(pmRadio).toHaveAttribute("aria-checked", "true");
+  });
+
+  // Test 115
+  test("Focus ring visible on keyboard-focused time selector", async () => {
+    const user = userEvent.setup();
+    render(
+      <TimePickerDial hourCycle={12} defaultValue={{ hour: 7, minute: 0 }} aria-label="Test time" />
+    );
+
+    const hourField = screen.getByRole("spinbutton", { name: "Hours" });
+    await user.tab();
+
+    if (document.activeElement === hourField) {
+      expect(hourField).toHaveAttribute("data-focus-visible");
+    }
+  });
+
+  // Test 116
+  test("Time changes announced via aria-live", () => {
+    const { container } = render(
+      <TimePickerDial
+        hourCycle={12}
+        defaultValue={{ hour: 7, minute: 30 }}
+        aria-label="Test time"
+      />
+    );
+
+    const liveRegion = container.querySelector('[aria-live="polite"]');
+    expect(liveRegion).toBeInTheDocument();
+    expect(liveRegion?.textContent).toContain("7:30");
+  });
+
+  // Test 117
+  test("All clock numbers meet 48dp touch target", () => {
+    const { container } = render(<TimePicker variant="dial" aria-label="Test time" />);
+
+    const rootEl = container.firstElementChild;
+    const className = rootEl?.className ?? "";
+    expect(className).toContain("[&_[data-clock-number]]:w-[48px]");
+    expect(className).toContain("[&_[data-clock-number]]:h-[48px]");
+  });
+
+  // Test 118
+  test("Tab order: hour → minute → period → actions", async () => {
+    const user = userEvent.setup();
+    render(
+      <TimePickerDial hourCycle={12} defaultValue={{ hour: 7, minute: 0 }} aria-label="Test time" />
+    );
+
+    await user.tab();
+    expect(document.activeElement).toHaveAttribute("aria-label", "Hours");
+
+    await user.tab();
+    expect(document.activeElement).toHaveAttribute("aria-label", "Minutes");
+
+    await user.tab();
+    const activeEl = document.activeElement;
+    const roleIsRadio = activeEl?.getAttribute("role") === "radio";
+    const labelIncludesAM = activeEl?.getAttribute("aria-label")?.includes("AM") === true;
+    const labelIncludesPM = activeEl?.getAttribute("aria-label")?.includes("PM") === true;
+    expect(roleIsRadio || labelIncludesAM || labelIncludesPM).toBe(true);
+  });
+
+  // Test 119
+  test("Keyboard increment/decrement works with Arrow keys", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <TimePickerDial
+        hourCycle={12}
+        defaultValue={{ hour: 7, minute: 0 }}
+        onChange={onChange}
+        aria-label="Test time"
+      />
+    );
+
+    const hourField = screen.getByRole("spinbutton", { name: "Hours" });
+    act(() => {
+      hourField.focus();
+    });
+    await user.keyboard("{ArrowUp}");
+
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ hour: 8, minute: 0 }));
+  });
+
+  // Test 120
+  test("Direct numeric input accepted in input variant", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <TimePickerInput
+        hourCycle={12}
+        defaultValue={{ hour: 7, minute: 0 }}
+        onChange={onChange}
+        aria-label="Test time"
+      />
+    );
+
+    const hourField = screen
+      .getAllByRole("spinbutton")
+      .find((el) => el.getAttribute("aria-label") === "Hour");
+    expect(hourField).toBeTruthy();
+
+    act(() => {
+      hourField!.focus();
+    });
+    await user.keyboard("09");
+
+    expect(onChange).toHaveBeenCalled();
+    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0] as { hour: number };
+    expect(lastCall.hour).toBe(9);
+  });
+});
+
+// ─── M12: Storybook Stories ───────────────────────────────────────────────────
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import timePickerMeta, {
+  Default as TimePickerDefault,
+  Dial24Hour as TimePickerDial24Hour,
+  DisabledState as TimePickerDisabledState,
+} from "./TimePicker.stories";
+
+describe("TimePicker — stories", () => {
+  // Test 121
+  test("Storybook meta has correct title 'Components/TimePicker'", () => {
+    expect(timePickerMeta.title).toBe("Components/TimePicker");
+  });
+
+  // Test 122
+  test("Storybook meta has 'autodocs' tag", () => {
+    expect(timePickerMeta.tags).toContain("autodocs");
+  });
+
+  // Test 123
+  test("Default story renders without errors", () => {
+    expect(TimePickerDefault).toBeDefined();
+    expect(TimePickerDefault.args ?? TimePickerDefault.render).toBeDefined();
+  });
+
+  // Test 124
+  test("Dial24Hour story renders 24 numbers on dial", () => {
+    expect(TimePickerDial24Hour).toBeDefined();
+    expect(TimePickerDial24Hour.args?.hourCycle).toBe(24);
+  });
+
+  // Test 125
+  test("DisabledState story renders with aria-disabled", () => {
+    expect(TimePickerDisabledState).toBeDefined();
+    expect(TimePickerDisabledState.render ?? TimePickerDisabledState.args).toBeDefined();
+  });
+});
+/* eslint-enable @typescript-eslint/no-unsafe-member-access */

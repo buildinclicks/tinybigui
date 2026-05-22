@@ -456,6 +456,135 @@ export interface DatePickerDockedProps {
   className?: string;
 }
 
+// ─── Date Picker Modal Props ─────────────────────────────────────────────────
+
+/**
+ * Props for the DatePickerModal headless component (Layer 2).
+ *
+ * Provides full-overlay modal dialog behavior for date selection,
+ * supporting both single-date and date-range modes.
+ *
+ * @example
+ * ```tsx
+ * // Single date modal
+ * <DatePickerModal
+ *   isOpen={open}
+ *   onOpenChange={setOpen}
+ *   onChange={(date) => console.log(date)}
+ * />
+ *
+ * // Range selection modal
+ * <DatePickerModal
+ *   selectionMode="range"
+ *   isOpen={open}
+ *   onOpenChange={setOpen}
+ *   onRangeChange={(range) => console.log(range)}
+ * />
+ * ```
+ */
+export interface DatePickerModalProps {
+  /** Selection mode for the date picker. @default 'single' */
+  selectionMode?: DateSelectionMode;
+  /** Controlled selected date value (single mode) */
+  value?: DateValue | null;
+  /** Default selected date for uncontrolled usage (single mode) */
+  defaultValue?: DateValue | null;
+  /** Controlled start and end date values (range mode) */
+  rangeValue?: { start: DateValue; end: DateValue } | null;
+  /** Default range value for uncontrolled usage (range mode) */
+  defaultRangeValue?: { start: DateValue; end: DateValue } | null;
+  /** Called when the selected date changes (single mode) */
+  onChange?: (value: DateValue | null) => void;
+  /** Called when the selected range changes (range mode) */
+  onRangeChange?: (value: { start: DateValue; end: DateValue } | null) => void;
+  /** Minimum selectable date */
+  minValue?: DateValue;
+  /** Maximum selectable date */
+  maxValue?: DateValue;
+  /** Whether a specific date is unavailable */
+  isDateUnavailable?: (date: DateValue) => boolean;
+  /** Whether the modal is open (controlled) */
+  isOpen?: boolean;
+  /** Default open state (uncontrolled). @default false */
+  defaultOpen?: boolean;
+  /** Called when the open state changes */
+  onOpenChange?: (isOpen: boolean) => void;
+  /** Headline text displayed in modal header. @default 'Select date' (single) | 'Select dates' (range) */
+  headline?: string;
+  /** Supporting text displayed below headline */
+  supportingText?: string;
+  /** Text for the cancel action button. @default 'Cancel' */
+  cancelLabel?: string;
+  /** Text for the confirm action button. @default 'OK' */
+  confirmLabel?: string;
+  /** Text for the clear action button. @default 'Clear' */
+  clearLabel?: string;
+  /** Whether to show the clear button. @default true */
+  showClear?: boolean;
+  /** Called when the cancel button is pressed */
+  onCancel?: () => void;
+  /** Called when the confirm button is pressed */
+  onConfirm?: (value: DateValue | { start: DateValue; end: DateValue } | null) => void;
+  /** Called when the clear button is pressed */
+  onClear?: () => void;
+  /** Additional CSS classes */
+  className?: string;
+}
+
+// ─── Date Picker Modal Header Props ──────────────────────────────────────────
+
+/**
+ * Props for the DatePickerModalHeader sub-component.
+ *
+ * Renders the modal header with headline, supporting text, and mode toggle.
+ *
+ * @internal
+ */
+export interface DatePickerModalHeaderProps {
+  /** Headline text. @default 'Select date' */
+  headline?: string;
+  /** Supporting text (formatted selected date) */
+  supportingText?: string;
+  /** Current input mode. @default 'calendar' */
+  inputMode?: "calendar" | "keyboard";
+  /** Called when the mode toggle is pressed */
+  onModeToggle?: () => void;
+  /** ID for the headline element (used for aria-labelledby) */
+  headlineId?: string;
+  /** Additional CSS classes */
+  className?: string;
+}
+
+// ─── Range Calendar Props ────────────────────────────────────────────────────
+
+/**
+ * Props for the RangeCalendar sub-component.
+ *
+ * Provides a scrollable multi-month calendar for date range selection.
+ *
+ * @internal
+ */
+export interface RangeCalendarProps {
+  /** Controlled start and end dates */
+  rangeValue?: { start: DateValue; end: DateValue } | null;
+  /** Default range for uncontrolled usage */
+  defaultRangeValue?: { start: DateValue; end: DateValue } | null;
+  /** Called when the selected range changes */
+  onRangeChange?: (value: { start: DateValue; end: DateValue }) => void;
+  /** Minimum selectable date */
+  minValue?: DateValue;
+  /** Maximum selectable date */
+  maxValue?: DateValue;
+  /** Whether a specific date is unavailable */
+  isDateUnavailable?: (date: DateValue) => boolean;
+  /** Number of months to display in the scrollable view. @default 3 */
+  visibleMonths?: number;
+  /** Accessible label */
+  "aria-label"?: string;
+  /** Additional CSS classes */
+  className?: string;
+}
+
 // ─── Date Picker Actions Props ───────────────────────────────────────────────
 
 /**
@@ -470,10 +599,18 @@ export interface DatePickerActionsProps {
   cancelLabel?: string;
   /** Text for the confirm button. @default 'OK' */
   confirmLabel?: string;
+  /** Text for the clear button. @default 'Clear' */
+  clearLabel?: string;
+  /** Whether to show the clear button. @default false */
+  showClear?: boolean;
+  /** Whether the confirm button is disabled. @default false */
+  isConfirmDisabled?: boolean;
   /** Called when cancel is pressed */
   onCancel?: () => void;
   /** Called when confirm is pressed */
   onConfirm?: () => void;
+  /** Called when clear is pressed */
+  onClear?: () => void;
   /** Additional CSS classes */
   className?: string;
 }
@@ -500,4 +637,131 @@ export interface DatePickerRenderState {
   today: CalendarDate;
   /** The month currently being displayed */
   visibleMonth: DateValue;
+}
+
+// ─── Date Input Field Props ─────────────────────────────────────────────────
+
+/**
+ * Props for the DateInputField headless component (Layer 2).
+ *
+ * An outlined text field for manual date entry with validation.
+ * Wraps `useDateField` from React Aria for segmented date input behavior.
+ *
+ * @example
+ * ```tsx
+ * <DateInputField
+ *   label="Date"
+ *   placeholder="mm/dd/yyyy"
+ *   onChange={(date) => console.log(date)}
+ * />
+ * ```
+ *
+ * @internal
+ */
+export interface DateInputFieldProps {
+  /** Controlled value */
+  value?: DateValue | null;
+  /** Default value for uncontrolled usage */
+  defaultValue?: DateValue | null;
+  /** Called when the value changes */
+  onChange?: (value: DateValue | null) => void;
+  /** Visible label text */
+  label?: string;
+  /** Placeholder text. @default 'mm/dd/yyyy' */
+  placeholder?: string;
+  /** Accessible label */
+  "aria-label"?: string;
+  /** ID of labelling element */
+  "aria-labelledby"?: string;
+  /** Whether the field is disabled. @default false */
+  isDisabled?: boolean;
+  /** Whether the field is read-only. @default false */
+  isReadOnly?: boolean;
+  /** Whether the field is required. @default false */
+  isRequired?: boolean;
+  /** Minimum allowed date */
+  minValue?: DateValue;
+  /** Maximum allowed date */
+  maxValue?: DateValue;
+  /** Placeholder value for segments */
+  placeholderValue?: DateValue;
+  /** Date granularity. @default 'day' */
+  granularity?: "day" | "month" | "year";
+  /** Whether the field is in an invalid state */
+  isInvalid?: boolean;
+  /** Error message to display when invalid */
+  errorMessage?: string | undefined;
+  /** Whether the field should auto-focus on mount. @default false */
+  autoFocus?: boolean;
+  /** Additional CSS classes */
+  className?: string;
+}
+
+// ─── Date Picker Modal Input Props ──────────────────────────────────────────
+
+/**
+ * Props for the DatePickerModalInput headless component (Layer 2).
+ *
+ * Provides a modal dialog for manual keyboard entry of dates.
+ * Supports single-date and range-date input modes with validation.
+ *
+ * @example
+ * ```tsx
+ * // Single date modal input
+ * <DatePickerModalInput
+ *   isOpen={open}
+ *   onOpenChange={setOpen}
+ *   onChange={(date) => console.log(date)}
+ * />
+ *
+ * // Range date modal input
+ * <DatePickerModalInput
+ *   selectionMode="range"
+ *   isOpen={open}
+ *   onOpenChange={setOpen}
+ *   onRangeChange={(range) => console.log(range)}
+ * />
+ * ```
+ */
+export interface DatePickerModalInputProps {
+  /** Selection mode for the date picker. @default 'single' */
+  selectionMode?: DateSelectionMode;
+  /** Controlled selected date value (single mode) */
+  value?: DateValue | null;
+  /** Default selected date for uncontrolled usage (single mode) */
+  defaultValue?: DateValue | null;
+  /** Controlled start and end date values (range mode) */
+  rangeValue?: { start: DateValue; end: DateValue } | null;
+  /** Default range value for uncontrolled usage (range mode) */
+  defaultRangeValue?: { start: DateValue; end: DateValue } | null;
+  /** Called when the selected date changes (single mode) */
+  onChange?: (value: DateValue | null) => void;
+  /** Called when the selected range changes (range mode) */
+  onRangeChange?: (value: { start: DateValue; end: DateValue } | null) => void;
+  /** Minimum selectable date */
+  minValue?: DateValue;
+  /** Maximum selectable date */
+  maxValue?: DateValue;
+  /** Whether the modal is open (controlled) */
+  isOpen?: boolean;
+  /** Default open state (uncontrolled). @default false */
+  defaultOpen?: boolean;
+  /** Called when the open state changes */
+  onOpenChange?: (isOpen: boolean) => void;
+  /** Headline text displayed in modal header. @default 'Select date' (single) | 'Select dates' (range) */
+  headline?: string;
+  /** Supporting text. @default 'Enter date' (single) | 'Enter dates' (range) */
+  supportingText?: string;
+  /** Text for the cancel action button. @default 'Cancel' */
+  cancelLabel?: string;
+  /** Text for the confirm action button. @default 'OK' */
+  confirmLabel?: string;
+  /** Called when the cancel button is pressed */
+  onCancel?: () => void;
+  /** Called when the confirm button is pressed */
+  onConfirm?: (value: DateValue | { start: DateValue; end: DateValue } | null) => void;
+  /** Called when mode switches to calendar view */
+  onModeToggle?: () => void;
+  /** Additional CSS classes */
+  className?: string;
 }
