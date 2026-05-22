@@ -370,6 +370,28 @@ export type {
 } from "./components/FABMenu";
 
 export {
+  Slider,
+  SliderHeadless,
+  sliderContainerVariants,
+  sliderActiveTrackVariants,
+  sliderInactiveTrackVariants,
+  sliderHandleVariants,
+  sliderHandleStateLayerVariants,
+  sliderTrackLayoutVariants,
+} from "./components/Slider";
+export type {
+  SliderVariant,
+  SliderSize,
+  SliderOrientation,
+  SliderHeadlessProps,
+  SliderThumbProps,
+  SliderProps,
+  SliderThumbState,
+  SliderRenderState,
+  SliderRangeThumbLabels,
+} from "./components/Slider";
+
+export {
   BottomSheet,
   BottomSheetHandle,
   BottomSheetHeadless,

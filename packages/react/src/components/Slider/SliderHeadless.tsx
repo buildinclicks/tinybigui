@@ -1,0 +1,275 @@
+"use client";
+
+import { forwardRef, useMemo, useRef } from "react";
+import type React from "react";
+import { mergeProps, useFocusRing, useSlider, useSliderThumb, VisuallyHidden } from "react-aria";
+import { useSliderState } from "react-stately";
+import type { SliderState } from "react-stately";
+import { cn } from "../../utils/cn";
+import type { SliderHeadlessProps } from "./Slider.types";
+
+// ─── Centered Variant Utilities ───────────────────────────────────────────────
+
+/**
+ * Calculate the percentage position of zero within the slider range.
+ * For range [-100, 100]: zeroPercent = 50
+ * For range [-50, 150]: zeroPercent = 25
+ * For range [0, 100]:   zeroPercent = 0  (degenerates to standard)
+ */
+function getZeroPercent(minValue: number, maxValue: number): number {
+  if (minValue >= 0) return 0;
+  if (maxValue <= 0) return 100;
+  return ((0 - minValue) / (maxValue - minValue)) * 100;
+}
+
+/**
+ * Determine which side of center the thumb sits on.
+ */
+function getValueDirection(value: number): "negative" | "positive" | "zero" {
+  if (value < 0) return "negative";
+  if (value > 0) return "positive";
+  return "zero";
+}
+
+// ─── Internal Thumb ───────────────────────────────────────────────────────────
+
+interface SliderThumbInternalProps {
+  index: number;
+  state: SliderState;
+  trackRef: React.RefObject<HTMLDivElement>;
+  isDisabled: boolean;
+  formatValue?: (value: number) => string;
+  "aria-label"?: string;
+  className?: string;
+  "data-direction"?: "negative" | "positive" | "zero";
+}
+
+function SliderThumbInternal({
+  index,
+  state,
+  trackRef,
+  isDisabled,
+  formatValue,
+  className,
+  "data-direction": dataDirection,
+  ...ariaProps
+}: SliderThumbInternalProps): React.JSX.Element {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const { thumbProps, inputProps, isDragging, isFocused } = useSliderThumb(
+    {
+      index,
+      trackRef,
+      inputRef,
+      isDisabled,
+      ...ariaProps,
+    },
+    state
+  );
+
+  const { isFocusVisible, focusProps } = useFocusRing();
+
+  // Override aria-valuetext with the custom formatter when provided.
+  // React Stately v3.7 does not support getValueLabel; we patch the attribute directly.
+  const currentValue = state.getThumbValue(index);
+  const ariaValueText = formatValue ? formatValue(currentValue) : undefined;
+
+  return (
+    <div
+      {...thumbProps}
+      data-dragging={isDragging || undefined}
+      data-focused={isFocused || undefined}
+      data-focus-visible={isFocusVisible || undefined}
+      data-disabled={isDisabled || undefined}
+      {...(dataDirection !== undefined ? { "data-direction": dataDirection } : {})}
+      className={cn(
+        "outline-none",
+        // Focus ring visible only on keyboard focus — matches project pattern (md3-design.mdc §Accessibility)
+        "data-[focus-visible]:ring-3",
+        "data-[focus-visible]:ring-secondary",
+        "data-[focus-visible]:ring-offset-2",
+        className
+      )}
+    >
+      <VisuallyHidden>
+        <input
+          ref={inputRef}
+          {...mergeProps(inputProps, focusProps)}
+          {...(ariaValueText !== undefined ? { "aria-valuetext": ariaValueText } : {})}
+        />
+      </VisuallyHidden>
+    </div>
+  );
+}
+
+// ─── SliderHeadless ───────────────────────────────────────────────────────────
+
+/**
+ * Headless Slider Component (Layer 2)
+ *
+ * Unstyled slider primitive using React Aria for full accessibility.
+ * Provides behavior only — bring your own styles.
+ *
+ * Features:
+ * - role="group" on container with role="slider" on thumb input
+ * - Full keyboard navigation: Arrow keys, Page Up/Down, Home, End
+ * - Pointer drag with capture (mouse, touch, pen)
+ * - Click-to-seek on the track
+ * - Controlled and uncontrolled value management
+ * - Horizontal and vertical orientations
+ * - Discrete stepping support
+ * - Live value announcements via <output>
+ * - data-* attributes for styled layer targeting
+ *
+ * @example
+ * ```tsx
+ * <SliderHeadless label="Volume" defaultValue={[50]} />
+ *
+ * <SliderHeadless
+ *   label="Price range"
+ *   variant="range"
+ *   minValue={0}
+ *   maxValue={500}
+ *   defaultValue={[100, 400]}
+ *   formatValue={(v) => `$${v}`}
+ * />
+ * ```
+ */
+export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
+  (props, forwardedRef) => {
+    const {
+      variant = "standard",
+      orientation = "horizontal",
+      minValue = 0,
+      maxValue = 100,
+      step,
+      value,
+      defaultValue,
+      onChange,
+      onChangeEnd,
+      isDisabled = false,
+      label,
+      formatValue,
+      thumbLabels,
+      className,
+      style,
+      children,
+      ...ariaProps
+    } = props;
+
+    const trackRef = useRef<HTMLDivElement>(null);
+    const internalRef = useRef<HTMLDivElement>(null);
+    const containerRef = (forwardedRef ?? internalRef) as React.RefObject<HTMLDivElement>;
+
+    if (process.env.NODE_ENV !== "production") {
+      if (!label && !ariaProps["aria-label"] && !ariaProps["aria-labelledby"]) {
+        console.warn(
+          "[Slider] Slider must have an accessible name. Provide a `label`, `aria-label`, or `aria-labelledby` prop."
+        );
+      }
+    }
+
+    // Stable formatter for React Stately value announcements
+    const numberFormatter = useMemo(() => new Intl.NumberFormat(), []);
+
+    const resolvedDefaultValue =
+      defaultValue ?? (variant === "range" ? [25, 75] : variant === "centered" ? [0] : [minValue]);
+
+    // Build state options — omit optional props when undefined to satisfy exactOptionalPropertyTypes
+    const state = useSliderState({
+      minValue,
+      maxValue,
+      ...(step !== undefined ? { step } : {}),
+      orientation,
+      isDisabled,
+      ...(label !== undefined ? { label } : {}),
+      ...(value !== undefined ? { value } : {}),
+      defaultValue: resolvedDefaultValue,
+      ...(onChange !== undefined ? { onChange } : {}),
+      ...(onChangeEnd !== undefined ? { onChangeEnd } : {}),
+      numberFormatter,
+    });
+
+    const { groupProps, trackProps, labelProps, outputProps } = useSlider(
+      {
+        ...ariaProps,
+        ...(label !== undefined ? { label } : {}),
+        orientation,
+        isDisabled,
+        minValue,
+        maxValue,
+        ...(step !== undefined ? { step } : {}),
+        ...(value !== undefined ? { value } : {}),
+        defaultValue: resolvedDefaultValue,
+        ...(onChange !== undefined ? { onChange } : {}),
+        ...(onChangeEnd !== undefined ? { onChangeEnd } : {}),
+      },
+      state,
+      trackRef
+    );
+
+    const isRange = variant === "range";
+    const isCentered = variant === "centered";
+
+    const zeroPercent = isCentered ? getZeroPercent(minValue, maxValue) : undefined;
+    const direction = isCentered ? getValueDirection(state.getThumbValue(0)) : undefined;
+
+    // For range, each thumb needs its own distinct aria-label so screen readers
+    // can distinguish between the minimum and maximum handle.
+    const thumb0Label = isRange ? (thumbLabels?.[0] ?? "Minimum") : ariaProps["aria-label"];
+
+    return (
+      <div
+        {...groupProps}
+        ref={containerRef}
+        className={className}
+        style={style}
+        data-orientation={orientation}
+        data-disabled={isDisabled || undefined}
+        data-variant={variant}
+        {...(zeroPercent !== undefined ? { "data-zero-percent": zeroPercent } : {})}
+      >
+        {label && <label {...labelProps}>{label}</label>}
+        <div
+          {...trackProps}
+          ref={trackRef}
+          data-orientation={orientation}
+          data-track
+          {...(zeroPercent !== undefined ? { "data-zero-percent": zeroPercent } : {})}
+        >
+          {children}
+          <SliderThumbInternal
+            index={0}
+            state={state}
+            trackRef={trackRef}
+            isDisabled={isDisabled}
+            {...(formatValue !== undefined ? { formatValue } : {})}
+            {...(thumb0Label !== undefined ? { "aria-label": thumb0Label } : {})}
+            {...(direction !== undefined ? { "data-direction": direction } : {})}
+          />
+          {isRange && (
+            <SliderThumbInternal
+              index={1}
+              state={state}
+              trackRef={trackRef}
+              isDisabled={isDisabled}
+              {...(formatValue !== undefined ? { formatValue } : {})}
+              aria-label={thumbLabels?.[1] ?? "Maximum"}
+            />
+          )}
+        </div>
+        <output {...outputProps}>
+          {isRange
+            ? formatValue
+              ? `${formatValue(state.getThumbValue(0))} \u2013 ${formatValue(state.getThumbValue(1))}`
+              : `${state.getThumbValueLabel(0)} \u2013 ${state.getThumbValueLabel(1)}`
+            : formatValue
+              ? formatValue(state.getThumbValue(0))
+              : state.getThumbValueLabel(0)}
+        </output>
+      </div>
+    );
+  }
+);
+
+SliderHeadless.displayName = "SliderHeadless";
