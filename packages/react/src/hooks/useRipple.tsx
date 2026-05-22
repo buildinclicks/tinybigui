@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, type MouseEvent } from "react";
+import { useRef, useCallback, useState, useEffect, type MouseEvent } from "react";
 
 /**
  * Ripple state for tracking individual ripple animations
@@ -60,6 +60,13 @@ export function useRipple(options: UseRippleOptions = {}): {
 
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const rippleKeyCounter = useRef(0);
+  const timersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+    };
+  }, []);
 
   /**
    * Create ripple on mouse down
@@ -86,9 +93,11 @@ export function useRipple(options: UseRippleOptions = {}): {
       setRipples((prev) => [...prev, { key, x, y, size }]);
 
       // Remove ripple after animation completes
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setRipples((prev) => prev.filter((r) => r.key !== key));
+        timersRef.current = timersRef.current.filter((t) => t !== timer);
       }, duration);
+      timersRef.current.push(timer);
     },
     [disabled, duration]
   );
