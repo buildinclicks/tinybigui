@@ -1,0 +1,154 @@
+/**
+ * @tinybigui/tokens — Reference Palette Tokens
+ * Material Design 3 tonal palette — raw hex values at each tonal stop.
+ *
+ * Token prefix: --md-ref-palette-*
+ *
+ * These are Layer 1 (reference) tokens. They are NOT consumed by components
+ * directly. Components use the system color tokens (--md-sys-color-*) defined
+ * in color.css, which reference these palette tokens.
+ *
+ * Standard tonal stops: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100
+ * Extended neutral stops: 4, 6, 12, 17, 22 (dark surface containers)
+ *                         87, 92, 94, 96   (light surface containers)
+ *
+ * Values sourced from:
+ *   https://github.com/material-foundation/material-tokens/blob/main/css/palette.css
+ * Extended neutral stops derived from the default MD3 baseline purple seed (#6750A4).
+ */
+
+:root {
+  /* ==========================================================================
+     PRIMARY
+     ========================================================================== */
+
+  --md-ref-palette-primary0: #000000;
+  --md-ref-palette-primary10: #21005d;
+  --md-ref-palette-primary20: #381e72;
+  --md-ref-palette-primary30: #4f378b;
+  --md-ref-palette-primary40: #6750a4;
+  --md-ref-palette-primary50: #7f67be;
+  --md-ref-palette-primary60: #9a82db;
+  --md-ref-palette-primary70: #b69df8;
+  --md-ref-palette-primary80: #d0bcff;
+  --md-ref-palette-primary90: #eaddff;
+  --md-ref-palette-primary95: #f6edff;
+  --md-ref-palette-primary99: #fffbfe;
+  --md-ref-palette-primary100: #ffffff;
+
+  /* ==========================================================================
+     SECONDARY
+     ========================================================================== */
+
+  --md-ref-palette-secondary0: #000000;
+  --md-ref-palette-secondary10: #1d192b;
+  --md-ref-palette-secondary20: #332d41;
+  --md-ref-palette-secondary30: #4a4458;
+  --md-ref-palette-secondary40: #625b71;
+  --md-ref-palette-secondary50: #7a7289;
+  --md-ref-palette-secondary60: #958da5;
+  --md-ref-palette-secondary70: #b0a7c0;
+  --md-ref-palette-secondary80: #ccc2dc;
+  --md-ref-palette-secondary90: #e8def8;
+  --md-ref-palette-secondary95: #f6edff;
+  --md-ref-palette-secondary99: #fffbfe;
+  --md-ref-palette-secondary100: #ffffff;
+
+  /* ==========================================================================
+     TERTIARY
+     ========================================================================== */
+
+  --md-ref-palette-tertiary0: #000000;
+  --md-ref-palette-tertiary10: #31111d;
+  --md-ref-palette-tertiary20: #492532;
+  --md-ref-palette-tertiary30: #633b48;
+  --md-ref-palette-tertiary40: #7d5260;
+  --md-ref-palette-tertiary50: #986977;
+  --md-ref-palette-tertiary60: #b58392;
+  --md-ref-palette-tertiary70: #d29dac;
+  --md-ref-palette-tertiary80: #efb8c8;
+  --md-ref-palette-tertiary90: #ffd8e4;
+  --md-ref-palette-tertiary95: #ffecf1;
+  --md-ref-palette-tertiary99: #fffbfa;
+  --md-ref-palette-tertiary100: #ffffff;
+
+  /* ==========================================================================
+     ERROR
+     ========================================================================== */
+
+  --md-ref-palette-error0: #000000;
+  --md-ref-palette-error10: #410e0b;
+  --md-ref-palette-error20: #601410;
+  --md-ref-palette-error30: #8c1d18;
+  --md-ref-palette-error40: #b3261e;
+  --md-ref-palette-error50: #dc362e;
+  --md-ref-palette-error60: #e46962;
+  --md-ref-palette-error70: #ec928e;
+  --md-ref-palette-error80: #f2b8b5;
+  --md-ref-palette-error90: #f9dedc;
+  --md-ref-palette-error95: #fceeee;
+  --md-ref-palette-error99: #fffbf9;
+  --md-ref-palette-error100: #ffffff;
+
+  /* ==========================================================================
+     NEUTRAL
+     Standard stops + extended stops for surface container elevation system.
+     ========================================================================== */
+
+  --md-ref-palette-neutral0: #000000;
+  /* Extended: dark surface-container-lowest */
+  --md-ref-palette-neutral4: #0f0d13;
+  /* Extended: dark surface-container-low */
+  --md-ref-palette-neutral6: #1d1b20;
+  --md-ref-palette-neutral10: #1c1b1f;
+  /* Extended: dark surface-container */
+  --md-ref-palette-neutral12: #211f26;
+  /* Extended: dark surface-container-high */
+  --md-ref-palette-neutral17: #2b2930;
+  --md-ref-palette-neutral20: #313033;
+  /* Extended: dark surface-container-highest */
+  --md-ref-palette-neutral22: #36343b;
+  --md-ref-palette-neutral30: #484649;
+  --md-ref-palette-neutral40: #605d62;
+  --md-ref-palette-neutral50: #787579;
+  --md-ref-palette-neutral60: #939094;
+  --md-ref-palette-neutral70: #aeaaae;
+  --md-ref-palette-neutral80: #c9c5ca;
+  --md-ref-palette-neutral90: #e6e1e5;
+  --md-ref-palette-neutral95: #f4eff4;
+  /* Extended: light surface-container-highest */
+  --md-ref-palette-neutral87: #e6e0e9;
+  /* Extended: light surface-container-high */
+  --md-ref-palette-neutral92: #ece6f0;
+  /* Extended: light surface-container */
+  --md-ref-palette-neutral94: #f3edf7;
+  /* Extended: light surface-container-low */
+  --md-ref-palette-neutral96: #f7f2fa;
+  --md-ref-palette-neutral99: #fffbfe;
+  --md-ref-palette-neutral100: #ffffff;
+
+  /* ==========================================================================
+     NEUTRAL VARIANT
+     ========================================================================== */
+
+  --md-ref-palette-neutral-variant0: #000000;
+  --md-ref-palette-neutral-variant10: #1d1a22;
+  --md-ref-palette-neutral-variant20: #322f37;
+  --md-ref-palette-neutral-variant30: #49454f;
+  --md-ref-palette-neutral-variant40: #605d66;
+  --md-ref-palette-neutral-variant50: #79747e;
+  --md-ref-palette-neutral-variant60: #938f99;
+  --md-ref-palette-neutral-variant70: #aea9b4;
+  --md-ref-palette-neutral-variant80: #cac4d0;
+  --md-ref-palette-neutral-variant90: #e7e0ec;
+  --md-ref-palette-neutral-variant95: #f5eefa;
+  --md-ref-palette-neutral-variant99: #fffbfe;
+  --md-ref-palette-neutral-variant100: #ffffff;
+
+  /* ==========================================================================
+     BLACK / WHITE — explicit aliases
+     ========================================================================== */
+
+  --md-ref-palette-black: #000000;
+  --md-ref-palette-white: #ffffff;
+}
