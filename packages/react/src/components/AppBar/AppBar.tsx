@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 import { AppBarHeadless } from "./AppBarHeadless";
-import { appBarVariants, appBarTitleVariants } from "./AppBar.variants";
+import { appBarVariants, appBarTitleVariants, appBarSubtitleVariants } from "./AppBar.variants";
 import { cn } from "../../utils/cn";
 import { useScrollElevation } from "../../hooks/useScrollElevation";
 import type { AppBarProps } from "./AppBar.types";
@@ -21,11 +21,19 @@ import type { AppBarProps } from "./AppBar.types";
  *
  * **Key Features:**
  * - 4 MD3 variants: small, center-aligned, medium, large
+ * - Optional subtitle (per M3 Expressive spec) with per-variant typography
  * - Composable API: pass `<IconButton>` nodes into navigation and action slots
- * - Scroll elevation: flat at rest → elevated on scroll (MD3 motion tokens)
+ * - Scroll elevation: flat (bg-surface) at rest → bg-surface-container + shadow-elevation-2 on scroll
  * - Controlled and uncontrolled scroll state
  * - WCAG 2.1 AA: `role="banner"` landmark, keyboard accessible slots
  * - Dark mode via existing token system
+ *
+ * **MD3 Accessibility (m3.material.io/components/app-bars/accessibility):**
+ * - Focus lands on the leading navigation button first (first interactive element in DOM)
+ * - Tab navigates: leading icon → trailing action icons (left to right)
+ * - Space / Enter activates the focused element
+ * - All icon buttons MUST have descriptive `aria-label` attributes
+ * - Title text is the accessibility label for the current page context
  *
  * @example
  * ```tsx
@@ -52,10 +60,11 @@ import type { AppBarProps } from "./AppBar.types";
  *   onScrollStateChange={setIsScrolled}
  * />
  *
- * // Medium with expanded title area
+ * // Medium with expanded title and subtitle
  * <AppBar
  *   variant="medium"
  *   title="Article Title"
+ *   subtitle="Author · 5 min read"
  *   navigationIcon={
  *     <IconButton aria-label="Go back">
  *       <ArrowBackIcon />
@@ -69,6 +78,7 @@ export const AppBar = forwardRef<HTMLElement, AppBarProps>(
     {
       variant = "small",
       title,
+      subtitle,
       navigationIcon,
       actions,
       scrolled: scrolledProp,
@@ -110,19 +120,26 @@ export const AppBar = forwardRef<HTMLElement, AppBarProps>(
             </div>
           )}
 
-          {/* Title — rendered in top row for small and center-aligned variants */}
+          {/* Title + subtitle — rendered in top row for small and center-aligned variants */}
           {!isExpandedVariant && (
-            <span
-              data-testid="appbar-title"
+            <div
               className={cn(
-                "min-w-0 flex-1 px-1",
-                appBarTitleVariants({ variant }),
-                // Center-aligned: center the title text
+                "flex min-w-0 flex-1 flex-col justify-center px-1",
                 variant === "center-aligned" && "text-center"
               )}
             >
-              {title}
-            </span>
+              <span data-testid="appbar-title" className={cn(appBarTitleVariants({ variant }))}>
+                {title}
+              </span>
+              {subtitle != null && (
+                <span
+                  data-testid="appbar-subtitle"
+                  className={cn(appBarSubtitleVariants({ variant }))}
+                >
+                  {subtitle}
+                </span>
+              )}
+            </div>
           )}
 
           {/* Actions slot (trailing) */}
@@ -133,15 +150,26 @@ export const AppBar = forwardRef<HTMLElement, AppBarProps>(
           )}
         </div>
 
-        {/* Expanded title row — only for medium and large variants */}
+        {/* Expanded title + subtitle row — only for medium and large variants */}
         {isExpandedVariant && (
-          <div data-slot="expanded-title" className={cn("flex flex-1 items-end", "px-4 pb-4")}>
+          <div
+            data-slot="expanded-title"
+            className={cn("flex flex-1 flex-col justify-end", "gap-0.5 px-4 pb-4")}
+          >
             <span
               data-testid="appbar-title"
-              className={cn("min-w-0 truncate", appBarTitleVariants({ variant }))}
+              className={cn("min-w-0", appBarTitleVariants({ variant }))}
             >
               {title}
             </span>
+            {subtitle != null && (
+              <span
+                data-testid="appbar-subtitle"
+                className={cn("min-w-0", appBarSubtitleVariants({ variant }))}
+              >
+                {subtitle}
+              </span>
+            )}
           </div>
         )}
       </AppBarHeadless>

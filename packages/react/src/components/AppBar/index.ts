@@ -5,7 +5,12 @@ export { AppBar } from "./AppBar";
 export { AppBarHeadless } from "./AppBarHeadless";
 
 // CVA Variants
-export { appBarVariants, appBarTitleVariants, type AppBarVariants } from "./AppBar.variants";
+export {
+  appBarVariants,
+  appBarTitleVariants,
+  appBarSubtitleVariants,
+  type AppBarVariants,
+} from "./AppBar.variants";
 
 // Types
 export type { AppBarProps, AppBarHeadlessProps, AppBarVariant } from "./AppBar.types";

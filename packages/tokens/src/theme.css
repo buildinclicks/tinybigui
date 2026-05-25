@@ -318,7 +318,7 @@
 
   --spacing-appbar-small: 4rem; /* 64px  */
   --spacing-appbar-medium: 7rem; /* 112px */
-  --spacing-appbar-large: 9.5rem; /* 152px */
+  --spacing-appbar-large: 7.5rem; /* 120px — M3 Expressive flexible large */
   --spacing-drawer: 22.5rem; /* 360px */
   --spacing-snackbar-max: 35.5rem; /* 568px */
   --spacing-dialog-max: 35rem; /* 560px */
