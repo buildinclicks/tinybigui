@@ -25,6 +25,7 @@
   "type": "module",
   "exports": {
     "./tokens.css": "./dist/tokens.css",
+    "./palette.css": "./dist/palette.css",
     "./color.css": "./dist/color.css",
     "./typography.css": "./dist/typography.css",
     "./shape.css": "./dist/shape.css",

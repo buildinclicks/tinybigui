@@ -6,7 +6,8 @@
  * file that consumers (and packages/react/src/styles.css) should import.
  *
  * Partial breakdown:
- *   color.css      — MD3 color roles + light/dark mode
+ *   palette.css    — MD3 reference palette tokens (--md-ref-palette-*)
+ *   color.css      — MD3 color roles + light/dark mode (references palette)
  *   typography.css — MD3 type scale (display → label)
  *   shape.css      — MD3 corner radius scale
  *   elevation.css  — MD3 elevation levels (box shadows)
@@ -18,6 +19,7 @@
 @import "tailwindcss";
 
 /* MD3 token partials */
+@import "./palette.css";
 @import "./color.css";
 @import "./typography.css";
 @import "./shape.css";
