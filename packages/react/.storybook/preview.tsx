@@ -1,10 +1,31 @@
-import type { Preview } from "@storybook/react-vite";
+import type { Preview, ReactRenderer } from "@storybook/react-vite";
+import type { DecoratorFunction } from "storybook/internal/types";
 import { withThemeByClassName } from "@storybook/addon-themes";
 import "../src/styles.css"; // Import MD3 tokens and Tailwind
 
+/**
+ * Wraps every story in a surface-colored container so that the active MD3
+ * theme (light or dark) is visually apparent from the canvas background.
+ * Uses semantic token utilities so the color automatically follows the
+ * `.dark` / `.light` class applied by withThemeByClassName.
+ */
+const withThemeWrapper: DecoratorFunction<ReactRenderer> = (Story) => (
+  <div className="bg-surface text-on-surface duration-medium2 min-h-[100px] w-full p-6 transition-colors">
+    <Story />
+  </div>
+);
+
 const preview: Preview = {
+  /**
+   * Pre-seed the `theme` global so the addon-themes toolbar renders its
+   * initial label ("light theme") without waiting for the first story render.
+   */
+  initialGlobals: {
+    theme: "light",
+  },
   decorators: [
-    withThemeByClassName({
+    withThemeWrapper,
+    withThemeByClassName<ReactRenderer>({
       themes: {
         light: "light",
         dark: "dark",
@@ -26,21 +47,6 @@ const preview: Preview = {
     // Configure actions
     actions: {
       argTypesRegex: "^on[A-Z].*", // Auto-detect event handlers
-    },
-
-    // Configure backgrounds for light/dark mode testing
-    backgrounds: {
-      default: "light",
-      values: [
-        {
-          name: "light",
-          value: "#fef7ff", // MD3 surface light
-        },
-        {
-          name: "dark",
-          value: "#1c1b1f", // MD3 surface dark
-        },
-      ],
     },
 
     // Configure viewport presets
