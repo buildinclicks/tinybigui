@@ -95,7 +95,7 @@ export const AppBar = forwardRef<HTMLElement, AppBarProps>(
         <div
           data-slot="top-row"
           className={cn(
-            "flex items-center",
+            "flex items-center justify-between",
             "px-1",
             // Small and center-aligned: fill the full bar height
             !isExpandedVariant && "flex-1",
