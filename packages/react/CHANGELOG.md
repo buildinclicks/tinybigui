@@ -1,5 +1,28 @@
 # @tinybigui/react
 
+## 0.4.0
+
+### Minor Changes
+
+- cfd9af7: feat(badge): add MD3 Badge component with dot and count variants, error/primary colors, and composable overlay wrapper
+- 9b89f1d: feat(bottom-sheet): add MD3 Bottom Sheet component with standard and modal variants, draggable snap-point handle, and keyboard accessibility
+- 42db9f8: Add MD3 ButtonGroup component with connected button layout, single and multi-select selection modes, and ButtonGroupContext for propagating variant/size to child buttons. Modularize @tinybigui/tokens into focused CSS files: color.css, elevation.css, motion.css, shape.css, theme.css, and typography.css, each available as a standalone import alongside the combined tokens.css.
+- a9be72e: feat(card): add MD3 Card component with elevated, filled, and outlined variants, composable sub-components, and interactive mode with ripple and state layer
+- a9be72e: feat(chip): add MD3 Chip component with Assist, Filter, Input, and Suggestion types, ChipSet container, and MD3 animations
+- b005db0: feat(date-time-pickers): add MD3 Date Picker and Time Picker components with docked, modal, and input variants, range selection, 12h/24h clock dial, and full accessibility
+- 8efcd34: feat(divider): add MD3 Divider component with horizontal/vertical orientations, inset variants, and subheader label support
+- 1877960: feat(fab-menu): add MD3 FAB Menu speed-dial component with stagger animation and direction variants
+- e76fb76: feat(list): add MD3 List component with static and interactive modes, slot-based sub-components, selection management, and Divider integration
+- 5c40b1e: feat(drawer): enhance MD3 Navigation Drawer with section dividers, badge support on items, active indicator polish, scrim animation, and icon-only mode
+- 17a1813: feat(search): add MD3 Search component with SearchBar and SearchView overlay, portal rendering, and suggestions slot
+- 47912be: feat(slider): add MD3 Slider component with standard, centered, and range variants, five size presets, vertical orientation, discrete stops, value indicator, and inset icon
+- 5c3dd3e: feat(split-button): add MD3 Split Button component composing Button and Menu with filled, tonal, and outlined variants
+- 762e0cc: feat(tooltip): add MD3 Tooltip and RichTooltip components with portal rendering, smart positioning, 300ms hover delay, and MD3 entry/exit animations
+
+### Patch Changes
+
+- 4850568: Fix AppBar component — resolve missing style gaps, correct Tailwind utilities generation, and expand AppBar stories and test coverage. Refine token layer by extracting a `preset.css` for token presets, and update `theme.css`/`tokens.css` to clean up the semantic layer structure. Add THEMING guide and update README with usage documentation.
+
 ## 0.3.0
 
 ### Minor Changes

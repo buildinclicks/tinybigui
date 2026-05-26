@@ -1,6 +1,6 @@
 {
   "name": "@tinybigui/tokens",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Material Design 3 design tokens as CSS variables",
   "keywords": [
     "material-design",
