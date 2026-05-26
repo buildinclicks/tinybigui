@@ -1,0 +1,23 @@
+/**
+ * @tinybigui/tokens — Preset (all-in-one entry)
+ *
+ * Imports all MD3 CSS variable tokens and the Tailwind v4 @theme bridge.
+ * Does NOT import Tailwind itself — the consumer must add:
+ *
+ *   @import "tailwindcss";
+ *   @source "../node_modules/@tinybigui/react/dist";  // or your dist path
+ *
+ * before importing this file so that @theme directives and utility class
+ * generation resolve correctly.
+ *
+ * Usage:
+ *   @import "@tinybigui/tokens/preset.css";
+ *   // or via @tinybigui/react:
+ *   @import "@tinybigui/react/styles.css";
+ */
+
+/* All MD3 CSS custom properties */
+@import "./tokens.css";
+
+/* Tailwind v4 @theme bridge — maps tokens to utility class names */
+@import "./theme.css";
