@@ -60,16 +60,30 @@ This library requires React 18 or higher:
 
 ## 🚀 Quick Start
 
-### 1. Import the CSS
+TinyBigUI requires **Tailwind CSS v4**. Styles must be loaded through a CSS file processed by Tailwind, not via a direct JS import.
 
-Import the styles in your app's entry point:
+### 1. Create a CSS entry file
 
-```tsx
-// main.tsx or App.tsx
-import "@tinybigui/react/styles.css";
+```css
+/* app/globals.css (Next.js) or src/index.css (Vite) */
+@import "tailwindcss";
+@source "../node_modules/@tinybigui/react/dist";
+@import "@tinybigui/react/styles.css";
 ```
 
-### 2. Use Components
+> `@source` is required so Tailwind scans the library's compiled output and generates all utility classes used by components.
+
+### 2. Import the CSS in your app entry
+
+```tsx
+// app/layout.tsx (Next.js)
+import "./globals.css";
+
+// src/main.tsx (Vite)
+import "./index.css";
+```
+
+### 3. Use Components
 
 ```tsx
 import { Button, TextField, Checkbox } from "@tinybigui/react";
@@ -87,16 +101,25 @@ function App() {
 }
 ```
 
-### 3. Customize Theme (Optional)
+### 4. Customize Theme (Optional)
 
-Override CSS variables to customize the theme:
+Override palette variables after the library import to apply your brand colors:
 
 ```css
+/* app/globals.css */
+@import "tailwindcss";
+@source "../node_modules/@tinybigui/react/dist";
+@import "@tinybigui/react/styles.css";
+
 :root {
-  --md-sys-color-primary: #your-color;
-  --md-sys-color-on-primary: #your-text-color;
+  /* Override the primary palette — all components update automatically */
+  --md-ref-palette-primary40: #006a6a;
+  --md-ref-palette-primary80: #4ddada;
+  --md-ref-palette-primary90: #b2fefe;
 }
 ```
+
+See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ---
 
@@ -206,13 +229,15 @@ Dark mode is enabled automatically based on system preferences:
 
 ```tsx
 // Force dark mode
-document.documentElement.setAttribute("data-theme", "dark");
+document.documentElement.classList.add("dark");
+document.documentElement.classList.remove("light");
 
 // Force light mode
-document.documentElement.setAttribute("data-theme", "light");
+document.documentElement.classList.add("light");
+document.documentElement.classList.remove("dark");
 
-// Use system preference
-document.documentElement.removeAttribute("data-theme");
+// Revert to OS preference
+document.documentElement.classList.remove("dark", "light");
 ```
 
 ---
@@ -254,11 +279,20 @@ import { Button } from "@tinybigui/react";
 
 ## 🔗 Using with Frameworks
 
+All frameworks require a CSS entry file that includes `@import "tailwindcss"` and `@source` before the library import.
+
 ### Next.js
+
+```css
+/* app/globals.css */
+@import "tailwindcss";
+@source "../node_modules/@tinybigui/react/dist";
+@import "@tinybigui/react/styles.css";
+```
 
 ```tsx
 // app/layout.tsx
-import "@tinybigui/react/styles.css";
+import "./globals.css";
 
 export default function RootLayout({ children }) {
   return (
@@ -271,9 +305,16 @@ export default function RootLayout({ children }) {
 
 ### Vite
 
+```css
+/* src/index.css */
+@import "tailwindcss";
+@source "./node_modules/@tinybigui/react/dist";
+@import "@tinybigui/react/styles.css";
+```
+
 ```tsx
-// main.tsx
-import "@tinybigui/react/styles.css";
+// src/main.tsx
+import "./index.css";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 
@@ -282,9 +323,16 @@ createRoot(document.getElementById("root")!).render(<App />);
 
 ### Remix
 
+```css
+/* app/root.css */
+@import "tailwindcss";
+@source "../node_modules/@tinybigui/react/dist";
+@import "@tinybigui/react/styles.css";
+```
+
 ```tsx
 // app/root.tsx
-import styles from "@tinybigui/react/styles.css";
+import styles from "@tinybigui/react/styles.css?url";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 ```
@@ -293,24 +341,37 @@ export const links = () => [{ rel: "stylesheet", href: styles }];
 
 ## 🛠️ Customization
 
-### CSS Variables
+### Brand Colors
 
-All components use CSS custom properties for easy theming:
+Override the palette layer to retheme all components at once. All semantic color roles cascade from these raw palette values:
 
 ```css
 :root {
-  /* Colors */
-  --md-sys-color-primary: #6750a4;
-  --md-sys-color-on-primary: #ffffff;
+  /* Teal brand — light mode uses the 40-stop, dark mode uses the 80-stop */
+  --md-ref-palette-primary40: #006a6a;
+  --md-ref-palette-primary80: #4ddada;
+  --md-ref-palette-primary90: #b2fefe;
+  --md-ref-palette-primary10: #002020;
+}
+```
 
-  /* Typography */
-  --md-sys-typescale-body-medium-font-size: 14px;
+Use the [Material Theme Builder](https://m3.material.io/theme-builder) to generate a complete tonal palette from a single hex color.
 
-  /* Shape */
-  --md-sys-shape-corner-medium: 12px;
+### Typography
 
-  /* Elevation */
-  --md-sys-elevation-2: 0 1px 3px rgba(0, 0, 0, 0.12);
+```css
+:root {
+  --md-sys-typescale-font-family-plain: "Inter", system-ui, sans-serif;
+  --md-sys-typescale-font-family-brand: "Playfair Display", serif;
+}
+```
+
+### Shape
+
+```css
+:root {
+  --md-sys-shape-corner-medium: 6px; /* sharper cards */
+  --md-sys-shape-corner-large: 10px; /* sharper FABs and drawers */
 }
 ```
 
@@ -321,6 +382,8 @@ Components work seamlessly with Tailwind utilities:
 ```tsx
 <Button className="mt-4 w-full">Custom Styles</Button>
 ```
+
+See [THEMING.md](./THEMING.md) for the complete theming reference including dark mode overrides, granular imports, and all available CSS variable namespaces.
 
 ---
 

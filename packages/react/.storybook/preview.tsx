@@ -1,7 +1,7 @@
 import type { Preview, ReactRenderer } from "@storybook/react-vite";
 import type { DecoratorFunction } from "storybook/internal/types";
 import { withThemeByClassName } from "@storybook/addon-themes";
-import "../src/styles.css"; // Import MD3 tokens and Tailwind
+import "./storybook.css"; // Tailwind + @source scanning + MD3 tokens and component styles
 
 /**
  * Wraps every story in a surface-colored container so that the active MD3

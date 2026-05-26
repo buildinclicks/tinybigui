@@ -1,9 +1,10 @@
 /**
  * @tinybigui/tokens
- * Material Design 3 Design Tokens — barrel entry point.
+ * Material Design 3 Design Tokens — CSS variables only.
  *
- * This file imports Tailwind CSS and all token partials. It is the single
- * file that consumers (and packages/react/src/styles.css) should import.
+ * This file imports all MD3 token partials as pure CSS custom properties.
+ * It does NOT import Tailwind or the @theme bridge — that is the
+ * responsibility of the consumer (or of preset.css).
  *
  * Partial breakdown:
  *   palette.css    — MD3 reference palette tokens (--md-ref-palette-*)
@@ -12,11 +13,10 @@
  *   shape.css      — MD3 corner radius scale
  *   elevation.css  — MD3 elevation levels (box shadows)
  *   motion.css     — MD3 motion: legacy easing/duration + spring-based system
- *   theme.css      — Tailwind v4 @theme bridge + keyframes + animate-* utilities
+ *
+ * To also register Tailwind utility classes, import preset.css instead,
+ * or import theme.css separately after @import "tailwindcss".
  */
-
-/* Tailwind CSS v4 — must come first so @theme and other directives resolve */
-@import "tailwindcss";
 
 /* MD3 token partials */
 @import "./palette.css";
@@ -25,18 +25,3 @@
 @import "./shape.css";
 @import "./elevation.css";
 @import "./motion.css";
-
-/* Tailwind @theme mappings, keyframes, and composite animations */
-@import "./theme.css";
-
-/* ==========================================================================
-   GLOBAL BASE STYLES
-   Apply MD3 surface colors and typography to the document root.
-   ========================================================================== */
-
-body {
-  background-color: var(--md-sys-color-surface);
-  color: var(--md-sys-color-on-surface);
-  margin: 0;
-  font-family: var(--md-sys-typescale-font-family-plain);
-}

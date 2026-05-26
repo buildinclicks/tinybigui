@@ -24,6 +24,7 @@
   "sideEffects": true,
   "type": "module",
   "exports": {
+    "./preset.css": "./dist/preset.css",
     "./tokens.css": "./dist/tokens.css",
     "./palette.css": "./dist/palette.css",
     "./color.css": "./dist/color.css",
