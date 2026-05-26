@@ -6,8 +6,10 @@ import { IconButtonHeadless } from "./IconButtonHeadless";
 import { iconButtonVariants, type IconButtonVariants } from "./IconButton.variants";
 import { cn } from "../../utils/cn";
 import { useRipple } from "../../hooks/useRipple";
-import type { IconButtonProps } from "./IconButton.types";
 import { mergeProps } from "@react-aria/utils";
+import { useOptionalButtonGroup } from "../ButtonGroup/ButtonGroupContext";
+import { getConnectedRadiusClasses } from "../ButtonGroup/ButtonGroup.utils";
+import type { IconButtonProps } from "./IconButton.types";
 
 /**
  * Material Design 3 IconButton Component
@@ -22,6 +24,7 @@ import { mergeProps } from "@react-aria/utils";
  * - Toggle support with `selected` prop
  * - Ripple effect on interaction
  * - 48×48px minimum touch target
+ * - ButtonGroup-aware: applies connected corner radii and min-width when inside a group
  *
  * @example
  * ```tsx
@@ -43,6 +46,12 @@ import { mergeProps } from "@react-aria/utils";
  * >
  *   {selected ? <IconStarFilled /> : <IconStarOutline />}
  * </IconButton>
+ *
+ * // Inside a connected ButtonGroup (corner radii applied automatically)
+ * <ButtonGroup variant="connected" selectionMode="multi" aria-label="Quick settings">
+ *   <IconButton aria-label="Bluetooth"><BluetoothIcon /></IconButton>
+ *   <IconButton aria-label="Wi-Fi"><WifiIcon /></IconButton>
+ * </ButtonGroup>
  * ```
  */
 export const IconButton = forwardRef<
@@ -57,6 +66,7 @@ export const IconButton = forwardRef<
       size = "medium",
       // IconButton specific props
       children,
+      value,
       selected,
       disableRipple = false,
       className,
@@ -70,6 +80,10 @@ export const IconButton = forwardRef<
     },
     ref
   ) => {
+    // ButtonGroup context — null when rendered outside a group (safe to call unconditionally)
+    const groupCtx = useOptionalButtonGroup();
+    const isConnected = groupCtx?.variant === "connected";
+
     // Development warnings
     if (process.env.NODE_ENV === "development") {
       if (!ariaLabel) {
@@ -103,18 +117,29 @@ export const IconButton = forwardRef<
       isDisabled,
     });
 
+    // Connected group radius + min-width overrides (pass value for selection-aware shape morph)
+    const connectedClasses =
+      isConnected && groupCtx
+        ? [
+            ...getConnectedRadiusClasses(groupCtx, value),
+            groupCtx.enforceMinWidth ? "min-w-12" : "",
+          ]
+        : [];
+
     return (
       <IconButtonHeadless
         ref={ref}
         className={cn(
           // Base classes
           "relative inline-flex items-center justify-center",
-          "overflow-hidden rounded-full", // Circular shape
-          "transition-all duration-200",
+          "overflow-hidden rounded-full", // Circular shape (overridden by connected group classes)
+          // Spatial (border-radius, transform): expressive fast spring — 350ms, visible overshoot
+          "duration-expressive-fast-spatial ease-expressive-fast-spatial transition-all",
           "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
 
-          // State layers (hover, focus, active)
-          "before:absolute before:inset-0 before:rounded-[inherit] before:transition-opacity before:duration-200",
+          // State layers (hover, focus, active) — effects token: opacity, no overshoot
+          "before:absolute before:inset-0 before:rounded-[inherit]",
+          "before:duration-spring-standard-fast-effects before:ease-spring-standard-fast-effects before:transition-opacity",
           "before:bg-current before:opacity-0",
           "hover:before:opacity-8",
           "focus-visible:before:opacity-12",
@@ -123,10 +148,15 @@ export const IconButton = forwardRef<
           // CVA variants
           iconButtonVariants({ variant, color, size, selected: selected ?? false, isDisabled }),
 
+          // Connected group overrides: inner radius + start/end outer radius + min-width
+          ...connectedClasses,
+
           // User custom classes
           className
         )}
         aria-label={ariaLabel}
+        data-variant={variant}
+        data-color={color}
         {...(selected !== undefined && { selected })}
         {...(title && { title })}
         {...mergedPropsValue}

@@ -83,6 +83,35 @@ export type {
 export { Progress, ProgressHeadless } from "./Progress";
 export type { ProgressProps, ProgressHeadlessProps } from "./Progress";
 
+export { Divider, DividerHeadless, dividerVariants } from "./Divider";
+export type {
+  DividerProps,
+  DividerHeadlessProps,
+  DividerOrientation,
+  DividerInset,
+  DividerVariants,
+} from "./Divider";
+
+export {
+  Card,
+  CardMedia,
+  CardHeader,
+  CardContent,
+  CardActions,
+  CardHeadless,
+  cardVariants,
+} from "./Card";
+export type {
+  CardVariant,
+  CardVariants,
+  CardProps,
+  CardHeadlessProps,
+  CardMediaProps,
+  CardHeaderProps,
+  CardContentProps,
+  CardActionsProps,
+} from "./Card";
+
 export {
   MenuTrigger,
   Menu,
@@ -128,6 +157,16 @@ export type {
   SnackbarItem,
 } from "./Snackbar";
 
+export { Chip, ChipSet, ChipHeadless, chipVariants } from "./Chip";
+export type {
+  ChipType,
+  ChipSurface,
+  ChipProps,
+  ChipHeadlessProps,
+  ChipSetProps,
+  ChipVariants,
+} from "./Chip";
+
 export {
   Dialog,
   DialogHeadline,
@@ -147,3 +186,76 @@ export type {
   DialogActionsProps,
   DialogContextValue,
 } from "./Dialog";
+
+export {
+  TooltipTrigger,
+  Tooltip,
+  RichTooltip,
+  TooltipTriggerHeadless,
+  TooltipOverlayHeadless,
+  tooltipVariants,
+  richTooltipVariants,
+} from "./Tooltip";
+export type {
+  TooltipVariant,
+  TooltipPlacement,
+  TooltipTriggerProps,
+  TooltipTriggerStyledProps,
+  TooltipProps,
+  RichTooltipProps,
+  TooltipHeadlessProps,
+  TooltipVariants,
+  RichTooltipVariants,
+} from "./Tooltip";
+
+export {
+  List,
+  ListItem,
+  ListItemLeading,
+  ListItemTrailing,
+  ListItemText,
+  ListHeadless,
+  ListItemHeadless,
+  listVariants,
+  listItemVariants,
+} from "./List";
+export type {
+  ListDensity,
+  ListLeadingType,
+  ListTrailingType,
+  ListProps,
+  ListItemProps,
+  ListItemLeadingProps,
+  ListItemTrailingProps,
+  ListItemTextProps,
+  ListHeadlessProps,
+  ListVariants,
+  ListItemVariants,
+} from "./List";
+export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./Badge";
+export type {
+  BadgeProps,
+  BadgeHeadlessProps,
+  BadgeContentProps,
+  BadgeColor,
+  BadgeVariants,
+} from "./Badge";
+
+export {
+  FABMenu,
+  FABMenuItem,
+  FABMenuHeadless,
+  FABMenuContext,
+  useFABMenuContext,
+  fabMenuVariants,
+  fabMenuItemVariants,
+} from "./FABMenu";
+export type {
+  FABMenuDirection,
+  FABMenuProps,
+  FABMenuItemProps,
+  FABMenuHeadlessProps,
+  FABMenuContextValue,
+  FABMenuVariants,
+  FABMenuItemVariants,
+} from "./FABMenu";

@@ -78,7 +78,6 @@ describe("AppBar", () => {
 
     test("renders without actions when not provided", () => {
       render(<AppBar title="Page Title" />);
-      // No action buttons should be present
       expect(screen.queryAllByRole("button")).toHaveLength(0);
     });
 
@@ -114,16 +113,16 @@ describe("AppBar", () => {
       expect(header).toHaveClass("h-appbar-small");
     });
 
-    test("renders medium variant with correct height class", () => {
+    test("renders medium variant with min-height class", () => {
       render(<AppBar title="Page Title" variant="medium" />);
       const header = screen.getByRole("banner");
-      expect(header).toHaveClass("h-appbar-medium");
+      expect(header).toHaveClass("min-h-appbar-medium");
     });
 
-    test("renders large variant with correct height class", () => {
+    test("renders large variant with min-height class", () => {
       render(<AppBar title="Page Title" variant="large" />);
       const header = screen.getByRole("banner");
-      expect(header).toHaveClass("h-appbar-large");
+      expect(header).toHaveClass("min-h-appbar-large");
     });
 
     test("renders small variant with surface background", () => {
@@ -140,7 +139,6 @@ describe("AppBar", () => {
 
     test("renders medium variant with title in bottom area", () => {
       render(<AppBar title="Bottom Title" variant="medium" />);
-      // Title should be present and in the expanded area
       expect(screen.getByText("Bottom Title")).toBeInTheDocument();
     });
 
@@ -161,16 +159,121 @@ describe("AppBar", () => {
       expect(titleEl).toHaveClass("text-title-large");
     });
 
-    test("title in medium variant has headline-small typography class", () => {
+    test("title in medium variant has headline-medium typography class", () => {
       render(<AppBar title="Page Title" variant="medium" />);
       const titleEl = screen.getByTestId("appbar-title");
-      expect(titleEl).toHaveClass("text-headline-small");
+      expect(titleEl).toHaveClass("text-headline-medium");
     });
 
     test("title in large variant has display-small typography class", () => {
       render(<AppBar title="Page Title" variant="large" />);
       const titleEl = screen.getByTestId("appbar-title");
       expect(titleEl).toHaveClass("text-display-small");
+    });
+  });
+
+  describe("Subtitle", () => {
+    test("renders subtitle when provided", () => {
+      render(<AppBar title="Title" subtitle="Subtitle text" />);
+      expect(screen.getByTestId("appbar-subtitle")).toBeInTheDocument();
+      expect(screen.getByText("Subtitle text")).toBeInTheDocument();
+    });
+
+    test("does not render subtitle element when not provided", () => {
+      render(<AppBar title="Title" />);
+      expect(screen.queryByTestId("appbar-subtitle")).not.toBeInTheDocument();
+    });
+
+    test("does not render subtitle element when null", () => {
+      render(<AppBar title="Title" subtitle={null} />);
+      expect(screen.queryByTestId("appbar-subtitle")).not.toBeInTheDocument();
+    });
+
+    test("subtitle in small variant has title-medium typography class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="small" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-title-medium");
+    });
+
+    test("subtitle in small variant has on-surface-variant color class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="small" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-on-surface-variant");
+    });
+
+    test("subtitle in center-aligned variant has title-medium typography class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="center-aligned" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-title-medium");
+    });
+
+    test("subtitle in center-aligned variant has on-surface-variant color class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="center-aligned" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-on-surface-variant");
+    });
+
+    test("subtitle in medium variant has title-large typography class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="medium" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-title-large");
+    });
+
+    test("subtitle in medium variant has on-surface color class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="medium" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-on-surface");
+    });
+
+    test("subtitle in large variant has headline-small typography class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="large" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-headline-small");
+    });
+
+    test("subtitle in large variant has on-surface color class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="large" />);
+      const subtitleEl = screen.getByTestId("appbar-subtitle");
+      expect(subtitleEl).toHaveClass("text-on-surface");
+    });
+
+    test("renders subtitle as ReactNode", () => {
+      render(
+        <AppBar title="Title" subtitle={<span data-testid="custom-subtitle">Rich subtitle</span>} />
+      );
+      expect(screen.getByTestId("custom-subtitle")).toBeInTheDocument();
+    });
+
+    test("subtitle appears in expanded area for medium variant", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="medium" />);
+      const header = screen.getByRole("banner");
+      const expandedRow = header.querySelector("[data-slot='expanded-title']");
+      expect(expandedRow).toBeInTheDocument();
+      expect(expandedRow).toHaveTextContent("Sub");
+    });
+
+    test("subtitle appears in expanded area for large variant", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="large" />);
+      const header = screen.getByRole("banner");
+      const expandedRow = header.querySelector("[data-slot='expanded-title']");
+      expect(expandedRow).toBeInTheDocument();
+      expect(expandedRow).toHaveTextContent("Sub");
+    });
+
+    test("subtitle appears in top row for small variant", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="small" />);
+      const header = screen.getByRole("banner");
+      const topRow = header.querySelector("[data-slot='top-row']");
+      expect(topRow).toBeInTheDocument();
+      expect(topRow).toHaveTextContent("Sub");
+    });
+
+    test("subtitle appears in top row for center-aligned variant", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="center-aligned" />);
+      const header = screen.getByRole("banner");
+      const topRow = header.querySelector("[data-slot='top-row']");
+      expect(topRow).toBeInTheDocument();
+      expect(topRow).toHaveTextContent("Sub");
     });
   });
 
@@ -193,6 +296,18 @@ describe("AppBar", () => {
       expect(header).toHaveClass("shadow-elevation-0");
     });
 
+    test("applies surface-container background when scrolled", () => {
+      render(<AppBar title="Page Title" scrolled={true} />);
+      const header = screen.getByRole("banner");
+      expect(header).toHaveClass("bg-surface-container");
+    });
+
+    test("does not apply surface-container background when not scrolled", () => {
+      render(<AppBar title="Page Title" scrolled={false} />);
+      const header = screen.getByRole("banner");
+      expect(header).not.toHaveClass("bg-surface-container");
+    });
+
     test("has elevation transition classes for smooth animation", () => {
       render(<AppBar title="Page Title" />);
       const header = screen.getByRole("banner");
@@ -202,20 +317,16 @@ describe("AppBar", () => {
     test("calls onScrollStateChange when scroll state changes (uncontrolled)", () => {
       const onScrollStateChange = vi.fn();
       render(<AppBar title="Page Title" onScrollStateChange={onScrollStateChange} />);
-      // Simulate scroll event on document/window
       fireEvent.scroll(window, { target: { scrollY: 100 } });
       expect(onScrollStateChange).toHaveBeenCalledWith(true);
     });
 
     test("does not call onScrollStateChange when controlled", () => {
       const onScrollStateChange = vi.fn();
-      // When scrolled prop is provided (controlled), internal listener should not fire
       render(
         <AppBar title="Page Title" scrolled={false} onScrollStateChange={onScrollStateChange} />
       );
       fireEvent.scroll(window, { target: { scrollY: 100 } });
-      // In controlled mode, the consumer manages state; callback is informational only
-      // The visual state stays false (controlled)
       const header = screen.getByRole("banner");
       expect(header).toHaveClass("shadow-elevation-0");
     });
@@ -279,6 +390,30 @@ describe("AppBar", () => {
       expect(results).toHaveNoViolations();
     });
 
+    test("has no accessibility violations - small with subtitle", async () => {
+      const { container } = render(
+        <AppBar title="Page Title" subtitle="Subtitle text" variant="small" />
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations - medium with subtitle", async () => {
+      const { container } = render(
+        <AppBar title="Page Title" subtitle="Subtitle text" variant="medium" />
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations - large with subtitle", async () => {
+      const { container } = render(
+        <AppBar title="Page Title" subtitle="Subtitle text" variant="large" />
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
     test("navigation icon slot is keyboard accessible when it contains a button", () => {
       render(<AppBar title="Page Title" navigationIcon={<NavIcon />} />);
       const navBtn = screen.getByRole("button", { name: "Open navigation menu" });
@@ -289,6 +424,19 @@ describe("AppBar", () => {
       render(<AppBar title="Page Title" actions={<ActionIcon label="Search" />} />);
       const actionBtn = screen.getByRole("button", { name: "Search" });
       expect(isKeyboardAccessible(actionBtn)).toBe(true);
+    });
+
+    test("navigation icon appears first in DOM for leading focus order", () => {
+      render(
+        <AppBar
+          title="Page Title"
+          navigationIcon={<NavIcon />}
+          actions={<ActionIcon label="Search" />}
+        />
+      );
+      const buttons = screen.getAllByRole("button");
+      expect(buttons[0]).toHaveAccessibleName("Open navigation menu");
+      expect(buttons[1]).toHaveAccessibleName("Search");
     });
   });
 
@@ -388,6 +536,22 @@ describe("AppBar", () => {
       render(<AppBar title="Page Title" actions={null} />);
       expect(screen.getByRole("banner")).toBeInTheDocument();
     });
+
+    test("renders with subtitle and all slots", () => {
+      render(
+        <AppBar
+          title="Full AppBar"
+          subtitle="Subtitle"
+          variant="medium"
+          navigationIcon={<NavIcon />}
+          actions={<ActionIcon label="Search" />}
+        />
+      );
+      expect(screen.getByTestId("appbar-title")).toBeInTheDocument();
+      expect(screen.getByTestId("appbar-subtitle")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Open navigation menu" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Search" })).toBeInTheDocument();
+    });
   });
 });
 
@@ -415,7 +579,6 @@ describe("AppBarHeadless", () => {
 
   test("manages uncontrolled scroll state internally", () => {
     render(<AppBarHeadless>Content</AppBarHeadless>);
-    // No scroll by default -- just verify it renders
     expect(screen.getByRole("banner")).toBeInTheDocument();
   });
 

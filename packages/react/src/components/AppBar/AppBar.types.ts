@@ -6,8 +6,10 @@ import type React from "react";
  * Each variant differs in height, title alignment, and type scale.
  * - `small`: 64dp height, title left-aligned, title-large type scale
  * - `center-aligned`: 64dp height, title centered, title-large type scale
- * - `medium`: 112dp height, title bottom-left, headline-small type scale
- * - `large`: 152dp height, title bottom-left, display-small type scale
+ * - `medium`: min 112dp height, title bottom-left, headline-medium type scale
+ * - `large`: min 120dp height, title bottom-left, display-small type scale
+ *
+ * Medium and large grow vertically when a subtitle is present.
  *
  * @see https://m3.material.io/components/top-app-bar/specs
  */
@@ -70,8 +72,30 @@ export interface AppBarProps {
   title: React.ReactNode;
 
   /**
+   * Optional subtitle content rendered below the title.
+   * Typography scale and color are automatically applied based on `variant`:
+   * - `small` / `center-aligned`: title-medium, on-surface-variant
+   * - `medium`: title-large, on-surface
+   * - `large`: headline-small, on-surface
+   *
+   * @example
+   * ```tsx
+   * <AppBar
+   *   title="Settings"
+   *   subtitle="Account preferences"
+   *   variant="medium"
+   * />
+   * ```
+   */
+  subtitle?: React.ReactNode;
+
+  /**
    * Navigation icon slot (leading position, optional).
    * Expects a React node — typically an `<IconButton>` with `aria-label`.
+   *
+   * **Accessibility:** Per MD3 spec, focus should initially land on this element
+   * since it is the first interactive element in the app bar. The `aria-label`
+   * must clearly describe the action (e.g. "Open navigation menu", "Go back").
    *
    * @example
    * ```tsx
@@ -106,8 +130,8 @@ export interface AppBarProps {
    * is responsible for managing this value.
    * When `undefined`, internal scroll detection is used (uncontrolled mode).
    *
-   * - `false` (default): flat surface, `shadow-elevation-0`
-   * - `true`: elevated surface, `shadow-elevation-2`
+   * - `false` (default): flat surface — `bg-surface`, `shadow-elevation-0`
+   * - `true`: on-scroll surface — `bg-surface-container`, `shadow-elevation-2`
    */
   scrolled?: boolean;
 

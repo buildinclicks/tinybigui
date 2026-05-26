@@ -1,6 +1,6 @@
 {
   "name": "@tinybigui/tokens",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Material Design 3 design tokens as CSS variables",
   "keywords": [
     "material-design",
@@ -24,7 +24,15 @@
   "sideEffects": true,
   "type": "module",
   "exports": {
+    "./preset.css": "./dist/preset.css",
     "./tokens.css": "./dist/tokens.css",
+    "./palette.css": "./dist/palette.css",
+    "./color.css": "./dist/color.css",
+    "./typography.css": "./dist/typography.css",
+    "./shape.css": "./dist/shape.css",
+    "./elevation.css": "./dist/elevation.css",
+    "./motion.css": "./dist/motion.css",
+    "./theme.css": "./dist/theme.css",
     "./package.json": "./package.json"
   },
   "files": [

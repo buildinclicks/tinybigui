@@ -40,12 +40,18 @@ lerna-debug.log*
 *.tmp
 
 # Project-specific
+md3-specs/
 info.txt
 .cursor/
 .prompts/
 .qa-phases/
 .github-issues/
 learning-docs/
+
+# Generated doc exports (source .md files are tracked)
+docs/*.html
+docs/*.pdf
+docs/*.print.css
 
 
 *storybook.log

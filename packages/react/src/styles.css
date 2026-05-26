@@ -1,17 +1,39 @@
 /**
  * @tinybigui/react
- * Main stylesheet - includes tokens and component styles
- * 
- * Import this file in your app to use TinyBigUI components:
- * import "@tinybigui/react/styles.css";
+ * Main stylesheet — includes MD3 tokens, Tailwind @theme bridge, and component styles.
+ *
+ * Import this file in your app AFTER @import "tailwindcss":
+ *
+ *   @import "tailwindcss";
+ *   @source "../node_modules/@tinybigui/react/dist";
+ *   @import "@tinybigui/react/styles.css";
+ *
+ * The @source directive is required so Tailwind scans the compiled library
+ * output for utility class names and generates them in your CSS bundle.
  */
 
 /* ==========================================================================
-   DESIGN TOKENS
-   Imports Material Design 3 tokens and Tailwind v4 integration
+   DESIGN TOKENS + TAILWIND @THEME BRIDGE
+   Imports all MD3 CSS variable tokens and the Tailwind utility mappings.
+   Resolves via pnpm workspace link in monorepo dev; via node_modules after publish.
    ========================================================================== */
 
-@import "../../../packages/tokens/src/tokens.css";
+@import "@tinybigui/tokens/preset.css";
+
+/* ==========================================================================
+   GLOBAL BASE STYLES
+   Apply MD3 surface colors and typography to the document root.
+   Placed in @layer base so consumer styles can easily override.
+   ========================================================================== */
+
+@layer base {
+  body {
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    margin: 0;
+    font-family: var(--md-sys-typescale-font-family-plain);
+  }
+}
 
 /* ==========================================================================
    COMPONENT STYLES
@@ -56,9 +78,29 @@
   }
 }
 
-/* TODO: Component-specific styles will be added here as we build components:
- * - State layers (hover, press, focus states)
- * - Ripple effects
- * - Elevation transitions
- * - Component-specific overrides
+/* ==========================================================================
+   COMPONENT TRANSITION UTILITIES
+   Split MD3 transition: spatial properties use the expressive spring (allows
+   overshoot); effects properties use the standard spring (no overshoot).
+
+   MD3 spec: opacity/color/blur MUST NOT overshoot — applying the expressive
+   spatial cubic-bezier to color transitions causes a visible flicker/stutter.
+   ========================================================================== */
+
+/**
+ * btn-transition — use on all Button and IconButton elements inside connected
+ * groups where border-radius morphs on selection.
+ *
+ * Spatial  (border-radius):         expressive-fast-spatial  350ms, overshoot ok
+ * Effects  (color / bg / shadow):   standard-fast-effects    150ms, no overshoot
  */
+@utility btn-transition {
+  transition:
+    border-radius var(--md-sys-motion-expressive-fast-spatial-duration),
+    color var(--md-sys-motion-standard-fast-effects-duration),
+    background-color var(--md-sys-motion-standard-fast-effects-duration),
+    border-color var(--md-sys-motion-standard-fast-effects-duration),
+    opacity var(--md-sys-motion-standard-fast-effects-duration),
+    box-shadow var(--md-sys-motion-standard-fast-effects-duration),
+    outline-color var(--md-sys-motion-standard-fast-effects-duration);
+}

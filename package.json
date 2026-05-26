@@ -33,7 +33,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -r --parallel dev",
-    "dev:storybook": "pnpm -r storybook",
+    "dev:storybook": "pnpm --filter @tinybigui/tokens build && pnpm --filter @tinybigui/react storybook",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",

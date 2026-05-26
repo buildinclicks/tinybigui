@@ -1,0 +1,25 @@
+/**
+ * Storybook CSS entry point
+ *
+ * Owns the Tailwind v4 import and source scanning for the Storybook build.
+ * Consumers of @tinybigui/react must replicate this pattern in their own
+ * CSS entry (app/globals.css, main.css, etc.):
+ *
+ *   @import "tailwindcss";
+ *   @source "../node_modules/@tinybigui/react/dist";
+ *   @import "@tinybigui/react/styles.css";
+ */
+
+/* Tailwind CSS v4 — must come first so @theme and @layer directives resolve */
+@import "tailwindcss";
+
+/*
+ * Scan component source files so Tailwind generates all utility classes used
+ * by components even when they are not present in story files directly.
+ * This fixes missing utilities like text-display-large, shadow-elevation-*,
+ * animate-md-*, etc. in the Storybook CSS output.
+ */
+@source "../src/**/*.{ts,tsx}";
+
+/* MD3 tokens, Tailwind @theme bridge, and component styles */
+@import "../src/styles.css";
