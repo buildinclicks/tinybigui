@@ -27,9 +27,9 @@ export const cardVariants = cva(
        * Card visual variant per MD3 specification.
        */
       variant: {
-        elevated: ["bg-surface-container-low", "shadow-elevation-1", "hover:shadow-elevation-2"],
-        filled: ["bg-surface-container-highest", "shadow-elevation-0"],
-        outlined: ["bg-surface", "border", "border-outline-variant", "shadow-elevation-0"],
+        elevated: ["shadow-elevation-1", "hover:shadow-elevation-2"],
+        filled: ["shadow-elevation-0"],
+        outlined: ["border", "border-outline-variant", "shadow-elevation-0"],
       },
 
       /**
@@ -70,6 +70,46 @@ export const cardVariants = cva(
         false: "",
       },
     },
+
+    compoundVariants: [
+      // Filled + enabled
+      {
+        variant: "filled",
+        isDisabled: false,
+        class: "bg-surface-container-highest",
+      },
+
+      // Filled + disabled
+      {
+        variant: "filled",
+        isDisabled: true,
+        class: "bg-surface-container-variant",
+      },
+      // Elevated + enabled
+      {
+        variant: "elevated",
+        isDisabled: true,
+        class: "bg-surface",
+      },
+      // Elevated + disabled
+      {
+        variant: "elevated",
+        isDisabled: false,
+        class: "bg-surface-container-low",
+      },
+      // Outlined + enabled
+      {
+        variant: "outlined",
+        isDisabled: true,
+        class: "bg-surface",
+      },
+      // Outlined + disabled
+      {
+        variant: "outlined",
+        isDisabled: false,
+        class: "bg-surface",
+      },
+    ],
 
     defaultVariants: {
       variant: "elevated",

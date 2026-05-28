@@ -269,7 +269,7 @@ export const WithMedia: Story = {
         alt="Scenic landscape placeholder image"
         aspectRatio="16/9"
       />
-      <CardHeader className="pt-0" headline="Media card" subheader="16 / 9 image slot" />
+      <CardHeader headline="Media card" subheader="16 / 9 image slot" />
       <CardContent>
         <p className="text-on-surface-variant text-body-medium">
           Full card composition: CardMedia → CardHeader → CardContent → CardActions.
@@ -395,7 +395,7 @@ export const SlotCompositions: Story = {
             alt="Full composition placeholder"
             aspectRatio="16/9"
           />
-          <CardHeader className="pt-0" headline="Full card" subheader="All slots" />
+          <CardHeader headline="Full card" subheader="All slots" />
           <CardContent>
             <p className="text-on-surface-variant text-body-small">Body text.</p>
           </CardContent>
@@ -538,7 +538,7 @@ export const Playground: Story = {
         alt="Playground card placeholder image"
         aspectRatio="16/9"
       />
-      <CardHeader className="pt-0" headline="Playground card" subheader="Try all props" />
+      <CardHeader headline="Playground card" subheader="Try all props" />
       <CardContent>
         <p className="text-on-surface-variant text-body-medium">
           Use the controls panel to experiment with every available prop.
