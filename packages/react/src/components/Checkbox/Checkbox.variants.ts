@@ -41,7 +41,7 @@ export const checkboxVariants = cva(
 export const checkboxContainerVariants = cva(
   [
     // Base classes for checkbox visual container
-    "relative inline-flex items-center justify-center",
+    "relative inline-flex items-center justify-center m-1",
     "w-10 h-10", // 40x40dp touch target (MD3 spec)
     "flex-shrink-0",
     "transition-all duration-200",
@@ -126,7 +126,7 @@ export const checkboxIconBoxVariants = cva(
         unchecked: [
           "fill-transparent",
           "stroke-outline", // MD3: outline color for unchecked
-          "stroke-2", // MD3: 2dp outline width
+          "stroke-4", // MD3: 2dp outline width
         ],
         checked: [
           "fill-current", // Uses parent text color (primary or error)
@@ -198,7 +198,6 @@ export const checkboxLabelVariants = cva(
     "text-sm", // MD3: Body Medium (14px)
     "text-on-surface",
     "select-none",
-    "ml-1.5",
   ],
   {
     variants: {
