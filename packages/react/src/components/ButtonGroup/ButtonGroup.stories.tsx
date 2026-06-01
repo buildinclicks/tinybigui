@@ -98,7 +98,7 @@ const GroupButton = ({
       aria-pressed={isSelected}
       onClick={() => onSelectionChange(value)}
       className={[
-        "inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium",
+        "inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium",
         // Effects token for color: standard fast (150ms, no overshoot)
         "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-all",
         "focus-visible:ring-primary outline-none focus-visible:ring-2",
@@ -136,7 +136,7 @@ const GroupIconButton = ({
       aria-pressed={isSelected}
       onClick={() => onSelectionChange(value)}
       className={[
-        "inline-flex h-10 w-10 items-center justify-center rounded-full",
+        "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full",
         // Effects token: standard fast (150ms, no overshoot) for color/bg
         "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-all",
         "focus-visible:ring-primary outline-none focus-visible:ring-2",
@@ -233,19 +233,19 @@ export const Default: Story = {
     <ButtonGroup {...args}>
       <button
         type="button"
-        className="bg-surface-container text-on-surface rounded-full px-4 py-2 text-sm font-medium"
+        className="bg-surface-container text-on-surface inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
       >
         One
       </button>
       <button
         type="button"
-        className="bg-surface-container text-on-surface rounded-full px-4 py-2 text-sm font-medium"
+        className="bg-surface-container text-on-surface inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
       >
         Two
       </button>
       <button
         type="button"
-        className="bg-surface-container text-on-surface rounded-full px-4 py-2 text-sm font-medium"
+        className="bg-surface-container text-on-surface inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
       >
         Three
       </button>
@@ -273,19 +273,19 @@ export const Variants: Story = {
         <ButtonGroup variant="standard" aria-label="Standard variant example">
           <button
             type="button"
-            className="bg-surface-container text-on-surface rounded-full px-4 py-2 text-sm font-medium"
+            className="bg-surface-container text-on-surface inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
           >
             Cut
           </button>
           <button
             type="button"
-            className="bg-surface-container text-on-surface rounded-full px-4 py-2 text-sm font-medium"
+            className="bg-surface-container text-on-surface inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
           >
             Copy
           </button>
           <button
             type="button"
-            className="bg-surface-container text-on-surface rounded-full px-4 py-2 text-sm font-medium"
+            className="bg-surface-container text-on-surface inline-flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
           >
             Paste
           </button>
@@ -296,19 +296,19 @@ export const Variants: Story = {
         <ButtonGroup variant="connected" aria-label="Connected variant example">
           <button
             type="button"
-            className="bg-surface-container text-on-surface flex-1 rounded-full px-4 py-2 text-sm font-medium"
+            className="bg-surface-container text-on-surface inline-flex flex-1 cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
           >
             Small
           </button>
           <button
             type="button"
-            className="bg-surface-container text-on-surface flex-1 rounded-full px-4 py-2 text-sm font-medium"
+            className="bg-surface-container text-on-surface inline-flex flex-1 cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
           >
             Medium
           </button>
           <button
             type="button"
-            className="bg-surface-container text-on-surface flex-1 rounded-full px-4 py-2 text-sm font-medium"
+            className="bg-surface-container text-on-surface inline-flex flex-1 cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium"
           >
             Large
           </button>
