@@ -174,7 +174,7 @@ export const radioContainerVariants = cva(
 export const radioIconOuterVariants = cva(
   [
     // Base classes for the radio outer circle
-    "transition-all duration-200",
+    "transition-all duration-200 stroke-current stroke-2 fill-transparent",
   ],
   {
     variants: {
@@ -182,15 +182,8 @@ export const radioIconOuterVariants = cva(
        * Radio state
        */
       state: {
-        unselected: [
-          "fill-transparent",
-          "stroke-current", // Uses parent text color (on-surface-variant or error)
-          "stroke-2", // MD3: 2dp outline width
-        ],
-        selected: [
-          "fill-current", // Uses parent text color (primary or error)
-          "stroke-none",
-        ],
+        unselected: [],
+        selected: [],
       },
 
       /**
@@ -219,26 +212,24 @@ export const radioIconOuterVariants = cva(
 /**
  * Radio icon inner dot variants (the 10px center dot when selected)
  */
-export const radioIconInnerVariants = cva(
-  [
-    "fill-current", // Inherits color from parent (on-primary)
-    "transition-all duration-200",
-  ],
-  {
-    variants: {
-      /**
-       * Visibility based on state
-       */
-      visible: {
-        true: "opacity-100 scale-100",
-        false: "opacity-0 scale-0",
-      },
+export const radioIconInnerVariants = cva(["transition-opacity duration-200"], {
+  variants: {
+    /**
+     * Visibility based on state
+     */
+    state: {
+      selected: ["fill-current"],
+      unselected: ["fill-transparent"],
     },
-    defaultVariants: {
-      visible: false,
+    visible: {
+      true: "opacity-100 scale-100 fill-current",
+      false: "opacity-0 scale-0",
     },
-  }
-);
+  },
+  defaultVariants: {
+    visible: false,
+  },
+});
 
 /**
  * Radio label text variants
