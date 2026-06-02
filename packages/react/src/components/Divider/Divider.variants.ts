@@ -24,8 +24,8 @@ export const dividerVariants = cva(
        * Controls the axis of the visual rule.
        */
       orientation: {
-        horizontal: "border-t w-full",
-        vertical: "border-l h-full self-stretch",
+        horizontal: "border-t",
+        vertical: "border-l h-auto self-stretch",
       },
 
       /**
