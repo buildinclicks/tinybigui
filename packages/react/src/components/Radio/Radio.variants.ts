@@ -112,7 +112,7 @@ export const radioContainerVariants = cva(
     "w-10 h-10", // 40x40dp touch target (MD3 spec)
     "flex-shrink-0",
     "transition-all duration-200",
-
+    "m-1", // 4px margin around radio for spacing (total 8px gap between radios)
     // State layer (hover, focus, active) - MD3 spec: 8%/12%/12% opacity
     "before:absolute before:inset-0 before:rounded-full before:transition-opacity before:duration-200",
     "before:bg-current before:opacity-0",
@@ -248,7 +248,6 @@ export const radioLabelVariants = cva(
     "text-sm", // MD3: Body Medium (14px)
     "text-on-surface",
     "select-none",
-    "ml-1.5",
   ],
   {
     variants: {
