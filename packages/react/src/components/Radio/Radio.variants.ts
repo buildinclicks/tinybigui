@@ -212,7 +212,7 @@ export const radioIconOuterVariants = cva(
 /**
  * Radio icon inner dot variants (the 10px center dot when selected)
  */
-export const radioIconInnerVariants = cva(["transition-opacity duration-200"], {
+export const radioIconInnerVariants = cva(["transition-all origin-center duration-200"], {
   variants: {
     /**
      * Visibility based on state
