@@ -191,6 +191,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                   selected: isSelected,
                   pressed: isPressed,
                   disabled: isDisabled,
+                  withIcon: !!icon || !!selectedIcon,
                 })
               )}
             >

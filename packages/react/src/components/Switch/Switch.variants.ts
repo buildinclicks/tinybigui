@@ -47,9 +47,10 @@ export const switchTrackVariants = cva(
   [
     // Base classes for track
     "relative flex items-center",
-    "w-[52px] h-[32px]", // MD3 spec: 52x32dp
+    "w-13 h-8", // MD3 spec: 52x32dp
     "rounded-full", // MD3 spec: border-radius 16dp (full)
     "transition-all duration-200",
+    "border-2 border-outline", // MD3 spec: outline border
   ],
   {
     variants: {
@@ -57,7 +58,7 @@ export const switchTrackVariants = cva(
        * Switch state (determines track color)
        */
       selected: {
-        true: "bg-primary", // MD3: selected track
+        true: "bg-primary border-primary", // MD3: selected track
         false: "bg-surface-container-highest", // MD3: unselected track
       },
 
@@ -65,7 +66,7 @@ export const switchTrackVariants = cva(
        * Disabled state
        */
       disabled: {
-        true: "bg-on-surface/12", // MD3: 12% opacity for disabled
+        true: "bg-on-surface/12 border-on-surface/12", // MD3: 12% opacity for disabled
         false: "",
       },
     },
@@ -112,11 +113,11 @@ export const switchHandleContainerVariants = cva(
        */
       selected: {
         true: [
-          "left-[24px]", // Position when ON (52px - 24px = 28px)
+          "left-[22px]", // Position when ON (52px - 24px = 28px)
           "text-primary", // State layer color
         ],
         false: [
-          "left-[8px]", // Position when OFF (centered in left half)
+          "left-1.5", // Position when OFF (centered in left half)
           "text-on-surface-variant", // State layer color
         ],
       },
@@ -125,7 +126,7 @@ export const switchHandleContainerVariants = cva(
        * Pressed state (increases handle size)
        */
       pressed: {
-        true: "w-[28px] h-[28px]", // MD3: 28dp when pressed
+        true: "size-7 left-[20px]", // MD3: 28dp when pressed
         false: "",
       },
 
@@ -142,12 +143,12 @@ export const switchHandleContainerVariants = cva(
       {
         selected: true,
         pressed: false,
-        className: "w-[24px] h-[24px]", // MD3: 24dp when selected
+        className: "size-6", // MD3: 24dp when selected
       },
       {
         selected: false,
         pressed: false,
-        className: "w-[16px] h-[16px]", // MD3: 16dp when unselected
+        className: "size-4", // MD3: 16dp when unselected
       },
     ],
     defaultVariants: {
@@ -164,7 +165,7 @@ export const switchHandleContainerVariants = cva(
 export const switchHandleVariants = cva(
   [
     // Base classes for the handle
-    "relative z-10 rounded-full",
+    "relative z-10 rounded-full flex-shrink-0",
     "transition-all duration-200",
     "flex items-center justify-center",
   ],
@@ -182,7 +183,7 @@ export const switchHandleVariants = cva(
        * Pressed state
        */
       pressed: {
-        true: "w-[28px] h-[28px]", // MD3: 28dp when pressed
+        true: "size-7", // MD3: 28dp when pressed
         false: "",
       },
 
@@ -193,18 +194,42 @@ export const switchHandleVariants = cva(
         true: "bg-on-surface/38", // MD3: 38% opacity for disabled
         false: "",
       },
+
+      /**
+       * HOvered state
+       */
+      hovered: {
+        true: "bg-on-primary/8", // MD3: 8% opacity hover state
+        false: "",
+      },
+
+      /**
+       * With icon state
+       */
+      withIcon: {
+        true: "size-7", // MD3: 28dp when handle has icon (to accommodate icon size)
+        false: "",
+      },
     },
     compoundVariants: [
       // Size depends on selected + pressed state
       {
         selected: true,
         pressed: false,
-        className: "w-[24px] h-[24px]", // MD3: 24dp when selected
+        className: "size-6", // MD3: 24dp when selected
       },
       {
         selected: false,
         pressed: false,
-        className: "w-[16px] h-[16px]", // MD3: 16dp when unselected
+        withIcon: true,
+        className: "size-6", // MD3: 24dp when unselected
+      },
+
+      {
+        selected: false,
+        pressed: false,
+        withIcon: false,
+        className: "size-4", // MD3: 16dp when unselected
       },
       // Disabled state overrides normal colors
       {
@@ -232,8 +257,9 @@ export const switchHandleVariants = cva(
 export const switchIconVariants = cva(
   [
     // Base classes for icons
-    "w-4 h-4", // MD3: 16x16dp icon size
+    "size-5", // MD3: 16x16dp icon size
     "transition-all duration-200",
+    "flex items-center justify-center flex-shrink-0",
   ],
   {
     variants: {
@@ -241,8 +267,8 @@ export const switchIconVariants = cva(
        * Icon visibility based on state
        */
       visible: {
-        true: "opacity-100",
-        false: "opacity-0",
+        true: "opacity-100", // MD3: fully visible with appropriate color
+        false: "opacity-0", // MD3: invisible but still takes space (for smooth transitions)
       },
 
       /**
