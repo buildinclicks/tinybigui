@@ -58,7 +58,7 @@ export const switchRootVariants = cva([
  * overflow-hidden clips the state-layer ring to the pill shape.
  */
 export const switchTrackVariants = cva([
-  "relative flex items-center w-13 h-8 rounded-full border-2 overflow-hidden",
+  "relative flex items-center w-13 h-8 rounded-full border-2",
   // Effects transition (color — no spatial overshoot)
   "transition-colors duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
   // Unselected (base)
@@ -95,14 +95,14 @@ export const switchFocusRingVariants = cva([
  * position. Translates horizontally via group-data-[selected].
  *
  * Geometry:
- *   -left-1 → container left edge at –4px from track inner-left.
+ *   -left-1.5 → container left edge at –6px from track inner-left. (2dp border + 4px gap)
  *   Container center (40dp/2=20) at –4+20 = 16px from track inner-left.
  *   Handle 16dp: center at 16px (symmetric gap of ~0px from inner-left arc) ✓
  *   translate-x-5 (+20px): center at 36px from inner-left.
  *   Handle 24dp: edges at 24–48px (inner track spans 0–48px) ✓
  */
 export const switchHandleContainerVariants = cva([
-  "absolute top-1/2 -translate-y-1/2 -left-1 size-10",
+  "absolute top-1/2 -translate-y-1/2 -left-1.5 size-10",
   "flex items-center justify-center rounded-full",
   // Spatial transition for movement (position is spatial, not an effect)
   "transition-transform duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial",
