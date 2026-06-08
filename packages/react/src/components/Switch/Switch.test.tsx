@@ -54,8 +54,8 @@ describe("Switch", () => {
     test("renders disabled state", () => {
       render(<Switch isDisabled>Disabled</Switch>);
       const label = screen.getByText("Disabled").closest("label");
-      expect(label).toHaveClass("opacity-38");
-      expect(label).toHaveClass("pointer-events-none");
+      // Disabled state expressed via data attribute (Variants vs States architecture)
+      expect(label).toHaveAttribute("data-disabled", "");
     });
 
     test("renders readonly state", () => {
@@ -116,7 +116,7 @@ describe("Switch", () => {
       const switchElement = screen.getByRole("switch");
       const label = screen.getByText("Disabled").closest("label");
 
-      expect(label).toHaveClass("opacity-38");
+      expect(label).toHaveAttribute("data-disabled", "");
       expect(switchElement).not.toBeChecked();
     });
 
@@ -286,22 +286,24 @@ describe("Switch", () => {
   });
 
   describe("Disabled", () => {
-    test("applies disabled styling", () => {
+    test("applies disabled styling via data attribute", () => {
       render(<Switch isDisabled>Disabled</Switch>);
       const label = screen.getByText("Disabled").closest("label");
-      expect(label).toHaveClass("opacity-38");
+      // New architecture: disabled state is a data attribute; CSS classes are applied
+      // by Tailwind's data-[disabled]: selectors rather than hard-coded class names.
+      expect(label).toHaveAttribute("data-disabled", "");
     });
 
     test("switch has disabled visual state", () => {
       render(<Switch isDisabled>Disabled</Switch>);
       const label = screen.getByText("Disabled").closest("label");
-      expect(label).toHaveClass("pointer-events-none");
+      expect(label).toHaveAttribute("data-disabled", "");
     });
 
     test("does not respond to interactions when disabled", () => {
       render(<Switch isDisabled>Disabled</Switch>);
       const label = screen.getByText("Disabled").closest("label");
-      expect(label).toHaveClass("pointer-events-none");
+      expect(label).toHaveAttribute("data-disabled", "");
     });
   });
 
@@ -427,6 +429,69 @@ describe("Switch", () => {
       switchElement.focus();
       await user.keyboard(" ");
       expect(handleSubmit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Data Attributes (Variants vs States architecture)", () => {
+    test("sets data-disabled attribute when disabled", () => {
+      render(<Switch isDisabled>Disabled</Switch>);
+      const label = screen.getByText("Disabled").closest("label");
+      expect(label).toHaveAttribute("data-disabled", "");
+    });
+
+    test("does not set data-disabled when enabled", () => {
+      render(<Switch>Enabled</Switch>);
+      const label = screen.getByText("Enabled").closest("label");
+      expect(label).not.toHaveAttribute("data-disabled");
+    });
+
+    test("sets data-selected attribute when selected", () => {
+      render(<Switch isSelected>Selected</Switch>);
+      const label = screen.getByText("Selected").closest("label");
+      expect(label).toHaveAttribute("data-selected", "");
+    });
+
+    test("does not set data-selected when unselected", () => {
+      render(<Switch>Unselected</Switch>);
+      const label = screen.getByText("Unselected").closest("label");
+      expect(label).not.toHaveAttribute("data-selected");
+    });
+
+    test("updates data-selected on toggle", async () => {
+      const user = userEvent.setup();
+      render(<Switch>Toggle</Switch>);
+      const switchElement = screen.getByRole("switch");
+      const label = screen.getByText("Toggle").closest("label");
+
+      expect(label).not.toHaveAttribute("data-selected");
+      await user.click(switchElement);
+      expect(label).toHaveAttribute("data-selected", "");
+      await user.click(switchElement);
+      expect(label).not.toHaveAttribute("data-selected");
+    });
+
+    test("sets data-with-icon when icon prop is provided", () => {
+      render(<Switch icon={<span>X</span>}>With icon</Switch>);
+      const label = screen.getByText("With icon").closest("label");
+      expect(label).toHaveAttribute("data-with-icon", "");
+    });
+
+    test("sets data-with-icon when selectedIcon prop is provided", () => {
+      render(<Switch selectedIcon={<span>✓</span>}>With icon</Switch>);
+      const label = screen.getByText("With icon").closest("label");
+      expect(label).toHaveAttribute("data-with-icon", "");
+    });
+
+    test("does not set data-with-icon when no icons are provided", () => {
+      render(<Switch>No icon</Switch>);
+      const label = screen.getByText("No icon").closest("label");
+      expect(label).not.toHaveAttribute("data-with-icon");
+    });
+
+    test("sets data-readonly attribute when readonly", () => {
+      render(<Switch isReadOnly>Readonly</Switch>);
+      const label = screen.getByText("Readonly").closest("label");
+      expect(label).toHaveAttribute("data-readonly", "");
     });
   });
 

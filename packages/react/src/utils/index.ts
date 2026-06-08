@@ -24,6 +24,9 @@ export {
   type Theme,
 } from "./colors";
 
+// Interaction state utilities
+export { getInteractionDataAttributes, type InteractionStates } from "./interactionStates";
+
 // Typography utilities
 export {
   getTypographyToken,

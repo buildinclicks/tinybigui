@@ -2,14 +2,17 @@
 
 import { forwardRef, useRef } from "react";
 import type React from "react";
-import { useSwitch, useFocusRing, mergeProps, VisuallyHidden } from "react-aria";
+import { useSwitch, useFocusRing, useHover, mergeProps, VisuallyHidden } from "react-aria";
 import { useToggleState } from "react-stately";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
 import {
-  switchVariants,
+  switchRootVariants,
   switchTrackVariants,
+  switchFocusRingVariants,
   switchHandleContainerVariants,
+  switchStateLayerVariants,
   switchHandleVariants,
   switchIconVariants,
   switchLabelVariants,
@@ -20,8 +23,9 @@ import type { SwitchProps } from "./Switch.types";
  * Material Design 3 Switch Component (Layer 3: Styled)
  *
  * Built on React Aria for world-class accessibility.
- * Uses CVA for type-safe variant management.
- * Styled with Tailwind CSS using MD3 design tokens.
+ * Implements the Variants-vs-States architecture: all interaction/selection
+ * states are expressed as data-* attributes on the root and consumed by each
+ * slot via group-data-[x]/switch Tailwind selectors — no state variants in CVA.
  *
  * Features:
  * - ✅ 2 states: on/off (not selection like checkbox)
@@ -33,11 +37,11 @@ import type { SwitchProps } from "./Switch.types";
  * - ✅ Form integration (name, value props)
  *
  * MD3 Specifications:
- * - Track: 52x32dp (border-radius 16dp)
- * - Handle: 16x16dp (unselected), 24x24dp (selected), 28x28dp (pressed)
- * - Touch target: 48x48dp minimum
- * - State layers: 8% hover, 12% focus/pressed
- * - Disabled: 12% container, 38% content opacity
+ * - Track: 52×32dp (border-radius 16dp)
+ * - Handle: 16dp (unselected) | 24dp (selected / with-icon) | 28dp (pressed)
+ * - State-layer container: 40dp centered on handle
+ * - State-layer opacities: hover 8% | focus 10% | pressed 10%
+ * - Disabled: container 12% | content 38% opacity
  * - Label spacing: 16px (ml-4)
  *
  * @example
@@ -65,179 +69,121 @@ import type { SwitchProps } from "./Switch.types";
 export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
   (
     {
-      // Content props
       children,
       icon,
       selectedIcon,
-
-      // State props
       disableRipple = false,
       isDisabled = false,
-
-      // Styling
       className,
-
-      // Other props
       ...props
     },
     forwardedRef
   ) => {
-    // Internal ref for React Aria
     const internalRef = useRef<HTMLInputElement>(null);
-
-    // Merge internal ref with forwarded ref
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLInputElement>;
 
-    // Extract data-testid and other HTML attributes
+    // Extract passthrough HTML attributes that React Aria doesn't understand
     const htmlAttrs = props as Record<string, unknown>;
     const dataTestId = htmlAttrs["data-testid"] as string | undefined;
     const htmlId = htmlAttrs.id as string | undefined;
     const htmlTitle = htmlAttrs.title as string | undefined;
 
-    // Remove HTML attributes from props for React Aria
     const {
       "data-testid": _dataTestId,
       id: _htmlId,
       title: _htmlTitle,
-      ...restPropsWithoutHtmlAttrs
+      ...ariaProps
     } = props as Record<string, unknown>;
 
-    // State management using React Stately
-    const state = useToggleState(restPropsWithoutHtmlAttrs as Parameters<typeof useToggleState>[0]);
+    // React Stately — toggle state
+    const state = useToggleState(ariaProps as Parameters<typeof useToggleState>[0]);
 
-    // React Aria hooks - pass props without HTML attributes
+    // React Aria hooks
     const { inputProps, labelProps, isPressed } = useSwitch(
-      restPropsWithoutHtmlAttrs as Parameters<typeof useSwitch>[0],
+      ariaProps as Parameters<typeof useSwitch>[0],
       state,
       ref
     );
     const { isFocusVisible, focusProps } = useFocusRing();
+    const { isHovered, hoverProps } = useHover({ isDisabled });
 
-    // Get selected state
     const isSelected = state.isSelected;
+    const hasIcon = !!icon || !!selectedIcon;
 
-    // Ripple effect
+    // Ripple effect on the handle container
     const { onMouseDown: handleRipple, ripples } = useRipple({
       disabled: isDisabled || disableRipple,
     });
 
-    // Development warnings
     if (process.env.NODE_ENV === "development") {
-      const ariaProps = restPropsWithoutHtmlAttrs as {
-        "aria-label"?: string;
-        "aria-labelledby"?: string;
-      };
-      if (!children && !ariaProps["aria-label"] && !ariaProps["aria-labelledby"]) {
-        console.warn(
-          "[Switch] Switch should have a label (children) or aria-label for accessibility."
-        );
+      const a = ariaProps as { "aria-label"?: string; "aria-labelledby"?: string };
+      if (!children && !a["aria-label"] && !a["aria-labelledby"]) {
+        console.warn("[Switch] Provide a label via children or aria-label for accessibility.");
       }
     }
 
     return (
       <label
-        {...labelProps}
-        className={cn(
-          switchVariants({
-            disabled: isDisabled,
-          }),
-          className
-        )}
+        {...mergeProps(labelProps, hoverProps)}
+        className={cn(switchRootVariants(), "group/switch", className)}
         data-testid={dataTestId}
         title={htmlTitle}
+        // ── Interaction data attributes (from React Aria state) ──────────
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          isSelected,
+          isDisabled,
+          // isReadOnly can be undefined; ?? false satisfies exactOptionalPropertyTypes
+          isReadOnly: (ariaProps as { isReadOnly?: boolean }).isReadOnly ?? false,
+        })}
+        // ── Content flag (describes structure, NOT interaction state) ────
+        data-with-icon={hasIcon ? "" : undefined}
       >
-        {/* Visually hidden native input for accessibility */}
+        {/* Visually hidden native input — handles all accessibility */}
         <VisuallyHidden>
           <input {...mergeProps(inputProps, focusProps)} ref={ref} id={htmlId} />
         </VisuallyHidden>
 
-        {/* Visual switch container */}
-        <div
-          role="presentation"
-          className={cn(
-            switchTrackVariants({
-              selected: isSelected,
-              disabled: isDisabled,
-            })
-          )}
-        >
-          {/* Focus ring (keyboard focus indicator) */}
-          {isFocusVisible && (
-            <div
-              className="border-primary absolute inset-[-4px] animate-pulse rounded-full border-2"
-              aria-hidden="true"
-            />
-          )}
+        {/*
+         * Relative wrapper — gives the focus ring an absolute positioning
+         * context that is outside the track's overflow-hidden, so the ring
+         * is never clipped.
+         */}
+        <div role="presentation" className="relative">
+          {/* Focus ring — sibling of track div, not clipped by overflow-hidden */}
+          <div className={cn(switchFocusRingVariants())} aria-hidden="true" />
 
-          {/* Handle container (with state layers and ripple) */}
-          <div
-            className={cn(
-              switchHandleContainerVariants({
-                selected: isSelected,
-                pressed: isPressed,
-                disabled: isDisabled,
-              })
-            )}
-            onMouseDown={handleRipple}
-            role="presentation"
-          >
-            {/* Ripple effect */}
-            {ripples}
-
-            {/* Handle (thumb) */}
+          {/* Track — overflow-hidden clips the state layer to the pill shape */}
+          <div className={cn(switchTrackVariants())}>
+            {/* Handle container — movement only (translate-x) */}
             <div
-              className={cn(
-                switchHandleVariants({
-                  selected: isSelected,
-                  pressed: isPressed,
-                  disabled: isDisabled,
-                  withIcon: !!icon || !!selectedIcon,
-                })
-              )}
+              role="presentation"
+              className={cn(switchHandleContainerVariants())}
+              onMouseDown={handleRipple}
             >
-              {/* Icon when OFF */}
-              {!isSelected && icon && (
-                <div
-                  className={cn(
-                    switchIconVariants({
-                      visible: !isSelected,
-                      disabled: isDisabled,
-                    })
-                  )}
-                >
-                  {icon}
-                </div>
-              )}
+              {/* Ripple */}
+              {ripples}
 
-              {/* Icon when ON */}
-              {isSelected && selectedIcon && (
-                <div
-                  className={cn(
-                    switchIconVariants({
-                      visible: isSelected,
-                      disabled: isDisabled,
-                    })
-                  )}
-                >
-                  {selectedIcon}
-                </div>
-              )}
+              {/* State layer — hover/focus/pressed opacity ring */}
+              <span className={cn(switchStateLayerVariants())} aria-hidden="true" />
+
+              {/* Handle — size + color only */}
+              <div className={cn(switchHandleVariants())} aria-hidden="true">
+                {/* Icon when unselected */}
+                {!isSelected && icon && <span className={cn(switchIconVariants())}>{icon}</span>}
+                {/* Icon when selected */}
+                {isSelected && selectedIcon && (
+                  <span className={cn(switchIconVariants())}>{selectedIcon}</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Label text */}
-        {children && (
-          <span
-            className={cn(
-              switchLabelVariants({
-                disabled: isDisabled,
-              })
-            )}
-          >
-            {children}
-          </span>
-        )}
+        {/* Text label */}
+        {children && <span className={cn(switchLabelVariants())}>{children}</span>}
       </label>
     );
   }
