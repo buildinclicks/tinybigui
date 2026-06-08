@@ -51,12 +51,17 @@ import { cva, type VariantProps } from "class-variance-authority";
  *   xlarge: narrow 96dp / default 136dp / wide 168dp
  *
  * Shape:
- *   round  → rounded-full  (press morphs to size-tiered corner)
- *   square → size-tiered corner at rest (no morph)
+ *   round  → per-size half-height radius (true circle: xsmall 16px … xlarge 68px)
+ *            Press morphs to the size-tiered square corner (e.g. medium 28px → 16px).
+ *            Using exact half-height (not 9999px) keeps the morph distance small so
+ *            emphasized-decelerate produces a smooth transition with no overshoot clamp.
+ *   square → size-tiered corner at rest; no press morph.
  *
- * Press shape morph (round only): on data-[pressed] the radius shrinks to the
- * same scale as the square shape for that size, giving the Expressive spring feel.
- * Driven by [--ib-radius-press] CSS variable consumed by the root.
+ * Press shape morph (round only): on data-[pressed] the radius shrinks to
+ * --ib-radius-press (= MD3 square corner for that size tier).
+ * Smooth because btn-transition uses emphasized-decelerate (no overshoot) for
+ * border-radius. The old 9999px radius caused the spring to overshoot below 0,
+ * producing a sharp-corner flash before settling.
  *
  * MD3 state-layer opacities:
  *   hover        opacity-8  (8%)
@@ -66,12 +71,18 @@ import { cva, type VariantProps } from "class-variance-authority";
  *   disabled content    text-on-surface/38
  */
 
-// ─── SHAPE CORNER RADIUS LOOKUP ───────────────────────────────────────────────
-// MD3 square shape corner radii per size tier:
-//   xsmall / small: 12dp → rounded-xl (not in theme — use rounded-md = 12px)
-//   medium:         16dp → rounded-lg
-//   large / xlarge: 28dp → rounded-xl
-// Press morph target for round shape matches the square radius for that size.
+// ─── SHAPE CORNER RADIUS REFERENCE ───────────────────────────────────────────
+// Round rest radius (half container height → true circle):
+//   xsmall (32dp) → 16px = 1rem
+//   small  (40dp) → 20px = 1.25rem
+//   medium (56dp) → 28px = 1.75rem
+//   large  (96dp) → 48px = 3rem
+//   xlarge(136dp) → 68px = 4.25rem
+//
+// Square rest radius / round press-morph target (MD3 shape scale):
+//   xsmall / small → 12px = 0.75rem
+//   medium         → 16px = 1rem
+//   large / xlarge → 28px = 1.75rem
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
 
@@ -93,13 +104,17 @@ export const iconButtonRootVariants = cva(
     "cursor-pointer select-none",
     "overflow-hidden",
 
-    // Corner radius driven by CSS variable — lets compoundVariants set the
-    // correct value per shape×size without repeating transitions.
+    // Corner radius driven by CSS variable — set per shape×size in compoundVariants.
+    // Fallback 9999px is only reached if both shape and size props are absent,
+    // which cannot happen in normal usage.
     "rounded-[var(--ib-radius,9999px)]",
 
-    // Spatial transition: border-radius (shape morph on press/toggle)
-    "transition-[border-radius,background-color,border-color,color,opacity]",
-    "duration-expressive-fast-spatial ease-expressive-fast-spatial",
+    // Split MD3 transition via the existing btn-transition utility:
+    //   border-radius  → emphasized-decelerate (no overshoot, no sharp-corner flash)
+    //   color/bg/border/opacity → standard-fast-effects (no overshoot on effects)
+    // This is identical to the approach used by Button/connected ButtonGroup and is
+    // the standard fix for the 9999px overshoot problem documented in styles.css.
+    "btn-transition",
 
     // Background + border + text driven from CSS role variables
     "bg-[var(--ib-bg,transparent)]",
@@ -177,18 +192,19 @@ export const iconButtonRootVariants = cva(
       },
 
       /**
-       * Shape — sets --ib-radius and --ib-radius-press
+       * Shape — base values only; per-size radii set via compoundVariants below.
+       *
+       * round:  --ib-radius = half the container height (true circle), set per size.
+       *         --ib-radius-press = square corner for that size (set per size).
+       *         Morph distance is small (e.g. 28px → 16px for medium), so the
+       *         emphasized-decelerate curve from btn-transition produces a smooth,
+       *         non-overshooting transition. The old 9999px fallback caused the
+       *         spring to overshoot below 0 = sharp-corner flash.
+       * square: --ib-radius = size-tiered MD3 corner, set per size. No press morph.
        */
       shape: {
-        round: [
-          "[--ib-radius:9999px]",
-          // Press morph: round → md3 square radius for that size
-          // (overridden per size in compoundVariants below)
-          "[--ib-radius-press:9999px]",
-        ],
-        square: [
-          // Base square radius set per size in compoundVariants
-        ],
+        round: [],
+        square: [],
       },
     },
 
@@ -217,24 +233,45 @@ export const iconButtonRootVariants = cva(
       { size: "xlarge", width: "wide", className: "w-42" },
 
       // ══════════════════════════════════════════════════════════════════════
-      // SHAPE × SIZE — square corner radii + round press-morph targets
+      // SHAPE × SIZE — corner radii for both round and square shapes
       // ══════════════════════════════════════════════════════════════════════
+      //
+      // Round rest radius = half container height (true circle).
+      // Using the exact half-height keeps the morph distance small, so the
+      // no-overshoot emphasized-decelerate curve in btn-transition produces a
+      // smooth animation. Using 9999px was the original cause of the sharp-
+      // corner flash (the spring overshoots below 0 before settling).
+      //
+      //   xsmall h-8  = 32px  → half = 16px = 1rem
+      //   small  h-10 = 40px  → half = 20px = 1.25rem
+      //   medium h-14 = 56px  → half = 28px = 1.75rem
+      //   large  h-24 = 96px  → half = 48px = 3rem
+      //   xlarge h-34 = 136px → half = 68px = 4.25rem
+      //
+      // Round press-morph target = MD3 square corner for that size tier.
+      // Square rest radius = same MD3 corner (no morph).
 
-      // square: xsmall / small → 12dp corner (rounded-md = 12px)
-      { shape: "square", size: "xsmall", className: "[--ib-radius:0.75rem]" },
-      { shape: "square", size: "small", className: "[--ib-radius:0.75rem]" },
-      // square: medium → 16dp corner (rounded-lg token = 16px)
-      { shape: "square", size: "medium", className: "[--ib-radius:1rem]" },
-      // square: large / xlarge → 28dp corner (rounded-xl token = 28px)
-      { shape: "square", size: "large", className: "[--ib-radius:1.75rem]" },
-      { shape: "square", size: "xlarge", className: "[--ib-radius:1.75rem]" },
+      // ── round: rest radius (half height) ──────────────────────────────────
+      { shape: "round", size: "xsmall", className: "[--ib-radius:1rem]" },
+      { shape: "round", size: "small", className: "[--ib-radius:1.25rem]" },
+      { shape: "round", size: "medium", className: "[--ib-radius:1.75rem]" },
+      { shape: "round", size: "large", className: "[--ib-radius:3rem]" },
+      { shape: "round", size: "xlarge", className: "[--ib-radius:4.25rem]" },
 
-      // round press-morph: shrink to the square value for that size on press
+      // ── round: press-morph target (square corner for that size) ───────────
       { shape: "round", size: "xsmall", className: "[--ib-radius-press:0.75rem]" },
       { shape: "round", size: "small", className: "[--ib-radius-press:0.75rem]" },
       { shape: "round", size: "medium", className: "[--ib-radius-press:1rem]" },
       { shape: "round", size: "large", className: "[--ib-radius-press:1.75rem]" },
       { shape: "round", size: "xlarge", className: "[--ib-radius-press:1.75rem]" },
+
+      // ── square: rest radius (MD3 shape scale) ─────────────────────────────
+      // xsmall / small → 12px (0.75rem), medium → 16px (1rem), large / xlarge → 28px (1.75rem)
+      { shape: "square", size: "xsmall", className: "[--ib-radius:0.75rem]" },
+      { shape: "square", size: "small", className: "[--ib-radius:0.75rem]" },
+      { shape: "square", size: "medium", className: "[--ib-radius:1rem]" },
+      { shape: "square", size: "large", className: "[--ib-radius:1.75rem]" },
+      { shape: "square", size: "xlarge", className: "[--ib-radius:1.75rem]" },
 
       // ══════════════════════════════════════════════════════════════════════
       // VARIANT × COLOR — CSS role variable assignments

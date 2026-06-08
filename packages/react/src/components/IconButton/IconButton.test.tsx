@@ -116,9 +116,9 @@ describe("IconButton", () => {
         </IconButton>
       );
       const button = screen.getByRole("button");
-      // Round shape uses CSS variable [--ib-radius:9999px] rather than rounded-full
+      // Round shape sets --ib-radius to half the container height (medium = 1.75rem = 28px)
       expect(button).toHaveAttribute("data-shape", "round");
-      expect(button.className).toContain("[--ib-radius:9999px]");
+      expect(button.className).toContain("[--ib-radius:1.75rem]");
     });
 
     test("merges custom className", () => {
@@ -718,9 +718,9 @@ describe("IconButton", () => {
         </IconButton>
       );
       const button = screen.getByRole("button");
-      // Round shape uses CSS variable rather than rounded-full
+      // Round shape sets --ib-radius to half the container height (medium = 1.75rem = 28px)
       expect(button).toHaveAttribute("data-shape", "round");
-      expect(button.className).toContain("[--ib-radius:9999px]");
+      expect(button.className).toContain("[--ib-radius:1.75rem]");
       expect(button).not.toHaveClass("rounded-xs");
       expect(button).not.toHaveClass("rounded-sm");
     });
@@ -856,9 +856,9 @@ describe("IconButton", () => {
         </ButtonGroup>
       );
       const button = screen.getByRole("button");
-      // Round shape uses CSS variable rather than rounded-full
+      // Round shape sets --ib-radius to half the container height (medium = 1.75rem = 28px)
       expect(button).toHaveAttribute("data-shape", "round");
-      expect(button.className).toContain("[--ib-radius:9999px]");
+      expect(button.className).toContain("[--ib-radius:1.75rem]");
       expect(button).not.toHaveClass("rounded-sm");
       expect(button).not.toHaveClass("min-w-12");
     });
