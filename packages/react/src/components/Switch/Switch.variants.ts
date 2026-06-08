@@ -44,10 +44,13 @@ export const switchRootVariants = cva([
   "data-[disabled]:opacity-38",
   // ── Handle size CSS variable ──────────────────────────────────────────────
   // Set via self-referential data-[x]: so all child slots inherit the value.
+  // "data-[selected]" and "data-[with-icon]" have specificity (0,1,0).
+  // "data-[pressed]:data-[pressed]:" doubles the attribute selector → (0,2,0),
+  // guaranteeing it always wins regardless of Tailwind's CSS output order.
   "[--switch-handle-size:1rem]", // 16dp base
   "data-[selected]:[--switch-handle-size:1.5rem]", // 24dp selected
   "data-[with-icon]:[--switch-handle-size:1.5rem]", // 24dp with icon
-  "data-[pressed]:[--switch-handle-size:1.75rem]", // 28dp pressed (last = wins)
+  "data-[pressed]:data-[pressed]:[--switch-handle-size:1.75rem]", // 28dp pressed — doubled for higher specificity
 ]);
 
 // ─── TRACK ────────────────────────────────────────────────────────────────────
@@ -79,8 +82,10 @@ export const switchTrackVariants = cva([
  * Replaces the non-MD3 animate-pulse ring from the previous implementation.
  */
 export const switchFocusRingVariants = cva([
+  // Sits outside the track's overflow-hidden by being rendered as a sibling,
+  // not a child — see Switch.tsx for the relative wrapper structure.
   "pointer-events-none absolute inset-[-3px] rounded-full",
-  "outline outline-2 outline-offset-0 outline-primary",
+  "outline outline-2 outline-offset-0 outline-secondary",
   "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
   "opacity-0",
   "group-data-[focus-visible]/switch:opacity-100",

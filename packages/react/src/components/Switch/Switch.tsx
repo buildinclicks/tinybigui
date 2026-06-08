@@ -146,31 +146,38 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           <input {...mergeProps(inputProps, focusProps)} ref={ref} id={htmlId} />
         </VisuallyHidden>
 
-        {/* Visual track */}
-        <div role="presentation" className={cn(switchTrackVariants())}>
-          {/* Focus ring — outside overflow-hidden, replaces animate-pulse */}
+        {/*
+         * Relative wrapper — gives the focus ring an absolute positioning
+         * context that is outside the track's overflow-hidden, so the ring
+         * is never clipped.
+         */}
+        <div role="presentation" className="relative">
+          {/* Focus ring — sibling of track div, not clipped by overflow-hidden */}
           <div className={cn(switchFocusRingVariants())} aria-hidden="true" />
 
-          {/* Handle container — movement only (translate-x) */}
-          <div
-            role="presentation"
-            className={cn(switchHandleContainerVariants())}
-            onMouseDown={handleRipple}
-          >
-            {/* Ripple */}
-            {ripples}
+          {/* Track — overflow-hidden clips the state layer to the pill shape */}
+          <div className={cn(switchTrackVariants())}>
+            {/* Handle container — movement only (translate-x) */}
+            <div
+              role="presentation"
+              className={cn(switchHandleContainerVariants())}
+              onMouseDown={handleRipple}
+            >
+              {/* Ripple */}
+              {ripples}
 
-            {/* State layer — hover/focus/pressed opacity ring */}
-            <span className={cn(switchStateLayerVariants())} aria-hidden="true" />
+              {/* State layer — hover/focus/pressed opacity ring */}
+              <span className={cn(switchStateLayerVariants())} aria-hidden="true" />
 
-            {/* Handle — size + color only */}
-            <div className={cn(switchHandleVariants())} aria-hidden="true">
-              {/* Unselected icon */}
-              {!isSelected && icon && <span className={cn(switchIconVariants())}>{icon}</span>}
-              {/* Selected icon */}
-              {isSelected && selectedIcon && (
-                <span className={cn(switchIconVariants())}>{selectedIcon}</span>
-              )}
+              {/* Handle — size + color only */}
+              <div className={cn(switchHandleVariants())} aria-hidden="true">
+                {/* Icon when unselected */}
+                {!isSelected && icon && <span className={cn(switchIconVariants())}>{icon}</span>}
+                {/* Icon when selected */}
+                {isSelected && selectedIcon && (
+                  <span className={cn(switchIconVariants())}>{selectedIcon}</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
