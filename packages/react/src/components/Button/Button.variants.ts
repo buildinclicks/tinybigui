@@ -24,7 +24,7 @@ export const buttonVariants = cva(
        */
       variant: {
         filled: "shadow-none hover:shadow-elevation-1", // MD3: gains elevation on hover
-        outlined: "bg-transparent border border-outline",
+        outlined: "bg-transparent border border-outline-variant",
         tonal: "",
         elevated: "shadow-elevation-1 hover:shadow-elevation-2", // MD3: level 1 → level 2 on hover
         text: "bg-transparent",
@@ -186,22 +186,22 @@ export const buttonVariants = cva(
       {
         variant: "text",
         color: "primary",
-        className: "text-primary",
+        className: "text-primary hover:bg-primary/[0.08]", // MD3: text buttons gain primary color at 8% opacity on hover
       },
       {
         variant: "text",
         color: "secondary",
-        className: "text-secondary",
+        className: "text-secondary hover:bg-secondary/[0.08]", // MD3: text buttons gain secondary color at 8% opacity on hover
       },
       {
         variant: "text",
         color: "tertiary",
-        className: "text-tertiary",
+        className: "text-tertiary hover:bg-tertiary/[0.08]", // MD3: text buttons gain tertiary color at 8% opacity on hover
       },
       {
         variant: "text",
         color: "error",
-        className: "text-error",
+        className: "text-error hover:bg-error/[0.08]", // MD3: text buttons gain error color at 8% opacity on hover
       },
     ],
 

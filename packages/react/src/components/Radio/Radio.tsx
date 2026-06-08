@@ -214,7 +214,6 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
                   visible: isSelected,
                 })
               )}
-              style={{ fill: "var(--color-on-primary)" }}
             />
 
             {/* Focus ring (visible on keyboard focus) */}

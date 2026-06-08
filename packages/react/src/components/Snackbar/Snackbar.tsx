@@ -119,7 +119,7 @@ export const Snackbar = forwardRef<HTMLDivElement, SnackbarProps>(function Snack
               <Button
                 variant="text"
                 onPress={action.onAction}
-                className="text-inverse-primary hover:text-inverse-primary"
+                className="text-inverse-primary hover:text-inverse-primary px-3"
               >
                 {action.label}
               </Button>

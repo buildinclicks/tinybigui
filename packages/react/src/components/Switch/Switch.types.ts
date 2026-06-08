@@ -6,7 +6,7 @@ import type { AriaSwitchProps } from "react-aria";
  *
  * Built on React Aria for world-class accessibility.
  * Represents on/off states (not selection like checkbox).
- * Implementation uses CVA + Tailwind CSS classes mapped to MD3 tokens.
+ * Styled via the Variants-vs-States architecture: CVA slots + data-* attributes.
  *
  * @example
  * ```tsx
@@ -41,52 +41,58 @@ export interface SwitchProps
     AriaSwitchProps,
     Omit<React.HTMLAttributes<HTMLLabelElement>, keyof AriaSwitchProps | "children"> {
   /**
-   * Switch label content
+   * Switch label content.
    */
   children?: React.ReactNode;
 
   /**
-   * Icon to display inside handle when switch is OFF
+   * Icon displayed inside the handle when the switch is OFF.
+   * Presence of this prop also sets `data-with-icon` on the root,
+   * expanding the handle to 24dp (same as selected) for visual balance.
+   *
    * @default undefined
    */
   icon?: React.ReactNode;
 
   /**
-   * Icon to display inside handle when switch is ON
+   * Icon displayed inside the handle when the switch is ON.
+   * Presence of this prop also sets `data-with-icon` on the root.
+   *
    * @default undefined
    */
   selectedIcon?: React.ReactNode;
 
   /**
-   * Disable ripple effect
+   * Disable the ripple effect on press.
+   *
    * @default false
    */
   disableRipple?: boolean;
 
   /**
-   * Additional CSS classes (Tailwind)
+   * Additional Tailwind CSS classes applied to the root label element.
    */
   className?: string;
 }
 
 /**
- * Props for the headless Switch component
- * Extends AriaSwitchProps for accessibility
+ * Props for the headless Switch component.
+ * Extends AriaSwitchProps for accessibility primitives.
  */
 export interface SwitchHeadlessProps extends AriaSwitchProps {
   /**
-   * Additional CSS classes for the label wrapper
+   * Additional CSS classes for the label wrapper.
    */
   className?: string;
 
   /**
-   * Switch label content
+   * Switch label content.
    */
   children?: React.ReactNode;
 
   /**
-   * Render prop for custom switch visual
-   * Receives state information
+   * Render prop for custom switch visual.
+   * Receives the current interaction/selection state.
    */
   renderSwitch?: (state: {
     isSelected: boolean;

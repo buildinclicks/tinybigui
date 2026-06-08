@@ -51,7 +51,7 @@
      SURFACE
      ========================================================================== */
 
-  --md-sys-color-surface: var(--md-ref-palette-neutral99);
+  --md-sys-color-surface: var(--md-ref-palette-neutral98);
   --md-sys-color-on-surface: var(--md-ref-palette-neutral10);
   --md-sys-color-surface-variant: var(--md-ref-palette-neutral-variant90);
   --md-sys-color-on-surface-variant: var(--md-ref-palette-neutral-variant30);
@@ -61,7 +61,7 @@
   --md-sys-color-surface-container-low: var(--md-ref-palette-neutral96);
   --md-sys-color-surface-container: var(--md-ref-palette-neutral94);
   --md-sys-color-surface-container-high: var(--md-ref-palette-neutral92);
-  --md-sys-color-surface-container-highest: var(--md-ref-palette-neutral87);
+  --md-sys-color-surface-container-highest: var(--md-ref-palette-neutral90);
 
   /* ==========================================================================
      OUTLINE
@@ -179,7 +179,7 @@
     --md-sys-color-surface-container-highest: var(--md-ref-palette-neutral22);
 
     --md-sys-color-outline: var(--md-ref-palette-neutral-variant60);
-    --md-sys-color-outline-variant: var(--md-ref-palette-neutral-variant30);
+    --md-sys-color-outline-variant: var(--md-ref-palette-neutral-variant80);
 
     --md-sys-color-background: var(--md-ref-palette-neutral10);
     --md-sys-color-on-background: var(--md-ref-palette-neutral90);

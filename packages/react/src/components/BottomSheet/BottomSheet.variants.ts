@@ -75,7 +75,7 @@ export const bottomSheetVariants = cva(
     // Max width constraint (full width up to 640dp)
     "mx-auto",
     // NOTE: measurement-derived value from MD3 spec; permitted exception
-    "max-w-[640px]",
+    "w-[640px] max-w-full",
 
     // Clip content during height transitions (sheet shrinks/grows from bottom edge)
     "overflow-hidden",
@@ -101,8 +101,8 @@ export const bottomSheetVariants = cva(
     // NOTE: measurement-derived values from MD3 spec; permitted exception
     "max-h-[calc(100vh-72px)]",
     "sm:max-h-[calc(100vh-56px)]",
-    // All corners rounded at wide layout (sheet floats away from screen edge)
-    "sm:rounded-xl",
+    // Top corners rounded at wide layout (sheet floats away from screen edge)
+    "rounded-t-xl",
   ],
   {
     variants: {

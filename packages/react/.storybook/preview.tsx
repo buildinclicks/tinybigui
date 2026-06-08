@@ -10,7 +10,7 @@ import "./storybook.css"; // Tailwind + @source scanning + MD3 tokens and compon
  * `.dark` / `.light` class applied by withThemeByClassName.
  */
 const withThemeWrapper: DecoratorFunction<ReactRenderer> = (Story) => (
-  <div className="bg-surface text-on-surface duration-medium2 min-h-[100px] w-full p-6 transition-colors">
+  <div className="text-on-surface duration-medium2 min-h-[100px] w-full p-6 transition-colors">
     <Story />
   </div>
 );

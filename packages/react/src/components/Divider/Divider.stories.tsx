@@ -93,7 +93,7 @@ export const Vertical: Story = {
   render: () => (
     <div className="bg-surface flex h-16 items-center gap-4 rounded-lg px-4">
       <p className="text-on-surface text-body-medium">Left content</p>
-      <Divider orientation="vertical" className="h-8" />
+      <Divider orientation="vertical" />
       <p className="text-on-surface text-body-medium">Right content</p>
     </div>
   ),
@@ -337,11 +337,11 @@ export const VerticalInToolbar: Story = {
       <ToolbarButton label="Underline">
         <IconUnderline />
       </ToolbarButton>
-      <Divider orientation="vertical" className="mx-1 h-5" />
+      <Divider orientation="vertical" className="mx-1" />
       <ToolbarButton label="Align left">
         <IconAlignLeft />
       </ToolbarButton>
-      <Divider orientation="vertical" className="mx-1 h-5" />
+      <Divider orientation="vertical" className="mx-1" />
       <ToolbarButton label="Insert link">
         <IconLink />
       </ToolbarButton>
@@ -351,8 +351,7 @@ export const VerticalInToolbar: Story = {
     docs: {
       description: {
         story:
-          "Vertical dividers separating logical action groups inside a text-formatting toolbar. " +
-          "The divider height is constrained with `h-5` so it stays proportional to the icon buttons.",
+          "Vertical dividers separating logical action groups inside a text-formatting toolbar. ",
       },
     },
   },
@@ -370,7 +369,7 @@ export const LightAndDarkTheme: Story = {
         <Divider />
         <div className="mt-3 flex h-12 items-center gap-2">
           <p className="text-on-surface-variant text-body-small flex-1">Left</p>
-          <Divider orientation="vertical" className="h-6" />
+          <Divider orientation="vertical" />
           <p className="text-on-surface-variant text-body-small flex-1">Right</p>
         </div>
         <Divider label="Section" />
@@ -380,7 +379,7 @@ export const LightAndDarkTheme: Story = {
         <Divider />
         <div className="mt-3 flex h-12 items-center gap-2">
           <p className="text-on-surface-variant text-body-small flex-1">Left</p>
-          <Divider orientation="vertical" className="h-6" />
+          <Divider orientation="vertical" />
           <p className="text-on-surface-variant text-body-small flex-1">Right</p>
         </div>
         <Divider label="Section" />
