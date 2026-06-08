@@ -1,72 +1,85 @@
+"use client";
+
 import { forwardRef, useRef } from "react";
-import { useButton } from "react-aria";
-import type { AriaButtonProps } from "react-aria";
+import { useButton, useHover, useFocusRing } from "react-aria";
 import { mergeProps, filterDOMProps } from "@react-aria/utils";
+import type { AriaButtonProps } from "react-aria";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 
 /**
  * Headless IconButton Component (Layer 2)
  *
  * Unstyled icon button primitive using React Aria for accessibility.
- * Provides behavior only - bring your own styles.
+ * Provides behavior AND emits MD3-compliant data-* interaction attributes
+ * so the styled Layer 3 can drive all visual states through CSS alone.
+ *
+ * Emitted data attributes (via getInteractionDataAttributes):
+ * - `data-hovered`       — pointer is over the button
+ * - `data-focus-visible` — keyboard/programmatic focus is visible
+ * - `data-pressed`       — button is being pressed
+ * - `data-selected`      — toggle button is in the ON state
+ * - `data-disabled`      — button is non-interactive
+ *
+ * Content flags (set explicitly):
+ * - `data-toggle`        — button is a toggle (selected prop is defined)
  *
  * Features:
  * - Full keyboard navigation (Enter, Space)
- * - Screen reader support
+ * - Screen reader support (aria-pressed for toggle buttons)
  * - Touch/pointer event handling
  * - Focus management
+ * - Hover detection (useHover — pointer-only, not keyboard)
  * - Disabled state handling
- * - Toggle button support (aria-pressed)
  *
  * @example
  * ```tsx
- * // Use for custom styling
- * <IconButtonHeadless className="custom-icon-button-class" aria-label="Delete">
+ * // Advanced custom styling
+ * <IconButtonHeadless
+ *   aria-label="Delete"
+ *   className="group/icon-button my-custom-classes"
+ *   isSelected={false}
+ *   isToggle={false}
+ *   isDisabled={false}
+ * >
  *   <IconDelete />
  * </IconButtonHeadless>
  * ```
  */
 export interface IconButtonHeadlessProps extends AriaButtonProps {
-  /**
-   * Additional CSS classes
-   */
+  /** Additional CSS classes */
   className?: string;
 
-  /**
-   * Icon content (React node)
-   */
+  /** Icon content */
   children: React.ReactNode;
 
-  /**
-   * Tab index for keyboard navigation
-   * @default 0
-   */
+  /** Tab index for keyboard navigation @default 0 */
   tabIndex?: number;
 
-  /**
-   * Mouse down handler (for ripple effect)
-   */
+  /** Mouse down handler (for ripple effect) */
   onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 
-  /**
-   * Button type attribute
-   * @default 'button'
-   */
+  /** Button type attribute @default 'button' */
   type?: "button" | "submit" | "reset";
 
   /**
-   * Toggle state (for toggle buttons)
-   * Sets aria-pressed attribute
+   * Toggle selected state.
+   * When defined, sets aria-pressed and emits data-selected / data-toggle.
    */
-  selected?: boolean;
+  isSelected?: boolean;
 
   /**
-   * REQUIRED: Accessible label for screen readers
+   * Whether this button behaves as a toggle (i.e. selected prop was passed).
+   * Drives `data-toggle` attribute; determines whether aria-pressed is set.
    */
+  isToggle?: boolean;
+
+  /** Whether the button is disabled */
+  isDisabled?: boolean;
+
+  /** REQUIRED: Accessible label for screen readers */
   "aria-label": string;
 
-  /**
-   * HTML title attribute for tooltip
-   */
+  /** HTML title attribute for tooltip */
   title?: string;
 }
 
@@ -78,56 +91,61 @@ export const IconButtonHeadless = forwardRef<HTMLButtonElement, IconButtonHeadle
       tabIndex = 0,
       onMouseDown,
       type,
-      selected,
+      isSelected,
+      isToggle = false,
+      isDisabled = false,
       "aria-label": ariaLabel,
       title,
       ...props
     },
     forwardedRef
   ) => {
-    // Internal ref for React Aria
     const internalRef = useRef<HTMLButtonElement>(null);
-
-    // Merge internal ref with forwarded ref
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
-    // React Aria hook - handles all accessibility
-    const { buttonProps } = useButton(
+    // React Aria hooks — behavior layer
+    const { buttonProps, isPressed } = useButton(
       {
         ...props,
-        // Ensure element type is 'button' for proper semantics
         elementType: "button",
-        // Pass aria-label
         "aria-label": ariaLabel,
+        isDisabled,
       },
       ref
     );
 
-    // Filter out React Aria-specific props that shouldn't be passed to the DOM element
+    const { isHovered, hoverProps } = useHover({ isDisabled });
+    const { isFocusVisible, focusProps } = useFocusRing();
 
+    // Filter non-DOM props before spreading
     const domProps = filterDOMProps(props);
 
-    // Merge React Aria props with custom props and filtered DOM props
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const mergedProps: React.ButtonHTMLAttributes<HTMLButtonElement> = mergeProps(
-      buttonProps,
-      domProps,
-      {
-        tabIndex,
-        className,
-        onMouseDown,
-        type: type ?? "button",
-        // Add aria-pressed for toggle buttons (only if selected is defined)
-        ...(selected !== undefined && { "aria-pressed": selected }),
-        // Add title if provided
-        ...(title && { title }),
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ) as any;
+    const mergedProps = mergeProps(buttonProps, hoverProps, focusProps, domProps, {
+      tabIndex,
+      className,
+      onMouseDown,
+      type: type ?? "button",
+      ...(title && { title }),
+      // aria-pressed only when acting as a toggle button
+      ...(isToggle && { "aria-pressed": isSelected ?? false }),
+    }) as React.ButtonHTMLAttributes<HTMLButtonElement>;
 
     return (
-      // eslint-disable-next-line react/button-has-type
-      <button {...mergedProps} ref={ref} type={type ?? "button"}>
+      <button
+        {...mergedProps}
+        ref={ref}
+        type={type === "submit" ? "submit" : type === "reset" ? "reset" : "button"}
+        // Interaction state attributes — consumed by group-data-[x]/icon-button selectors
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          ...(isToggle ? { isSelected: isSelected ?? false } : {}),
+          isDisabled,
+        })}
+        // Content flag: present when acting as a toggle, absent otherwise
+        data-toggle={isToggle ? "" : undefined}
+      >
         {children}
       </button>
     );

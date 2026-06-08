@@ -12,6 +12,7 @@ import { isKeyboardAccessible, hasAccessibleLabel } from "../../../test/helpers"
 // Mock icons for testing
 const IconDelete = (): React.ReactElement => <svg data-testid="icon-delete" />;
 const IconFavorite = (): React.ReactElement => <svg data-testid="icon-favorite" />;
+const IconFavoriteSelected = (): React.ReactElement => <svg data-testid="icon-favorite-selected" />;
 const IconEdit = (): React.ReactElement => <svg data-testid="icon-edit" />;
 
 describe("IconButton", () => {
@@ -42,7 +43,7 @@ describe("IconButton", () => {
         </IconButton>
       );
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-transparent");
+      expect(button).toHaveAttribute("data-variant", "standard");
     });
 
     test("renders filled variant", () => {
@@ -51,8 +52,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary", "text-on-primary");
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "filled");
     });
 
     test("renders tonal variant", () => {
@@ -61,8 +61,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-secondary-container", "text-on-secondary-container");
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "tonal");
     });
 
     test("renders outlined variant", () => {
@@ -71,8 +70,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-transparent", "border", "border-outline");
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "outlined");
     });
 
     test("renders with primary color", () => {
@@ -81,8 +79,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary");
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "primary");
     });
 
     test("renders with secondary color", () => {
@@ -91,8 +88,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-secondary");
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "secondary");
     });
 
     test("renders with tertiary color", () => {
@@ -101,8 +97,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-tertiary");
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "tertiary");
     });
 
     test("renders with error color", () => {
@@ -111,48 +106,19 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-error");
+      expect(screen.getByRole("button")).toHaveAttribute("data-color", "error");
     });
 
-    test("renders small size", () => {
-      render(
-        <IconButton aria-label="Delete" size="small">
-          <IconDelete />
-        </IconButton>
-      );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("h-8", "w-8"); // 32px
-    });
-
-    test("renders medium size by default", () => {
+    test("renders with circular shape by default", () => {
       render(
         <IconButton aria-label="Delete">
           <IconDelete />
         </IconButton>
       );
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("h-10", "w-10"); // 40px
-    });
-
-    test("renders large size", () => {
-      render(
-        <IconButton aria-label="Delete" size="large">
-          <IconDelete />
-        </IconButton>
-      );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("h-12", "w-12"); // 48px
-    });
-
-    test("renders with circular shape", () => {
-      render(
-        <IconButton aria-label="Delete">
-          <IconDelete />
-        </IconButton>
-      );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("rounded-full");
+      // Round shape uses CSS variable [--ib-radius:9999px] rather than rounded-full
+      expect(button).toHaveAttribute("data-shape", "round");
+      expect(button.className).toContain("[--ib-radius:9999px]");
     });
 
     test("merges custom className", () => {
@@ -161,8 +127,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("custom-class");
+      expect(screen.getByRole("button")).toHaveClass("custom-class");
     });
 
     test("applies title attribute", () => {
@@ -171,13 +136,130 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
+      expect(screen.getByRole("button")).toHaveAttribute("title", "Delete item");
+    });
+
+    test("renders state layer span", () => {
+      render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
       const button = screen.getByRole("button");
-      expect(button).toHaveAttribute("title", "Delete item");
+      expect(button.querySelector("[data-state-layer]")).toBeInTheDocument();
+    });
+
+    test("renders icon slot span", () => {
+      render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      const button = screen.getByRole("button");
+      expect(button.querySelector("[data-icon-slot]")).toBeInTheDocument();
     });
   });
 
-  describe("States", () => {
-    test("handles disabled state", () => {
+  describe("Sizes — M3 Expressive 5-tier", () => {
+    test("renders xsmall size", () => {
+      render(
+        <IconButton aria-label="Delete" size="xsmall">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "xsmall");
+    });
+
+    test("renders small size", () => {
+      render(
+        <IconButton aria-label="Delete" size="small">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "small");
+    });
+
+    test("renders medium size by default", () => {
+      render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "medium");
+    });
+
+    test("renders large size", () => {
+      render(
+        <IconButton aria-label="Delete" size="large">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "large");
+    });
+
+    test("renders xlarge size", () => {
+      render(
+        <IconButton aria-label="Delete" size="xlarge">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "xlarge");
+    });
+  });
+
+  describe("Width variants", () => {
+    test("renders with default width by default", () => {
+      render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-width", "default");
+    });
+
+    test("renders with narrow width", () => {
+      render(
+        <IconButton aria-label="Delete" width="narrow">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-width", "narrow");
+    });
+
+    test("renders with wide width", () => {
+      render(
+        <IconButton aria-label="Delete" width="wide">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-width", "wide");
+    });
+  });
+
+  describe("Shape variants", () => {
+    test("renders with round shape by default", () => {
+      render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).toHaveAttribute("data-shape", "round");
+    });
+
+    test("renders with square shape", () => {
+      render(
+        <IconButton aria-label="Delete" shape="square">
+          <IconDelete />
+        </IconButton>
+      );
+      const button = screen.getByRole("button");
+      expect(button).toHaveAttribute("data-shape", "square");
+      expect(button).not.toHaveClass("rounded-full");
+    });
+  });
+
+  describe("Interaction state attributes", () => {
+    test("sets data-disabled when disabled", () => {
       render(
         <IconButton aria-label="Delete" isDisabled>
           <IconDelete />
@@ -185,21 +267,19 @@ describe("IconButton", () => {
       );
       const button = screen.getByRole("button");
       expect(button).toBeDisabled();
-      expect(button).toHaveClass("opacity-38", "pointer-events-none");
+      expect(button).toHaveAttribute("data-disabled", "");
     });
 
-    test("renders unselected state by default", () => {
+    test("does not set data-disabled when enabled", () => {
       render(
-        <IconButton aria-label="Favorite">
-          <IconFavorite />
+        <IconButton aria-label="Delete">
+          <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      // When selected is not provided, aria-pressed should not be set
-      expect(button).not.toHaveAttribute("aria-pressed");
+      expect(screen.getByRole("button")).not.toHaveAttribute("data-disabled");
     });
 
-    test("renders selected state", () => {
+    test("sets data-selected when selected is true", () => {
       render(
         <IconButton aria-label="Favorite" selected>
           <IconFavorite />
@@ -207,9 +287,10 @@ describe("IconButton", () => {
       );
       const button = screen.getByRole("button");
       expect(button).toHaveAttribute("aria-pressed", "true");
+      expect(button).toHaveAttribute("data-selected", "");
     });
 
-    test("renders unselected state explicitly", () => {
+    test("does not set data-selected when selected is false", () => {
       render(
         <IconButton aria-label="Favorite" selected={false}>
           <IconFavorite />
@@ -217,36 +298,75 @@ describe("IconButton", () => {
       );
       const button = screen.getByRole("button");
       expect(button).toHaveAttribute("aria-pressed", "false");
+      expect(button).not.toHaveAttribute("data-selected");
     });
 
-    test("applies selected styles for standard variant", () => {
+    test("sets data-toggle when selected prop is defined", () => {
       render(
-        <IconButton aria-label="Favorite" variant="standard" selected>
+        <IconButton aria-label="Favorite" selected={false}>
           <IconFavorite />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("text-primary");
+      expect(screen.getByRole("button")).toHaveAttribute("data-toggle", "");
     });
 
-    test("applies selected styles for filled variant", () => {
+    test("does not set data-toggle when selected prop is undefined", () => {
       render(
-        <IconButton aria-label="Favorite" variant="filled" color="primary" selected>
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).not.toHaveAttribute("data-toggle");
+      expect(screen.getByRole("button")).not.toHaveAttribute("aria-pressed");
+    });
+  });
+
+  describe("Toggle behaviour", () => {
+    test("shows selectedIcon when selected is true", () => {
+      render(
+        <IconButton aria-label="Favorite" selected selectedIcon={<IconFavoriteSelected />}>
           <IconFavorite />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary-container", "text-on-primary-container");
+      expect(screen.getByTestId("icon-favorite-selected")).toBeInTheDocument();
+      expect(screen.queryByTestId("icon-favorite")).not.toBeInTheDocument();
     });
 
-    test("applies selected styles for outlined variant", () => {
+    test("shows children icon when selected is false", () => {
       render(
-        <IconButton aria-label="Favorite" variant="outlined" selected>
+        <IconButton aria-label="Favorite" selected={false} selectedIcon={<IconFavoriteSelected />}>
           <IconFavorite />
         </IconButton>
       );
+      expect(screen.getByTestId("icon-favorite")).toBeInTheDocument();
+      expect(screen.queryByTestId("icon-favorite-selected")).not.toBeInTheDocument();
+    });
+
+    test("supports controlled toggle behavior", async () => {
+      const user = userEvent.setup();
+      const TestComponent = (): React.ReactElement => {
+        const [selected, setSelected] = React.useState(false);
+        return (
+          <IconButton
+            aria-label={selected ? "Remove favorite" : "Add favorite"}
+            selected={selected}
+            onPress={() => setSelected(!selected)}
+            selectedIcon={<IconFavoriteSelected />}
+          >
+            <IconFavorite />
+          </IconButton>
+        );
+      };
+
+      render(<TestComponent />);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-inverse-surface", "text-inverse-on-surface");
+      expect(button).toHaveAttribute("aria-pressed", "false");
+
+      await user.click(button);
+      expect(button).toHaveAttribute("aria-pressed", "true");
+
+      await user.click(button);
+      expect(button).toHaveAttribute("aria-pressed", "false");
     });
   });
 
@@ -332,31 +452,19 @@ describe("IconButton", () => {
       expect(button).toHaveFocus();
     });
 
-    test("supports toggle behavior", async () => {
+    test("handles rapid clicks", async () => {
       const user = userEvent.setup();
-      const TestComponent = (): React.ReactElement => {
-        const [selected, setSelected] = React.useState(false);
-        return (
-          <IconButton
-            aria-label={selected ? "Remove favorite" : "Add favorite"}
-            selected={selected}
-            onPress={() => setSelected(!selected)}
-          >
-            <IconFavorite />
-          </IconButton>
-        );
-      };
+      const onPress = vi.fn();
 
-      render(<TestComponent />);
+      render(
+        <IconButton aria-label="Delete" onPress={onPress}>
+          <IconDelete />
+        </IconButton>
+      );
 
       const button = screen.getByRole("button");
-      expect(button).toHaveAttribute("aria-pressed", "false");
-
-      await user.click(button);
-      expect(button).toHaveAttribute("aria-pressed", "true");
-
-      await user.click(button);
-      expect(button).toHaveAttribute("aria-pressed", "false");
+      await user.tripleClick(button);
+      expect(onPress).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -377,8 +485,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveAccessibleName("Delete");
+      expect(screen.getByRole("button")).toHaveAccessibleName("Delete");
     });
 
     test("supports aria-pressed for toggle buttons", () => {
@@ -387,8 +494,16 @@ describe("IconButton", () => {
           <IconFavorite />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveAttribute("aria-pressed", "true");
+      expect(screen.getByRole("button")).toHaveAttribute("aria-pressed", "true");
+    });
+
+    test("does not set aria-pressed when not a toggle button", () => {
+      render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      expect(screen.getByRole("button")).not.toHaveAttribute("aria-pressed");
     });
 
     test("has proper button role", () => {
@@ -400,24 +515,13 @@ describe("IconButton", () => {
       expect(screen.getByRole("button")).toBeInTheDocument();
     });
 
-    test("includes icon in accessibility tree", () => {
-      render(
-        <IconButton aria-label="Delete item">
-          <IconDelete />
-        </IconButton>
-      );
-      // Icon should be present but decorative (label comes from aria-label)
-      expect(screen.getByTestId("icon-delete")).toBeInTheDocument();
-    });
-
-    test("disabled button has aria-disabled", () => {
+    test("disabled button is properly disabled", () => {
       render(
         <IconButton aria-label="Delete" isDisabled>
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveAttribute("disabled");
+      expect(screen.getByRole("button")).toHaveAttribute("disabled");
     });
   });
 
@@ -428,9 +532,9 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-
-      const button = screen.getByRole("button");
-      expect(button.querySelector("[data-ripple-container]")).toBeInTheDocument();
+      expect(
+        screen.getByRole("button").querySelector("[data-ripple-container]")
+      ).toBeInTheDocument();
     });
 
     test("disables ripple when disableRipple is true", () => {
@@ -439,9 +543,9 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-
-      const button = screen.getByRole("button");
-      expect(button.querySelector("[data-ripple-container]")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button").querySelector("[data-ripple-container]")
+      ).not.toBeInTheDocument();
     });
 
     test("does not show ripple when disabled", () => {
@@ -450,9 +554,9 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-
-      const button = screen.getByRole("button");
-      expect(button.querySelector("[data-ripple-container]")).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button").querySelector("[data-ripple-container]")
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -463,8 +567,7 @@ describe("IconButton", () => {
           <IconDelete />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveAttribute("type", "button");
+      expect(screen.getByRole("button")).toHaveAttribute("type", "button");
     });
 
     test("supports submit type", () => {
@@ -473,8 +576,7 @@ describe("IconButton", () => {
           <IconEdit />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveAttribute("type", "submit");
+      expect(screen.getByRole("button")).toHaveAttribute("type", "submit");
     });
 
     test("supports reset type", () => {
@@ -483,12 +585,11 @@ describe("IconButton", () => {
           <IconEdit />
         </IconButton>
       );
-      const button = screen.getByRole("button");
-      expect(button).toHaveAttribute("type", "reset");
+      expect(screen.getByRole("button")).toHaveAttribute("type", "reset");
     });
   });
 
-  describe("Variant Combinations", () => {
+  describe("Variant combinations", () => {
     test("renders all variant and color combinations", () => {
       const variants = ["standard", "filled", "tonal", "outlined"] as const;
       const colors = ["primary", "secondary", "tertiary", "error"] as const;
@@ -505,12 +606,38 @@ describe("IconButton", () => {
       });
     });
 
-    test("renders all size variations", () => {
-      const sizes = ["small", "medium", "large"] as const;
+    test("renders all 5 size variations", () => {
+      const sizes = ["xsmall", "small", "medium", "large", "xlarge"] as const;
 
       sizes.forEach((size) => {
         const { container } = render(
           <IconButton aria-label={`${size} button`} size={size}>
+            <IconDelete />
+          </IconButton>
+        );
+        expect(container.querySelector("button")).toBeInTheDocument();
+      });
+    });
+
+    test("renders all width variations", () => {
+      const widths = ["narrow", "default", "wide"] as const;
+
+      widths.forEach((width) => {
+        const { container } = render(
+          <IconButton aria-label={`${width} button`} width={width}>
+            <IconDelete />
+          </IconButton>
+        );
+        expect(container.querySelector("button")).toBeInTheDocument();
+      });
+    });
+
+    test("renders both shape variations", () => {
+      const shapes = ["round", "square"] as const;
+
+      shapes.forEach((shape) => {
+        const { container } = render(
+          <IconButton aria-label={`${shape} button`} shape={shape}>
             <IconDelete />
           </IconButton>
         );
@@ -525,19 +652,6 @@ describe("IconButton", () => {
       expect(screen.getByRole("button")).toBeInTheDocument();
     });
 
-    test("handles multiple icons (uses last one)", () => {
-      render(
-        <IconButton aria-label="Multiple">
-          <IconDelete />
-          <IconFavorite />
-        </IconButton>
-      );
-      const button = screen.getByRole("button");
-      expect(button).toBeInTheDocument();
-      expect(screen.getByTestId("icon-delete")).toBeInTheDocument();
-      expect(screen.getByTestId("icon-favorite")).toBeInTheDocument();
-    });
-
     test("forwards ref correctly", () => {
       const ref = React.createRef<HTMLButtonElement>();
       render(
@@ -547,68 +661,9 @@ describe("IconButton", () => {
       );
       expect(ref.current).toBeInstanceOf(HTMLButtonElement);
     });
-
-    test("handles rapid clicks", async () => {
-      const user = userEvent.setup();
-      const onPress = vi.fn();
-
-      render(
-        <IconButton aria-label="Delete" onPress={onPress}>
-          <IconDelete />
-        </IconButton>
-      );
-
-      const button = screen.getByRole("button");
-      await user.tripleClick(button);
-      expect(onPress).toHaveBeenCalledTimes(3);
-    });
   });
 
-  describe("Development Warnings", () => {
-    const originalEnv = process.env.NODE_ENV;
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    afterEach(() => {
-      process.env.NODE_ENV = originalEnv;
-      consoleError.mockClear();
-      consoleWarn.mockClear();
-    });
-
-    test("warns when icon is missing in development", () => {
-      process.env.NODE_ENV = "development";
-
-      render(<IconButton aria-label="Empty">{null}</IconButton>);
-
-      expect(consoleWarn).toHaveBeenCalledWith(
-        "[IconButton] IconButton should have an icon as children."
-      );
-    });
-  });
-
-  describe("Axe Accessibility", () => {
-    test("has no accessibility violations", async () => {
-      const { container } = render(
-        <IconButton aria-label="Delete">
-          <IconDelete />
-        </IconButton>
-      );
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    test("has no accessibility violations when disabled", async () => {
-      const { container } = render(
-        <IconButton aria-label="Delete" isDisabled>
-          <IconDelete />
-        </IconButton>
-      );
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-  });
-
-  describe("data attributes for ButtonGroup integration", () => {
+  describe("data attributes for styling and ButtonGroup integration", () => {
     test("sets data-variant attribute matching the variant prop", () => {
       render(
         <IconButton aria-label="Test" variant="filled">
@@ -616,33 +671,6 @@ describe("IconButton", () => {
         </IconButton>
       );
       expect(screen.getByRole("button")).toHaveAttribute("data-variant", "filled");
-    });
-
-    test("sets data-variant for standard", () => {
-      render(
-        <IconButton aria-label="Test" variant="standard">
-          <IconDelete />
-        </IconButton>
-      );
-      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "standard");
-    });
-
-    test("sets data-variant for tonal", () => {
-      render(
-        <IconButton aria-label="Test" variant="tonal">
-          <IconDelete />
-        </IconButton>
-      );
-      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "tonal");
-    });
-
-    test("sets data-variant for outlined", () => {
-      render(
-        <IconButton aria-label="Test" variant="outlined">
-          <IconDelete />
-        </IconButton>
-      );
-      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "outlined");
     });
 
     test("sets data-color attribute matching the color prop", () => {
@@ -654,31 +682,31 @@ describe("IconButton", () => {
       expect(screen.getByRole("button")).toHaveAttribute("data-color", "primary");
     });
 
-    test("sets data-color for secondary", () => {
+    test("sets data-size attribute", () => {
       render(
-        <IconButton aria-label="Test" variant="filled" color="secondary">
+        <IconButton aria-label="Test" size="large">
           <IconDelete />
         </IconButton>
       );
-      expect(screen.getByRole("button")).toHaveAttribute("data-color", "secondary");
+      expect(screen.getByRole("button")).toHaveAttribute("data-size", "large");
     });
 
-    test("sets data-color for tertiary", () => {
+    test("sets data-shape attribute", () => {
       render(
-        <IconButton aria-label="Test" variant="filled" color="tertiary">
+        <IconButton aria-label="Test" shape="square">
           <IconDelete />
         </IconButton>
       );
-      expect(screen.getByRole("button")).toHaveAttribute("data-color", "tertiary");
+      expect(screen.getByRole("button")).toHaveAttribute("data-shape", "square");
     });
 
-    test("sets data-color for error", () => {
+    test("sets data-width attribute", () => {
       render(
-        <IconButton aria-label="Test" variant="filled" color="error">
+        <IconButton aria-label="Test" width="wide">
           <IconDelete />
         </IconButton>
       );
-      expect(screen.getByRole("button")).toHaveAttribute("data-color", "error");
+      expect(screen.getByRole("button")).toHaveAttribute("data-width", "wide");
     });
   });
 
@@ -690,7 +718,9 @@ describe("IconButton", () => {
         </IconButton>
       );
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("rounded-full");
+      // Round shape uses CSS variable rather than rounded-full
+      expect(button).toHaveAttribute("data-shape", "round");
+      expect(button.className).toContain("[--ib-radius:9999px]");
       expect(button).not.toHaveClass("rounded-xs");
       expect(button).not.toHaveClass("rounded-sm");
     });
@@ -826,9 +856,63 @@ describe("IconButton", () => {
         </ButtonGroup>
       );
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("rounded-full");
+      // Round shape uses CSS variable rather than rounded-full
+      expect(button).toHaveAttribute("data-shape", "round");
+      expect(button.className).toContain("[--ib-radius:9999px]");
       expect(button).not.toHaveClass("rounded-sm");
       expect(button).not.toHaveClass("min-w-12");
+    });
+  });
+
+  describe("Development Warnings", () => {
+    const originalEnv = process.env.NODE_ENV;
+    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv;
+      consoleWarn.mockClear();
+    });
+
+    test("warns when icon is missing in development", () => {
+      process.env.NODE_ENV = "development";
+
+      render(<IconButton aria-label="Empty">{null}</IconButton>);
+
+      expect(consoleWarn).toHaveBeenCalledWith(
+        "[IconButton] IconButton should have an icon as children."
+      );
+    });
+  });
+
+  describe("Axe Accessibility", () => {
+    test("has no accessibility violations", async () => {
+      const { container } = render(
+        <IconButton aria-label="Delete">
+          <IconDelete />
+        </IconButton>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations when disabled", async () => {
+      const { container } = render(
+        <IconButton aria-label="Delete" isDisabled>
+          <IconDelete />
+        </IconButton>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations in toggle mode", async () => {
+      const { container } = render(
+        <IconButton aria-label="Favorite" selected={false}>
+          <IconFavorite />
+        </IconButton>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
     });
   });
 });
