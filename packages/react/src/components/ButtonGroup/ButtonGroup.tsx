@@ -1,19 +1,31 @@
 "use client";
 
-import { forwardRef, useCallback, useEffect, useRef } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useMemo } from "react";
 import type React from "react";
 import { ButtonGroupHeadless } from "./ButtonGroupHeadless";
-import { buttonGroupVariants } from "./ButtonGroup.variants";
+import { buttonGroupRootVariants } from "./ButtonGroup.variants";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import type { ButtonGroupProps } from "./ButtonGroup.types";
 
 /**
  * Material Design 3 ButtonGroup Component (Layer 3: Styled)
  *
+ * Built on the Variants-vs-States architecture: interaction/selection states
+ * are expressed as data-* attributes on the root and consumed by child slots
+ * via group-data-[x]/button-group Tailwind selectors.
+ *
  * An invisible container that:
- * - Applies MD3-spec gap between child buttons
+ * - Applies MD3-spec gap between child buttons with spatial spring transitions
  * - Manages selection state (single / multi / required) across toggle buttons
- * - Passes shape, size, and variant metadata to children via React Context
+ * - Passes shape, size, variant, and disabled metadata to children via React Context
+ * - Emits container-level state attributes for CSS targeting
+ *
+ * Container data attributes:
+ * - `data-connected`      — variant is "connected"
+ * - `data-has-selection`  — at least one child button is selected
+ * - `data-selection-mode` — "single" | "required" | "multi"
+ * - `data-disabled`       — group is non-interactive (via getInteractionDataAttributes)
  *
  * Variants:
  * - `standard`: Buttons float independently. Gap is larger for xs/sm to preserve
@@ -25,6 +37,11 @@ import type { ButtonGroupProps } from "./ButtonGroup.types";
  * - `single`: At most one button selected; deselectable.
  * - `required`: Exactly one always selected; pressing the active button is a no-op.
  * - `multi`: Any number of buttons selected simultaneously.
+ *
+ * Motion:
+ * - Gap transitions use spring-standard-fast-spatial (350ms) for smooth layout changes
+ * - Border-radius morphing on child buttons uses expressive-fast-spatial (350ms, overshoot)
+ * - Color/opacity effects on children use spring-standard-fast-effects (150ms, no overshoot)
  *
  * @example
  * ```tsx
@@ -46,16 +63,10 @@ import type { ButtonGroupProps } from "./ButtonGroup.types";
  *   <Button value="16oz">16 oz</Button>
  * </ButtonGroup>
  *
- * // Controlled multi-select
- * <ButtonGroup
- *   variant="connected"
- *   selectionMode="multi"
- *   selectedValues={selected}
- *   onSelectionChange={setSelected}
- *   aria-label="Text formatting"
- * >
- *   <Button value="bold">Bold</Button>
- *   <Button value="italic">Italic</Button>
+ * // Disabled group
+ * <ButtonGroup variant="connected" isDisabled aria-label="Unavailable options">
+ *   <Button value="a">A</Button>
+ *   <Button value="b">B</Button>
  * </ButtonGroup>
  * ```
  */
@@ -69,16 +80,15 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
       selectedValues,
       onSelectionChange,
       defaultValue,
+      isDisabled = false,
       children,
       className,
       ...htmlProps
     },
     ref
   ) => {
-    // Internal ref used by dev-mode DOM inspection — separate from the forwarded ref
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Combine the internal ref with the consumer's forwarded ref
     const handleRef = useCallback(
       (node: HTMLDivElement | null) => {
         (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
@@ -90,6 +100,15 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
       },
       [ref]
     );
+
+    // Compute whether the group has any active selection
+    const hasSelection = useMemo(() => {
+      if (selectedValues) return selectedValues.size > 0;
+      if (defaultValue) {
+        return Array.isArray(defaultValue) ? defaultValue.length > 0 : true;
+      }
+      return false;
+    }, [selectedValues, defaultValue]);
 
     // Development warnings — synchronous child-prop scan
     if (process.env.NODE_ENV === "development") {
@@ -117,7 +136,6 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
       if (process.env.NODE_ENV !== "development") return;
       if (variant !== "connected" || !containerRef.current) return;
 
-      // Warning: connected group with no toggle buttons
       const toggleButtons = containerRef.current.querySelectorAll("[aria-pressed]");
       if (toggleButtons.length === 0) {
         console.warn(
@@ -126,7 +144,6 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
         );
       }
 
-      // Warning: connected group with mixed child color styles
       const colorValues = new Set<string>();
       containerRef.current.querySelectorAll("[data-color]").forEach((el) => {
         const c = el.getAttribute("data-color");
@@ -139,7 +156,7 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
         );
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Run once after mount
+    }, []);
 
     return (
       <ButtonGroupHeadless
@@ -152,7 +169,14 @@ export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
         selectedValues={selectedValues}
         onSelectionChange={onSelectionChange}
         defaultValue={defaultValue}
-        className={cn(buttonGroupVariants({ variant, size }), className)}
+        isDisabled={isDisabled}
+        className={cn(buttonGroupRootVariants({ variant, size }), "group/button-group", className)}
+        // ── Interaction data attributes (from component state) ─────────────
+        {...getInteractionDataAttributes({ isDisabled })}
+        // ── Container state attributes (describe group-level state) ────────
+        data-connected={variant === "connected" ? "" : undefined}
+        data-has-selection={hasSelection ? "" : undefined}
+        data-selection-mode={selectionMode ?? undefined}
       >
         {children}
       </ButtonGroupHeadless>

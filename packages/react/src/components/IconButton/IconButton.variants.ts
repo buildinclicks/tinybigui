@@ -17,11 +17,13 @@ export const iconButtonVariants = cva(
     // Base classes (always applied)
     "relative inline-flex items-center justify-center cursor-pointer",
     "overflow-hidden rounded-full", // Circular shape
-    // Spatial (border-radius, transform): expressive fast spring — 350ms, visible overshoot
-    "transition-all duration-expressive-fast-spatial ease-expressive-fast-spatial",
+    // Split MD3 transition: btn-transition handles spatial (border-radius) with asymmetric
+    // easing (decelerate by default, switched to expressive via btn-transition-selected when
+    // the button is group-selected) and effects (color/bg/shadow) with standard spring.
+    "btn-transition",
     "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
 
-    // State layers — effects token: opacity only, no overshoot
+    // State layers — effects token: opacity only, no overshoot (separate ::before pseudo-element)
     "before:absolute before:inset-0 before:rounded-[inherit]",
     "before:transition-opacity before:duration-spring-standard-fast-effects before:ease-spring-standard-fast-effects",
     "before:bg-current before:opacity-0",

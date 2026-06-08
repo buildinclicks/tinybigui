@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import type React from "react";
-import { buttonGroupVariants } from "./ButtonGroup.variants";
+import { buttonGroupRootVariants, buttonGroupVariants } from "./ButtonGroup.variants";
 import { ButtonGroupContext, useButtonGroup, useOptionalButtonGroup } from "./ButtonGroupContext";
 import { ButtonGroupHeadless } from "./ButtonGroupHeadless";
 import { ButtonGroup } from "./ButtonGroup";
@@ -37,80 +37,107 @@ const ContextConsumer = ({ value }: { value: string }): React.ReactElement => {
 // 1. buttonGroupVariants (CVA) — class output
 // ---------------------------------------------------------------------------
 
-describe("buttonGroupVariants", () => {
+describe("buttonGroupRootVariants", () => {
   describe("standard variant", () => {
     test("default (standard, medium) has inline-flex", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "medium" });
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "medium" });
       expect(cls).toContain("inline-flex");
     });
 
     test("standard+extra-small has gap-[18px]", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "extra-small" });
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "extra-small" });
       expect(cls).toContain("gap-[18px]");
     });
 
     test("standard+small has gap-3", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "small" });
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "small" });
       expect(cls).toContain("gap-3");
     });
 
     test("standard+medium has gap-2", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "medium" });
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "medium" });
       expect(cls).toContain("gap-2");
     });
 
     test("standard+large has gap-2", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "large" });
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "large" });
       expect(cls).toContain("gap-2");
     });
 
     test("standard+extra-large has gap-2", () => {
-      const cls = buttonGroupVariants({ variant: "standard", size: "extra-large" });
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "extra-large" });
       expect(cls).toContain("gap-2");
     });
   });
 
   describe("connected variant", () => {
     test("connected has flex and w-full", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "medium" });
+      const cls = buttonGroupRootVariants({ variant: "connected", size: "medium" });
       expect(cls).toContain("flex");
       expect(cls).toContain("w-full");
     });
 
     test("connected+extra-small has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "extra-small" });
+      const cls = buttonGroupRootVariants({ variant: "connected", size: "extra-small" });
       expect(cls).toContain("gap-0.5");
     });
 
     test("connected+small has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "small" });
+      const cls = buttonGroupRootVariants({ variant: "connected", size: "small" });
       expect(cls).toContain("gap-0.5");
     });
 
     test("connected+medium has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "medium" });
+      const cls = buttonGroupRootVariants({ variant: "connected", size: "medium" });
       expect(cls).toContain("gap-0.5");
     });
 
     test("connected+large has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "large" });
+      const cls = buttonGroupRootVariants({ variant: "connected", size: "large" });
       expect(cls).toContain("gap-0.5");
     });
 
     test("connected+extra-large has gap-0.5", () => {
-      const cls = buttonGroupVariants({ variant: "connected", size: "extra-large" });
+      const cls = buttonGroupRootVariants({ variant: "connected", size: "extra-large" });
       expect(cls).toContain("gap-0.5");
     });
   });
 
+  describe("motion tokens", () => {
+    test("includes spatial transition for gap", () => {
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "medium" });
+      expect(cls).toContain("transition-[gap]");
+      expect(cls).toContain("duration-spring-standard-fast-spatial");
+      expect(cls).toContain("ease-spring-standard-fast-spatial");
+    });
+  });
+
+  describe("disabled state styling", () => {
+    test("includes data-[disabled] pointer-events-none", () => {
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "medium" });
+      expect(cls).toContain("data-[disabled]:pointer-events-none");
+    });
+
+    test("includes data-[disabled] opacity-38", () => {
+      const cls = buttonGroupRootVariants({ variant: "standard", size: "medium" });
+      expect(cls).toContain("data-[disabled]:opacity-38");
+    });
+  });
+
   test("default variant is standard", () => {
-    const cls = buttonGroupVariants({});
+    const cls = buttonGroupRootVariants({});
     expect(cls).toContain("inline-flex");
   });
 
   test("default size is md", () => {
-    const cls = buttonGroupVariants({ variant: "standard" });
+    const cls = buttonGroupRootVariants({ variant: "standard" });
     expect(cls).toContain("gap-2");
+  });
+});
+
+describe("buttonGroupVariants (backward compat)", () => {
+  test("is identical to buttonGroupRootVariants", () => {
+    expect(buttonGroupVariants).toBe(buttonGroupRootVariants);
   });
 });
 
@@ -126,6 +153,10 @@ describe("ButtonGroupContext", () => {
     selectionMode: undefined,
     selectedValues: new Set(),
     onSelectionChange: vi.fn(),
+    isDisabled: false,
+    connectedInnerRadius: "rounded-sm",
+    connectedOuterRadius: "rounded-full",
+    enforceMinWidth: false,
   };
 
   test("useButtonGroup throws when used outside a provider", () => {
@@ -996,5 +1027,178 @@ describe("ButtonGroup dev warnings (DOM-based)", () => {
         String(args[1]).includes("data-color")
     );
     expect(colorWarning).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Container data attributes
+// ---------------------------------------------------------------------------
+
+describe("ButtonGroup container data attributes", () => {
+  test("emits data-connected when variant is connected", () => {
+    render(
+      <ButtonGroup variant="connected" aria-label="Connected group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).toHaveAttribute("data-connected", "");
+  });
+
+  test("does NOT emit data-connected when variant is standard", () => {
+    render(
+      <ButtonGroup variant="standard" aria-label="Standard group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).not.toHaveAttribute("data-connected");
+  });
+
+  test("emits data-has-selection when selectedValues is non-empty", () => {
+    render(
+      <ButtonGroup
+        selectionMode="single"
+        selectedValues={new Set(["a"])}
+        onSelectionChange={vi.fn()}
+        aria-label="Selection group"
+      >
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).toHaveAttribute("data-has-selection", "");
+  });
+
+  test("does NOT emit data-has-selection when selectedValues is empty", () => {
+    render(
+      <ButtonGroup
+        selectionMode="single"
+        selectedValues={new Set()}
+        onSelectionChange={vi.fn()}
+        aria-label="Empty selection"
+      >
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).not.toHaveAttribute("data-has-selection");
+  });
+
+  test("emits data-has-selection when defaultValue is provided", () => {
+    render(
+      <ButtonGroup selectionMode="single" defaultValue="a" aria-label="Default value group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).toHaveAttribute("data-has-selection", "");
+  });
+
+  test("emits data-selection-mode with the mode value", () => {
+    render(
+      <ButtonGroup selectionMode="multi" aria-label="Multi group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).toHaveAttribute("data-selection-mode", "multi");
+  });
+
+  test("does NOT emit data-selection-mode when no selectionMode", () => {
+    render(
+      <ButtonGroup aria-label="Action group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).not.toHaveAttribute("data-selection-mode");
+  });
+
+  test("applies group/button-group class scope", () => {
+    render(
+      <ButtonGroup aria-label="Scoped group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).toHaveClass("group/button-group");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 10. Disabled group state
+// ---------------------------------------------------------------------------
+
+describe("ButtonGroup disabled state", () => {
+  test("emits data-disabled when isDisabled is true", () => {
+    render(
+      <ButtonGroup isDisabled aria-label="Disabled group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).toHaveAttribute("data-disabled", "");
+  });
+
+  test("does NOT emit data-disabled when isDisabled is false", () => {
+    render(
+      <ButtonGroup aria-label="Enabled group">
+        <button>A</button>
+      </ButtonGroup>
+    );
+    expect(screen.getByRole("group")).not.toHaveAttribute("data-disabled");
+  });
+
+  test("disabled group prevents selection changes", async () => {
+    const user = userEvent.setup();
+    const onSelectionChange = vi.fn();
+    render(
+      <ButtonGroup
+        isDisabled
+        selectionMode="single"
+        selectedValues={new Set<string>()}
+        onSelectionChange={onSelectionChange}
+        aria-label="Disabled toggle group"
+      >
+        <ContextConsumer value="a" />
+      </ButtonGroup>
+    );
+    await user.click(screen.getByText("a"));
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  test("provides isDisabled=true to children via context", () => {
+    const DisabledCapture = (): React.ReactElement => {
+      const ctx = useButtonGroup();
+      return <div data-testid="ctx-disabled" data-is-disabled={String(ctx.isDisabled)} />;
+    };
+
+    render(
+      <ButtonGroup isDisabled aria-label="Disabled context check">
+        <DisabledCapture />
+      </ButtonGroup>
+    );
+    expect(screen.getByTestId("ctx-disabled")).toHaveAttribute("data-is-disabled", "true");
+  });
+
+  test("provides isDisabled=false to children via context when not disabled", () => {
+    const DisabledCapture = (): React.ReactElement => {
+      const ctx = useButtonGroup();
+      return <div data-testid="ctx-disabled" data-is-disabled={String(ctx.isDisabled)} />;
+    };
+
+    render(
+      <ButtonGroup aria-label="Enabled context check">
+        <DisabledCapture />
+      </ButtonGroup>
+    );
+    expect(screen.getByTestId("ctx-disabled")).toHaveAttribute("data-is-disabled", "false");
+  });
+
+  test("accessibility: disabled group has no violations", async () => {
+    const { container } = render(
+      <ButtonGroup isDisabled aria-label="Disabled actions">
+        <button aria-pressed="false" disabled>
+          Bold
+        </button>
+        <button aria-pressed="false" disabled>
+          Italic
+        </button>
+      </ButtonGroup>
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 });

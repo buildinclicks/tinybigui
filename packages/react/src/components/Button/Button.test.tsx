@@ -15,20 +15,30 @@ describe("Button", () => {
 
     test("renders as button element by default", () => {
       render(<Button>Click me</Button>);
-      const button = screen.getByRole("button");
-      expect(button.tagName).toBe("BUTTON");
+      expect(screen.getByRole("button").tagName).toBe("BUTTON");
     });
 
     test("applies custom className", () => {
       render(<Button className="custom-class">Click me</Button>);
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("custom-class");
+      expect(screen.getByRole("button")).toHaveClass("custom-class");
     });
 
     test("forwards ref to button element", () => {
       const ref = { current: null };
       render(<Button ref={ref}>Click me</Button>);
       expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+    });
+
+    test("renders state layer span inside button", () => {
+      render(<Button>Button</Button>);
+      const button = screen.getByRole("button");
+      const stateLayer = button.querySelector('span[aria-hidden="true"]');
+      expect(stateLayer).toBeInTheDocument();
+    });
+
+    test("sets group/button class on root element", () => {
+      render(<Button>Button</Button>);
+      expect(screen.getByRole("button")).toHaveClass("group/button");
     });
   });
 
@@ -42,13 +52,13 @@ describe("Button", () => {
     test("renders outlined variant", () => {
       render(<Button variant="outlined">Outlined</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("border", "border-outline-variant");
+      expect(button).toHaveClass("border", "border-outline", "text-primary");
     });
 
     test("renders tonal variant", () => {
       render(<Button variant="tonal">Tonal</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary-container", "text-on-primary-container");
+      expect(button).toHaveClass("bg-secondary-container", "text-on-secondary-container");
     });
 
     test("renders elevated variant", () => {
@@ -62,32 +72,19 @@ describe("Button", () => {
       const button = screen.getByRole("button");
       expect(button).toHaveClass("bg-transparent", "text-primary");
     });
-  });
 
-  describe("Colors", () => {
-    test("renders primary color (default)", () => {
-      render(<Button color="primary">Primary</Button>);
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary", "text-on-primary");
+    test("sets data-variant attribute", () => {
+      render(<Button variant="filled">Filled</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "filled");
     });
 
-    test("renders secondary color", () => {
-      render(<Button color="secondary">Secondary</Button>);
-      const button = screen.getByRole("button");
-      // For filled variant with secondary color
-      expect(button).toHaveClass("bg-secondary", "text-on-secondary");
-    });
-
-    test("renders tertiary color", () => {
-      render(<Button color="tertiary">Tertiary</Button>);
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-tertiary", "text-on-tertiary");
-    });
-
-    test("renders error color", () => {
-      render(<Button color="error">Error</Button>);
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-error", "text-on-error");
+    test("sets data-variant for each variant", () => {
+      const variants = ["filled", "outlined", "tonal", "elevated", "text"] as const;
+      variants.forEach((variant) => {
+        const { unmount } = render(<Button variant={variant}>{variant}</Button>);
+        expect(screen.getByRole("button")).toHaveAttribute("data-variant", variant);
+        unmount();
+      });
     });
   });
 
@@ -107,7 +104,25 @@ describe("Button", () => {
     test("renders large size", () => {
       render(<Button size="large">Large</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("h-12", "px-8");
+      expect(button).toHaveClass("h-14", "px-8");
+    });
+
+    test("text variant uses reduced padding for medium", () => {
+      render(
+        <Button variant="text" size="medium">
+          Text
+        </Button>
+      );
+      expect(screen.getByRole("button")).toHaveClass("px-3");
+    });
+
+    test("text variant uses reduced padding for small", () => {
+      render(
+        <Button variant="text" size="small">
+          Text
+        </Button>
+      );
+      expect(screen.getByRole("button")).toHaveClass("px-3");
     });
   });
 
@@ -125,77 +140,145 @@ describe("Button", () => {
       expect(screen.getByTestId("trailing-icon")).toBeInTheDocument();
     });
 
-    test("icon appears before text", () => {
+    test("sets data-with-icon when leading icon is present", () => {
+      render(<Button icon={<svg>icon</svg>}>Icon</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-with-icon", "");
+    });
+
+    test("sets data-with-icon when trailing icon is present", () => {
+      render(<Button trailingIcon={<svg>icon</svg>}>Icon</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-with-icon", "");
+    });
+
+    test("does not set data-with-icon when no icon is present", () => {
+      render(<Button>No Icon</Button>);
+      expect(screen.getByRole("button")).not.toHaveAttribute("data-with-icon");
+    });
+
+    test("icon appears before label text in DOM order", () => {
       render(<Button icon={<span data-testid="icon">I</span>}>Text</Button>);
       const button = screen.getByRole("button");
       const icon = screen.getByTestId("icon");
-      const text = screen.getByText("Text");
+      const label = screen.getByText("Text");
 
-      // Icon should come before text in DOM order
-      // Get all children as array, excluding ripple container
-      const children = Array.from(button.childNodes).filter(
-        (node) => !(node as HTMLElement).hasAttribute?.("data-ripple-container")
-      );
-      expect(children[0]).toContainElement(icon);
-      expect(children[1]).toContainElement(text);
+      // Filter out ripple container and aria-hidden slots (state layer, focus ring)
+      const visibleChildren = Array.from(button.childNodes).filter((node) => {
+        const el = node as HTMLElement;
+        return (
+          !el.hasAttribute?.("data-ripple-container") && el.getAttribute?.("aria-hidden") !== "true"
+        );
+      });
+      expect(visibleChildren[0]).toContainElement(icon);
+      expect(visibleChildren[1]).toContainElement(label);
     });
 
-    test("trailing icon appears after text", () => {
+    test("trailing icon appears after label text in DOM order", () => {
       render(<Button trailingIcon={<span data-testid="trailing">I</span>}>Text</Button>);
       const button = screen.getByRole("button");
-      const text = screen.getByText("Text");
+      const label = screen.getByText("Text");
       const icon = screen.getByTestId("trailing");
 
-      // Text should come before trailing icon
-      // Get all children as array, excluding ripple container
-      const children = Array.from(button.childNodes).filter(
-        (node) => !(node as HTMLElement).hasAttribute?.("data-ripple-container")
-      );
-      expect(children[0]).toContainElement(text);
-      expect(children[1]).toContainElement(icon);
+      const visibleChildren = Array.from(button.childNodes).filter((node) => {
+        const el = node as HTMLElement;
+        return (
+          !el.hasAttribute?.("data-ripple-container") && el.getAttribute?.("aria-hidden") !== "true"
+        );
+      });
+      expect(visibleChildren[0]).toContainElement(label);
+      expect(visibleChildren[1]).toContainElement(icon);
     });
   });
 
   describe("States", () => {
-    test("handles disabled state", () => {
+    test("disabled button is not clickable", () => {
       render(<Button isDisabled>Disabled</Button>);
-      const button = screen.getByRole("button");
-      expect(button).toBeDisabled();
-      // MD3 spec: disabled state uses pointer-events-none, cursor-not-allowed, and removes shadows
-      expect(button).toHaveClass("pointer-events-none", "cursor-not-allowed", "shadow-none");
+      expect(screen.getByRole("button")).toBeDisabled();
     });
 
-    test("handles loading state", () => {
+    test("sets data-disabled attribute when disabled", () => {
+      render(<Button isDisabled>Disabled</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-disabled", "");
+    });
+
+    test("does not set data-disabled when enabled", () => {
+      render(<Button>Enabled</Button>);
+      expect(screen.getByRole("button")).not.toHaveAttribute("data-disabled");
+    });
+
+    test("loading button is also disabled", () => {
       render(<Button loading>Loading</Button>);
-      const button = screen.getByRole("button");
-      expect(button).toBeDisabled();
-      expect(button).toHaveClass("cursor-wait");
+      expect(screen.getByRole("button")).toBeDisabled();
+    });
+
+    test("sets data-loading attribute when loading", () => {
+      render(<Button loading>Loading</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-loading", "");
+    });
+
+    test("does not set data-loading when not loading", () => {
+      render(<Button>Normal</Button>);
+      expect(screen.getByRole("button")).not.toHaveAttribute("data-loading");
     });
 
     test("shows loading spinner when loading", () => {
       render(<Button loading>Loading</Button>);
-      // Spinner should be present (we'll check for loading indicator)
-      const button = screen.getByRole("button");
-      expect(button.querySelector('[role="progressbar"]')).toBeInTheDocument();
+      expect(screen.getByRole("button").querySelector('[role="progressbar"]')).toBeInTheDocument();
     });
 
-    test("hides icon when loading", () => {
+    test("icon is invisible (not removed) when loading", () => {
       render(
         <Button loading icon={<svg data-testid="icon">icon</svg>}>
           Loading
         </Button>
       );
-      // Icon should be present but hidden when loading
       const icon = screen.getByTestId("icon");
       expect(icon).toBeInTheDocument();
-      // Check that parent span has invisible class
       expect(icon.parentElement).toHaveClass("invisible");
     });
 
     test("full width button spans container", () => {
       render(<Button fullWidth>Full Width</Button>);
+      expect(screen.getByRole("button")).toHaveClass("w-full");
+    });
+  });
+
+  describe("Interaction Data Attributes", () => {
+    test("sets data-hovered when pointer is over button", async () => {
+      const user = userEvent.setup();
+      render(<Button>Hover me</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("w-full");
+
+      await user.hover(button);
+      expect(button).toHaveAttribute("data-hovered", "");
+    });
+
+    test("removes data-hovered when pointer leaves button", async () => {
+      const user = userEvent.setup();
+      render(<Button>Hover me</Button>);
+      const button = screen.getByRole("button");
+
+      await user.hover(button);
+      await user.unhover(button);
+      expect(button).not.toHaveAttribute("data-hovered");
+    });
+
+    test("does not set data-hovered when disabled", async () => {
+      const user = userEvent.setup();
+      render(<Button isDisabled>Disabled</Button>);
+      const button = screen.getByRole("button");
+
+      await user.hover(button);
+      expect(button).not.toHaveAttribute("data-hovered");
+    });
+
+    test("sets data-pressed on press start", async () => {
+      const user = userEvent.setup();
+      render(<Button>Press me</Button>);
+      const button = screen.getByRole("button");
+
+      // Hold pointer down to see pressed state
+      await user.pointer({ target: button, keys: "[MouseLeft>]" });
+      expect(button).toHaveAttribute("data-pressed", "");
     });
   });
 
@@ -220,7 +303,6 @@ describe("Button", () => {
         </Button>
       );
       await user.click(screen.getByRole("button"));
-
       expect(handlePress).not.toHaveBeenCalled();
     });
 
@@ -234,7 +316,6 @@ describe("Button", () => {
         </Button>
       );
       await user.click(screen.getByRole("button"));
-
       expect(handlePress).not.toHaveBeenCalled();
     });
 
@@ -243,10 +324,8 @@ describe("Button", () => {
       const user = userEvent.setup();
 
       render(<Button onPress={handlePress}>Press Enter</Button>);
-      const button = screen.getByRole("button");
-      button.focus();
+      screen.getByRole("button").focus();
       await user.keyboard("{Enter}");
-
       expect(handlePress).toHaveBeenCalledTimes(1);
     });
 
@@ -255,10 +334,8 @@ describe("Button", () => {
       const user = userEvent.setup();
 
       render(<Button onPress={handlePress}>Press Space</Button>);
-      const button = screen.getByRole("button");
-      button.focus();
+      screen.getByRole("button").focus();
       await user.keyboard(" ");
-
       expect(handlePress).toHaveBeenCalledTimes(1);
     });
   });
@@ -283,14 +360,12 @@ describe("Button", () => {
   describe("Accessibility", () => {
     test("is keyboard accessible", () => {
       render(<Button>Accessible</Button>);
-      const button = screen.getByRole("button");
-      expect(isKeyboardAccessible(button)).toBe(true);
+      expect(isKeyboardAccessible(screen.getByRole("button"))).toBe(true);
     });
 
     test("has accessible label from children", () => {
       render(<Button>Click me</Button>);
-      const button = screen.getByRole("button");
-      expect(hasAccessibleLabel(button)).toBe(true);
+      expect(hasAccessibleLabel(screen.getByRole("button"))).toBe(true);
     });
 
     test("supports custom aria-label", () => {
@@ -328,15 +403,19 @@ describe("Button", () => {
       expect(screen.getByRole("button")).toHaveAttribute("tabIndex", "-1");
     });
 
-    test("shows focus indicator on focus", async () => {
+    test("receives focus on tab", async () => {
       const user = userEvent.setup();
       render(<Button>Focus me</Button>);
-      const button = screen.getByRole("button");
-
       await user.tab();
-      expect(button).toHaveFocus();
-      // Focus styles should be applied
-      expect(button).toHaveClass("focus-visible:outline-2");
+      expect(screen.getByRole("button")).toHaveFocus();
+    });
+
+    test("focus ring span is present for keyboard focus styling", () => {
+      render(<Button>Focus me</Button>);
+      const button = screen.getByRole("button");
+      // Multiple aria-hidden spans: state layer + focus ring
+      const hiddenSpans = button.querySelectorAll('span[aria-hidden="true"]');
+      expect(hiddenSpans.length).toBeGreaterThanOrEqual(2);
     });
   });
 
@@ -344,54 +423,18 @@ describe("Button", () => {
     test("renders ripple container by default", () => {
       render(<Button>Ripple</Button>);
       const button = screen.getByRole("button");
-      // Ripple container should exist
-      const rippleContainer = button.querySelector("[data-ripple-container]");
-      expect(rippleContainer).toBeInTheDocument();
+      expect(button.querySelector("[data-ripple-container]")).toBeInTheDocument();
     });
 
     test("does not render ripple when disableRipple is true", () => {
       render(<Button disableRipple>No Ripple</Button>);
       const button = screen.getByRole("button");
-      const rippleContainer = button.querySelector("[data-ripple-container]");
-      expect(rippleContainer).not.toBeInTheDocument();
-    });
-  });
-
-  describe("Variant + Color Combinations", () => {
-    test("outlined secondary button has correct classes", () => {
-      render(
-        <Button variant="outlined" color="secondary">
-          Outlined Secondary
-        </Button>
-      );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("border-outline-variant", "text-secondary");
-    });
-
-    test("tonal tertiary button has correct classes", () => {
-      render(
-        <Button variant="tonal" color="tertiary">
-          Tonal Tertiary
-        </Button>
-      );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-tertiary-container", "text-on-tertiary-container");
-    });
-
-    test("text error button has correct classes", () => {
-      render(
-        <Button variant="text" color="error">
-          Text Error
-        </Button>
-      );
-      const button = screen.getByRole("button");
-      expect(button).toHaveClass("text-error");
+      expect(button.querySelector("[data-ripple-container]")).not.toBeInTheDocument();
     });
   });
 
   describe("Edge Cases", () => {
     test("handles empty children gracefully", () => {
-      // This should show a dev warning but still render
       const { container } = render(<Button>{""}</Button>);
       expect(container.querySelector("button")).toBeInTheDocument();
     });
@@ -407,7 +450,7 @@ describe("Button", () => {
       expect(screen.getByText("Part 2")).toBeInTheDocument();
     });
 
-    test("prevents event bubbling when disabled", async () => {
+    test("prevents press when disabled", async () => {
       const parentClick = vi.fn();
       const buttonPress = vi.fn();
       const user = userEvent.setup();
@@ -423,7 +466,6 @@ describe("Button", () => {
 
       await user.click(screen.getByRole("button"));
       expect(buttonPress).not.toHaveBeenCalled();
-      // Parent should also not receive click due to pointer-events-none
     });
   });
 
@@ -439,8 +481,8 @@ describe("Button", () => {
     });
   });
 
-  describe("data attributes for ButtonGroup integration", () => {
-    test("sets data-variant attribute matching the variant prop", () => {
+  describe("data-variant attribute for ButtonGroup integration", () => {
+    test("sets data-variant matching the variant prop", () => {
       render(<Button variant="filled">Test</Button>);
       expect(screen.getByRole("button")).toHaveAttribute("data-variant", "filled");
     });
@@ -460,29 +502,14 @@ describe("Button", () => {
       expect(screen.getByRole("button")).toHaveAttribute("data-variant", "text");
     });
 
-    test("sets data-color attribute matching the color prop", () => {
-      render(<Button color="primary">Test</Button>);
-      expect(screen.getByRole("button")).toHaveAttribute("data-color", "primary");
-    });
-
-    test("sets data-color for secondary", () => {
-      render(<Button color="secondary">Test</Button>);
-      expect(screen.getByRole("button")).toHaveAttribute("data-color", "secondary");
-    });
-
-    test("sets data-color for tertiary", () => {
-      render(<Button color="tertiary">Test</Button>);
-      expect(screen.getByRole("button")).toHaveAttribute("data-color", "tertiary");
-    });
-
-    test("sets data-color for error", () => {
-      render(<Button color="error">Test</Button>);
-      expect(screen.getByRole("button")).toHaveAttribute("data-color", "error");
+    test("sets data-variant for elevated", () => {
+      render(<Button variant="elevated">Test</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-variant", "elevated");
     });
   });
 
   describe("ButtonGroup context consumption", () => {
-    test("standalone Button renders normally without group context", () => {
+    test("standalone Button renders with rounded-full by default", () => {
       render(<Button>Standalone</Button>);
       const button = screen.getByRole("button");
       expect(button).toHaveClass("rounded-full");
@@ -497,9 +524,7 @@ describe("Button", () => {
           <Button>Two</Button>
         </ButtonGroup>
       );
-      const buttons = screen.getAllByRole("button");
-      // Inner radius (rounded-sm) overrides the default rounded-full
-      buttons.forEach((btn) => {
+      screen.getAllByRole("button").forEach((btn) => {
         expect(btn).toHaveClass("rounded-sm");
       });
     });
@@ -523,8 +548,7 @@ describe("Button", () => {
           <Button>Two</Button>
         </ButtonGroup>
       );
-      const buttons = screen.getAllByRole("button");
-      buttons.forEach((btn) => {
+      screen.getAllByRole("button").forEach((btn) => {
         expect(btn).toHaveClass("rounded-lg");
       });
     });
@@ -536,8 +560,7 @@ describe("Button", () => {
           <Button>Two</Button>
         </ButtonGroup>
       );
-      const buttons = screen.getAllByRole("button");
-      buttons.forEach((btn) => {
+      screen.getAllByRole("button").forEach((btn) => {
         expect(btn.className).toContain("rounded-[20px]");
       });
     });
@@ -554,15 +577,14 @@ describe("Button", () => {
       expect(buttons[0].className).toContain("last:rounded-e-sm");
     });
 
-    test("Button inside connected extra-small/small group has min-w-12", () => {
+    test("Button inside connected extra-small group has min-w-12", () => {
       render(
         <ButtonGroup variant="connected" size="extra-small" aria-label="Group">
           <Button>One</Button>
           <Button>Two</Button>
         </ButtonGroup>
       );
-      const buttons = screen.getAllByRole("button");
-      buttons.forEach((btn) => {
+      screen.getAllByRole("button").forEach((btn) => {
         expect(btn).toHaveClass("min-w-12");
       });
     });
@@ -613,6 +635,12 @@ describe("Button", () => {
 
     test("has no accessibility violations in loading state", async () => {
       const { container } = render(<Button loading>Saving</Button>);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no accessibility violations with icon", async () => {
+      const { container } = render(<Button icon={<svg aria-hidden="true" />}>With Icon</Button>);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });

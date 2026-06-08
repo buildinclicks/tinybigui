@@ -118,6 +118,9 @@ export const IconButton = forwardRef<
     });
 
     // Connected group radius + min-width overrides (pass value for selection-aware shape morph)
+    const isGroupSelected =
+      isConnected && groupCtx && value ? groupCtx.selectedValues.has(value) : false;
+
     const connectedClasses =
       isConnected && groupCtx
         ? [
@@ -130,23 +133,14 @@ export const IconButton = forwardRef<
       <IconButtonHeadless
         ref={ref}
         className={cn(
-          // Base classes
-          "relative inline-flex items-center justify-center",
-          "overflow-hidden rounded-full", // Circular shape (overridden by connected group classes)
-          // Spatial (border-radius, transform): expressive fast spring — 350ms, visible overshoot
-          "duration-expressive-fast-spatial ease-expressive-fast-spatial transition-all",
-          "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
-
-          // State layers (hover, focus, active) — effects token: opacity, no overshoot
-          "before:absolute before:inset-0 before:rounded-[inherit]",
-          "before:duration-spring-standard-fast-effects before:ease-spring-standard-fast-effects before:transition-opacity",
-          "before:bg-current before:opacity-0",
-          "hover:before:opacity-8",
-          "focus-visible:before:opacity-12",
-          "active:before:opacity-12",
-
-          // CVA variants
+          // CVA variants — includes btn-transition for asymmetric border-radius easing
           iconButtonVariants({ variant, color, size, selected: selected ?? false, isDisabled }),
+
+          // Asymmetric border-radius easing: expressive when selected, decelerate when not.
+          // btn-transition-selected overrides --_btn-radius-easing to the bouncy spring while
+          // the button is gaining the pill shape; removal restores decelerate for the return
+          // path, preventing the overshoot-to-0px sharp-corner flash.
+          isGroupSelected ? "btn-transition-selected" : "",
 
           // Connected group overrides: inner radius + start/end outer radius + min-width
           ...connectedClasses,
@@ -157,6 +151,8 @@ export const IconButton = forwardRef<
         aria-label={ariaLabel}
         data-variant={variant}
         data-color={color}
+        // Connected group selection state — mirrors btn-transition-selected for CSS targeting
+        data-group-selected={isGroupSelected ? "" : undefined}
         {...(selected !== undefined && { selected })}
         {...(title && { title })}
         {...mergedPropsValue}
