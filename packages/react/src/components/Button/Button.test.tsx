@@ -42,7 +42,7 @@ describe("Button", () => {
     test("renders outlined variant", () => {
       render(<Button variant="outlined">Outlined</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("border", "border-outline");
+      expect(button).toHaveClass("border", "border-outline-variant");
     });
 
     test("renders tonal variant", () => {
@@ -365,7 +365,7 @@ describe("Button", () => {
         </Button>
       );
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("border-outline", "text-secondary");
+      expect(button).toHaveClass("border-outline-variant", "text-secondary");
     });
 
     test("tonal tertiary button has correct classes", () => {
