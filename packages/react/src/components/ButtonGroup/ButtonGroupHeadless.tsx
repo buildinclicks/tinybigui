@@ -45,6 +45,7 @@ export const ButtonGroupHeadless = forwardRef<HTMLDivElement, ButtonGroupProps>(
       size = "medium",
       shape = "round",
       selectionMode,
+      isDisabled = false,
 
       // Selection — controlled
       selectedValues: controlledValues,
@@ -83,7 +84,7 @@ export const ButtonGroupHeadless = forwardRef<HTMLDivElement, ButtonGroupProps>(
      * Computes the new Set according to the selectionMode and notifies the parent.
      */
     const handleSelectionChange = (value: string): void => {
-      if (!selectionMode) return;
+      if (!selectionMode || isDisabled) return;
 
       let nextValues: Set<string>;
 
@@ -129,6 +130,7 @@ export const ButtonGroupHeadless = forwardRef<HTMLDivElement, ButtonGroupProps>(
             selectionMode,
             selectedValues,
             onSelectionChange: handleSelectionChange,
+            isDisabled,
             connectedInnerRadius: getInnerRadius(size),
             connectedOuterRadius: getOuterRadius(shape, size),
             enforceMinWidth:

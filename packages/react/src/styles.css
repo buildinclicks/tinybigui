@@ -91,16 +91,54 @@
  * btn-transition — use on all Button and IconButton elements inside connected
  * groups where border-radius morphs on selection.
  *
- * Spatial  (border-radius):         expressive-fast-spatial  350ms, overshoot ok
+ * Spatial  (border-radius):  driven by --_btn-radius-easing (see below)
  * Effects  (color / bg / shadow):   standard-fast-effects    150ms, no overshoot
+ *
+ * Border-radius easing is asymmetric by design:
+ *
+ *   Deselecting (pill → inner radius):  emphasized-decelerate   cubic-bezier(0.05, 0.7, 0.1, 1)
+ *     → No overshoot. Prevents the "sharp corner flash" that occurs when the
+ *       expressive spring overshoots below 0px from a large radius.
+ *
+ *   Selecting   (inner → pill):         expressive-fast-spatial cubic-bezier(0.42, 1.67, 0.21, 0.9)
+ *     → Overshoot is safe (can't go past fully-round). Applied via
+ *       `btn-transition-selected` class added when the button is group-selected.
+ *
+ * CSS transitions use the easing active on the element AFTER the state change,
+ * so toggling `btn-transition-selected` in the same render cycle that changes
+ * the radius class correctly applies the right easing for each direction.
  */
 @utility btn-transition {
+  /* Default easing for border-radius: decelerate (no overshoot) for deselect path */
+  --_btn-radius-easing: var(--md-sys-motion-easing-emphasized-decelerate);
+
   transition:
-    border-radius var(--md-sys-motion-expressive-fast-spatial-duration),
-    color var(--md-sys-motion-standard-fast-effects-duration),
-    background-color var(--md-sys-motion-standard-fast-effects-duration),
-    border-color var(--md-sys-motion-standard-fast-effects-duration),
-    opacity var(--md-sys-motion-standard-fast-effects-duration),
-    box-shadow var(--md-sys-motion-standard-fast-effects-duration),
-    outline-color var(--md-sys-motion-standard-fast-effects-duration);
+    /* Spatial — shape morphing; easing is directional via --_btn-radius-easing */
+    border-radius var(--md-sys-motion-expressive-fast-spatial-duration) var(--_btn-radius-easing),
+    /* Effects — no overshoot on color/opacity/shadow changes */ color
+      var(--md-sys-motion-standard-fast-effects-duration)
+      var(--md-sys-motion-standard-fast-effects-easing),
+    background-color var(--md-sys-motion-standard-fast-effects-duration)
+      var(--md-sys-motion-standard-fast-effects-easing),
+    border-color var(--md-sys-motion-standard-fast-effects-duration)
+      var(--md-sys-motion-standard-fast-effects-easing),
+    opacity var(--md-sys-motion-standard-fast-effects-duration)
+      var(--md-sys-motion-standard-fast-effects-easing),
+    box-shadow var(--md-sys-motion-standard-fast-effects-duration)
+      var(--md-sys-motion-standard-fast-effects-easing),
+    outline-color var(--md-sys-motion-standard-fast-effects-duration)
+      var(--md-sys-motion-standard-fast-effects-easing);
+}
+
+/**
+ * btn-transition-selected — apply alongside `btn-transition` when a button is
+ * currently selected inside a connected group.
+ *
+ * Switches the border-radius easing to expressive-fast-spatial so that the
+ * inner-radius → pill animation gains the intentional overshoot bounce.
+ * Removed when the button is deselected, leaving `btn-transition`'s default
+ * emphasized-decelerate easing for the pill → inner-radius return path.
+ */
+@utility btn-transition-selected {
+  --_btn-radius-easing: var(--md-sys-motion-expressive-fast-spatial-easing);
 }

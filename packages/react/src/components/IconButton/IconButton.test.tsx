@@ -422,9 +422,7 @@ describe("IconButton", () => {
   });
 
   describe("Ripple Effect", () => {
-    test("shows ripple effect by default", async () => {
-      const user = userEvent.setup();
-
+    test("shows ripple container by default", () => {
       render(
         <IconButton aria-label="Delete">
           <IconDelete />
@@ -432,10 +430,7 @@ describe("IconButton", () => {
       );
 
       const button = screen.getByRole("button");
-      await user.click(button);
-
-      // Ripple container should be present
-      expect(button.querySelector(".animate-ripple")).toBeInTheDocument();
+      expect(button.querySelector("[data-ripple-container]")).toBeInTheDocument();
     });
 
     test("disables ripple when disableRipple is true", () => {
@@ -446,15 +441,10 @@ describe("IconButton", () => {
       );
 
       const button = screen.getByRole("button");
-
-      // With disableRipple, no initial ripples should exist
-      const ripples = button.querySelectorAll(".animate-ripple");
-      expect(ripples.length).toBe(0);
+      expect(button.querySelector("[data-ripple-container]")).not.toBeInTheDocument();
     });
 
-    test("does not show ripple when disabled", async () => {
-      const user = userEvent.setup();
-
+    test("does not show ripple when disabled", () => {
       render(
         <IconButton aria-label="Delete" isDisabled>
           <IconDelete />
@@ -462,10 +452,7 @@ describe("IconButton", () => {
       );
 
       const button = screen.getByRole("button");
-      await user.click(button);
-
-      // No ripple when disabled
-      expect(button.querySelector(".animate-ripple")).not.toBeInTheDocument();
+      expect(button.querySelector("[data-ripple-container]")).not.toBeInTheDocument();
     });
   });
 

@@ -1,27 +1,59 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 /**
- * Material Design 3 ButtonGroup Variants (CVA)
+ * Material Design 3 ButtonGroup Variants
  *
- * Type-safe variant management for the ButtonGroup container.
- * The container has no colour of its own — it only controls layout
- * (display, width) and the inner gap between child buttons.
+ * Architecture: Variants vs States
+ * - CVA holds design-time structure only (no interaction state variants).
+ * - All interaction/selection states are driven by data-* attributes on the root
+ *   via group-data-[x]/button-group Tailwind selectors.
+ * - Container-level state attributes:
+ *     data-connected      — variant is "connected"
+ *     data-has-selection  — at least one child button is selected
+ *     data-disabled       — entire group is non-interactive
+ *     data-selection-mode — "single" | "required" | "multi" (when applicable)
  *
- * MD3 Inner Gap Spec:
- * | Size        | standard   | connected |
- * |-------------|------------|-----------|
- * | extra-small | 18dp       | 2dp       |
- * | small       | 12dp       | 2dp       |
- * | medium      | 8dp        | 2dp       |
- * | large       | 8dp        | 2dp       |
- * | extra-large | 8dp        | 2dp       |
+ * Slot responsibilities:
+ *   buttonGroupRootVariants  — layout container; gap, alignment, motion, disabled state
+ *
+ * MD3 Spec (Inner Gap):
+ *   | Size        | standard   | connected |
+ *   |-------------|------------|-----------|
+ *   | extra-small | 18dp       | 2dp       |
+ *   | small       | 12dp       | 2dp       |
+ *   | medium      | 8dp        | 2dp       |
+ *   | large       | 8dp        | 2dp       |
+ *   | extra-large | 8dp        | 2dp       |
+ *
+ * Motion:
+ *   Gap is a spatial property — uses spring-standard-fast-spatial (350ms, no overshoot
+ *   for gap since CSS gap cannot visually overshoot). This ensures smooth transitions
+ *   when the size prop changes or buttons are added/removed.
  *
  * Note: xs/sm standard gaps are intentionally large to preserve 48dp touch targets.
  * Connected gap is always 2dp (`gap-0.5`) regardless of size.
  */
-export const buttonGroupVariants = cva(
-  // Base classes applied to every ButtonGroup container
-  ["items-center"],
+
+// ─── ROOT ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Root container element — carries `group/button-group` scope via the styled layer.
+ *
+ * Handles:
+ * - Flexbox layout (inline-flex or flex)
+ * - Gap between child buttons (per variant × size)
+ * - Spatial motion for gap transitions
+ * - Disabled state (opacity + pointer-events)
+ */
+export const buttonGroupRootVariants = cva(
+  [
+    // Layout
+    "items-center",
+    // Spatial motion for gap changes — standard spring (calm, utility UI)
+    "transition-[gap] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial",
+    // Disabled state — self-targeting data-[x]: selector on root
+    "data-[disabled]:pointer-events-none data-[disabled]:opacity-38",
+  ],
   {
     variants: {
       /**
@@ -74,7 +106,41 @@ export const buttonGroupVariants = cva(
   }
 );
 
+// ─── FOCUS RING ───────────────────────────────────────────────────────────────
+
 /**
- * Extract variant prop types from CVA
+ * Focus ring overlay for the group container.
+ *
+ * Visible only when the group itself receives keyboard focus (rare — typically
+ * focus goes to child buttons). Included for completeness and edge cases where
+ * the group container might receive programmatic focus.
+ *
+ * Uses the same pattern as Switch/Button focus rings:
+ * - Always in DOM (opacity-0)
+ * - Transitions to opacity-100 on group-data-[focus-visible]
  */
-export type ButtonGroupVariants = VariantProps<typeof buttonGroupVariants>;
+export const buttonGroupFocusRingVariants = cva([
+  "pointer-events-none absolute inset-[-3px] rounded-[inherit]",
+  "outline outline-2 outline-offset-0 outline-secondary",
+  "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+  "opacity-0",
+  "group-data-[focus-visible]/button-group:opacity-100",
+]);
+
+// ─── BACKWARD COMPAT ──────────────────────────────────────────────────────────
+
+/**
+ * @deprecated Use `buttonGroupRootVariants` instead.
+ * Kept for backward compatibility during migration.
+ */
+export const buttonGroupVariants = buttonGroupRootVariants;
+
+// ─── EXPORTED TYPES ───────────────────────────────────────────────────────────
+
+export type ButtonGroupRootVariants = VariantProps<typeof buttonGroupRootVariants>;
+export type ButtonGroupFocusRingVariants = VariantProps<typeof buttonGroupFocusRingVariants>;
+
+/**
+ * @deprecated Use `ButtonGroupRootVariants` instead.
+ */
+export type ButtonGroupVariants = ButtonGroupRootVariants;

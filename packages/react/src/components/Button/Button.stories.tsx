@@ -1,7 +1,7 @@
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "./Button";
 
-// Sample icons for stories
 const IconAdd = (): React.ReactElement => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
@@ -20,6 +20,12 @@ const IconFavorite = (): React.ReactElement => (
   </svg>
 );
 
+const IconDelete = (): React.ReactElement => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+  </svg>
+);
+
 const meta: Meta<typeof Button> = {
   title: "Components/Button",
   component: Button,
@@ -28,7 +34,7 @@ const meta: Meta<typeof Button> = {
     docs: {
       description: {
         component:
-          "Material Design 3 Button component with 5 variants, multiple colors, sizes, and full accessibility support.",
+          "Material Design 3 Button component with 5 strict MD3 variants, 3 sizes, and full accessibility support. Each variant uses its spec-defined color roles — no color override is needed.",
       },
     },
   },
@@ -37,17 +43,12 @@ const meta: Meta<typeof Button> = {
     variant: {
       control: "select",
       options: ["filled", "outlined", "tonal", "elevated", "text"],
-      description: "Button visual style variant",
-    },
-    color: {
-      control: "select",
-      options: ["primary", "secondary", "tertiary", "error"],
-      description: "Color scheme for the button",
+      description: "MD3 button variant — determines visual emphasis and color roles",
     },
     size: {
       control: "select",
       options: ["small", "medium", "large"],
-      description: "Button size",
+      description: "Button size (small=32dp, medium=40dp, large=56dp)",
     },
     isDisabled: {
       control: "boolean",
@@ -55,15 +56,15 @@ const meta: Meta<typeof Button> = {
     },
     loading: {
       control: "boolean",
-      description: "Show loading spinner",
+      description: "Show loading spinner (also disables the button)",
     },
     fullWidth: {
       control: "boolean",
-      description: "Make button full width",
+      description: "Span the full width of the container",
     },
     disableRipple: {
       control: "boolean",
-      description: "Disable ripple effect",
+      description: "Disable the ripple press effect",
     },
   },
 };
@@ -71,137 +72,84 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
-// Default Story
+// ─── DEFAULT ──────────────────────────────────────────────────────────────────
+
 export const Default: Story = {
   args: {
     children: "Button",
     variant: "filled",
-    color: "primary",
     size: "medium",
   },
 };
 
-// Variants
+// ─── VARIANTS ─────────────────────────────────────────────────────────────────
+
 export const Filled: Story = {
-  args: {
-    variant: "filled",
-    children: "Filled Button",
-  },
+  args: { variant: "filled", children: "Filled" },
 };
 
 export const Outlined: Story = {
-  args: {
-    variant: "outlined",
-    children: "Outlined Button",
-  },
+  args: { variant: "outlined", children: "Outlined" },
 };
 
 export const Tonal: Story = {
-  args: {
-    variant: "tonal",
-    children: "Tonal Button",
-  },
+  args: { variant: "tonal", children: "Tonal" },
 };
 
 export const Elevated: Story = {
-  args: {
-    variant: "elevated",
-    children: "Elevated Button",
-  },
+  args: { variant: "elevated", children: "Elevated" },
 };
 
 export const Text: Story = {
-  args: {
-    variant: "text",
-    children: "Text Button",
-  },
+  args: { variant: "text", children: "Text" },
 };
 
-// All Variants Showcase
 export const AllVariants: Story = {
   render: () => (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-wrap items-center gap-3">
       <Button variant="filled">Filled</Button>
-      <Button variant="outlined">Outlined</Button>
       <Button variant="tonal">Tonal</Button>
       <Button variant="elevated">Elevated</Button>
+      <Button variant="outlined">Outlined</Button>
       <Button variant="text">Text</Button>
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "All 5 MD3 button variants ordered by visual emphasis (highest to lowest). Use at most one filled/elevated per surface.",
+      },
+    },
+  },
 };
 
-// Colors
-export const Colors: Story = {
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Button color="primary">Primary</Button>
-        <Button color="secondary">Secondary</Button>
-        <Button color="tertiary">Tertiary</Button>
-        <Button color="error">Error</Button>
-      </div>
-      <div className="flex gap-2">
-        <Button variant="outlined" color="primary">
-          Primary
-        </Button>
-        <Button variant="outlined" color="secondary">
-          Secondary
-        </Button>
-        <Button variant="outlined" color="tertiary">
-          Tertiary
-        </Button>
-        <Button variant="outlined" color="error">
-          Error
-        </Button>
-      </div>
-      <div className="flex gap-2">
-        <Button variant="tonal" color="primary">
-          Primary
-        </Button>
-        <Button variant="tonal" color="secondary">
-          Secondary
-        </Button>
-        <Button variant="tonal" color="tertiary">
-          Tertiary
-        </Button>
-        <Button variant="tonal" color="error">
-          Error
-        </Button>
-      </div>
-    </div>
-  ),
-};
+// ─── SIZES ────────────────────────────────────────────────────────────────────
 
-// Sizes
 export const Sizes: Story = {
   render: () => (
-    <div className="flex items-end gap-4">
-      <Button size="small">Small</Button>
-      <Button size="medium">Medium</Button>
-      <Button size="large">Large</Button>
+    <div className="flex flex-wrap items-end gap-3">
+      <Button size="small">Small (32dp)</Button>
+      <Button size="medium">Medium (40dp)</Button>
+      <Button size="large">Large (56dp)</Button>
     </div>
   ),
 };
 
-// With Icons
+// ─── ICONS ────────────────────────────────────────────────────────────────────
+
 export const WithLeadingIcon: Story = {
-  args: {
-    icon: <IconAdd />,
-    children: "Add Item",
-  },
+  args: { icon: <IconAdd />, children: "Add Item" },
 };
 
 export const WithTrailingIcon: Story = {
-  args: {
-    trailingIcon: <IconArrowForward />,
-    children: "Continue",
-  },
+  args: { trailingIcon: <IconArrowForward />, children: "Continue" },
 };
 
 export const IconExamples: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button icon={<IconAdd />}>Add</Button>
         <Button icon={<IconFavorite />} variant="outlined">
           Like
@@ -209,8 +157,14 @@ export const IconExamples: Story = {
         <Button icon={<IconAdd />} variant="tonal">
           Create
         </Button>
+        <Button icon={<IconAdd />} variant="elevated">
+          Elevated
+        </Button>
+        <Button icon={<IconFavorite />} variant="text">
+          Favorite
+        </Button>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button trailingIcon={<IconArrowForward />}>Next</Button>
         <Button trailingIcon={<IconArrowForward />} variant="outlined">
           Continue
@@ -219,80 +173,122 @@ export const IconExamples: Story = {
           Learn More
         </Button>
       </div>
-    </div>
-  ),
-};
-
-// States
-export const Disabled: Story = {
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Button isDisabled>Filled</Button>
-        <Button variant="outlined" isDisabled>
-          Outlined
+      <div className="flex flex-wrap gap-2">
+        <Button size="small" icon={<IconAdd />}>
+          Small
         </Button>
-        <Button variant="tonal" isDisabled>
-          Tonal
+        <Button size="medium" icon={<IconAdd />}>
+          Medium
         </Button>
-        <Button variant="elevated" isDisabled>
-          Elevated
-        </Button>
-        <Button variant="text" isDisabled>
-          Text
+        <Button size="large" icon={<IconAdd />}>
+          Large
         </Button>
       </div>
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MD3 spec: icons must be 18×18px. Use the leading slot for action icons, trailing for directional/navigation icons.",
+      },
+    },
+  },
+};
+
+// ─── STATES ───────────────────────────────────────────────────────────────────
+
+export const Disabled: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-2">
+      <Button isDisabled>Filled</Button>
+      <Button variant="outlined" isDisabled>
+        Outlined
+      </Button>
+      <Button variant="tonal" isDisabled>
+        Tonal
+      </Button>
+      <Button variant="elevated" isDisabled>
+        Elevated
+      </Button>
+      <Button variant="text" isDisabled>
+        Text
+      </Button>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled state per MD3: container uses on-surface at 12% opacity, label uses on-surface at 38% opacity. Elevation is removed.",
+      },
+    },
+  },
 };
 
 export const Loading: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Button loading>Loading</Button>
+      <div className="flex flex-wrap gap-2">
+        <Button loading>Saving</Button>
         <Button variant="outlined" loading>
-          Loading
+          Saving
         </Button>
         <Button variant="tonal" loading>
-          Loading
+          Saving
+        </Button>
+        <Button variant="elevated" loading>
+          Saving
+        </Button>
+        <Button variant="text" loading>
+          Saving
         </Button>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button loading icon={<IconAdd />}>
           Creating
         </Button>
         <Button variant="outlined" loading icon={<IconFavorite />}>
-          Saving
+          Liking
         </Button>
       </div>
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Loading state: spinner replaces icon (layout stable — icon is invisible not hidden), button is disabled. data-loading attribute is set on root.",
+      },
+    },
+  },
 };
 
-// Full Width
+// ─── FULL WIDTH ───────────────────────────────────────────────────────────────
+
 export const FullWidth: Story = {
   render: () => (
-    <div className="flex w-80 flex-col gap-4">
-      <Button fullWidth>Full Width Button</Button>
+    <div className="flex w-80 flex-col gap-3">
+      <Button fullWidth>Full Width Filled</Button>
       <Button variant="outlined" fullWidth>
         Full Width Outlined
       </Button>
       <Button variant="tonal" fullWidth icon={<IconAdd />}>
-        Full Width With Icon
+        With Icon
       </Button>
     </div>
   ),
 };
 
-// Interactive Example
+// ─── INTERACTIVE ─────────────────────────────────────────────────────────────
+
 const InteractiveExample = (): React.ReactElement => {
   const [count, setCount] = React.useState(0);
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-lg">Count: {count}</p>
+      <p className="text-body-large text-on-surface">Count: {count}</p>
       <div className="flex gap-2">
-        <Button onPress={() => setCount(count + 1)} icon={<IconAdd />}>
+        <Button onPress={() => setCount((c) => c + 1)} icon={<IconAdd />}>
           Increment
         </Button>
         <Button variant="outlined" onPress={() => setCount(0)} isDisabled={count === 0}>
@@ -307,7 +303,8 @@ export const Interactive: Story = {
   render: () => <InteractiveExample />,
 };
 
-// Accessibility Example
+// ─── ACCESSIBILITY ────────────────────────────────────────────────────────────
+
 export const Accessibility: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
@@ -325,14 +322,14 @@ export const Accessibility: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Buttons support ARIA attributes for enhanced accessibility. Use aria-label, aria-pressed, aria-haspopup, etc.",
+        story: "Buttons support ARIA attributes for enhanced accessibility.",
       },
     },
   },
 };
 
-// Button Types
+// ─── BUTTON TYPES ─────────────────────────────────────────────────────────────
+
 export const ButtonTypes: Story = {
   render: () => (
     <form
@@ -361,26 +358,20 @@ export const ButtonTypes: Story = {
       </div>
     </form>
   ),
-  parameters: {
-    docs: {
-      description: {
-        story: "Buttons support different HTML button types: submit, reset, and button.",
-      },
-    },
-  },
 };
 
-// Complex Example
+// ─── COMPLEX EXAMPLE ─────────────────────────────────────────────────────────
+
 export const ComplexExample: Story = {
   render: () => (
-    <div className="bg-surface w-96 rounded-lg p-6">
-      <h2 className="mb-4 text-2xl font-bold">Confirm Action</h2>
-      <p className="text-on-surface-variant mb-6">
-        Are you sure you want to proceed with this action? This cannot be undone.
+    <div className="bg-surface shadow-elevation-2 w-96 rounded-lg p-6">
+      <h2 className="text-headline-small text-on-surface mb-2">Delete item?</h2>
+      <p className="text-body-medium text-on-surface-variant mb-6">
+        This will permanently remove the item. This action cannot be undone.
       </p>
       <div className="flex justify-end gap-2">
         <Button variant="text">Cancel</Button>
-        <Button variant="tonal" color="error">
+        <Button variant="filled" icon={<IconDelete />}>
           Delete
         </Button>
       </div>
@@ -389,18 +380,19 @@ export const ComplexExample: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Example of buttons in a dialog/modal context.",
+        story:
+          "Dialog footer pattern: text button for dismissive actions, filled for destructive/confirming actions.",
       },
     },
   },
 };
 
-// Playground
+// ─── PLAYGROUND ───────────────────────────────────────────────────────────────
+
 export const Playground: Story = {
   args: {
     children: "Customize Me",
     variant: "filled",
-    color: "primary",
     size: "medium",
     isDisabled: false,
     loading: false,
@@ -410,11 +402,8 @@ export const Playground: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Play around with all the button props to see how they work together.",
+        story: "Use the controls panel to explore all button props.",
       },
     },
   },
 };
-
-// Import React for Interactive story
-import React from "react";
