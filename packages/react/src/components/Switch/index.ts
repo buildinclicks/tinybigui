@@ -12,17 +12,20 @@ export type { SwitchProps, SwitchHeadlessProps } from "./Switch.types";
 
 // Variants (for advanced customization)
 export {
-  switchVariants,
+  switchRootVariants,
   switchTrackVariants,
+  switchFocusRingVariants,
   switchHandleContainerVariants,
+  switchStateLayerVariants,
   switchHandleVariants,
   switchIconVariants,
   switchLabelVariants,
 } from "./Switch.variants";
 export type {
-  SwitchVariants,
+  SwitchRootVariants,
   SwitchTrackVariants,
   SwitchHandleContainerVariants,
+  SwitchStateLayerVariants,
   SwitchHandleVariants,
   SwitchIconVariants,
   SwitchLabelVariants,
