@@ -70,6 +70,14 @@ export interface ButtonGroupContextValue {
   onSelectionChange: (value: string) => void;
 
   /**
+   * Whether the entire group is disabled.
+   * When `true`, all child buttons should be non-interactive.
+   *
+   * @default false
+   */
+  isDisabled: boolean;
+
+  /**
    * Tailwind class for the inner (adjacent) corner radius in the connected variant.
    * Applied to all four corners of every button in a connected group.
    *
@@ -203,6 +211,15 @@ export interface ButtonGroupProps extends Omit<React.HTMLAttributes<HTMLDivEleme
    * @default new Set()
    */
   defaultValue?: string | string[] | undefined;
+
+  /**
+   * Whether the entire group and all child buttons are disabled.
+   * When `true`, the group container receives `data-disabled` and
+   * all children inherit the disabled state via context.
+   *
+   * @default false
+   */
+  isDisabled?: boolean;
 
   /**
    * Child buttons (Button, IconButton, or any element with a `value` prop).

@@ -45,11 +45,13 @@ export { AppBar, AppBarHeadless } from "./components/AppBar";
 export type { AppBarProps, AppBarHeadlessProps, AppBarVariant } from "./components/AppBar";
 
 export { Button } from "./components/Button";
-export type { ButtonProps, ButtonVariant, ButtonColor, ButtonSize } from "./components/Button";
+export type { ButtonProps, ButtonVariant, ButtonSize } from "./components/Button";
 
 export {
   ButtonGroup,
   ButtonGroupHeadless,
+  buttonGroupRootVariants,
+  buttonGroupFocusRingVariants,
   buttonGroupVariants,
   ButtonGroupContext,
   useButtonGroup,
@@ -63,6 +65,8 @@ export type {
   ButtonGroupShape,
   ButtonGroupSelectionMode,
   ButtonGroupContextValue,
+  ButtonGroupRootVariants,
+  ButtonGroupFocusRingVariants,
 } from "./components/ButtonGroup";
 
 export { IconButton, IconButtonHeadless } from "./components/IconButton";

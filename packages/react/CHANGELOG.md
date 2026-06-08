@@ -1,5 +1,11 @@
 # @tinybigui/react
 
+## 0.4.2
+
+### Patch Changes
+
+- 7e5661f: Refactor Button, ButtonGroup, and IconButton to align with MD3 specs — adopt variants-vs-states architecture with data-attribute interaction layers, remove non-spec `color` prop, correct size heights and state layer opacities, and enhance ripple and focus ring behavior.
+
 ## 0.4.1
 
 ### Patch Changes

@@ -1,10 +1,19 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useRef, useState, useCallback } from "react";
 import type React from "react";
+import { useHover, useFocusRing, mergeProps } from "react-aria";
 import { ButtonHeadless } from "./ButtonHeadless";
-import { buttonVariants, type ButtonVariants } from "./Button.variants";
+import {
+  buttonVariants,
+  buttonStateLayerVariants,
+  buttonFocusRingVariants,
+  buttonIconVariants,
+  buttonLabelVariants,
+  type ButtonVariants,
+} from "./Button.variants";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
 import { useOptionalButtonGroup } from "../ButtonGroup/ButtonGroupContext";
 import { getConnectedRadiusClasses } from "../ButtonGroup/ButtonGroup.utils";
@@ -17,7 +26,7 @@ const Spinner = (): React.ReactElement => (
   <svg
     role="progressbar"
     aria-label="Loading"
-    className="h-4 w-4 animate-spin"
+    className="relative z-10 h-[18px] w-[18px] animate-spin"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
@@ -35,58 +44,51 @@ const Spinner = (): React.ReactElement => (
  * Material Design 3 Button Component (Layer 3: Styled)
  *
  * Built on React Aria for world-class accessibility.
- * Uses CVA for type-safe variant management.
- * Styled with Tailwind CSS using MD3 design tokens.
+ * Implements the Variants-vs-States architecture: all interaction states are
+ * expressed as data-* attributes on the root and consumed by each slot via
+ * group-data-[x]/button Tailwind selectors — no state variants in CVA.
  *
  * Features:
  * - ✅ 5 MD3 variants: filled, outlined, tonal, elevated, text
- * - ✅ 4 color schemes: primary, secondary, tertiary, error
- * - ✅ 3 sizes: small, medium, large
+ * - ✅ 3 sizes: small (32dp), medium (40dp), large (56dp)
  * - ✅ Loading state with spinner
  * - ✅ Ripple effect (Material Design)
+ * - ✅ Proper MD3 state layer (hover 8%, focus 10%, pressed 10%)
  * - ✅ Full keyboard accessibility (via React Aria)
  * - ✅ Screen reader support (via React Aria)
  * - ✅ Focus management (via React Aria)
  * - ✅ ButtonGroup-aware: applies connected corner radii and min-width when inside a group
  *
  * MD3 Specifications:
- * - Height: 40dp (medium), 32dp (small), 48dp (large)
- * - Typography: Label Large (14px, 500 weight, +0.1px letter-spacing)
+ * - Height: 40dp (medium), 32dp (small), 56dp (large)
+ * - Typography: Label Large (medium), Label Medium (small), Title Medium (large)
  * - Icon size: 18px × 18px (per MD3 spec)
- * - State layers: 8% hover, 12% focus/pressed
- * - Elevation: Level 1 on hover (filled), Level 1→2 (elevated)
+ * - State layers: 8% hover, 10% focus/pressed
+ * - Elevation: Level 1 on hover (filled), Level 1 base → Level 2 hover (elevated)
  *
  * @example
  * ```tsx
  * // Basic usage
  * <Button>Click me</Button>
  *
- * // With variant and color
- * <Button variant="outlined" color="secondary">
- *   Secondary Action
- * </Button>
+ * // With variant
+ * <Button variant="outlined">Secondary Action</Button>
  *
- * // With icon (MD3 spec: icons should be 18px × 18px)
+ * // With icon (MD3 spec: icons are 18px × 18px)
  * <Button icon={<IconAdd className="h-[18px] w-[18px]" />}>
  *   Add Item
  * </Button>
  *
  * // Loading state
- * <Button loading>
- *   Saving...
- * </Button>
+ * <Button loading>Saving...</Button>
  *
  * // Disabled
- * <Button isDisabled>
- *   Disabled
- * </Button>
+ * <Button isDisabled>Disabled</Button>
  *
  * // Full width
- * <Button fullWidth>
- *   Full Width Button
- * </Button>
+ * <Button fullWidth>Full Width Button</Button>
  *
- * // Inside a connected ButtonGroup (corner radii applied automatically)
+ * // Inside a connected ButtonGroup
  * <ButtonGroup variant="connected" selectionMode="required" defaultValue="md">
  *   <Button value="sm">S</Button>
  *   <Button value="md">M</Button>
@@ -94,12 +96,11 @@ const Spinner = (): React.ReactElement => (
  * </ButtonGroup>
  * ```
  */
-export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVariants, "disabled">>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVariants, never>>(
   (
     {
       // Variant props (CVA)
       variant = "filled",
-      color = "primary",
       size = "medium",
       fullWidth = false,
 
@@ -116,33 +117,34 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
       // Styling
       className,
 
-      // Other props
+      // Other button props
       tabIndex = 0,
       type = "button",
-      onPress,
+
+      // Passed through to ButtonHeadless → useButton
       ...props
     },
     ref
   ) => {
-    // ButtonGroup context — null when rendered outside a group (safe to call unconditionally)
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const resolvedRef = (ref ?? buttonRef) as React.RefObject<HTMLButtonElement>;
+
+    // ButtonGroup context — null when rendered outside a group
     const groupCtx = useOptionalButtonGroup();
     const isConnected = groupCtx?.variant === "connected";
 
-    // Development warnings
-    if (process.env.NODE_ENV === "development") {
-      if (!children) {
-        console.warn(
-          "[Button] Button should have text content. Use IconButton for icon-only buttons."
-        );
-      }
-
-      if (icon && trailingIcon) {
-        console.warn("[Button] Button should have either icon or trailingIcon, not both.");
-      }
-    }
-
-    // Combine disabled states
+    // Combined disabled state (loading also disables)
     const isButtonDisabled = isDisabled || loading;
+
+    // ── Interaction state tracking ───────────────────────────────────────────
+    // isPressed is tracked via onPressStart/onPressEnd forwarded to useButton,
+    // which avoids competing with ButtonHeadless's own useButton press handling.
+    const [isPressed, setIsPressed] = useState(false);
+    const handlePressStart = useCallback(() => setIsPressed(true), []);
+    const handlePressEnd = useCallback(() => setIsPressed(false), []);
+
+    const { isHovered, hoverProps } = useHover({ isDisabled: isButtonDisabled });
+    const { isFocusVisible, focusProps } = useFocusRing();
 
     // Ripple effect
     const { onMouseDown: handleRipple, ripples } = useRipple({
@@ -150,35 +152,67 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
     });
 
     // Connected group radius + min-width overrides
+    const buttonValue = (props as { value?: string | undefined }).value;
+    const isGroupSelected =
+      isConnected && groupCtx && buttonValue ? groupCtx.selectedValues.has(buttonValue) : false;
+
     const connectedClasses =
       isConnected && groupCtx
         ? [
-            ...getConnectedRadiusClasses(groupCtx, props?.value),
+            ...getConnectedRadiusClasses(groupCtx, buttonValue),
             groupCtx.enforceMinWidth ? "min-w-12" : "",
           ]
         : [];
 
+    const hasIcon = !!icon || !!trailingIcon;
+
+    if (process.env.NODE_ENV === "development") {
+      if (!children) {
+        console.warn(
+          "[Button] Button should have text content. Use IconButton for icon-only buttons."
+        );
+      }
+    }
+
     return (
       <ButtonHeadless
-        {...props}
-        ref={ref}
+        {...mergeProps(
+          hoverProps,
+          focusProps,
+          // Track pressed state via useButton's press lifecycle callbacks,
+          // rather than a separate usePress hook, to avoid event handler conflicts.
+          { onPressStart: handlePressStart, onPressEnd: handlePressEnd },
+          props
+        )}
+        ref={resolvedRef}
         type={type}
         isDisabled={isButtonDisabled}
-        {...(onPress && { onPress })}
         tabIndex={tabIndex}
         onMouseDown={handleRipple}
+        // ── Interaction data attributes ──────────────────────────────────────
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          isDisabled: isButtonDisabled,
+        })}
+        // ── Content flags ────────────────────────────────────────────────────
         data-variant={variant}
-        data-color={color}
+        data-with-icon={hasIcon ? "" : undefined}
+        data-loading={loading ? "" : undefined}
+        // ── Connected group selection state ──────────────────────────────────
+        // Used to switch border-radius easing: expressive (select) vs decelerate (deselect).
+        // btn-transition-selected overrides --_btn-radius-easing to the bouncy spring only
+        // while the button is gaining the pill shape; removal restores safe decelerate easing
+        // for the pill→inner-radius return, eliminating the overshoot-to-0px flicker.
+        data-group-selected={isGroupSelected ? "" : undefined}
         className={cn(
-          // Apply CVA variants (includes rounded-full base)
-          buttonVariants({
-            variant,
-            color,
-            size,
-            fullWidth,
-            disabled: isButtonDisabled,
-            loading,
-          }),
+          buttonVariants({ variant, size, fullWidth }),
+          // group/button: enables group-data-[x]/button child selectors in all slots
+          // (added here, not in CVA, following the Switch pattern)
+          "group/button",
+          // Asymmetric border-radius easing: expressive when selected, decelerate when not
+          isGroupSelected ? "btn-transition-selected" : "",
           // Connected group overrides: inner radius + start/end outer radius + min-width
           ...connectedClasses,
           // User custom classes
@@ -188,28 +222,24 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
         {/* Ripple effect */}
         {ripples}
 
-        {/* Leading icon (hidden when loading) */}
-        {icon && (
-          <span className={cn("relative z-10 inline-flex shrink-0", loading && "invisible")}>
-            {icon}
-          </span>
-        )}
+        {/* State layer — absolute overlay that transitions opacity on interaction */}
+        <span className={cn(buttonStateLayerVariants({ variant }))} aria-hidden="true" />
 
-        {/* Loading spinner (shown when loading, overlays icon position) */}
-        {loading && (
-          <span className="relative z-10">
-            <Spinner />
-          </span>
-        )}
+        {/* Focus ring — absolute overlay rendered above state layer */}
+        <span className={cn(buttonFocusRingVariants())} aria-hidden="true" />
 
-        {/* Content */}
-        <span className="relative z-10 inline-flex items-center">{children}</span>
+        {/* Leading icon (invisible, not hidden, when loading so layout is stable) */}
+        {icon && <span className={cn(buttonIconVariants({ hidden: loading }))}>{icon}</span>}
 
-        {/* Trailing icon (hidden when loading) */}
+        {/* Loading spinner (replaces icon position) */}
+        {loading && <Spinner />}
+
+        {/* Label */}
+        <span className={cn(buttonLabelVariants())}>{children}</span>
+
+        {/* Trailing icon (invisible when loading) */}
         {trailingIcon && (
-          <span className={cn("relative z-10 inline-flex shrink-0", loading && "invisible")}>
-            {trailingIcon}
-          </span>
+          <span className={cn(buttonIconVariants({ hidden: loading }))}>{trailingIcon}</span>
         )}
       </ButtonHeadless>
     );
