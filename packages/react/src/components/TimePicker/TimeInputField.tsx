@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { TimeInputFieldProps } from "./TimePicker.types";
 
@@ -39,6 +39,14 @@ export function TimeInputField({
   const [isInvalid, setIsInvalid] = useState(false);
   const bufferRef = useRef<string>("");
   const bufferTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (bufferTimerRef.current !== null) {
+        clearTimeout(bufferTimerRef.current);
+      }
+    };
+  }, []);
 
   const label = field === "hour" ? "Hour" : "Minute";
 
