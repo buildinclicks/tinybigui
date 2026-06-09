@@ -4,22 +4,23 @@ import type { PressEvent } from "react-aria";
 /**
  * The four MD3 chip types, each with distinct interaction semantics.
  *
- * - `assist` – triggers an action (e.g. "Set alarm")
- * - `filter` – toggles a filter on/off (`aria-pressed`)
- * - `input` – represents a value the user entered; can be removed
+ * - `assist`     – triggers an action (e.g. "Set alarm")
+ * - `filter`     – toggles a filter on/off (`aria-pressed`)
+ * - `input`      – represents a value the user entered; can be removed
  * - `suggestion` – offers a contextual suggestion (acts like assist)
  */
 export type ChipType = "assist" | "filter" | "input" | "suggestion";
 
 /**
- * Surface style for Assist and Suggestion chips.
+ * Surface style for chips.
  *
- * - `tonal` – uses secondary-container fill (default)
- * - `elevated` – uses surface-container-low fill with elevation shadow
+ * - `flat`     – transparent container with outline border (MD3 default)
+ * - `elevated` – `surface-container-low` fill with elevation shadow; all four chip types support this
+ * - `tonal`    – @deprecated Use `flat` instead. Will be removed in a future minor version.
  *
- * @default 'tonal'
+ * @default 'flat'
  */
-export type ChipSurface = "tonal" | "elevated";
+export type ChipSurface = "flat" | "elevated" | "tonal";
 
 /**
  * Material Design 3 Chip Component Props
@@ -54,8 +55,13 @@ export interface ChipProps {
   label: string;
 
   /**
-   * Surface style (Assist and Suggestion chips only).
-   * @default 'tonal'
+   * Surface style applied to the chip.
+   *
+   * - `flat` (default) — transparent container with outline border per MD3 spec.
+   * - `elevated` — `surface-container-low` fill + elevation shadow; works with all chip types.
+   * - `tonal` — @deprecated alias for `flat`; logs a console.warn in development.
+   *
+   * @default 'flat'
    */
   surface?: ChipSurface;
 
@@ -86,6 +92,11 @@ export interface ChipProps {
 
   /**
    * Icon rendered before the label.
+   * Color follows the MD3 spec per chip type:
+   * - assist → `text-primary`
+   * - filter (unselected) → `text-on-surface-variant`; (selected) → `text-on-secondary-container`
+   * - input → `text-on-surface-variant`
+   * - suggestion → `text-on-surface-variant`
    */
   leadingIcon?: React.ReactNode;
 
@@ -104,6 +115,61 @@ export interface ChipProps {
    * Additional CSS classes (Tailwind).
    */
   className?: string;
+}
+
+/**
+ * Props passed through to the chip body element (button) in ChipHeadless.
+ * Allows the styled layer to inject data-* interaction attributes and
+ * merged hover/focus event handlers.
+ */
+export interface ChipBodyPassthroughProps {
+  /**
+   * Merged hover/focus/press event handlers from the styled layer.
+   * Spread onto the body <button>.
+   */
+  eventHandlers?: Record<string, unknown>;
+
+  /**
+   * data-* interaction attributes emitted by getInteractionDataAttributes.
+   * Spread onto the body <button>.
+   */
+  dataAttributes?: Record<string, string | undefined>;
+
+  /**
+   * onPressStart forwarded into useButton/useToggleButton for isPressed tracking.
+   */
+  onPressStart?: () => void;
+
+  /**
+   * onPressEnd forwarded into useButton/useToggleButton for isPressed tracking.
+   */
+  onPressEnd?: () => void;
+}
+
+/**
+ * Props passed through to the remove button element in InputChipImpl.
+ */
+export interface ChipRemovePassthroughProps {
+  /**
+   * data-* interaction attributes for the remove button.
+   */
+  dataAttributes?: Record<string, string | undefined>;
+
+  /**
+   * Merged hover/focus event handlers from useHover + useFocusRing.
+   * Spread onto the remove <button> alongside React Aria's buttonProps.
+   */
+  eventHandlers?: Record<string, unknown>;
+
+  /**
+   * onPressStart for remove button isPressed tracking.
+   */
+  onPressStart?: () => void;
+
+  /**
+   * onPressEnd for remove button isPressed tracking.
+   */
+  onPressEnd?: () => void;
 }
 
 /**
@@ -163,7 +229,7 @@ export interface ChipHeadlessProps {
   isDisabled?: boolean;
 
   /**
-   * Additional CSS classes (Tailwind).
+   * Additional CSS classes applied to the chip body button.
    */
   className?: string;
 
@@ -174,7 +240,7 @@ export interface ChipHeadlessProps {
 
   /**
    * Icon rendered inside the remove button (Input chips only).
-   * Typically an ×/close SVG.
+   * Typically an ×/close SVG wrapped in a fragment with a state layer span.
    */
   removeIcon?: React.ReactNode;
 
@@ -188,6 +254,18 @@ export interface ChipHeadlessProps {
    * Used by the styled layer to trigger the ripple effect.
    */
   onMouseDown?: React.MouseEventHandler<HTMLButtonElement>;
+
+  /**
+   * Interaction data attributes + merged handlers from the styled layer.
+   * Spread onto the body <button> to enable group-data-[x]/chip slot selectors.
+   */
+  bodyPassthrough?: ChipBodyPassthroughProps;
+
+  /**
+   * Interaction data attributes + handlers for the remove button (Input chips only).
+   * Spread onto the remove <button>.
+   */
+  removePassthrough?: ChipRemovePassthroughProps;
 }
 
 /**

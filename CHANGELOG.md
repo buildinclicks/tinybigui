@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Chip** — MD3 expressive slot-based variants-vs-states architecture; per-type color token corrections; elevated surface support for all chip types; spring motion tokens; dedicated focus-ring and remove-button state-layer slots; new slot variant exports
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for breaking change details and migration notes.
+
 ## [0.8.1] - 2026-06-09
 
 ### Changed
