@@ -92,7 +92,7 @@ const meta: Meta<typeof AppBar> = {
     docs: {
       description: {
         component:
-          "Material Design 3 Top App Bar. Provides context and actions for the current screen. Supports four size variants (small, center-aligned, medium, large), an optional subtitle, and composable navigation icon and action icon slots. Supports scroll-triggered elevation with `bg-surface-container` background per MD3 spec.",
+          "Material Design 3 Top App Bar (M3 Expressive Flexible). Provides context and actions for the current screen. Supports four size variants (small, center-aligned, medium, large), an optional subtitle, and composable navigation icon and action icon slots. Medium and large variants are M3 Expressive Flexible bars that grow vertically when a subtitle is present (136dp / 152dp). Scroll-triggered elevation applies `bg-surface-container` + `shadow-elevation-2` via a presence-based `data-scrolled` attribute and standard spring motion.",
       },
     },
   },
@@ -106,7 +106,7 @@ const meta: Meta<typeof AppBar> = {
     scrolled: {
       control: "boolean",
       description:
-        "Controlled scroll state. When true, applies surface-container background and elevation-2.",
+        "Controlled scroll state. When true, sets data-scrolled and applies surface-container background + elevation-2 via group-data selectors.",
     },
     title: {
       control: "text",
@@ -114,7 +114,8 @@ const meta: Meta<typeof AppBar> = {
     },
     subtitle: {
       control: "text",
-      description: "Optional subtitle rendered below the title. Typography is applied per variant.",
+      description:
+        "Optional subtitle rendered below the title. M3 Expressive Flexible type scales: small/center = label-medium (on-surface-variant); medium expanded = label-large (on-surface-variant); large expanded = title-medium (on-surface-variant). Setting a subtitle on medium/large also grows the bar height: 136dp (medium) / 152dp (large).",
     },
   },
 };
@@ -148,7 +149,7 @@ export const Variants: Story = {
     <div className="divide-outline-variant flex flex-col gap-0 divide-y">
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          small — 64dp, title-large
+          small — 64dp, title: title-large
         </p>
         <AppBar
           variant="small"
@@ -159,7 +160,7 @@ export const Variants: Story = {
       </div>
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          center-aligned — 64dp, title-large, centered
+          center-aligned — 64dp, title: title-large, centered
         </p>
         <AppBar
           variant="center-aligned"
@@ -170,7 +171,7 @@ export const Variants: Story = {
       </div>
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          medium — min 112dp, headline-medium
+          medium — 112dp (136dp with subtitle), title: headline-medium, subtitle: label-large
         </p>
         <AppBar
           variant="medium"
@@ -181,7 +182,7 @@ export const Variants: Story = {
       </div>
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          large — min 120dp, display-small
+          large — 120dp (152dp with subtitle), title: display-small, subtitle: title-medium
         </p>
         <AppBar
           variant="large"
@@ -196,7 +197,7 @@ export const Variants: Story = {
     docs: {
       description: {
         story:
-          "All four MD3 Top App Bar size variants. Each uses a different bar height and title type scale per MD3 specifications.",
+          "All four MD3 Top App Bar size variants. Small and center-aligned are fixed at 64dp. Medium and large are M3 Expressive Flexible bars: 112/120dp without subtitle, 136/152dp with subtitle.",
       },
     },
   },
@@ -431,7 +432,7 @@ export const WithSubtitle: Story = {
     <div className="divide-outline-variant flex flex-col gap-0 divide-y">
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          small — subtitle uses title-medium / on-surface-variant
+          small — subtitle: label-medium / on-surface-variant (64dp)
         </p>
         <AppBar
           variant="small"
@@ -443,7 +444,7 @@ export const WithSubtitle: Story = {
       </div>
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          center-aligned — subtitle centered, title-medium / on-surface-variant
+          center-aligned — subtitle centered, label-medium / on-surface-variant (64dp)
         </p>
         <AppBar
           variant="center-aligned"
@@ -455,7 +456,7 @@ export const WithSubtitle: Story = {
       </div>
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          medium — subtitle uses title-large / on-surface
+          medium — subtitle: label-large / on-surface-variant (grows to 136dp with subtitle)
         </p>
         <AppBar
           variant="medium"
@@ -472,7 +473,7 @@ export const WithSubtitle: Story = {
       </div>
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          large — subtitle uses headline-small / on-surface
+          large — subtitle: title-medium / on-surface-variant (grows to 152dp with subtitle)
         </p>
         <AppBar
           variant="large"
@@ -488,7 +489,7 @@ export const WithSubtitle: Story = {
     docs: {
       description: {
         story:
-          "Subtitle rendered below the title in all four variants. Typography and color are applied per MD3 spec: small/center-aligned use title-medium + on-surface-variant; medium uses title-large + on-surface; large uses headline-small + on-surface.",
+          "M3 Expressive Flexible subtitle type scales: small/center-aligned use label-medium + on-surface-variant; medium uses label-large + on-surface-variant (bar grows to 136dp); large uses title-medium + on-surface-variant (bar grows to 152dp). All subtitle colors are on-surface-variant per the M3 Expressive flexible spec.",
       },
     },
   },
@@ -542,7 +543,7 @@ export const Medium: Story = {
     docs: {
       description: {
         story:
-          "Medium variant with min 112dp height. Title sits in the bottom-left using headline-medium (28px) type scale. Ideal for content screens.",
+          "Medium M3 Expressive Flexible app bar: 112dp without subtitle, 136dp with subtitle. Title uses headline-medium (28px) in the expanded bottom area. Add a subtitle to see the bar grow to 136dp with label-large type.",
       },
     },
   },
@@ -561,7 +562,7 @@ export const Large: Story = {
     docs: {
       description: {
         story:
-          "Large variant with min 120dp height. Title sits at the bottom using display-small (36px) type scale. Use for top-level screens needing strong visual hierarchy.",
+          "Large M3 Expressive Flexible app bar: 120dp without subtitle, 152dp with subtitle. Title uses display-small (36px) in the expanded bottom area. Add a subtitle to see the bar grow to 152dp with title-medium type.",
       },
     },
   },
@@ -700,7 +701,7 @@ export const ScrolledState: Story = {
     <div className="divide-outline-variant flex flex-col gap-0 divide-y">
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          At rest — bg-surface, shadow-elevation-0
+          At rest — bg-surface, shadow-elevation-0 (no data-scrolled attribute)
         </p>
         <AppBar
           variant="small"
@@ -711,7 +712,7 @@ export const ScrolledState: Story = {
       </div>
       <div>
         <p className="text-label-medium text-on-surface-variant px-4 py-2">
-          Scrolled — bg-surface-container, shadow-elevation-2
+          Scrolled — bg-surface-container, shadow-elevation-2 (data-scrolled="" present)
         </p>
         <AppBar
           variant="small"
@@ -726,7 +727,7 @@ export const ScrolledState: Story = {
     docs: {
       description: {
         story:
-          "Flat vs elevated surface comparison. On scroll, `bg-surface-container` fills the bar and `shadow-elevation-2` separates it from content. The transition uses MD3 motion tokens.",
+          "Flat vs elevated surface comparison. On scroll, `data-scrolled` is set on the root and `group-data-[scrolled]/appbar` selectors apply `bg-surface-container` + `shadow-elevation-2`. The transition uses the MD3 standard effects spring pair (background-color + box-shadow).",
       },
     },
   },
@@ -834,7 +835,7 @@ export const MediumAndLarge: Story = {
     docs: {
       description: {
         story:
-          "Medium (min 112dp, headline-medium) and Large (min 120dp, display-small) variants. Both place the title in the bottom-left of the expanded area, with a fixed 64dp top row for navigation icon and actions.",
+          "Medium (112dp no subtitle / 136dp with subtitle, headline-medium title) and Large (120dp no subtitle / 152dp with subtitle, display-small title) M3 Expressive Flexible variants. Both place the title in the bottom-left of the expanded area, with a fixed 64dp top row for navigation icon and actions.",
       },
     },
   },
