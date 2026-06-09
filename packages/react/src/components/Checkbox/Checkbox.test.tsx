@@ -56,21 +56,18 @@ describe("Checkbox", () => {
       expect(checkbox.indeterminate).toBe(true);
     });
 
-    test("renders error state", () => {
+    test("renders error state with data-invalid attribute", () => {
       render(<Checkbox isInvalid>Error</Checkbox>);
       const label = screen.getByText("Error").closest("label");
-
-      // Visual error styling should be applied
-      expect(label).toBeInTheDocument();
+      // Variants-vs-States: error state is signalled via data-invalid on root
+      expect(label).toHaveAttribute("data-invalid", "");
     });
 
-    test("renders disabled state", () => {
+    test("renders disabled state with data-disabled attribute", () => {
       render(<Checkbox isDisabled>Disabled</Checkbox>);
       const label = screen.getByText("Disabled").closest("label");
-
-      // Visual styling should indicate disabled state
-      expect(label).toHaveClass("opacity-38");
-      expect(label).toHaveClass("pointer-events-none");
+      // Variants-vs-States: disabled state is signalled via data-disabled on root
+      expect(label).toHaveAttribute("data-disabled", "");
     });
   });
 
@@ -114,8 +111,8 @@ describe("Checkbox", () => {
       const checkbox = screen.getByRole("checkbox");
       const label = screen.getByText("Disabled").closest("label");
 
-      // Visual disabled state should be applied
-      expect(label).toHaveClass("opacity-38");
+      // Disabled state signalled via data-disabled; CSS pointer-events-none applied via Tailwind
+      expect(label).toHaveAttribute("data-disabled", "");
       expect(checkbox).not.toBeChecked();
     });
 
@@ -213,13 +210,14 @@ describe("Checkbox", () => {
       expect(checkbox.indeterminate).toBe(true);
     });
 
-    test("has invalid state when invalid", () => {
+    test("has data-invalid attribute on root when invalid", () => {
       render(<Checkbox isInvalid>Invalid</Checkbox>);
       screen.getByRole("checkbox");
       const label = screen.getByText("Invalid").closest("label");
-      expect(label).toBeInTheDocument();
-      const visualContainer = label?.querySelector("div > svg");
-      expect(visualContainer).toBeInTheDocument();
+      expect(label).toHaveAttribute("data-invalid", "");
+      // Control box is present inside the control slot
+      const control = label?.querySelector("[role='presentation']");
+      expect(control).toBeInTheDocument();
     });
 
     test("supports aria-describedby", () => {
@@ -253,26 +251,24 @@ describe("Checkbox", () => {
   });
 
   describe("Disabled", () => {
-    test("applies disabled styling", () => {
+    test("applies disabled styling via data-disabled attribute", () => {
       render(<Checkbox isDisabled>Disabled</Checkbox>);
       const label = screen.getByText("Disabled").closest("label");
-      expect(label).toHaveClass("opacity-38");
+      // Variants-vs-States: disabled state expressed as data-disabled on root
+      expect(label).toHaveAttribute("data-disabled", "");
     });
 
-    test("checkbox has disabled state", () => {
+    test("checkbox has disabled state via data-disabled attribute", () => {
       render(<Checkbox isDisabled>Disabled</Checkbox>);
-      screen.getByRole("checkbox");
       const label = screen.getByText("Disabled").closest("label");
-
-      expect(label).toHaveClass("pointer-events-none");
+      expect(label).toHaveAttribute("data-disabled", "");
     });
 
     test("does not respond to interactions when disabled", () => {
       render(<Checkbox isDisabled>Disabled</Checkbox>);
       const label = screen.getByText("Disabled").closest("label");
-
-      // pointer-events-none prevents interaction
-      expect(label).toHaveClass("pointer-events-none");
+      // CSS pointer-events-none is applied via data-[disabled]: Tailwind selector
+      expect(label).toHaveAttribute("data-disabled", "");
     });
   });
 
@@ -330,25 +326,28 @@ describe("Checkbox", () => {
   });
 
   describe("Focus", () => {
-    test("shows focus ring on keyboard focus", async () => {
+    test("shows focus on keyboard navigation", async () => {
       const user = userEvent.setup();
       render(<Checkbox>Focus me</Checkbox>);
       const checkbox = screen.getByRole("checkbox");
 
       await user.tab();
       expect(checkbox).toHaveFocus();
-      // Focus ring is rendered as part of SVG when isFocusVisible is true
       const label = screen.getByText("Focus me").closest("label");
-      expect(label).toBeInTheDocument();
+      // Focus-visible state is expressed via data-focus-visible on root
+      expect(label).toHaveAttribute("data-focus-visible", "");
     });
 
-    test("does not show focus ring on mouse click", async () => {
+    test("does not show keyboard focus ring on mouse click", async () => {
       const user = userEvent.setup();
       render(<Checkbox>Click me</Checkbox>);
       const checkbox = screen.getByRole("checkbox");
 
       await user.click(checkbox);
       expect(checkbox).toHaveFocus();
+      // After mouse click, focus-visible should NOT be set
+      const label = screen.getByText("Click me").closest("label");
+      expect(label).not.toHaveAttribute("data-focus-visible");
     });
   });
 

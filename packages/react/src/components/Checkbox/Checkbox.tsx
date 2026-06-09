@@ -2,14 +2,17 @@
 
 import { forwardRef, useRef, useEffect } from "react";
 import type React from "react";
-import { useCheckbox, useFocusRing, mergeProps, VisuallyHidden } from "react-aria";
+import { useCheckbox, useFocusRing, useHover, mergeProps, VisuallyHidden } from "react-aria";
 import { useToggleState } from "react-stately";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
 import {
-  checkboxVariants,
-  checkboxContainerVariants,
-  checkboxIconBoxVariants,
+  checkboxRootVariants,
+  checkboxControlVariants,
+  checkboxStateLayerVariants,
+  checkboxFocusRingVariants,
+  checkboxBoxVariants,
   checkboxIconVariants,
   checkboxLabelVariants,
 } from "./Checkbox.variants";
@@ -19,23 +22,23 @@ import type { CheckboxProps } from "./Checkbox.types";
  * Material Design 3 Checkbox Component (Layer 3: Styled)
  *
  * Built on React Aria for world-class accessibility.
- * Uses CVA for type-safe variant management.
- * Styled with Tailwind CSS using MD3 design tokens.
+ * Implements the Variants-vs-States architecture: all interaction/selection
+ * states are expressed as data-* attributes on the root and consumed by each
+ * slot via group-data-[x]/checkbox Tailwind selectors — no state variants in CVA.
  *
  * Features:
- * - ✅ 3 states: unchecked, checked, indeterminate
- * - ✅ Error/invalid state support
- * - ✅ Ripple effect (Material Design)
- * - ✅ Full keyboard accessibility (via React Aria)
- * - ✅ Screen reader support (via React Aria)
- * - ✅ Focus management (via React Aria)
- * - ✅ Form integration (name, value props)
+ * - 3 states: unchecked, checked, indeterminate
+ * - Error/invalid state support
+ * - Ripple effect (Material Design)
+ * - Full keyboard accessibility (via React Aria)
+ * - Screen reader support (via React Aria)
+ * - Focus management (via React Aria)
+ * - Form integration (name, value props)
  *
  * MD3 Specifications:
- * - Container: 18x18dp (within 40x40dp touch target)
- * - Corner radius: 2dp (applied via SVG rx/ry attributes)
- * - State layers: 8% hover, 12% focus/pressed
- * - Disabled: 38% opacity
+ * - Box: 18×18dp, 2dp corner radius, within 40×40dp touch target
+ * - State-layer opacities: hover 8% | focus/pressed 10%
+ * - Disabled: 38% opacity on root
  * - Label spacing: 16px (ml-4)
  *
  * @example
@@ -64,61 +67,47 @@ import type { CheckboxProps } from "./Checkbox.types";
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
-      // Content props
       children,
-
-      // State props
       isIndeterminate = false,
       isInvalid = false,
       disableRipple = false,
       isDisabled = false,
-
-      // Styling
       className,
-
-      // Other props
       ...props
     },
     forwardedRef
   ) => {
-    // Internal ref for React Aria
     const internalRef = useRef<HTMLInputElement>(null);
-
-    // Merge internal ref with forwarded ref
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLInputElement>;
 
-    // Extract data-testid and other HTML attributes
+    // Extract passthrough HTML attributes that React Aria doesn't understand
     const htmlAttrs = props as Record<string, unknown>;
     const dataTestId = htmlAttrs["data-testid"] as string | undefined;
     const htmlId = htmlAttrs.id as string | undefined;
     const htmlTitle = htmlAttrs.title as string | undefined;
 
-    // Remove HTML attributes from props for React Aria
     const {
       "data-testid": _dataTestId,
       id: _htmlId,
       title: _htmlTitle,
-      ...restPropsWithoutHtmlAttrs
+      ...ariaProps
     } = props as Record<string, unknown>;
 
     // State management using React Stately
-    const state = useToggleState(restPropsWithoutHtmlAttrs as Parameters<typeof useToggleState>[0]);
+    const state = useToggleState(ariaProps as Parameters<typeof useToggleState>[0]);
 
-    // React Aria hooks - pass props without HTML attributes
-    const { inputProps, labelProps } = useCheckbox(
-      restPropsWithoutHtmlAttrs as Parameters<typeof useCheckbox>[0],
+    // React Aria hooks
+    const { inputProps, labelProps, isPressed } = useCheckbox(
+      ariaProps as Parameters<typeof useCheckbox>[0],
       state,
       ref
     );
     const { isFocusVisible, focusProps } = useFocusRing();
+    const { isHovered, hoverProps } = useHover({ isDisabled });
 
-    // Get selected state
     const isSelected = state.isSelected;
 
-    // Determine visual state
-    const visualState = isIndeterminate ? "indeterminate" : isSelected ? "checked" : "unchecked";
-
-    // Ripple effect
+    // Ripple effect on the control container
     const { onMouseDown: handleRipple, ripples } = useRipple({
       disabled: isDisabled || disableRipple,
     });
@@ -130,13 +119,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       }
     }, [isIndeterminate, ref]);
 
-    // Development warnings
     if (process.env.NODE_ENV === "development") {
-      const ariaProps = restPropsWithoutHtmlAttrs as {
-        "aria-label"?: string;
-        "aria-labelledby"?: string;
-      };
-      if (!children && !ariaProps["aria-label"] && !ariaProps["aria-labelledby"]) {
+      const a = ariaProps as { "aria-label"?: string; "aria-labelledby"?: string };
+      if (!children && !a["aria-label"] && !a["aria-labelledby"]) {
         console.warn(
           "[Checkbox] Checkbox should have a label (children) or aria-label for accessibility."
         );
@@ -145,108 +130,86 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
     return (
       <label
-        {...labelProps}
-        className={cn(
-          checkboxVariants({
-            disabled: isDisabled,
-          }),
-          className
-        )}
+        {...mergeProps(labelProps, hoverProps)}
+        className={cn(checkboxRootVariants(), "group/checkbox", className)}
         data-testid={dataTestId}
         title={htmlTitle}
+        // ── Interaction + selection data attributes ──────────────────────────
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          isSelected,
+          isDisabled,
+          isInvalid,
+          isIndeterminate,
+          isReadOnly: (ariaProps as { isReadOnly?: boolean }).isReadOnly ?? false,
+        })}
       >
-        {/* Visually hidden native input for accessibility */}
+        {/* Visually hidden native input — handles all accessibility */}
         <VisuallyHidden>
           <input {...mergeProps(inputProps, focusProps)} ref={ref} id={htmlId} />
         </VisuallyHidden>
 
-        {/* Visual checkbox container */}
+        {/* Control — 40dp touch target, ripple host */}
         <div
           role="presentation"
-          className={cn(
-            checkboxContainerVariants({
-              state: visualState,
-              isInvalid,
-              disabled: isDisabled,
-            })
-          )}
+          className={cn(checkboxControlVariants())}
           onMouseDown={handleRipple}
         >
-          {/* Ripple effect */}
+          {/* Ripple */}
           {ripples}
 
-          {/* SVG Checkbox Visual */}
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            aria-hidden="true"
-            className="relative z-10"
-          >
-            {/* Checkbox box (rounded square) */}
-            <rect
-              x="0"
-              y="0"
-              width="18"
-              height="18"
-              rx="2"
-              ry="2"
-              className={cn(
-                checkboxIconBoxVariants({
-                  state: visualState,
-                  disabled: isDisabled,
-                })
-              )}
-            />
+          {/* State layer — hover/focus/pressed opacity ring */}
+          <span className={cn(checkboxStateLayerVariants())} aria-hidden="true" />
 
-            {/* Checkmark icon (for checked state) */}
+          {/* Focus ring — keyboard-focus outline */}
+          <span className={cn(checkboxFocusRingVariants())} aria-hidden="true" />
+
+          {/* Box — 18dp visual checkbox square */}
+          <div className={cn(checkboxBoxVariants())} aria-hidden="true">
+            {/* Check icon */}
             {isSelected && !isIndeterminate && (
-              <path
-                d="M14.1 4.5L6.3 12.3l-3.4-3.4L1.5 10.3l4.8 4.8 9.2-9.2z"
-                className={cn(checkboxIconVariants({ type: "check" }), "fill-on-primary")}
-              />
+              <span className={cn(checkboxIconVariants())}>
+                <svg
+                  width="12"
+                  height="10"
+                  viewBox="0 0 12 10"
+                  fill="none"
+                  aria-hidden="true"
+                  className="fill-current"
+                >
+                  <path
+                    d="M1 5L4.5 8.5L11 1.5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
             )}
 
-            {/* Dash icon (for indeterminate state) */}
+            {/* Dash icon — indeterminate state */}
             {isIndeterminate && (
-              <rect
-                x="4"
-                y="8"
-                width="10"
-                height="2"
-                className={cn(checkboxIconVariants({ type: "dash" }), "fill-on-primary")}
-              />
+              <span className={cn(checkboxIconVariants())}>
+                <svg
+                  width="10"
+                  height="2"
+                  viewBox="0 0 10 2"
+                  fill="none"
+                  aria-hidden="true"
+                  className="fill-current"
+                >
+                  <rect x="0" y="0" width="10" height="2" rx="1" fill="currentColor" />
+                </svg>
+              </span>
             )}
-
-            {/* Focus ring (visible on keyboard focus) */}
-            {isFocusVisible && (
-              <rect
-                x="-3"
-                y="-3"
-                width="24"
-                height="24"
-                rx="12"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="animate-pulse"
-              />
-            )}
-          </svg>
+          </div>
         </div>
 
-        {/* Label text */}
-        {children && (
-          <span
-            className={cn(
-              checkboxLabelVariants({
-                disabled: isDisabled,
-              })
-            )}
-          >
-            {children}
-          </span>
-        )}
+        {/* Text label */}
+        {children && <span className={cn(checkboxLabelVariants())}>{children}</span>}
       </label>
     );
   }
