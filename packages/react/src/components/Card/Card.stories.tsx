@@ -521,6 +521,182 @@ export const DraggedState: Story = {
   },
 };
 
+// ─── States ───────────────────────────────────────────────────────────────────
+
+/**
+ * Showcases all MD3 card interaction states side-by-side.
+ * Hover/focus/dragged states are demonstrated inline via Storybook controls
+ * since CSS-driven states require user interaction in a live browser.
+ */
+export const States: Story = {
+  render: () => (
+    <div className="flex flex-col items-start gap-6">
+      {/* Default (resting) */}
+      <div className="flex flex-col gap-1">
+        <span className="text-on-surface-variant text-label-small">Resting (elevated)</span>
+        <Card variant="elevated" className="w-72">
+          <CardHeader headline="Resting state" subheader="No interaction" />
+          <CardContent>
+            <p className="text-on-surface-variant text-body-medium">
+              1dp elevation, no state layer.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Interactive (hover to see state layer + elevation 2dp) */}
+      <div className="flex flex-col gap-1">
+        <span className="text-on-surface-variant text-label-small">
+          Interactive — hover / focus / press
+        </span>
+        <Card
+          variant="elevated"
+          className="w-72"
+          onPress={() => undefined}
+          aria-label="Interactive card — hover to see state layer"
+        >
+          <CardHeader headline="Interactive card" subheader="Hover · Focus · Press" />
+          <CardContent>
+            <p className="text-on-surface-variant text-body-medium">
+              Hover → 8% on-surface overlay + 2dp elevation. Focus (keyboard) → 10% + focus ring.
+              Press → 10% + 1dp.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Draggable */}
+      <div className="flex flex-col gap-1">
+        <span className="text-on-surface-variant text-label-small">Dragged — click and hold</span>
+        <Card
+          variant="elevated"
+          className="w-72"
+          isDraggable
+          onPress={() => undefined}
+          aria-label="Draggable card"
+        >
+          <CardHeader headline="Dragged state" subheader="isDraggable — click &amp; hold" />
+          <CardContent>
+            <p className="text-on-surface-variant text-body-medium">
+              Hold mousedown → 16% state-layer opacity + 4dp elevation.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Disabled */}
+      <div className="flex flex-col gap-1">
+        <span className="text-on-surface-variant text-label-small">Disabled</span>
+        <Card
+          variant="elevated"
+          className="w-72"
+          isDisabled
+          onPress={() => undefined}
+          aria-label="Disabled card"
+        >
+          <CardHeader headline="Disabled state" subheader="isDisabled=true" />
+          <CardContent>
+            <p className="text-on-surface-variant text-body-medium">
+              38% opacity on the container — no shadow, no hover, no ripple.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* All three variants interactive */}
+      <div className="flex flex-col gap-1">
+        <span className="text-on-surface-variant text-label-small">All variants — interactive</span>
+        <div className="flex flex-row gap-4">
+          {(["elevated", "filled", "outlined"] as const).map((variant) => (
+            <Card
+              key={variant}
+              variant={variant}
+              className="w-48"
+              onPress={() => undefined}
+              aria-label={`${variant} interactive card`}
+            >
+              <CardHeader headline={variant} subheader="hover me" />
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MD3 card interaction states: resting, interactive (hover/focus/press), dragged, and disabled across all three variants. Motion uses the Standard **default** tier (200ms effects spring) per the MD3 size-tier rule for standard-size components.",
+      },
+    },
+  },
+};
+
+// ─── WithMedia43 ──────────────────────────────────────────────────────────────
+
+export const WithMedia43: Story = {
+  render: () => (
+    <div className="flex flex-row items-start gap-6">
+      <div className="flex flex-col gap-1">
+        <Card variant="elevated" className="w-72">
+          <CardMedia
+            src="https://picsum.photos/seed/ratio43/400/300"
+            alt="4:3 landscape placeholder"
+            aspectRatio="4/3"
+          />
+          <CardHeader headline="4 : 3 media" subheader='aspectRatio="4/3"' />
+          <CardContent>
+            <p className="text-on-surface-variant text-body-medium">
+              Correct 4:3 ratio — previously rendered at 16:9 (bug fix).
+            </p>
+          </CardContent>
+        </Card>
+        <span className="text-on-surface-variant text-label-small">4 / 3</span>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Card variant="elevated" className="w-72">
+          <CardMedia
+            src="https://picsum.photos/seed/ratio169/400/225"
+            alt="16:9 landscape placeholder"
+            aspectRatio="16/9"
+          />
+          <CardHeader headline="16 : 9 media" subheader='aspectRatio="16/9"' />
+          <CardContent>
+            <p className="text-on-surface-variant text-body-medium">
+              Standard 16:9 widescreen ratio — unchanged reference.
+            </p>
+          </CardContent>
+        </Card>
+        <span className="text-on-surface-variant text-label-small">16 / 9</span>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Card variant="elevated" className="w-72">
+          <CardMedia
+            src="https://picsum.photos/seed/ratio11/300/300"
+            alt="1:1 square placeholder"
+            aspectRatio="1/1"
+          />
+          <CardHeader headline="1 : 1 media" subheader='aspectRatio="1/1"' />
+          <CardContent>
+            <p className="text-on-surface-variant text-body-medium">Square aspect ratio.</p>
+          </CardContent>
+        </Card>
+        <span className="text-on-surface-variant text-label-small">1 / 1</span>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Side-by-side comparison of all supported `CardMedia` aspect ratios: **4/3** (bug-fixed — was previously rendering as 16:9), **16/9**, and **1/1**.",
+      },
+    },
+  },
+};
+
 // ─── Playground ───────────────────────────────────────────────────────────────
 
 export const Playground: Story = {
