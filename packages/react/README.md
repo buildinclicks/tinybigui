@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.7.0** (2026-06-09)
+> **Latest Release: v0.8.0** (2026-06-09)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -170,15 +170,15 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 4: Data Display ✅
 
-| Component    | Status | Description                             |
-| ------------ | ------ | --------------------------------------- |
-| `Card`       | ✅     | Elevated, filled, outlined variants     |
-| `List`       | ✅     | Static and interactive list items       |
-| `Chip`       | ✅     | Assist, Filter, Input, Suggestion types |
-| `Badge`      | ✅     | Dot and count notification badges       |
-| `Divider`    | ✅     | Horizontal/vertical, inset variants     |
-| `DatePicker` | ✅     | Docked, modal, and input variants       |
-| `TimePicker` | ✅     | 12h/24h clock dial, range selection     |
+| Component    | Status | Description                                                     |
+| ------------ | ------ | --------------------------------------------------------------- |
+| `Card`       | ✅     | Elevated, filled, outlined variants                             |
+| `List`       | ✅     | Static and interactive list items                               |
+| `Chip`       | ✅     | Assist, Filter, Input, Suggestion types                         |
+| `Badge`      | ✅     | MD3 expressive dot/count badges, icon-corner anchoring (v0.8.0) |
+| `Divider`    | ✅     | Horizontal/vertical, inset variants                             |
+| `DatePicker` | ✅     | Docked, modal, and input variants                               |
+| `TimePicker` | ✅     | 12h/24h clock dial, range selection                             |
 
 ### Planned
 

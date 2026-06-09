@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Badge** — M3 expressive variants-vs-states architecture; removes non-spec `color` prop; anchors indicator to wrapped element's top-right corner per MD3 spec; adds `badgeStaticVariants` export for inline badge pills
+- **DrawerItem** — Trailing config-based badge now renders inline static pill via `badgeStaticVariants`
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full breaking change details and migration notes.
+
 ## [0.7.0] - 2026-06-09
 
 ### Changed

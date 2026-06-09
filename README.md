@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.7.0** (2026-06-09)
+> **Latest Release: v0.8.0** (2026-06-09)
 >
-> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **1,969 tests** passing.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **1,976 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,7 +94,7 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.7.0   | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.8.0   | Released |
 | [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.4.2   | Released |
 
 ---
@@ -154,7 +154,7 @@ This is a monorepo containing multiple packages:
 - [x] Card — elevated, filled, outlined variants (v0.4.0)
 - [x] List — static and interactive modes (v0.4.0)
 - [x] Chip — Assist, Filter, Input, Suggestion types (v0.4.0)
-- [x] Badge — dot and count variants (v0.4.0)
+- [x] Badge — MD3 expressive variants/states, icon-corner anchoring (v0.8.0)
 - [x] Divider — horizontal/vertical, inset variants (v0.4.0)
 - [x] DatePicker + TimePicker — docked, modal, input variants (v0.4.0)
 
