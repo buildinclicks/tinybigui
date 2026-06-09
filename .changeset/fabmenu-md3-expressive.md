@@ -17,10 +17,13 @@
 
 - `color` prop on `FABMenuItem` (default `primary-container`): choose from 6 MD3 Expressive color roles — `primary-container`, `secondary-container`, `tertiary-container`, `primary`, `secondary`, `tertiary`.
 - New exported slot CVAs: `fabMenuItemStateLayerVariants`, `fabMenuItemFocusRingVariants`, `fabMenuItemIconVariants`, `fabMenuItemLabelVariants`.
-- New exported type: `FABMenuItemColor`.
+- New exported CVA: `fabMenuListVariants` — absolutely-positioned overlay with per-direction anchoring via logical insets (`end-0`, `start-full`, etc.) so RTL placement is automatic.
+- New exported types: `FABMenuItemColor`, `FABMenuListVariants`.
 - Correct MD3 state-layer opacities: hover 8% / focus 10% / pressed 10% (was hover-only).
 - Dedicated focus ring slot (`inset-[-3px]`, keyboard-only) per Button/FAB architecture.
 - Elevation 3 base → 4 hover → 3 focus/pressed per MD3 FAB spec.
+- Trigger FAB is now the **sole in-flow child** of the root; action items render as an **absolutely-positioned overlay** so the FAB never shifts position when the menu opens or closes.
+- Scale-in/out pivot (`transform-origin`) aligns with the FAB edge per direction so items appear to emanate from the trigger.
 - Trigger FAB icon morph (+→×) now uses `expressive-fast-spatial` motion tokens, guarded by `useReducedMotion`.
 - Ripple effect on menu items.
 - Full React Aria keyboard accessibility via `useButton`/`useHover`/`useFocusRing`.
