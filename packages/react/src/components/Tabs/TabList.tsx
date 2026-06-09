@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useRef, useLayoutEffect, useState, useCallback } from "react";
+import { forwardRef, useRef, useLayoutEffect, useState, useCallback, useEffect } from "react";
 import type React from "react";
 import { useTabList } from "react-aria";
 import { cn } from "../../utils/cn";
@@ -10,7 +10,7 @@ import { tabListVariants, tabIndicatorVariants } from "./Tabs.variants";
 import type { TabListProps } from "./Tabs.types";
 
 /**
- * Indicator position and width state for the animated sliding underline
+ * Indicator position and width state for the animated sliding underline.
  */
 interface IndicatorStyle {
   left: number;
@@ -24,15 +24,12 @@ interface IndicatorStyle {
  * Uses React Aria's useTabList for role="tablist", keyboard navigation,
  * and accessibility attributes.
  *
- * The active indicator slides to the selected tab using CSS transitions
- * with MD3 motion tokens (medium2 duration, emphasized easing).
+ * Active indicator behavior (MD3 spec):
+ * - Primary: indicator width = content (label/icon) width, centered under content.
+ *   Measured via the [data-tab-content] child span of the selected tab.
+ * - Secondary: indicator spans the full tab button width.
  *
- * MD3 Specifications:
- * - Container background: bg-surface
- * - Container height: 48dp
- * - Bottom border: 1dp, outline-variant color
- * - Fixed layout: tabs fill width equally
- * - Scrollable layout: overflow-x, no wrapping
+ * Motion: left and width are spatial properties → spring-standard-default-spatial.
  *
  * @example
  * ```tsx
@@ -59,8 +56,7 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLDivElement>;
 
     // React Aria provides role="tablist", aria-label, and keyboard navigation.
-    // Conditionally spread ARIA props to satisfy exactOptionalPropertyTypes:
-    // passing undefined values explicitly would violate the strict optional type constraint.
+    // Conditionally spread ARIA props to satisfy exactOptionalPropertyTypes.
     const { tabListProps } = useTabList(
       {
         ...(ariaLabel !== undefined && { "aria-label": ariaLabel }),
@@ -76,7 +72,6 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
      * state.focusedKey. This is critical for test reliability: when a tab is focused
      * via element.focus() outside React's act() boundary, the setFocusedKey state
      * update is deferred and state.focusedKey may still be null when the keydown fires.
-     * Reading from the DOM directly avoids this race condition entirely.
      */
     const handleNavKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -89,11 +84,6 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
         const currentKey = focusedEl?.dataset?.key;
         if (!currentKey) return;
 
-        // Read the ordered tab keys and disabled state directly from the DOM.
-        // This is more reliable than state.collection.getKeys() because React Stately 3.x
-        // builds its collection through a virtual rendering context; when we compute
-        // <Item> elements programmatically inside Tabs.tsx, that context is never entered
-        // and state.collection remains empty. DOM attributes are always authoritative.
         const allTabEls = [...container.querySelectorAll<HTMLElement>("[data-key]")];
         const allKeys = allTabEls.map((el) => el.dataset.key!).filter(Boolean);
         const enabledKeys = allKeys.filter(
@@ -133,14 +123,8 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
       [state, ref]
     );
 
-    // Destructure onKeyDown so it can be used as a stable useCallback dependency.
     const { onKeyDown: tabListKeyDown } = tabListProps;
 
-    /**
-     * Combined keyboard handler: our DOM-based navigation runs first for arrow/home/end.
-     * If we call e.preventDefault() (signalling we handled it), React Aria's handler is
-     * skipped for that key. Other keys (Enter, Space, Tab) pass through to React Aria.
-     */
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLDivElement>) => {
         handleNavKeyDown(e);
@@ -156,9 +140,13 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
     const [indicatorReady, setIndicatorReady] = useState(false);
 
     /**
-     * Recalculates indicator position/width from the selected tab's DOM rect.
-     * Uses the [aria-selected="true"] element as the target.
-     * Only calls setState if values changed to prevent infinite update loops.
+     * Recalculates indicator position and width from the selected tab's DOM.
+     *
+     * Primary variant: measures the [data-tab-content] inner span of the selected tab,
+     * which contains only the icon/label. The indicator is centered under this content
+     * (MD3 spec: indicator hugs content, not the full tab width).
+     *
+     * Secondary variant: measures the full selected tab button rect (full tab width).
      */
     const updateIndicator = useCallback(() => {
       const container = ref.current;
@@ -168,28 +156,56 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
       if (!selectedTab) return;
 
       const containerRect = container.getBoundingClientRect();
-      const tabRect = selectedTab.getBoundingClientRect();
 
-      const newLeft = tabRect.left - containerRect.left + container.scrollLeft;
-      const newWidth = tabRect.width;
+      if (variant === "primary") {
+        // Primary: measure the content span centered under icon/label
+        const contentEl = selectedTab.querySelector<HTMLElement>("[data-tab-content]");
+        if (!contentEl) return;
 
-      // Use functional update to avoid stale closure and prevent needless re-renders
-      setIndicatorStyle((prev) => {
-        if (prev.left === newLeft && prev.width === newWidth) return prev;
-        return { left: newLeft, width: newWidth };
-      });
+        const contentRect = contentEl.getBoundingClientRect();
+        const newLeft = contentRect.left - containerRect.left + container.scrollLeft;
+        const newWidth = contentRect.width;
+
+        setIndicatorStyle((prev) => {
+          if (prev.left === newLeft && prev.width === newWidth) return prev;
+          return { left: newLeft, width: newWidth };
+        });
+      } else {
+        // Secondary: indicator spans the full tab button width
+        const tabRect = selectedTab.getBoundingClientRect();
+        const newLeft = tabRect.left - containerRect.left + container.scrollLeft;
+        const newWidth = tabRect.width;
+
+        setIndicatorStyle((prev) => {
+          if (prev.left === newLeft && prev.width === newWidth) return prev;
+          return { left: newLeft, width: newWidth };
+        });
+      }
+
       setIndicatorReady(true);
-    }, [ref]);
+    }, [ref, variant]);
 
-    // Only re-run when the selected key changes (not every render)
+    // Re-measure when selection changes or variant changes
     useLayoutEffect(() => {
       updateIndicator();
     }, [state.selectedKey, updateIndicator]);
 
+    // Re-measure on container resize (e.g. window resize, flex layout reflow)
+    useEffect(() => {
+      const container = ref.current;
+      if (!container || typeof ResizeObserver === "undefined") return;
+
+      const observer = new ResizeObserver(() => {
+        updateIndicator();
+      });
+      observer.observe(container);
+
+      return () => {
+        observer.disconnect();
+      };
+    }, [ref, updateIndicator]);
+
     // ── Render ──────────────────────────────────────────────────────────────
-    // Merge handleKeyDown into tabListProps so jsx-a11y can't flag a "static" div with
-    // an explicit onKeyDown. The role="tablist" (from tabListProps) makes it interactive,
-    // but ESLint can't trace roles through spread operators — this avoids the false positive.
     const mergedTabListProps = { ...tabListProps, onKeyDown: handleKeyDown };
 
     return (
@@ -206,7 +222,6 @@ export const TabList = forwardRef<HTMLDivElement, TabListProps>(
             !indicatorReady && "opacity-0"
           )}
           style={{
-            // Dynamic left/width values from DOM measurements
             left: `${indicatorStyle.left}px`,
             width: `${indicatorStyle.width}px`,
           }}

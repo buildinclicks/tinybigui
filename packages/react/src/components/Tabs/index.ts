@@ -46,6 +46,7 @@ export type {
 export {
   tabListVariants,
   tabVariants,
+  tabStateLayerVariants,
   tabIndicatorVariants,
   tabPanelVariants,
   tabBadgeVariants,
@@ -55,6 +56,7 @@ export {
 export type {
   TabListVariants,
   TabVariants,
+  TabStateLayerVariants,
   TabIndicatorVariants,
   TabPanelVariants,
   TabBadgeVariants,
