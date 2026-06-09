@@ -12,11 +12,11 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Released: v0.1.0** (2026-04-15)
+> **Latest Release: v0.7.0** (2026-06-09)
 >
-> This package is published to npm. Install it with `npm install @tinybigui/react`.
+> **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
-> Follow our [GitHub repository](https://github.com/buildinclicks/tinybigui) for updates!
+> Install with `npm install @tinybigui/react` — follow our [GitHub repository](https://github.com/buildinclicks/tinybigui) for updates!
 
 ---
 
@@ -127,46 +127,66 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 1a: Core Buttons ✅
 
-| Component    | Status | Description                   |
-| ------------ | ------ | ----------------------------- |
-| `Button`     | ✅     | Standard button with variants |
-| `IconButton` | ✅     | Button with icon only         |
-| `FAB`        | ✅     | FAB for primary actions       |
+| Component     | Status | Description                                      |
+| ------------- | ------ | ------------------------------------------------ |
+| `Button`      | ✅     | Filled, outlined, tonal, elevated, text variants |
+| `IconButton`  | ✅     | M3 Expressive 5-tier sizing, toggle mode         |
+| `FAB`         | ✅     | M3 Expressive slot architecture, size scale      |
+| `FABMenu`     | ✅     | Speed-dial with MD3 Expressive pill menu items   |
+| `ButtonGroup` | ✅     | Connected layout, single/multi-select            |
+| `SplitButton` | ✅     | Primary action + dropdown menu                   |
 
 ### Phase 1b: Form Components ✅
 
-| Component    | Status | Description           |
-| ------------ | ------ | --------------------- |
-| `TextField`  | ✅     | Text input with label |
-| `Checkbox`   | ✅     | Checkbox input        |
-| `Radio`      | ✅     | Radio button input    |
-| `RadioGroup` | ✅     | Radio group container |
-| `Switch`     | ✅     | Toggle switch         |
+| Component    | Status | Description                               |
+| ------------ | ------ | ----------------------------------------- |
+| `TextField`  | ✅     | Filled and outlined, floating label       |
+| `Checkbox`   | ✅     | Checked, unchecked, indeterminate         |
+| `Radio`      | ✅     | Radio button input                        |
+| `RadioGroup` | ✅     | Vertical and horizontal orientation       |
+| `Switch`     | ✅     | Toggle with variants-vs-states arch.      |
+| `Slider`     | ✅     | Standard, centered, range; discrete stops |
 
-### Phase 2: Layout & Navigation (Planned)
+### Phase 2: Navigation ✅
 
-| Component | Status | Description              |
-| --------- | ------ | ------------------------ |
-| `Card`    | 📋     | Container with elevation |
-| `Dialog`  | 📋     | Modal dialog             |
-| `Drawer`  | 📋     | Side navigation drawer   |
-| `Tabs`    | 📋     | Tabbed navigation        |
+| Component          | Status | Description                          |
+| ------------------ | ------ | ------------------------------------ |
+| `AppBar`           | ✅     | Four size variants, scroll elevation |
+| `Tabs`             | ✅     | Primary and secondary tab variants   |
+| `NavigationDrawer` | ✅     | Modal and standard navigation drawer |
+| `NavigationBar`    | ✅     | Bottom navigation with badges        |
+| `Search`           | ✅     | SearchBar and SearchView overlay     |
 
-### Phase 3: Data Display (Planned)
+### Phase 3: Feedback ✅
 
-| Component | Status | Description            |
-| --------- | ------ | ---------------------- |
-| `Table`   | 📋     | Data table             |
-| `List`    | 📋     | List with items        |
-| `Chip`    | 📋     | Compact information    |
-| `Badge`   | 📋     | Notification badge     |
-| `Tooltip` | 📋     | Contextual information |
+| Component     | Status | Description                             |
+| ------------- | ------ | --------------------------------------- |
+| `Dialog`      | ✅     | Basic and fullscreen modal dialogs      |
+| `Snackbar`    | ✅     | Provider, stacking, imperative API      |
+| `Menu`        | ✅     | Dropdown, context menu, submenus        |
+| `Progress`    | ✅     | Linear and circular indicators          |
+| `BottomSheet` | ✅     | Standard and modal with snap points     |
+| `Tooltip`     | ✅     | Plain and rich tooltip with positioning |
 
-**Legend:**
+### Phase 4: Data Display ✅
 
-- ✅ Complete
-- 🚧 In Progress
-- 📋 Planned
+| Component    | Status | Description                             |
+| ------------ | ------ | --------------------------------------- |
+| `Card`       | ✅     | Elevated, filled, outlined variants     |
+| `List`       | ✅     | Static and interactive list items       |
+| `Chip`       | ✅     | Assist, Filter, Input, Suggestion types |
+| `Badge`      | ✅     | Dot and count notification badges       |
+| `Divider`    | ✅     | Horizontal/vertical, inset variants     |
+| `DatePicker` | ✅     | Docked, modal, and input variants       |
+| `TimePicker` | ✅     | 12h/24h clock dial, range selection     |
+
+### Planned
+
+| Component | Status | Description |
+| --------- | ------ | ----------- |
+| `Table`   | 📋     | Data table  |
+
+**Legend:** ✅ Complete · 🚧 In Progress · 📋 Planned
 
 ---
 
