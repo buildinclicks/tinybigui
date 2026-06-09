@@ -63,7 +63,7 @@ const meta: Meta<typeof Chip> = {
     docs: {
       description: {
         component: `
-**Material Design 3 Chip** — a compact, interactive element used for actions, filters, inputs, and suggestions.
+**Material Design 3 Chip (MD3 Expressive)** — a compact, interactive element used for actions, filters, inputs, and suggestions.
 
 MD3 defines four distinct chip types, each with its own interaction model:
 
@@ -74,11 +74,20 @@ MD3 defines four distinct chip types, each with its own interaction model:
 | \`input\` | Represents a user-entered value; removable | two buttons (body + remove) |
 | \`suggestion\` | Offers a contextual suggestion | \`button\` |
 
-**Surfaces** — Assist and Suggestion chips support \`tonal\` (default) and \`elevated\`.
+**Surfaces:**
+- \`flat\` (default) — transparent container with MD3 outline border. This is the MD3 spec default. All four chip types support it.
+- \`elevated\` — \`surface-container-low\` fill + \`shadow-elevation-1\`. Hovers to \`shadow-elevation-2\`. All four chip types support it.
+- \`tonal\` — **@deprecated.** Maps to \`flat\` and logs a \`console.warn\` in development. Use \`flat\` instead.
+
+**MD3 Expressive per-type icon colors:**
+- Assist leading icon → \`primary\`
+- Filter/Input/Suggestion → \`on-surface-variant\`; filter selected → \`on-secondary-container\`
+
+**Motion:** Spring-based tokens (\`ease-spring-standard-fast-effects\`, \`ease-spring-standard-fast-spatial\`) — no hardcoded durations.
 
 **Keyboard:** Tab to focus · Enter/Space to press/toggle · Backspace on input chip removes it.
 
-[MD3 Chips spec →](https://m3.material.io/components/chips/overview)
+[MD3 Chips spec →](https://m3.material.io/components/chips/specs)
         `.trim(),
       },
     },
@@ -92,8 +101,9 @@ MD3 defines four distinct chip types, each with its own interaction model:
     },
     surface: {
       control: "select",
-      options: ["tonal", "elevated"],
-      description: "Surface style (Assist and Suggestion chips only)",
+      options: ["flat", "elevated", "tonal"],
+      description:
+        "Surface style. `flat` (default): transparent + outline. `elevated`: fill + shadow. `tonal`: deprecated alias for `flat`.",
     },
     selected: {
       control: "boolean",
@@ -121,7 +131,7 @@ export const Default: Story = {
   args: {
     type: "assist",
     label: "Set alarm",
-    surface: "tonal",
+    surface: "flat",
     isDisabled: false,
   },
   parameters: {
@@ -135,7 +145,7 @@ export const Default: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// Assist Chip — tonal surface
+// Assist Chip — flat surface (MD3 default)
 // ---------------------------------------------------------------------------
 
 export const AssistChip: Story = {
@@ -149,14 +159,14 @@ export const AssistChip: Story = {
     docs: {
       description: {
         story:
-          "Assist chips trigger contextual actions related to the current content. The tonal surface uses `secondary-container` fill. **Keyboard:** Tab · Enter/Space to activate.",
+          "Assist chips trigger contextual actions. The **flat** surface (MD3 default) uses a transparent container + `border-outline`. The leading icon color is `primary` per MD3 spec. **Keyboard:** Tab · Enter/Space to activate.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// Assist Chip Elevated
+// Assist Chip — Elevated
 // ---------------------------------------------------------------------------
 
 export const AssistChipElevated: Story = {
@@ -175,14 +185,14 @@ export const AssistChipElevated: Story = {
     docs: {
       description: {
         story:
-          "Elevated assist chips use `surface-container-low` with `shadow-elevation-1` to lift the chip off the surface. Prefer the tonal variant on white/light backgrounds.",
+          "Elevated assist chips use `surface-container-low` fill + `shadow-elevation-1` base, lifting to `shadow-elevation-2` on hover. Prefer the flat variant on white/light backgrounds.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// Filter Chip — uncontrolled (aria-pressed visible in a11y panel)
+// Filter Chip — flat (uncontrolled)
 // ---------------------------------------------------------------------------
 
 export const FilterChip: Story = {
@@ -197,7 +207,29 @@ export const FilterChip: Story = {
     docs: {
       description: {
         story:
-          "Uncontrolled filter chips manage their own selection state. Open the **Accessibility** panel to confirm `aria-pressed` toggles on click. **Keyboard:** Tab · Enter/Space to toggle.",
+          "Uncontrolled filter chips manage their own selection state. Selected state: `bg-secondary-container` fill, `text-on-secondary-container`. Open the **Accessibility** panel to confirm `aria-pressed` toggles on click. **Keyboard:** Tab · Enter/Space to toggle.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Filter Chip — Elevated
+// ---------------------------------------------------------------------------
+
+export const FilterChipElevated: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-3">
+      <Chip type="filter" surface="elevated" label="Vegetarian" defaultSelected />
+      <Chip type="filter" surface="elevated" label="Vegan" />
+      <Chip type="filter" surface="elevated" label="Gluten-free" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Elevated filter chips: unselected state uses `surface-container-low` fill + shadow-elevation-1. Selected state overrides to `bg-secondary-container` — the elevation is preserved. All four chip types support the elevated surface.",
       },
     },
   },
@@ -230,14 +262,14 @@ export const FilterChipControlled: Story = {
     docs: {
       description: {
         story:
-          "Controlled filter chip — the parent manages selection via `selected` + `onSelectionChange`. The label updates to reflect state, demonstrating that the component re-renders correctly.",
+          "Controlled filter chip — the parent manages selection via `selected` + `onSelectionChange`. The label updates to reflect state.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// Filter Chip With Checkmark animation
+// Filter Chip — Checkmark spring animation
 // ---------------------------------------------------------------------------
 
 const FilterChipWithCheckmarkDemo = (): React.ReactElement => {
@@ -258,14 +290,14 @@ export const FilterChipWithCheckmark: Story = {
     docs: {
       description: {
         story:
-          "Demonstrates the MD3 checkmark slide-in animation on filter chip selection. The checkmark uses `transition-[width,opacity]` with the `ease-emphasized-decelerate` easing token.",
+          "Demonstrates the MD3 checkmark spring animation on filter chip selection. Width uses `ease-spring-standard-fast-spatial` (spatial token); opacity uses `ease-spring-standard-fast-effects` (effects token) — MD3 motion pairing rules enforced.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// Input Chip — remove button
+// Input Chip — flat + remove button
 // ---------------------------------------------------------------------------
 
 const InputChipDemo = (): React.ReactElement => {
@@ -291,7 +323,43 @@ export const InputChip: Story = {
     docs: {
       description: {
         story:
-          "Input chips represent user-entered values (e.g. tags). Click the × button to remove a chip with a fade-out animation. **Keyboard:** Tab to the × button · Enter/Space to remove.",
+          "Input chips represent user-entered values (e.g. tags). Uses `border-outline-variant` per MD3 spec. Click the × button to remove a chip with a fade-out animation. **Keyboard:** Tab to the × button · Enter/Space to remove.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Input Chip — Elevated
+// ---------------------------------------------------------------------------
+
+const InputChipElevatedDemo = (): React.ReactElement => {
+  const [chips, setChips] = useState(["React", "TypeScript"]);
+  const remove = (label: string): void => {
+    setChips((prev) => prev.filter((c) => c !== label));
+  };
+  return (
+    <ChipSet>
+      {chips.map((label) => (
+        <Chip
+          key={label}
+          type="input"
+          surface="elevated"
+          label={label}
+          onRemove={() => remove(label)}
+        />
+      ))}
+    </ChipSet>
+  );
+};
+
+export const InputChipElevated: Story = {
+  render: () => <InputChipElevatedDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Elevated input chips. The elevated surface is now available for input chips — useful for placing chips on textured or colored backgrounds.",
       },
     },
   },
@@ -329,14 +397,14 @@ export const InputChipKeyboardRemoval: Story = {
     docs: {
       description: {
         story:
-          "Demonstrates keyboard removal of input chips. Tab to reach the × remove button on each chip, then press Enter or Space. The chip fades out with an `animate-md-fade-out` animation before being unmounted.",
+          "Demonstrates keyboard removal of input chips. Tab to reach the × remove button on each chip, then press Enter or Space. The chip fades out with `animate-md-fade-out` before unmounting.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// Suggestion Chip — tonal
+// Suggestion Chip — flat
 // ---------------------------------------------------------------------------
 
 export const SuggestionChip: Story = {
@@ -351,14 +419,14 @@ export const SuggestionChip: Story = {
     docs: {
       description: {
         story:
-          "Suggestion chips offer smart replies or contextual actions. They behave identically to assist chips but are semantically distinct per MD3. **Keyboard:** Tab · Enter/Space to activate.",
+          "Suggestion chips offer smart replies or contextual actions. They are semantically distinct from assist chips but share the same interaction model. Label/icon color: `on-surface-variant` per MD3 spec. **Keyboard:** Tab · Enter/Space to activate.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// Suggestion Chip Elevated
+// Suggestion Chip — Elevated
 // ---------------------------------------------------------------------------
 
 export const SuggestionChipElevated: Story = {
@@ -373,14 +441,14 @@ export const SuggestionChipElevated: Story = {
     docs: {
       description: {
         story:
-          "Elevated suggestion chips lift off the surface using `shadow-elevation-1`. Useful when placed on colored or patterned backgrounds where the tonal fill would blend in.",
+          "Elevated suggestion chips. Useful when placed on colored or patterned backgrounds where a flat outlined chip would blend in.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// All Types — side by side in a ChipSet
+// All Types — side by side
 // ---------------------------------------------------------------------------
 
 export const AllTypes: Story = {
@@ -396,7 +464,30 @@ export const AllTypes: Story = {
     docs: {
       description: {
         story:
-          "All four MD3 chip types displayed side by side. Notice the different visual treatments: tonal fills for assist/suggestion, fixed tonal for filter/input, and the remove button on the input chip.",
+          "All four MD3 chip types in their default flat surface. Notice the different visual treatments: assist uses `border-outline` + label `on-surface`; filter/suggestion use `border-outline` + label `on-surface-variant`; input uses `border-outline-variant`.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// All Types — Elevated
+// ---------------------------------------------------------------------------
+
+export const AllTypesElevated: Story = {
+  render: () => (
+    <ChipSet>
+      <Chip type="assist" surface="elevated" label="Assist" />
+      <Chip type="filter" surface="elevated" label="Filter" />
+      <Chip type="input" surface="elevated" label="Input" onRemove={noop} />
+      <Chip type="suggestion" surface="elevated" label="Suggestion" />
+    </ChipSet>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "All four chip types with the `elevated` surface — a new addition in this release. Each type gains `surface-container-low` fill + `shadow-elevation-1`, hovering to `shadow-elevation-2`.",
       },
     },
   },
@@ -419,7 +510,72 @@ export const WithLeadingIcon: Story = {
     docs: {
       description: {
         story:
-          "Chips with 18×18dp inline SVG leading icons. Icons are wrapped in a `size-4.5` span and marked `aria-hidden` — the chip label provides the accessible name. All icon colors inherit `currentColor`.",
+          "Chips with 18×18dp inline SVG leading icons. Icon colors follow MD3 spec: assist → `primary`; filter/input/suggestion → `on-surface-variant` (selected filter → `on-secondary-container`). All icon colors inherit `currentColor`.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// States — hover / focus / disabled (simulated)
+// ---------------------------------------------------------------------------
+
+export const States: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div>
+        <p className="text-on-surface-variant mb-2 text-xs font-medium tracking-wide uppercase">
+          Enabled (default)
+        </p>
+        <ChipSet>
+          <Chip type="assist" label="Assist" />
+          <Chip type="filter" label="Filter" />
+          <Chip type="filter" label="Filter selected" selected />
+          <Chip type="input" label="Input" onRemove={noop} />
+          <Chip type="suggestion" label="Suggestion" />
+        </ChipSet>
+      </div>
+      <div>
+        <p className="text-on-surface-variant mb-2 text-xs font-medium tracking-wide uppercase">
+          Disabled
+        </p>
+        <ChipSet>
+          <Chip type="assist" label="Assist" isDisabled />
+          <Chip type="filter" label="Filter" isDisabled />
+          <Chip type="filter" label="Filter selected" selected isDisabled />
+          <Chip type="input" label="Input" isDisabled onRemove={noop} />
+          <Chip type="suggestion" label="Suggestion" isDisabled />
+        </ChipSet>
+      </div>
+      <div>
+        <p className="text-on-surface-variant mb-2 text-xs font-medium tracking-wide uppercase">
+          Elevated surface — all types
+        </p>
+        <ChipSet>
+          <Chip type="assist" surface="elevated" label="Assist" />
+          <Chip type="filter" surface="elevated" label="Filter" />
+          <Chip type="filter" surface="elevated" label="Filter selected" selected />
+          <Chip type="input" surface="elevated" label="Input" onRemove={noop} />
+          <Chip type="suggestion" surface="elevated" label="Suggestion" />
+        </ChipSet>
+      </div>
+      <div>
+        <p className="text-on-surface-variant mb-2 text-xs font-medium tracking-wide uppercase">
+          Elevated + disabled
+        </p>
+        <ChipSet>
+          <Chip type="assist" surface="elevated" label="Assist" isDisabled />
+          <Chip type="filter" surface="elevated" label="Filter" isDisabled />
+          <Chip type="input" surface="elevated" label="Input" isDisabled onRemove={noop} />
+        </ChipSet>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "State overview: enabled (default), disabled, elevated surface, and elevated + disabled. Hover/focus/pressed states use MD3 state layers at 8%/10%/10% opacity driven by `data-*` attributes via `group-data-[x]/chip` selectors — no CSS `:hover` pseudo-classes.",
       },
     },
   },
@@ -442,14 +598,47 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "All four chip types in the disabled state. Disabled chips receive `opacity-38` and `pointer-events-none`. React Aria ensures `aria-disabled` is set and keyboard interaction is blocked.",
+          "All four chip types in the disabled state. `data-[disabled]:text-on-surface/38`, `data-[disabled]:border-on-surface/12`, transparent bg. React Aria ensures `aria-disabled` is set and keyboard interaction is blocked.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// ChipSet Layout — flex-wrap with constrained container
+// Deprecated surface="tonal" note
+// ---------------------------------------------------------------------------
+
+export const DeprecatedTonalSurface: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <div className="bg-warning-container text-on-warning-container border-outline rounded-md border px-4 py-3 text-sm">
+        <strong>⚠ Deprecated:</strong> <code>surface=&quot;tonal&quot;</code> is an alias for{" "}
+        <code>surface=&quot;flat&quot;</code> and will log a <code>console.warn</code> in
+        development. Migrate to <code>surface=&quot;flat&quot;</code>.
+      </div>
+      <ChipSet>
+        {/* @ts-expect-error intentionally demonstrating the deprecated value */}
+        <Chip type="assist" surface="tonal" label="Tonal (deprecated)" />
+        <Chip type="assist" surface="flat" label="Flat (use this)" />
+      </ChipSet>
+      <p className="text-on-surface-variant text-xs">
+        Both chips render identically. Open the browser console to see the deprecation warning for
+        the tonal chip.
+      </p>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates the deprecated `surface="tonal"` alias. It maps to `flat` internally and emits a `console.warn` in development. **Migrate: replace `surface="tonal"` with `surface="flat"`** — or simply omit `surface` since `flat` is the default.',
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// ChipSet Layout — flex-wrap
 // ---------------------------------------------------------------------------
 
 export const ChipSetLayout: Story = {
@@ -472,7 +661,7 @@ export const ChipSetLayout: Story = {
     docs: {
       description: {
         story:
-          "A `ChipSet` inside a `max-w-xs` container demonstrating `flex-wrap` behavior. Chips flow into multiple rows as needed. The 8dp gap (`gap-2`) is applied consistently between all chips.",
+          "A `ChipSet` inside a `max-w-xs` container demonstrating `flex-wrap` behavior. Chips flow into multiple rows as needed. The 8dp gap (`gap-2`) is applied consistently.",
       },
     },
   },
@@ -529,7 +718,7 @@ export const FilterGroup: Story = {
     docs: {
       description: {
         story:
-          "Realistic multi-select filter UI with five category filter chips. Selection state is managed externally with `useState` and a `Set`. Multiple chips can be active simultaneously. **Keyboard:** Tab between chips · Enter/Space to toggle each.",
+          "Realistic multi-select filter UI with five category filter chips. Selection state is managed externally with `useState` and a `Set`. **Keyboard:** Tab between chips · Enter/Space to toggle each.",
       },
     },
   },
@@ -573,7 +762,7 @@ export const InputChipList: Story = {
     docs: {
       description: {
         story:
-          "Realistic tag-input UI starting with five input chips. Clicking the × on any chip removes it individually with a fade-out animation. Each chip's remove button is independently keyboard-focusable. **Keyboard:** Tab to × · Enter/Space to remove.",
+          "Realistic tag-input UI starting with five input chips. Clicking × on any chip removes it with a fade-out animation. Each chip's remove button has its own `group/chip-remove` state layer for independent hover/focus/pressed states. **Keyboard:** Tab to × · Enter/Space to remove.",
       },
     },
   },
@@ -587,7 +776,7 @@ export const Playground: Story = {
   args: {
     type: "assist",
     label: "Chip label",
-    surface: "tonal",
+    surface: "flat",
     selected: false,
     isDisabled: false,
   },
@@ -595,7 +784,7 @@ export const Playground: Story = {
     docs: {
       description: {
         story:
-          "Full interactive playground. Use the Controls panel to explore every combination of `type`, `surface`, `selected`, `isDisabled`, and `label`. Note: `selected` only affects filter chips; `surface` only affects assist and suggestion chips.",
+          "Full interactive playground. Use the Controls panel to explore every combination of `type`, `surface`, `selected`, `isDisabled`, and `label`. Note: `selected` only affects filter chips; `surface` affects all chip types.",
       },
     },
   },

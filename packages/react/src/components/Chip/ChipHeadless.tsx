@@ -12,13 +12,56 @@ import type { ChipHeadlessProps } from "./Chip.types";
 // Each chip type has distinct React Aria hook requirements. Hooks cannot be
 // called conditionally, so we use separate forwardRef components per type and
 // select the correct one in the public ChipHeadless switcher below.
+//
+// The styled layer (Chip.tsx) injects interaction data attributes and event
+// handlers via `bodyPassthrough` (and `removePassthrough` for input chips).
+// These are spread onto the DOM element after React Aria's props so they do
+// not get stripped by the React Aria hooks' internal prop filtering.
 // ---------------------------------------------------------------------------
+
+/**
+ * Strip React Aria-specific props that must not reach the DOM.
+ * Returns only HTML-safe passthrough properties.
+ */
+function stripAriaProps(handlers: Record<string, unknown>): Record<string, unknown> {
+  const {
+    isDisabled: _isDisabled,
+    onPress: _onPress,
+    onPressStart: _onPressStart,
+    onPressEnd: _onPressEnd,
+    onPressChange: _onPressChange,
+    onPressUp: _onPressUp,
+    ...html
+  } = handlers;
+  return html;
+}
+
+/**
+ * Build press lifecycle callbacks for useButton/useToggleButton.
+ * Uses conditional spreading to satisfy exactOptionalPropertyTypes: true —
+ * React Aria's onPressStart/onPressEnd must be a function, not undefined.
+ */
+function buildPressCallbacks(
+  onPressStart?: () => void,
+  onPressEnd?: () => void
+): {
+  onPressStart?: () => void;
+  onPressEnd?: () => void;
+} {
+  return {
+    ...(onPressStart !== undefined && { onPressStart }),
+    ...(onPressEnd !== undefined && { onPressEnd }),
+  };
+}
 
 /**
  * Assist chip implementation — uses `useButton` (Enter/Space → onPress).
  */
 const AssistChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
-  ({ label, onPress, isDisabled, className, onMouseDown, children }, forwardedRef) => {
+  (
+    { label, onPress, isDisabled, className, onMouseDown, children, bodyPassthrough },
+    forwardedRef
+  ) => {
     const internalRef = useRef<HTMLButtonElement>(null);
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
@@ -26,11 +69,19 @@ const AssistChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       {
         ...(onPress !== undefined && { onPress }),
         ...(isDisabled !== undefined && { isDisabled }),
+        ...buildPressCallbacks(bodyPassthrough?.onPressStart, bodyPassthrough?.onPressEnd),
       },
       ref
     );
 
-    const mergedProps = mergeProps(buttonProps, { onMouseDown });
+    const htmlPassthrough = stripAriaProps(bodyPassthrough?.eventHandlers ?? {});
+
+    const mergedProps = mergeProps(
+      buttonProps,
+      { onMouseDown },
+      bodyPassthrough?.dataAttributes ?? {},
+      htmlPassthrough
+    );
 
     return (
       <button {...mergedProps} type="button" ref={ref} className={className}>
@@ -56,6 +107,7 @@ const FilterChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       className,
       onMouseDown,
       children,
+      bodyPassthrough,
     },
     forwardedRef
   ) => {
@@ -67,12 +119,20 @@ const FilterChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       ...(defaultSelected !== undefined && { defaultSelected }),
       ...(onSelectionChange !== undefined && { onChange: onSelectionChange }),
       ...(isDisabled !== undefined && { isDisabled }),
+      ...buildPressCallbacks(bodyPassthrough?.onPressStart, bodyPassthrough?.onPressEnd),
     };
 
     const state = useToggleState(toggleProps);
     const { buttonProps } = useToggleButton(toggleProps, state, ref);
 
-    const mergedProps = mergeProps(buttonProps, { onMouseDown });
+    const htmlPassthrough = stripAriaProps(bodyPassthrough?.eventHandlers ?? {});
+
+    const mergedProps = mergeProps(
+      buttonProps,
+      { onMouseDown },
+      bodyPassthrough?.dataAttributes ?? {},
+      htmlPassthrough
+    );
 
     return (
       <button {...mergedProps} type="button" ref={ref} className={className}>
@@ -102,6 +162,8 @@ const InputChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       removeIcon,
       removeButtonClassName,
       children,
+      bodyPassthrough,
+      removePassthrough,
     },
     forwardedRef
   ) => {
@@ -113,6 +175,7 @@ const InputChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       {
         "aria-label": label,
         ...(isDisabled !== undefined && { isDisabled }),
+        ...buildPressCallbacks(bodyPassthrough?.onPressStart, bodyPassthrough?.onPressEnd),
       },
       ref
     );
@@ -122,6 +185,7 @@ const InputChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
         "aria-label": `Remove ${label}`,
         onPress: () => onRemove?.(),
         ...(isDisabled !== undefined && { isDisabled }),
+        ...buildPressCallbacks(removePassthrough?.onPressStart, removePassthrough?.onPressEnd),
       },
       removeRef
     );
@@ -133,7 +197,21 @@ const InputChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       }
     };
 
-    const mergedChipProps = mergeProps(chipButtonProps, { onKeyDown: handleKeyDown, onMouseDown });
+    const htmlBodyPassthrough = stripAriaProps(bodyPassthrough?.eventHandlers ?? {});
+    const htmlRemovePassthrough = stripAriaProps(removePassthrough?.eventHandlers ?? {});
+
+    const mergedChipProps = mergeProps(
+      chipButtonProps,
+      { onKeyDown: handleKeyDown, onMouseDown },
+      bodyPassthrough?.dataAttributes ?? {},
+      htmlBodyPassthrough
+    );
+
+    const mergedRemoveProps = mergeProps(
+      removeButtonProps,
+      removePassthrough?.dataAttributes ?? {},
+      htmlRemovePassthrough
+    );
 
     return (
       <span className={className}>
@@ -141,7 +219,7 @@ const InputChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
           {children ?? label}
         </button>
         <button
-          {...removeButtonProps}
+          {...mergedRemoveProps}
           type="button"
           ref={removeRef}
           className={removeButtonClassName}
@@ -158,7 +236,10 @@ InputChipImpl.displayName = "InputChipImpl";
  * Suggestion chip implementation — uses `useButton` (identical to Assist).
  */
 const SuggestionChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
-  ({ label, onPress, isDisabled, className, onMouseDown, children }, forwardedRef) => {
+  (
+    { label, onPress, isDisabled, className, onMouseDown, children, bodyPassthrough },
+    forwardedRef
+  ) => {
     const internalRef = useRef<HTMLButtonElement>(null);
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
@@ -166,11 +247,19 @@ const SuggestionChipImpl = forwardRef<HTMLButtonElement, ChipHeadlessProps>(
       {
         ...(onPress !== undefined && { onPress }),
         ...(isDisabled !== undefined && { isDisabled }),
+        ...buildPressCallbacks(bodyPassthrough?.onPressStart, bodyPassthrough?.onPressEnd),
       },
       ref
     );
 
-    const mergedProps = mergeProps(buttonProps, { onMouseDown });
+    const htmlPassthrough = stripAriaProps(bodyPassthrough?.eventHandlers ?? {});
+
+    const mergedProps = mergeProps(
+      buttonProps,
+      { onMouseDown },
+      bodyPassthrough?.dataAttributes ?? {},
+      htmlPassthrough
+    );
 
     return (
       <button {...mergedProps} type="button" ref={ref} className={className}>
@@ -190,6 +279,10 @@ SuggestionChipImpl.displayName = "SuggestionChipImpl";
  *
  * Unstyled chip primitive covering all four MD3 chip types. Delegates to the
  * correct React Aria hook per `type` — bring your own styles.
+ *
+ * The styled layer (Chip.tsx) passes `bodyPassthrough` to inject data-* interaction
+ * attributes and merged hover/focus handlers onto the body button, enabling the
+ * group-data-[x]/chip slot selectors defined in Chip.variants.ts.
  *
  * | type         | Hook                                    | Key behaviour                    |
  * |------------- |-----------------------------------------|----------------------------------|
