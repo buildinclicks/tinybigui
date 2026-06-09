@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.11.2** (2026-06-09)
+> **Latest Release: v0.12.0** (2026-06-09)
 >
-> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,025 tests** passing.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,029 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,8 +94,8 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.11.2  | Released |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.10.0  | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.12.0  | Released |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.12.0  | Released |
 
 ---
 
@@ -155,7 +155,7 @@ This is a monorepo containing multiple packages:
 - [x] List — static and interactive modes (v0.4.0)
 - [x] Chip — MD3 expressive slot architecture, token corrections, elevated surface (v0.9.0)
 - [x] Badge — MD3 expressive variants/states, icon-corner anchoring (v0.8.0)
-- [x] Divider — horizontal/vertical, inset variants (v0.4.0)
+- [x] Divider — MD3 expressive slot-based CVA, CSS-var thickness, logical RTL insets (v0.12.0)
 - [x] DatePicker + TimePicker — docked, modal, input variants (v0.4.0)
 
 ### Phase 5: Stable Release
