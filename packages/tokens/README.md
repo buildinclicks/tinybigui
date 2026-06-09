@@ -12,11 +12,11 @@ A comprehensive collection of Material Design 3 design tokens implemented as CSS
 
 ## ✅ Status
 
-> **Released: v0.1.0** (2026-04-15)
+> **Latest Release: v0.4.2** (2026-06-08)
 >
-> This package is published to npm. Install it with `npm install @tinybigui/tokens`.
+> Modular MD3 design tokens published to npm — use standalone imports (`color.css`, `motion.css`, `theme.css`, etc.) or the combined `tokens.css`.
 >
-> Follow our [GitHub repository](https://github.com/buildinclicks/tinybigui) for updates!
+> Install with `npm install @tinybigui/tokens` — follow our [GitHub repository](https://github.com/buildinclicks/tinybigui) for updates!
 
 ---
 

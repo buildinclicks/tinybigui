@@ -9,39 +9,69 @@ import type React from "react";
 export type FABMenuDirection = "up" | "down" | "left" | "right";
 
 /**
- * Props for an individual FABMenu action item (mini FAB).
+ * Color role for individual FABMenu action items.
  *
- * Each item renders as a small FAB with an icon and optional label.
- * `aria-label` is required for accessibility since items are icon-based.
+ * Matches the MD3 Expressive FAB color roles:
+ * - Container variants: `primary-container` (default), `secondary-container`, `tertiary-container`
+ * - Solid variants (M3 Expressive): `primary`, `secondary`, `tertiary`
+ *
+ * The state-layer color equals the icon/on-color per MD3 spec.
+ *
+ * @default 'primary-container'
+ */
+export type FABMenuItemColor =
+  | "primary-container"
+  | "secondary-container"
+  | "tertiary-container"
+  | "primary"
+  | "secondary"
+  | "tertiary";
+
+/**
+ * Props for an individual FABMenu action item (MD3 Expressive pill menu item).
+ *
+ * Each item renders as a full-rounded 56dp pill button with a leading icon
+ * and an inline text label. `label` or `aria-label` must be provided.
  *
  * @example
  * ```tsx
  * <FABMenuItem
  *   icon={<IconEdit />}
  *   label="Edit"
- *   aria-label="Edit item"
  *   onPress={() => console.log('edit')}
  * />
+ *
+ * // Icon-only (requires aria-label)
+ * <FABMenuItem icon={<IconEdit />} aria-label="Edit item" />
  * ```
  */
 export interface FABMenuItemProps {
-  /** Icon content for the mini FAB action item. */
+  /** Leading icon for the menu item. */
   icon: React.ReactNode;
 
   /**
-   * Optional text label displayed beside the mini FAB.
-   * Acts as a tooltip or visible label depending on the styled layer.
+   * Inline text label displayed inside the pill button.
+   * Provides the accessible name when `aria-label` is not supplied.
    */
   label?: string;
+
+  /**
+   * Explicit accessible label for screen readers.
+   * Required when `label` is not provided.
+   * When both are present, `aria-label` takes precedence.
+   */
+  "aria-label"?: string;
 
   /** Handler called when the action item is pressed. */
   onPress?: (e: PressEvent) => void;
 
   /**
-   * REQUIRED: Accessible label for screen readers.
-   * Mandatory since action items are icon-based.
+   * Color role for the menu item container.
+   * Controls the background, text, and state-layer colors.
+   *
+   * @default 'primary-container'
    */
-  "aria-label": string;
+  color?: FABMenuItemColor;
 
   /**
    * Whether the action item is disabled.
@@ -49,14 +79,14 @@ export interface FABMenuItemProps {
    */
   isDisabled?: boolean;
 
-  /** Additional CSS classes. */
+  /** Additional CSS classes applied to the root pill button. */
   className?: string;
 }
 
 /**
  * Props for the headless FABMenu primitive (Layer 2).
  *
- * Manages open/close state, keyboard navigation, focus management,
+ * Manages open/close state, keyboard interactions, focus management,
  * and accessibility attributes without opinionated styling.
  *
  * Supports both controlled (`open` + `onOpenChange`) and uncontrolled
@@ -66,7 +96,7 @@ export interface FABMenuItemProps {
  * ```tsx
  * // Uncontrolled
  * <FABMenuHeadless aria-label="Actions" direction="up">
- *   <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
+ *   <FABMenuItem icon={<IconEdit />} label="Edit" />
  * </FABMenuHeadless>
  *
  * // Controlled
@@ -75,7 +105,7 @@ export interface FABMenuItemProps {
  *   onOpenChange={setIsOpen}
  *   aria-label="Quick actions"
  * >
- *   <FABMenuItem icon={<IconAdd />} aria-label="Add" />
+ *   <FABMenuItem icon={<IconAdd />} label="Add" />
  * </FABMenuHeadless>
  * ```
  */
@@ -118,13 +148,9 @@ export interface FABMenuHeadlessProps {
 /**
  * Props for the styled FABMenu component (Layer 3).
  *
- * Extends the headless props — no additional required props at this layer.
- * Styling, variants, and CVA will be added when the styled layer is built.
+ * Extends the headless props. No additional required props at this layer.
  */
-export interface FABMenuProps extends FABMenuHeadlessProps {
-  /** Placeholder for future styled-layer extensions (e.g., variant, color). */
-  _brand?: never;
-}
+export type FABMenuProps = FABMenuHeadlessProps;
 
 /**
  * Context value shared between FABMenu and its item descendants.

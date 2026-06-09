@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **FABMenu** — Redesigned action items to MD3 Expressive pill buttons (56dp full-rounded pills with inline label); trigger FAB is now the sole in-flow child with absolutely-positioned overlay items; scale-in/out pivot aligned per direction; stagger animation flicker fixes; new `color` prop with 6 MD3 Expressive color roles
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full breaking change details and migration notes.
+
+## [0.6.0] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **FAB** — M3 Expressive refactor: slot architecture, new size scale (`fab`/`medium`), solid and container color styles, dedicated focus-ring and state-layer slots
+
+## [0.5.0] - 2026-06-08
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **IconButton** — M3 Expressive 5-tier sizing system (`xsmall`–`xlarge`), variants-vs-states architecture, press shape-morph, new `width`/`shape`/`selectedIcon` props
+
+## [0.4.2] - 2026-06-08
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Button**, **ButtonGroup**, **IconButton** — Aligned with MD3 specs; variants-vs-states architecture; removed non-spec `color` prop from Button
+
+## [0.4.1] - 2026-06-08
+
+### Fixed
+
+#### `@tinybigui/react`
+
+- **Switch** — Corrected track alignment and variant system; shared interaction state utilities
+
+## [0.4.0] - 2026-06-07
+
+### Added
+
+#### `@tinybigui/react`
+
+- **Badge**, **BottomSheet**, **ButtonGroup**, **Card**, **Chip**, **DatePicker**, **TimePicker**, **Divider**, **FABMenu**, **List**, **NavigationDrawer** (enhanced), **Search**, **Slider**, **SplitButton**, **Tooltip**
+
+#### `@tinybigui/tokens`
+
+- Modular CSS files: `color.css`, `elevation.css`, `motion.css`, `shape.css`, `theme.css`, `typography.css`
+
 ## [0.3.0] - 2026-05-13
 
 ### Added
@@ -95,7 +149,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Checkbox inline styles** — Replaced `style={{ fill: "var(--color-on-primary)" }}` with a Tailwind CSS class, eliminating the only inline style violation in the codebase
 - **Axe accessibility coverage** — Verified all 7 components pass automated axe checks; added axe test coverage across the test suite
 
-[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/buildinclicks/tinybigui/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/buildinclicks/tinybigui/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/buildinclicks/tinybigui/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/buildinclicks/tinybigui/compare/v0.4.2...v0.5.0
+[0.4.2]: https://github.com/buildinclicks/tinybigui/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/buildinclicks/tinybigui/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/buildinclicks/tinybigui/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/buildinclicks/tinybigui/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/buildinclicks/tinybigui/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/buildinclicks/tinybigui/compare/v0.1.0...v0.1.1

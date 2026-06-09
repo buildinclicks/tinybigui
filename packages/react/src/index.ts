@@ -361,16 +361,27 @@ export {
   FABMenuContext,
   useFABMenuContext,
   fabMenuVariants,
+  fabMenuListVariants,
   fabMenuItemVariants,
+  fabMenuItemStateLayerVariants,
+  fabMenuItemFocusRingVariants,
+  fabMenuItemIconVariants,
+  fabMenuItemLabelVariants,
 } from "./components/FABMenu";
 export type {
   FABMenuDirection,
+  FABMenuItemColor,
   FABMenuProps,
   FABMenuItemProps,
   FABMenuHeadlessProps,
   FABMenuContextValue,
   FABMenuVariants,
+  FABMenuListVariants,
   FABMenuItemVariants,
+  FABMenuItemStateLayerVariants,
+  FABMenuItemFocusRingVariants,
+  FABMenuItemIconVariants,
+  FABMenuItemLabelVariants,
 } from "./components/FABMenu";
 
 export {

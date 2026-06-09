@@ -4,42 +4,80 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.1.0 (released 2026-04-15)  
-**Next Release:** v0.2.0  
-**Status:** v0.1.0 published to NPM; Phase 2 (Navigation) planned next
+**Current Version:** v0.7.0 (released 2026-06-09)  
+**Next Release:** v0.8.0  
+**Status:** 29 components published to NPM; 1,969 tests passing
 
 ## Release Timeline
 
-| Version | Phase   | Components                                                  | Status              |
-| ------- | ------- | ----------------------------------------------------------- | ------------------- |
-| v0.1.0  | 1a + 1b | Button, IconButton, FAB, TextField, Checkbox, Switch, Radio | Released 2026-04-15 |
-| v0.2.0  | 2       | AppBar, Tabs, Drawer, Bottom Navigation                     | Planned             |
-| v0.3.0  | 3       | Dialog, Snackbar, Menu, Progress Indicators                 | Planned             |
-| v0.4.0  | 4       | Card, List, Chip, Table                                     | Planned             |
-| v1.0.0  | -       | Stable release, API frozen                                  | Planned             |
+| Version | Phase   | Highlights                                                                                                                        | Status              |
+| ------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| v0.1.0  | 1a + 1b | Button, IconButton, FAB, TextField, Checkbox, Switch, Radio                                                                       | Released 2026-04-15 |
+| v0.2.0  | 2       | AppBar, Tabs, NavigationDrawer, NavigationBar                                                                                     | Released 2026-04-25 |
+| v0.3.0  | 3       | Dialog, Snackbar, Menu, Progress                                                                                                  | Released 2026-05-13 |
+| v0.4.0  | 4       | Card, List, Chip, Badge, Tooltip, Divider, Slider, Search, ButtonGroup, SplitButton, FABMenu, BottomSheet, DatePicker, TimePicker | Released 2026-06-07 |
+| v0.4.1  | —       | Switch variants-vs-states architecture                                                                                            | Released 2026-06-08 |
+| v0.4.2  | —       | Button, ButtonGroup, IconButton MD3 alignment                                                                                     | Released 2026-06-08 |
+| v0.5.0  | —       | IconButton M3 Expressive sizing system                                                                                            | Released 2026-06-08 |
+| v0.6.0  | —       | FAB M3 Expressive slot architecture                                                                                               | Released 2026-06-09 |
+| v0.7.0  | —       | FABMenu M3 Expressive pill menu redesign                                                                                          | Released 2026-06-09 |
+| v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                  | Planned             |
 
 ## Completed Work
 
-### Phase 1a - Core Buttons
+### Phase 1a — Core Buttons
 
-| Component  | Tests | Status   |
-| ---------- | ----- | -------- |
-| Button     | 53    | Complete |
-| IconButton | 49    | Complete |
-| FAB        | 51    | Complete |
+| Component   | Status   |
+| ----------- | -------- |
+| Button      | Complete |
+| IconButton  | Complete |
+| FAB         | Complete |
+| FABMenu     | Complete |
+| ButtonGroup | Complete |
+| SplitButton | Complete |
 
-**Total:** 153 tests passing
+### Phase 1b — Form Components
 
-### Phase 1b - Form Components
+| Component | Status   |
+| --------- | -------- |
+| TextField | Complete |
+| Checkbox  | Complete |
+| Switch    | Complete |
+| Radio     | Complete |
+| Slider    | Complete |
 
-| Component | Tests | Status   |
-| --------- | ----- | -------- |
-| TextField | 56    | Complete |
-| Checkbox  | 49    | Complete |
-| Switch    | 50    | Complete |
-| Radio     | 47    | Complete |
+### Phase 2 — Navigation
 
-**Total:** 202 tests passing
+| Component        | Status   |
+| ---------------- | -------- |
+| AppBar           | Complete |
+| Tabs             | Complete |
+| NavigationDrawer | Complete |
+| NavigationBar    | Complete |
+| Search           | Complete |
+
+### Phase 3 — Feedback
+
+| Component   | Status   |
+| ----------- | -------- |
+| Dialog      | Complete |
+| Snackbar    | Complete |
+| Menu        | Complete |
+| Progress    | Complete |
+| BottomSheet | Complete |
+| Tooltip     | Complete |
+
+### Phase 4 — Data Display
+
+| Component  | Status   |
+| ---------- | -------- |
+| Card       | Complete |
+| List       | Complete |
+| Chip       | Complete |
+| Badge      | Complete |
+| Divider    | Complete |
+| DatePicker | Complete |
+| TimePicker | Complete |
 
 ### Infrastructure
 
@@ -47,49 +85,29 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] TypeScript strict mode configuration
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
-- [x] CVA variant management
-- [x] Vitest + React Testing Library setup
+- [x] CVA variant management with variants-vs-states architecture
+- [x] Vitest + React Testing Library (1,969 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards
 - [x] GitHub Actions CI/CD pipeline
-
-## In Progress
-
-### v0.2.0 Phase 2 — Navigation (Next)
-
-Planning in progress. See Planned Work below.
+- [x] NPM publishing with provenance attestation
+- [x] Changesets release management
 
 ## Planned Work
 
-### Phase 2 - Navigation
+### Phase 5 — Data & Advanced
 
-- AppBar (top app bar with actions)
-- Tabs (scrollable and fixed tabs)
-- Drawer (navigation drawer)
-- Bottom Navigation
-
-### Phase 3 - Feedback
-
-- Dialog (modal dialogs)
-- Snackbar (toast notifications)
-- Menu (dropdown and context menus)
-- Progress Indicators (linear and circular)
-
-### Phase 4 - Data Display
-
-- Card (content containers)
-- List (vertical lists with items)
-- Chip (compact elements for input, attributes, or actions)
-- Table (data tables)
-
-### Phase 5 - Advanced Components
-
-- Date Picker
+- Table (data tables with sorting and pagination)
 - Autocomplete
 - Data Grid
-- Slider
-- Tooltip
+
+### Phase 6 — Stable Release
+
+- Documentation site at [tinybigui.dev](https://tinybigui.dev)
+- Performance and bundle size optimization
+- Migration guides for pre-1.0 API changes
+- v1.0.0 stable release with frozen API
 
 ## Versioning Policy
 
@@ -119,3 +137,4 @@ Have an idea for a new component or feature? Open a [feature request](https://gi
 
 - Watch this repository for release notifications
 - Check the [Changelog](CHANGELOG.md) for release notes
+- See [packages/react/CHANGELOG.md](packages/react/CHANGELOG.md) for detailed per-version notes

@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Released: v0.1.0** (2026-04-15)
+> **Latest Release: v0.7.0** (2026-06-09)
 >
-> Phase 1a (Button, IconButton, FAB) and Phase 1b (TextField, Checkbox, Switch, Radio, RadioGroup) are complete and published to npm.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **1,969 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,8 +94,8 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.1.0   | Released |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.1.0   | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.7.0   | Released |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.4.2   | Released |
 
 ---
 
@@ -117,42 +117,52 @@ This is a monorepo containing multiple packages:
 
 ### Phase 1a: Core Buttons ✅
 
-- [x] Button component (53 tests)
-- [x] IconButton component (49 tests)
-- [x] FloatingActionButton (FAB) component (51 tests)
-- [x] Comprehensive tests
-- [x] Accessibility compliance
+- [x] Button — M3 Expressive variants-vs-states architecture (v0.4.2)
+- [x] IconButton — M3 Expressive 5-tier sizing system (v0.5.0)
+- [x] FAB — M3 Expressive slot architecture, size scale, solid colors (v0.6.0)
+- [x] FABMenu — M3 Expressive pill menu items with overlay anchoring (v0.7.0)
+- [x] ButtonGroup — connected layout, single/multi-select (v0.4.0)
+- [x] SplitButton — filled, tonal, outlined variants (v0.4.0)
 
 ### Phase 1b: Form Components ✅
 
-- [x] TextField component (56 tests)
-- [x] Checkbox component (49 tests)
-- [x] Radio component (47 tests)
-- [x] Switch component (50 tests)
-- [x] First npm release (v0.1.0) — released 2026-04-15
+- [x] TextField component
+- [x] Checkbox component
+- [x] Radio + RadioGroup components
+- [x] Switch component — variants-vs-states architecture (v0.4.1)
+- [x] Slider — standard, centered, range variants (v0.4.0)
 
-### Phase 2: Layout & Navigation
+### Phase 2: Navigation ✅
 
-- [ ] Card component
-- [ ] Dialog component
-- [ ] Drawer component
-- [ ] Tabs component
-- [ ] Navigation components
-- [ ] Documentation site launch
+- [x] AppBar — four size variants, scroll elevation (v0.2.0)
+- [x] Tabs — primary and secondary variants (v0.2.0)
+- [x] NavigationDrawer — modal and standard variants (v0.2.0)
+- [x] NavigationBar — bottom navigation with badges (v0.2.0)
+- [x] Search — SearchBar and SearchView overlay (v0.4.0)
 
-### Phase 3: Data Display
+### Phase 3: Feedback ✅
+
+- [x] Dialog — basic and fullscreen variants (v0.3.0)
+- [x] Snackbar — provider, stacking, imperative API (v0.3.0)
+- [x] Menu — dropdown, context menu, submenus (v0.3.0)
+- [x] Progress — linear and circular indicators (v0.3.0)
+- [x] BottomSheet — standard and modal variants (v0.4.0)
+- [x] Tooltip + RichTooltip — portal rendering, smart positioning (v0.4.0)
+
+### Phase 4: Data Display ✅
+
+- [x] Card — elevated, filled, outlined variants (v0.4.0)
+- [x] List — static and interactive modes (v0.4.0)
+- [x] Chip — Assist, Filter, Input, Suggestion types (v0.4.0)
+- [x] Badge — dot and count variants (v0.4.0)
+- [x] Divider — horizontal/vertical, inset variants (v0.4.0)
+- [x] DatePicker + TimePicker — docked, modal, input variants (v0.4.0)
+
+### Phase 5: Stable Release
 
 - [ ] Table component
-- [ ] List component
-- [ ] Chip component
-- [ ] Badge component
-- [ ] Tooltip component
-
-### Phase 4: Stable Release
-
-- [ ] Performance optimization
-- [ ] Bundle size optimization
-- [ ] Comprehensive documentation
+- [ ] Documentation site launch
+- [ ] Performance and bundle size optimization
 - [ ] Migration guides
 - [ ] v1.0.0 stable release
 
