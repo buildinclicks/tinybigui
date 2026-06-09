@@ -1,25 +1,70 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 /**
- * Material Design 3 Card Variants (CVA)
+ * Material Design 3 Card Variants
  *
- * Type-safe variant management for the Card component.
- * Uses Tailwind CSS classes mapped to MD3 design tokens.
+ * Architecture: Variants vs States
+ * - CVA holds design-time structure only (the `variant` axis). No interaction
+ *   state variants (hovered/pressed/focused/dragged/disabled) live in CVA.
+ * - All interaction states are driven by data-* attributes on the root via
+ *   `data-[x]:` (self-targeting) on the root and `group-data-[x]/card:` selectors
+ *   in each slot's base classes.
+ * - Content flags (`data-interactive`) are set explicitly by the component.
  *
- * MD3 Specifications:
- * - Shape: medium (12dp) → `rounded-md`
- * - Elevated: surface-container-low + elevation-1 (resting), elevation-2 (hover/interactive)
- * - Filled: surface-container-highest + elevation-0
- * - Outlined: surface + outline-variant border + elevation-0
- * - Dragged state (elevated only): elevation-4, slower shadow transition
- * - Disabled: on-surface at 12% opacity (`opacity-38`) + no pointer events
+ * Slot responsibilities:
+ *   cardVariants           — root container; shape, color, per-state elevation
+ *   cardStateLayerVariants — hover/focus/press/drag opacity ring (absolute overlay)
+ *   cardFocusRingVariants  — keyboard focus outline (inset so overflow-hidden never clips it)
+ *
+ * MD3 Spec (https://m3.material.io/components/cards/specs):
+ *   Shape: medium corner (12dp) → `rounded-md`
+ *   State-layer color: on-surface (all variants)
+ *   State-layer opacities: hover 8% | focus 10% | pressed 10% | dragged 16%
+ *   Disabled: container 38% opacity, no pointer events
+ *
+ * Elevation per state (MD3 comp tokens):
+ *   Elevated  enabled=1  hover=2  focus=1  pressed=1  dragged=4
+ *   Filled    enabled=0  hover=1  focus=0  pressed=0  dragged=3
+ *   Outlined  enabled=0  hover=1  focus=0  pressed=0  dragged=3
+ *
+ * Motion tier: Standard **default** (cards are standard-size components alongside
+ *   dialogs/menus — not the fast tier used for small <48dp controls like buttons).
+ *   All effect transitions use `duration-spring-standard-default-effects` (200ms) +
+ *   `ease-spring-standard-default-effects`.
+ *
+ * Specificity strategy (self-targeting `data-[x]:` on the root):
+ *   base → hover (single) → focus (single) → pressed (doubled) → dragged (tripled)
+ *   Doubling/tripling the attribute selector guarantees the later state wins
+ *   regardless of Tailwind's emitted class order. `pressed` (and `dragged`,
+ *   which co-occurs with a held pointer) therefore beat `hover` deterministically.
+ */
+
+// ─── ROOT / CONTAINER ────────────────────────────────────────────────────────
+
+/**
+ * Root container element.
+ *
+ * `overflow-hidden` clips full-bleed media (CardMedia), the ripple, and the
+ * state layer to the card's rounded shape. Because the root clips, the focus
+ * ring is rendered as an INSET overlay (see `cardFocusRingVariants`) rather than
+ * an outset ring, so it is never cut off.
+ *
+ * Elevation responds to the root's own `data-*` state attributes via
+ * self-targeting selectors (the root carries both `group/card` and the state
+ * attributes). The shadow, opacity, and border-color changes are effects, so
+ * they use the standard-default-effects spring (200ms, no overshoot).
  */
 export const cardVariants = cva(
   [
     // Shape: MD3 medium corner = 12dp
-    "relative overflow-hidden rounded-md",
-    // Shadow transition (effects property — use spring standard fast effects)
-    "transition-shadow duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+    "relative overflow-hidden rounded-md text-on-surface",
+    // Transition: effects properties — standard default tier (cards are standard-size, not <48dp)
+    // Covers shadow (elevation), opacity (disabled fade), border-color (outlined state)
+    "transition-[box-shadow,opacity,border-color] duration-spring-standard-default-effects ease-spring-standard-default-effects",
+    // Interactive affordance (content flag set by the component)
+    "data-[interactive]:cursor-pointer",
+    // Disabled — self-targeting selectors (38% container, no interaction)
+    "data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none data-[disabled]:opacity-38",
   ],
   {
     variants: {
@@ -27,100 +72,108 @@ export const cardVariants = cva(
        * Card visual variant per MD3 specification.
        */
       variant: {
-        elevated: ["shadow-elevation-1", "hover:shadow-elevation-2"],
-        filled: ["shadow-elevation-0"],
-        outlined: ["border", "border-outline-variant", "shadow-elevation-0"],
-      },
-
-      /**
-       * Whether the card is interactive (has onPress or href).
-       * Interactive cards gain a cursor, keyboard focus ring, and state layer.
-       */
-      isInteractive: {
-        true: [
-          "cursor-pointer",
-          "focus-visible:outline-2",
-          "focus-visible:outline-primary",
-          "focus-visible:outline-offset-2",
+        /**
+         * Elevated — separation via shadow.
+         * MD3: container=surface-container-low.
+         * Elevation: 1 base → 2 hover → 1 focus → 1 pressed → 4 dragged.
+         */
+        elevated: [
+          "bg-surface-container-low",
+          "shadow-elevation-1",
+          "data-[hovered]:shadow-elevation-2",
+          "data-[focus-visible]:shadow-elevation-1",
+          "data-[pressed]:data-[pressed]:shadow-elevation-1",
+          "data-[dragged]:data-[dragged]:data-[dragged]:shadow-elevation-4",
+          "data-[disabled]:shadow-none",
         ],
-        false: "cursor-default",
-      },
 
-      /**
-       * Whether the card is currently being dragged.
-       * Applies elevated shadow level 4 with a slower, more intentional transition
-       * to communicate physical lift per MD3 motion spec.
-       */
-      isDragged: {
-        true: [
-          "shadow-elevation-4",
-          // Override base transition to use a slower, decelerate curve for drag onset
-          "duration-medium2",
-          "ease-emphasized-decelerate",
+        /**
+         * Filled — subtle container fill, no resting shadow.
+         * MD3: container=surface-container-highest.
+         * Elevation: 0 base → 1 hover → 0 focus → 0 pressed → 3 dragged.
+         */
+        filled: [
+          "bg-surface-container-highest",
+          "shadow-none",
+          "data-[hovered]:shadow-elevation-1",
+          "data-[focus-visible]:shadow-none",
+          "data-[pressed]:data-[pressed]:shadow-none",
+          "data-[dragged]:data-[dragged]:data-[dragged]:shadow-elevation-3",
+          "data-[disabled]:shadow-none",
         ],
-        false: "",
-      },
 
-      /**
-       * Whether the card is disabled.
-       * MD3 spec: 38% opacity, no pointer events.
-       */
-      isDisabled: {
-        true: ["opacity-38", "pointer-events-none"],
-        false: "",
+        /**
+         * Outlined — visual boundary via border, no resting shadow.
+         * MD3: container=surface, outline=outline-variant.
+         * Elevation: 0 base → 1 hover → 0 focus → 0 pressed → 3 dragged.
+         */
+        outlined: [
+          "bg-surface border border-outline-variant",
+          "shadow-none",
+          "data-[hovered]:shadow-elevation-1",
+          "data-[focus-visible]:shadow-none",
+          "data-[pressed]:data-[pressed]:shadow-none",
+          "data-[dragged]:data-[dragged]:data-[dragged]:shadow-elevation-3",
+          "data-[disabled]:shadow-none",
+        ],
       },
     },
-
-    compoundVariants: [
-      // Filled + enabled
-      {
-        variant: "filled",
-        isDisabled: false,
-        class: "bg-surface-container-highest",
-      },
-
-      // Filled + disabled
-      {
-        variant: "filled",
-        isDisabled: true,
-        class: "bg-surface-container-variant",
-      },
-      // Elevated + enabled
-      {
-        variant: "elevated",
-        isDisabled: true,
-        class: "bg-surface",
-      },
-      // Elevated + disabled
-      {
-        variant: "elevated",
-        isDisabled: false,
-        class: "bg-surface-container-low",
-      },
-      // Outlined + enabled
-      {
-        variant: "outlined",
-        isDisabled: true,
-        class: "bg-surface",
-      },
-      // Outlined + disabled
-      {
-        variant: "outlined",
-        isDisabled: false,
-        class: "bg-surface",
-      },
-    ],
 
     defaultVariants: {
       variant: "elevated",
-      isInteractive: false,
-      isDragged: false,
-      isDisabled: false,
     },
   }
 );
+
+// ─── STATE LAYER ─────────────────────────────────────────────────────────────
+
+/**
+ * State layer — absolute overlay that transitions opacity on interaction.
+ *
+ * Color is always `on-surface` per MD3 (cards do not vary the state-layer color
+ * by variant). Rendered below the content (content wrapper carries `z-10`) so it
+ * tints the container surface without reducing text legibility.
+ *
+ * Opacity: 0 rest → 8% hover → 10% focus/pressed → 16% dragged → hidden disabled.
+ * `pressed` (doubled) and `dragged` (tripled) win over `hover` (single) by
+ * specificity when multiple attributes are set simultaneously.
+ */
+export const cardStateLayerVariants = cva([
+  "pointer-events-none absolute inset-0 rounded-[inherit] opacity-0",
+  "bg-on-surface",
+  // Effects transition for opacity — standard default tier (200ms, no overshoot)
+  "transition-opacity duration-spring-standard-default-effects ease-spring-standard-default-effects",
+  "group-data-[hovered]/card:opacity-8",
+  "group-data-[focus-visible]/card:opacity-10",
+  "group-data-[pressed]/card:group-data-[pressed]/card:opacity-10",
+  "group-data-[dragged]/card:group-data-[dragged]/card:group-data-[dragged]/card:opacity-16",
+  "group-data-[disabled]/card:hidden",
+]);
+
+// ─── FOCUS RING ───────────────────────────────────────────────────────────────
+
+/**
+ * Focus ring overlay.
+ *
+ * Rendered INSET (`-outline-offset-2`, `z-20`) so it stays inside the root's
+ * `overflow-hidden` clip and sits above the content. Always present in the DOM
+ * (opacity-0 at rest) and fades in on keyboard/programmatic focus, which avoids
+ * layout shift and lets the opacity transition animate smoothly.
+ */
+export const cardFocusRingVariants = cva([
+  "pointer-events-none absolute inset-0 z-20 rounded-[inherit]",
+  "outline outline-2 -outline-offset-2 outline-secondary",
+  // Effects transition — standard default tier, opacity must not overshoot
+  "transition-opacity duration-spring-standard-default-effects ease-spring-standard-default-effects",
+  "opacity-0",
+  "group-data-[focus-visible]/card:opacity-100",
+]);
+
+// ─── EXPORTED TYPES ───────────────────────────────────────────────────────────
 
 /**
  * Extract variant prop types from CVA for typed usage.
  */
 export type CardVariants = VariantProps<typeof cardVariants>;
+export type CardStateLayerVariants = VariantProps<typeof cardStateLayerVariants>;
+export type CardFocusRingVariants = VariantProps<typeof cardFocusRingVariants>;
