@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **AppBar** — M3 expressive flexible slot-based variants-vs-states architecture; corrected subtitle type scales per MD3 spec; subtitle-driven height growth (136dp medium / 152dp large); scroll elevation via `data-scrolled` + group selectors; spring motion tokens; new slot CVA exports (`appBarVariants`, `appBarTitleVariants`, etc.)
+
+#### `@tinybigui/tokens`
+
+- AppBar spacing tokens: `--spacing-appbar-medium-subtitle` (136dp), `--spacing-appbar-large-subtitle` (152dp)
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for breaking change details and migration notes.
+
 ## [0.9.0] - 2026-06-09
 
 ### Changed

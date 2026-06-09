@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.9.0** (2026-06-09)
+> **Latest Release: v0.10.0** (2026-06-09)
 >
-> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,003 tests** passing.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,010 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,8 +94,8 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.9.0   | Released |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.4.2   | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.10.0  | Released |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.10.0  | Released |
 
 ---
 
@@ -134,7 +134,7 @@ This is a monorepo containing multiple packages:
 
 ### Phase 2: Navigation ✅
 
-- [x] AppBar — four size variants, scroll elevation (v0.2.0)
+- [x] AppBar — M3 expressive flexible slot architecture, subtitle height growth (v0.10.0)
 - [x] Tabs — primary and secondary variants (v0.2.0)
 - [x] NavigationDrawer — modal and standard variants (v0.2.0)
 - [x] NavigationBar — bottom navigation with badges (v0.2.0)
