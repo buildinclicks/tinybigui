@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { forwardRef, useRef, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   useDatePicker,
   useDateField,
@@ -20,6 +21,7 @@ import { createCalendar } from "@internationalized/date";
 import { CalendarCore } from "./CalendarCore";
 import { DatePickerActions } from "./DatePickerActions";
 import { getInteractionDataAttributes } from "../../utils/interactionStates";
+import { cn } from "../../utils/cn";
 
 import type { DateSegment as DateSegmentType } from "react-stately";
 import type { DateValue } from "@internationalized/date";
@@ -101,7 +103,7 @@ function CalendarTriggerIcon(): JSX.Element {
  */
 function PopoverContent({
   popoverRef,
-  triggerRef,
+  anchorRef,
   state,
   dialogProps,
   calendarProps,
@@ -111,9 +113,11 @@ function PopoverContent({
   onConfirm,
   slots,
   ActionButtonComponent,
+  popoverClassName,
 }: {
   popoverRef: React.RefObject<HTMLDivElement>;
-  triggerRef: React.RefObject<HTMLButtonElement>;
+  /** The element the popover is anchored to for positioning — the field group, not the icon button. */
+  anchorRef: React.RefObject<HTMLDivElement>;
   state: ReturnType<typeof useDatePickerState>;
   dialogProps: ReturnType<typeof useDatePicker>["dialogProps"];
   calendarProps: ReturnType<typeof useDatePicker>["calendarProps"];
@@ -123,13 +127,16 @@ function PopoverContent({
   onConfirm: () => void;
   slots?: DatePickerDockedProps["slots"] | undefined;
   ActionButtonComponent?: React.ComponentType<ActionButtonSlotProps> | undefined;
-}): JSX.Element {
+  popoverClassName?: string | undefined;
+}): JSX.Element | null {
   const { popoverProps } = usePopover(
     {
       popoverRef,
-      triggerRef,
+      triggerRef: anchorRef,
       placement: "bottom start",
       offset: 4,
+      shouldFlip: true,
+      containerPadding: 12,
     },
     state
   );
@@ -146,8 +153,12 @@ function PopoverContent({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [state]);
 
-  return (
-    <div {...popoverProps} ref={popoverRef} data-popover>
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const content = (
+    <div {...popoverProps} ref={popoverRef} data-popover className={cn(popoverClassName)}>
       <DismissButton onDismiss={() => state.close()} />
       <div {...dialogProps} role="dialog">
         <CalendarCore
@@ -178,6 +189,8 @@ function PopoverContent({
       <DismissButton onDismiss={() => state.close()} />
     </div>
   );
+
+  return createPortal(content, document.body) as JSX.Element;
 }
 
 /**
@@ -212,6 +225,7 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
       onCancel,
       onConfirm,
       className,
+      popoverClassName,
       slots,
       ActionButtonComponent,
       ...datePickerProps
@@ -220,6 +234,7 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
     const internalRef = useRef<HTMLDivElement>(null);
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLDivElement>;
     const triggerRef = useRef<HTMLButtonElement>(null);
+    const groupRef = useRef<HTMLDivElement>(null);
     const popoverRef = useRef<HTMLDivElement>(null);
 
     const stateProps = {
@@ -312,7 +327,7 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
             {datePickerProps.label}
           </label>
         )}
-        <div {...groupProps} data-field-group>
+        <div {...groupProps} ref={groupRef} data-field-group>
           <PickerDateField fieldProps={fieldProps as Record<string, unknown>} />
           <button
             {...mergeProps(iconButtonProps, triggerFocusProps, triggerHoverProps)}
@@ -332,7 +347,7 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
         {state.isOpen && (
           <PopoverContent
             popoverRef={popoverRef}
-            triggerRef={triggerRef}
+            anchorRef={groupRef}
             state={state}
             dialogProps={dialogProps}
             calendarProps={calendarProps}
@@ -342,6 +357,7 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
             onConfirm={handleConfirm}
             {...(slots !== undefined ? { slots } : {})}
             {...(ActionButtonComponent !== undefined ? { ActionButtonComponent } : {})}
+            {...(popoverClassName !== undefined ? { popoverClassName } : {})}
           />
         )}
       </div>

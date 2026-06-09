@@ -59,24 +59,37 @@ import { cva, type VariantProps } from "class-variance-authority";
 // ─── CONTAINER ───────────────────────────────────────────────────────────────
 
 /**
- * Root container — shape, surface color, width by variant.
+ * Container variants — width and surface styling by structural variant.
+ *
+ * - **docked**: Root wrapper is layout-only (width). Calendar surface styling
+ *   (`bg-surface-container-high`, `rounded-3xl`) is applied to `[data-popover]`
+ *   via `DOCKED_POPOVER_STRUCTURAL` in `datePickerStructuralStyles.ts`.
+ * - **modal** / **modal-input**: Full container styling on `[data-modal-dialog]`.
+ *
  * MD3 spec: surface-container-high, 28dp corner radius (extra-large = rounded-3xl).
  */
-export const datePickerContainerVariants = cva(
-  ["bg-surface-container-high", "rounded-3xl", "overflow-hidden"],
-  {
-    variants: {
-      variant: {
-        docked: "w-[360px]", // NOTE: measurement-derived (360dp fixed width); permitted exception
-        modal: "w-[360px]", // NOTE: measurement-derived (360dp fixed width); permitted exception
-        "modal-input": "w-[328px]", // NOTE: measurement-derived (328dp); permitted exception
-      },
+export const datePickerContainerVariants = cva("", {
+  variants: {
+    variant: {
+      docked: "w-[360px]", // NOTE: measurement-derived (360dp fixed width); permitted exception
+      modal: [
+        "bg-surface-container-high",
+        "rounded-3xl",
+        "overflow-hidden",
+        "w-[360px]", // NOTE: measurement-derived (360dp fixed width); permitted exception
+      ],
+      "modal-input": [
+        "bg-surface-container-high",
+        "rounded-3xl",
+        "overflow-hidden",
+        "w-[328px]", // NOTE: measurement-derived (328dp); permitted exception
+      ],
     },
-    defaultVariants: {
-      variant: "docked",
-    },
-  }
-);
+  },
+  defaultVariants: {
+    variant: "docked",
+  },
+});
 
 export type DatePickerContainerVariants = VariantProps<typeof datePickerContainerVariants>;
 
@@ -682,7 +695,7 @@ export type DockedTriggerStateLayerVariants = VariantProps<typeof dockedTriggerS
 export const popoverVariants = cva([
   "bg-surface-container-high rounded-3xl",
   "shadow-elevation-2 overflow-hidden",
-  "z-50 mt-1",
+  "z-50 w-[360px]",
 ]);
 
 export type PopoverVariants = VariantProps<typeof popoverVariants>;

@@ -36,8 +36,17 @@ import {
   actionButtonVariants,
   headlineVariants,
   supportingTextVariants,
+  modalDialogVariants,
+  scrimVariants,
 } from "./DatePicker.variants";
-import { DOCKED_MOTION_STRUCTURAL, MODAL_MOTION_STRUCTURAL } from "./datePickerStructuralStyles";
+import {
+  DOCKED_POPOVER_MOTION,
+  DOCKED_MOTION_STRUCTURAL,
+  MODAL_MOTION_STRUCTURAL,
+  CALENDAR_GRID_STRUCTURAL,
+  MODAL_CONTENT_STRUCTURAL,
+  MODAL_INPUT_CONTENT_STRUCTURAL,
+} from "./datePickerStructuralStyles";
 
 // ─── M01: Type Tests ──────────────────────────────────────────────────────────
 
@@ -641,6 +650,31 @@ describe("DatePickerDocked — headless docked date picker behavior", () => {
 
     const grid = screen.getByRole("grid");
     expect(grid).toBeInTheDocument();
+  });
+
+  // Test 41b
+  test("DatePickerDocked renders popover in a portal", async () => {
+    const user = userEvent.setup();
+
+    const { container } = render(
+      <div data-testid="app-root">
+        <DatePickerDocked
+          aria-label="Departure date"
+          defaultValue={new CalendarDate(2025, 8, 17)}
+        />
+      </div>
+    );
+
+    const triggerButton = getTriggerButton(container);
+    await user.click(triggerButton);
+
+    const appRoot = screen.getByTestId("app-root");
+    const dialog = screen.getByRole("dialog");
+    const popover = document.querySelector("[data-popover]");
+
+    expect(appRoot.contains(dialog)).toBe(false);
+    expect(popover).not.toBeNull();
+    expect(document.body.contains(popover)).toBe(true);
   });
 
   // Test 41
@@ -1667,11 +1701,23 @@ describe("DatePickerModalInput — headless modal date input behavior", () => {
 
 describe("DatePicker — styled layer", () => {
   // Test 104
-  test("DatePicker renders with bg-surface-container-high on container", () => {
+  test("DatePicker docked root does not apply calendar surface classes directly", () => {
     const { container } = render(<DatePicker aria-label="Test date" />);
 
     const root = container.firstElementChild;
-    expect(root?.className).toContain("bg-surface-container-high");
+    const rootClasses = root?.className.split(/\s+/) ?? [];
+    expect(rootClasses).not.toContain("bg-surface-container-high");
+    expect(rootClasses).not.toContain("rounded-3xl");
+  });
+
+  // Test 104b
+  test("DatePicker docked applies calendar surface styles directly on the portaled popover", () => {
+    render(<DatePicker aria-label="Test date" defaultOpen />);
+
+    const popover = document.querySelector("[data-popover]");
+    expect(popover).not.toBeNull();
+    expect(popover?.className).toContain("bg-surface-container-high");
+    expect(popover?.className).toContain("rounded-3xl");
   });
 
   // Test 105
@@ -1693,8 +1739,8 @@ describe("DatePicker — styled layer", () => {
   });
 
   // Test 108
-  test("DatePicker container has rounded-3xl (28dp corner radius)", () => {
-    const classes = datePickerContainerVariants({ variant: "docked" });
+  test("DatePicker modal container has rounded-3xl (28dp corner radius)", () => {
+    const classes = datePickerContainerVariants({ variant: "modal" });
     expect(classes).toContain("rounded-3xl");
   });
 
@@ -1858,6 +1904,53 @@ describe("DatePicker — styled layer", () => {
     const classes = calendarCellVariants();
     expect(classes).toContain("data-[range-middle]:bg-secondary-container");
   });
+
+  // Test 125a — Calendar grid structural includes mx-auto for table centering
+  test("CALENDAR_GRID_STRUCTURAL includes [&_table]:mx-auto to center the grid", () => {
+    expect(CALENDAR_GRID_STRUCTURAL.join(" ")).toContain("[&_table]:mx-auto");
+  });
+
+  // Test 125b — Modal dialog variants include fixed positioning
+  test("modalDialogVariants includes fixed and -translate-x-1/2", () => {
+    const classes = modalDialogVariants({ variant: "modal" });
+    expect(classes).toContain("fixed");
+    expect(classes).toContain("-translate-x-1/2");
+    expect(classes).toContain("-translate-y-1/2");
+  });
+
+  // Test 125c — scrimVariants includes fixed inset and bg-scrim
+  test("scrimVariants includes fixed inset-0 and bg-scrim", () => {
+    const classes = scrimVariants();
+    expect(classes).toContain("fixed");
+    expect(classes).toContain("inset-0");
+    expect(classes).toContain("bg-scrim");
+  });
+
+  // Test 125d — Styled modal dialog element carries fixed positioning
+  test("DatePickerModal styled variant: [data-modal-dialog] carries fixed class", () => {
+    render(<DatePicker variant="modal" isOpen={true} aria-label="Test modal" />);
+    const dialog = document.querySelector("[data-modal-dialog]");
+    expect(dialog).not.toBeNull();
+    expect(dialog?.className).toContain("fixed");
+  });
+
+  // Test 125e — Styled modal scrim element carries bg-scrim class
+  test("DatePickerModal styled variant: [data-scrim] carries bg-scrim class", () => {
+    render(<DatePicker variant="modal" isOpen={true} aria-label="Test modal scrim" />);
+    const scrim = document.querySelector("[data-scrim]");
+    expect(scrim).not.toBeNull();
+    expect(scrim?.className).toContain("bg-scrim");
+  });
+
+  // Test 125f — MODAL_CONTENT_STRUCTURAL does not contain [data-modal-dialog] descendant selector
+  test("MODAL_CONTENT_STRUCTURAL contains no [data-modal-dialog] descendant selector (dialog styles applied directly)", () => {
+    expect(MODAL_CONTENT_STRUCTURAL).not.toContain("[data-modal-dialog]");
+  });
+
+  // Test 125g — MODAL_INPUT_CONTENT_STRUCTURAL does not contain [data-modal-dialog] descendant selector
+  test("MODAL_INPUT_CONTENT_STRUCTURAL contains no [data-modal-dialog] descendant selector", () => {
+    expect(MODAL_INPUT_CONTENT_STRUCTURAL).not.toContain("[data-modal-dialog]");
+  });
 });
 
 // ─── M10: Motion and Animation Tests ──────────────────────────────────────────
@@ -1865,14 +1958,14 @@ describe("DatePicker — styled layer", () => {
 describe("DatePicker — motion and animation", () => {
   // Test 126 — Docked popover enter motion (screen-level, standard legacy)
   test("Docked popover enter: has duration-short3 and ease-standard-decelerate", () => {
-    expect(DOCKED_MOTION_STRUCTURAL).toContain("duration-short3");
-    expect(DOCKED_MOTION_STRUCTURAL).toContain("ease-standard-decelerate");
+    expect(DOCKED_POPOVER_MOTION).toContain("duration-short3");
+    expect(DOCKED_POPOVER_MOTION).toContain("ease-standard-decelerate");
   });
 
   // Test 127 — Docked popover exit motion
   test("Docked popover exit: has duration-short2 and ease-standard-accelerate", () => {
-    expect(DOCKED_MOTION_STRUCTURAL).toContain("duration-short2");
-    expect(DOCKED_MOTION_STRUCTURAL).toContain("ease-standard-accelerate");
+    expect(DOCKED_POPOVER_MOTION).toContain("duration-short2");
+    expect(DOCKED_POPOVER_MOTION).toContain("ease-standard-accelerate");
   });
 
   // Test 128 — Modal enter motion
@@ -1965,7 +2058,7 @@ describe("DatePicker — motion and animation", () => {
 
   // Test 135 — No hardcoded arbitrary duration/ease values in motion strings
   test("No hardcoded duration-[Xms] or ease-[cubic-bezier] values in motion structural strings", () => {
-    const allMotion = DOCKED_MOTION_STRUCTURAL + MODAL_MOTION_STRUCTURAL;
+    const allMotion = DOCKED_POPOVER_MOTION + DOCKED_MOTION_STRUCTURAL + MODAL_MOTION_STRUCTURAL;
     expect(allMotion).not.toMatch(/duration-\[\d+ms\]/);
     expect(allMotion).not.toMatch(/ease-\[cubic-bezier/);
   });
@@ -2014,24 +2107,19 @@ describe("DatePicker — accessibility hardening", () => {
 
   // Test 140
   test('Calendar grid has role="grid"', async () => {
-    const { container } = render(
-      <DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />
-    );
+    render(<DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />);
 
     await waitFor(() => {
-      const grid = container.querySelector('table[role="grid"]');
-      expect(grid).toBeInTheDocument();
+      expect(screen.getByRole("grid")).toBeInTheDocument();
     });
   });
 
   // Test 141
   test("All date cells have aria-label with full date string", async () => {
-    const { container } = render(
-      <DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />
-    );
+    render(<DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />);
 
     await waitFor(() => {
-      const cells = container.querySelectorAll('td[role="gridcell"] > div');
+      const cells = document.querySelectorAll('td[role="gridcell"] > div');
       const cellsWithLabel = Array.from(cells).filter((cell) => cell.getAttribute("aria-label"));
       expect(cellsWithLabel.length).toBeGreaterThan(0);
       cellsWithLabel.forEach((cell) => {
@@ -2043,12 +2131,10 @@ describe("DatePicker — accessibility hardening", () => {
 
   // Test 142
   test('Today cell has aria-current="date"', async () => {
-    const { container } = render(
-      <DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />
-    );
+    render(<DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />);
 
     await waitFor(() => {
-      const todayCell = container.querySelector('[aria-current="date"]');
+      const todayCell = document.querySelector('[aria-current="date"]');
       expect(todayCell).toBeInTheDocument();
     });
   });
@@ -2056,7 +2142,7 @@ describe("DatePicker — accessibility hardening", () => {
   // Test 143
   test('Selected cell has aria-selected="true"', async () => {
     const todayDate = today(getLocalTimeZone());
-    const { container } = render(
+    render(
       <DatePicker
         variant="docked"
         label="Test"
@@ -2067,7 +2153,7 @@ describe("DatePicker — accessibility hardening", () => {
     );
 
     await waitFor(() => {
-      const selected = container.querySelector('[aria-selected="true"]');
+      const selected = document.querySelector('[aria-selected="true"]');
       expect(selected).toBeInTheDocument();
     });
   });
@@ -2077,7 +2163,7 @@ describe("DatePicker — accessibility hardening", () => {
     const todayDate = today(getLocalTimeZone());
     const maxDate = todayDate.add({ days: 3 });
 
-    const { container } = render(
+    render(
       <DatePicker
         variant="docked"
         label="Test"
@@ -2088,19 +2174,17 @@ describe("DatePicker — accessibility hardening", () => {
     );
 
     await waitFor(() => {
-      const disabledCells = container.querySelectorAll('[aria-disabled="true"]');
+      const disabledCells = document.querySelectorAll('[aria-disabled="true"]');
       expect(disabledCells.length).toBeGreaterThan(0);
     });
   });
 
   // Test 145
   test('Navigation announcements use aria-live="polite"', async () => {
-    const { container } = render(
-      <DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />
-    );
+    render(<DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />);
 
     await waitFor(() => {
-      const liveRegion = container.querySelector('[aria-live="polite"]');
+      const liveRegion = document.querySelector('[aria-live="polite"]');
       expect(liveRegion).toBeInTheDocument();
     });
   });

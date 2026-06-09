@@ -468,8 +468,13 @@ export interface DatePickerDockedProps {
   onCancel?: () => void;
   /** Called when the confirm button is pressed */
   onConfirm?: (value: DateValue | null) => void;
-  /** Additional CSS classes */
+  /** Additional CSS classes on the root wrapper */
   className?: string;
+  /**
+   * CSS classes applied to the portaled calendar popover panel.
+   * Used by the styled layer to inject popover surface + calendar layout styles.
+   */
+  popoverClassName?: string;
   /**
    * Calendar slot component overrides (cells, nav buttons, year items, etc.).
    * Used by the styled layer to inject CVA + state-layer components.
@@ -555,6 +560,11 @@ export interface DatePickerModalProps {
   onClear?: () => void;
   /** Additional CSS classes */
   className?: string;
+  /**
+   * CSS classes applied directly to the `[data-scrim]` overlay element.
+   * Used by the styled layer to inject scrim surface styles.
+   */
+  scrimClassName?: string;
   /** Calendar slot component overrides. */
   slots?: DatePickerCalendarSlots;
   /** Slot component for action buttons. */
@@ -794,6 +804,11 @@ export interface DatePickerModalInputProps {
   onModeToggle?: () => void;
   /** Additional CSS classes */
   className?: string;
+  /**
+   * CSS classes applied directly to the `[data-scrim]` overlay element.
+   * Used by the styled layer to inject scrim surface styles.
+   */
+  scrimClassName?: string;
   /** Slot component for action buttons. */
   ActionButtonComponent?: AnyComponent;
 }

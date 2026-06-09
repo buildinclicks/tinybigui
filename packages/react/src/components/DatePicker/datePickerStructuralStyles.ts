@@ -35,6 +35,8 @@ export const CALENDAR_HEADER_STRUCTURAL = [
 export const CALENDAR_GRID_STRUCTURAL = [
   // Table resets
   "[&_table]:border-collapse",
+  // Center the fixed-width table so 7×48px = 336px is equally inset within 360px
+  "[&_table]:mx-auto",
   "[&_th]:p-0",
   "[&_td]:p-0",
 ];
@@ -249,7 +251,57 @@ export const SHARED_CALENDAR_STRUCTURAL = [
 ].join(" ");
 
 /**
- * Structural styles for the docked variant.
+ * Structural styles applied directly on the `[data-modal-dialog]` element for
+ * the modal (calendar) variant. Does NOT include the dialog surface/sizing
+ * (those come from `modalDialogVariants` applied inline) or the scrim
+ * (applied via `scrimClassName` on `[data-scrim]`).
+ *
+ * Use this on the modal dialog's `className` alongside `modalDialogVariants`.
+ */
+export const MODAL_CONTENT_STRUCTURAL = [
+  ...MODAL_HEADER_STRUCTURAL,
+  ...CALENDAR_HEADER_STRUCTURAL,
+  ...CALENDAR_GRID_STRUCTURAL,
+  ...YEAR_GRID_STRUCTURAL,
+  ...DIVIDER_STRUCTURAL,
+  ...ACTION_ROW_STRUCTURAL,
+].join(" ");
+
+/**
+ * Structural styles applied directly on the `[data-modal-dialog]` element for
+ * the modal-input variant.
+ *
+ * Use this on the modal-input dialog's `className` alongside `modalDialogVariants`.
+ */
+export const MODAL_INPUT_CONTENT_STRUCTURAL = [
+  ...MODAL_HEADER_STRUCTURAL,
+  ...MODAL_INPUT_SUPPORTING_TEXT_STRUCTURAL,
+  ...MODAL_INPUT_FIELD_STRUCTURAL,
+  ...DIVIDER_STRUCTURAL,
+  ...ACTION_ROW_STRUCTURAL,
+].join(" ");
+
+/**
+ * Structural styles for the docked variant root (label, field, trigger only).
+ * Calendar/popover styles live on the portaled popover panel — see
+ * `DOCKED_POPOVER_PANEL_STRUCTURAL`.
+ */
+export const DOCKED_ROOT_STRUCTURAL = [
+  ...DOCKED_LABEL_STRUCTURAL,
+  ...DOCKED_FIELD_STRUCTURAL,
+  ...DOCKED_TRIGGER_STRUCTURAL,
+].join(" ");
+
+/**
+ * Structural styles applied directly on the portaled `[data-popover]` panel.
+ * Includes shared calendar layout (header, grid, year grid, divider, actions).
+ */
+export const DOCKED_POPOVER_PANEL_STRUCTURAL = SHARED_CALENDAR_STRUCTURAL;
+
+/**
+ * Structural styles for the docked variant (root + descendant popover selectors).
+ * @deprecated Prefer `DOCKED_ROOT_STRUCTURAL` on root and `DOCKED_POPOVER_PANEL_STRUCTURAL`
+ * on the portaled popover panel.
  */
 export const DOCKED_STRUCTURAL = [
   ...DOCKED_LABEL_STRUCTURAL,
@@ -265,6 +317,7 @@ export const DOCKED_STRUCTURAL = [
 
 /**
  * Structural styles for the modal variant.
+ * @deprecated Prefer `MODAL_CONTENT_STRUCTURAL` applied on the dialog element directly.
  */
 export const MODAL_STRUCTURAL = [
   ...MODAL_DIALOG_STRUCTURAL,
@@ -279,6 +332,7 @@ export const MODAL_STRUCTURAL = [
 
 /**
  * Structural styles for the modal-input variant.
+ * @deprecated Prefer `MODAL_INPUT_CONTENT_STRUCTURAL` applied on the dialog element directly.
  */
 export const MODAL_INPUT_STRUCTURAL = [
   ...MODAL_DIALOG_STRUCTURAL,
@@ -296,7 +350,20 @@ export const MODAL_INPUT_STRUCTURAL = [
 /**
  * Screen-level motion for the docked popover container.
  * Uses legacy standard-decelerate (enter) / standard-accelerate (exit).
- * Applied conditionally when reduced motion is NOT active.
+ * Applied directly on the portaled `[data-popover]` element when reduced motion
+ * is NOT active.
+ */
+export const DOCKED_POPOVER_MOTION = [
+  "transition-[transform,opacity]",
+  "duration-short3",
+  "ease-standard-decelerate",
+  "data-[exiting]:duration-short2",
+  "data-[exiting]:ease-standard-accelerate",
+].join(" ");
+
+/**
+ * Screen-level motion for the docked popover container (root descendant selector).
+ * @deprecated Prefer `DOCKED_POPOVER_MOTION` applied directly on the portaled popover.
  */
 export const DOCKED_MOTION_STRUCTURAL = [
   "[&_[data-popover]]:transition-[transform,opacity]",
@@ -317,4 +384,17 @@ export const MODAL_MOTION_STRUCTURAL = [
   "[&_[data-modal-dialog]]:ease-standard-decelerate",
   "[&_[data-modal-dialog][data-exiting]]:duration-medium1",
   "[&_[data-modal-dialog][data-exiting]]:ease-standard-accelerate",
+].join(" ");
+
+/**
+ * Screen-level motion applied directly on the `[data-modal-dialog]` element.
+ * Uses standard-decelerate (enter) / standard-accelerate (exit).
+ * Applied conditionally when reduced motion is NOT active.
+ */
+export const MODAL_DIALOG_MOTION = [
+  "transition-[transform,opacity]",
+  "duration-medium2",
+  "ease-standard-decelerate",
+  "data-[exiting]:duration-medium1",
+  "data-[exiting]:ease-standard-accelerate",
 ].join(" ");

@@ -73,6 +73,7 @@ export const DatePickerModal = forwardRef<HTMLDivElement, DatePickerModalProps>(
       onConfirm,
       onClear,
       className,
+      scrimClassName,
       slots,
       ActionButtonComponent,
     } = props;
@@ -235,6 +236,7 @@ export const DatePickerModal = forwardRef<HTMLDivElement, DatePickerModalProps>(
           headlineId={headlineId}
           onClose={handleClose}
           {...(className ? { className } : {})}
+          {...(scrimClassName ? { scrimClassName } : {})}
           isOpen={state.isOpen}
         >
           <DatePickerModalHeader
@@ -300,6 +302,7 @@ interface ModalOverlayProps {
   headlineId: string;
   onClose: () => void;
   className?: string;
+  scrimClassName?: string;
   isOpen: boolean;
   children: React.ReactNode;
 }
@@ -314,6 +317,7 @@ function ModalOverlay({
   headlineId,
   onClose,
   className,
+  scrimClassName,
   isOpen,
   children,
 }: ModalOverlayProps): JSX.Element {
@@ -338,7 +342,7 @@ function ModalOverlay({
 
   return (
     <>
-      <div data-scrim aria-hidden="true" onClick={onClose} />
+      <div data-scrim aria-hidden="true" onClick={onClose} className={scrimClassName} />
       <div
         {...overlayProps}
         {...dialogProps}
