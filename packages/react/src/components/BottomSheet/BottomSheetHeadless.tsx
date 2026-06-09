@@ -126,7 +126,7 @@ const BottomSheetModalPanel = ({
       aria-modal="true"
       className={cn(className, getAnimationClassName?.(animationState))}
       data-animation-state={animationState}
-      data-dragging={isDragging || undefined}
+      data-dragging={isDragging ? "" : undefined}
       style={panelStyle}
       onTransitionEnd={onTransitionEnd}
     >
@@ -365,7 +365,7 @@ export const BottomSheetHeadless = forwardRef<HTMLDivElement, BottomSheetHeadles
             ref={ref}
             className={cn(className, getAnimationClassName?.(animationState))}
             data-animation-state={animationState}
-            data-dragging={isDragging || undefined}
+            data-dragging={isDragging ? "" : undefined}
             style={panelStyle}
             onTransitionEnd={handleTransitionEnd}
           >

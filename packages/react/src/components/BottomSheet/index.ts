@@ -16,9 +16,11 @@ export { useBottomSheetDrag } from "./useBottomSheetDrag";
 export {
   bottomSheetVariants,
   bottomSheetScrimVariants,
-  bottomSheetHandleWrapperVariants,
-  bottomSheetHandlePillVariants,
   bottomSheetAnimationVariants,
+  bottomSheetHandleWrapperVariants,
+  bottomSheetHandleStateLayerVariants,
+  bottomSheetHandleFocusRingVariants,
+  bottomSheetHandlePillVariants,
 } from "./BottomSheet.variants";
 
 // Types
@@ -36,4 +38,8 @@ export type {
   BottomSheetVariants,
   BottomSheetScrimVariants,
   BottomSheetHandleVariants,
+  BottomSheetHandleWrapperVariants,
+  BottomSheetHandleStateLayerVariants,
+  BottomSheetHandleFocusRingVariants,
+  BottomSheetHandlePillVariants,
 } from "./BottomSheet.variants";
