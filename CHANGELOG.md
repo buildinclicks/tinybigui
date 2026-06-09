@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.2] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Tabs** — MD3 expressive styling refactor with variants-vs-states architecture; `tabStateLayerVariants` slot replacing pseudo-element overlays; correct primary/secondary active-indicator tokens and spring motion; content-width primary indicator with `ResizeObserver`; exports `tabStateLayerVariants`
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.11.1] - 2026-06-09
 
 ### Changed

@@ -4,9 +4,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.11.1 (released 2026-06-09)  
+**Current Version:** v0.11.2 (released 2026-06-09)  
 **Next Release:** v0.12.0  
-**Status:** 29 components published to NPM; 2,022 tests passing
+**Status:** 29 components published to NPM; 2,025 tests passing
 
 ## Release Timeline
 
@@ -27,6 +27,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.10.0 | —       | AppBar M3 expressive flexible slot architecture, subtitle type scales, subtitle-driven height growth, scroll elevation data attrs                  | Released 2026-06-09 |
 | v0.11.0 | —       | BottomSheet MD3 expressive handle refactor, variants-vs-states architecture, state layer and focus ring slots                                      | Released 2026-06-09 |
 | v0.11.1 | —       | Card MD3 styling refactor — standard motion tier, 4:3 media fix, title-medium headline, `cardStateLayerVariants` / `cardFocusRingVariants` exports | Released 2026-06-09 |
+| v0.11.2 | —       | Tabs MD3 expressive refactor — variants-vs-states architecture, state-layer slot, spring indicator motion, content-width primary indicator         | Released 2026-06-09 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                   | Planned             |
 
 ## Completed Work
@@ -92,7 +93,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
 - [x] CVA variant management with variants-vs-states architecture
-- [x] Vitest + React Testing Library (2,022 tests)
+- [x] Vitest + React Testing Library (2,025 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards
