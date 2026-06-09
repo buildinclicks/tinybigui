@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.8.1** (2026-06-09)
+> **Latest Release: v0.9.0** (2026-06-09)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -174,7 +174,7 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 | ------------ | ------ | --------------------------------------------------------------- |
 | `Card`       | ✅     | Elevated, filled, outlined variants                             |
 | `List`       | ✅     | Static and interactive list items                               |
-| `Chip`       | ✅     | Assist, Filter, Input, Suggestion types                         |
+| `Chip`       | ✅     | MD3 expressive slot architecture, elevated surface (v0.9.0)     |
 | `Badge`      | ✅     | MD3 expressive dot/count badges, icon-corner anchoring (v0.8.0) |
 | `Divider`    | ✅     | Horizontal/vertical, inset variants                             |
 | `DatePicker` | ✅     | Docked, modal, and input variants                               |
