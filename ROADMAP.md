@@ -4,7 +4,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.8.0 (released 2026-06-09)  
+**Current Version:** v0.8.1 (released 2026-06-09)  
 **Next Release:** v0.9.0  
 **Status:** 29 components published to NPM; 1,976 tests passing
 
@@ -22,6 +22,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.6.0  | —       | FAB M3 Expressive slot architecture                                                                                               | Released 2026-06-09 |
 | v0.7.0  | —       | FABMenu M3 Expressive pill menu redesign                                                                                          | Released 2026-06-09 |
 | v0.8.0  | —       | Badge M3 expressive variants/states, icon-corner anchoring, `badgeStaticVariants` export                                          | Released 2026-06-09 |
+| v0.8.1  | —       | Checkbox MD3 variants-vs-states architecture, motion tokens, spec-accurate 18dp icons                                             | Released 2026-06-09 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                  | Planned             |
 
 ## Completed Work
