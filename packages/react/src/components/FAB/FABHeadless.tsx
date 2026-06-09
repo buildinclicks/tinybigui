@@ -1,13 +1,13 @@
 import { forwardRef, useRef } from "react";
 import { useButton } from "react-aria";
 import type { AriaButtonProps } from "react-aria";
-import { mergeProps, filterDOMProps } from "@react-aria/utils";
+import { mergeProps } from "@react-aria/utils";
 
 /**
  * Headless FAB Component (Layer 2)
  *
  * Unstyled FAB primitive using React Aria for accessibility.
- * Provides behavior only - bring your own styles.
+ * Provides behavior only — bring your own styles.
  *
  * Features:
  * - Full keyboard navigation (Enter, Space)
@@ -15,51 +15,41 @@ import { mergeProps, filterDOMProps } from "@react-aria/utils";
  * - Touch/pointer event handling
  * - Focus management
  * - Disabled state handling
+ * - Press lifecycle callbacks (onPressStart/onPressEnd) for pressed state tracking
  *
  * @example
  * ```tsx
- * // Use for custom styling
- * <FABHeadless className="custom-fab-class" aria-label="Add">
+ * <FABHeadless aria-label="Add" className="custom-fab">
  *   <IconAdd />
  * </FABHeadless>
  * ```
  */
 export interface FABHeadlessProps extends AriaButtonProps {
-  /**
-   * Additional CSS classes
-   */
+  /** Additional CSS classes */
   className?: string;
 
-  /**
-   * FAB content (icon and optional text)
-   */
+  /** FAB content (icon and optional text) */
   children: React.ReactNode;
 
   /**
-   * Tab index for keyboard navigation
+   * Tab index for keyboard navigation.
    * @default 0
    */
   tabIndex?: number;
 
-  /**
-   * Mouse down handler (for ripple effect)
-   */
+  /** Mouse down handler (for ripple effect) */
   onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 
   /**
-   * Button type attribute
+   * Button type attribute.
    * @default 'button'
    */
   type?: "button" | "submit" | "reset";
 
-  /**
-   * REQUIRED: Accessible label for screen readers
-   */
+  /** REQUIRED: Accessible label for screen readers */
   "aria-label": string;
 
-  /**
-   * HTML title attribute for tooltip
-   */
+  /** HTML title attribute for tooltip */
   title?: string;
 }
 
@@ -73,42 +63,49 @@ export const FABHeadless = forwardRef<HTMLButtonElement, FABHeadlessProps>(
       type,
       "aria-label": ariaLabel,
       title,
-      ...props
+      ...restProps
     },
     forwardedRef
   ) => {
-    // Internal ref for React Aria
     const internalRef = useRef<HTMLButtonElement>(null);
-
-    // Merge internal ref with forwarded ref
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
-    // React Aria hook - handles all accessibility
+    // React Aria hook — handles all accessibility
     const { buttonProps } = useButton(
       {
-        ...props,
+        ...restProps,
         elementType: "button",
       },
       ref
     );
 
-    // Filter out React Aria-specific props that shouldn't be passed to the DOM element
-    const domProps = filterDOMProps(props);
+    // Strip React Aria-specific event props that must not reach the DOM,
+    // then pass the remainder (data-*, interaction callbacks, etc.) through.
+    const {
+      isDisabled: _isDisabled,
+      onPress: _onPress,
+      onPressStart: _onPressStart,
+      onPressEnd: _onPressEnd,
+      onPressChange: _onPressChange,
+      onPressUp: _onPressUp,
+      ...htmlAttrs
+    } = restProps;
 
-    // Merge React Aria props with custom props and filtered DOM props
-    const mergedProps = mergeProps(buttonProps, domProps, {
-      tabIndex,
-      className,
-      onMouseDown,
-      type: type ?? "button",
-      "aria-label": ariaLabel, // Add aria-label
-      // Add title if provided
-      ...(title && { title }),
-    }) as React.ButtonHTMLAttributes<HTMLButtonElement>;
+    const mergedProps = mergeProps(
+      buttonProps,
+      {
+        tabIndex,
+        className,
+        onMouseDown,
+        "aria-label": ariaLabel,
+        ...(title !== undefined && { title }),
+      },
+      htmlAttrs
+    ) as React.ButtonHTMLAttributes<HTMLButtonElement>;
 
     return (
-      // eslint-disable-next-line react/button-has-type
-      <button {...mergedProps} ref={ref}>
+      // eslint-disable-next-line react/button-has-type -- type is dynamically passed from props
+      <button {...mergedProps} ref={ref} type={type ?? "button"}>
         {children}
       </button>
     );
