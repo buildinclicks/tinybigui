@@ -9,7 +9,14 @@ export { CardActions } from "./CardActions";
 export { CardHeadless } from "./CardHeadless";
 
 // ─── CVA Variants ─────────────────────────────────────────────────────────────
-export { cardVariants, type CardVariants } from "./Card.variants";
+export {
+  cardVariants,
+  type CardVariants,
+  cardStateLayerVariants,
+  type CardStateLayerVariants,
+  cardFocusRingVariants,
+  type CardFocusRingVariants,
+} from "./Card.variants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type {
