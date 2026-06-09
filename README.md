@@ -29,7 +29,7 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.8.0** (2026-06-09)
+> **Latest Release: v0.8.1** (2026-06-09)
 >
 > **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **1,976 tests** passing.
 >
@@ -94,7 +94,7 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.8.0   | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.8.1   | Released |
 | [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.4.2   | Released |
 
 ---
@@ -127,7 +127,7 @@ This is a monorepo containing multiple packages:
 ### Phase 1b: Form Components ✅
 
 - [x] TextField component
-- [x] Checkbox component
+- [x] Checkbox — MD3 variants-vs-states architecture, spec-accurate icons (v0.8.1)
 - [x] Radio + RadioGroup components
 - [x] Switch component — variants-vs-states architecture (v0.4.1)
 - [x] Slider — standard, centered, range variants (v0.4.0)

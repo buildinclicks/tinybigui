@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Checkbox** — MD3 variants-vs-states architecture with slot-based CVA; spec-accurate 18dp checkmark and indeterminate icons; MD3 motion tokens and corrected state-layer opacities; dedicated focus-ring slot
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full details.
+
 ## [0.8.0] - 2026-06-09
 
 ### Changed
