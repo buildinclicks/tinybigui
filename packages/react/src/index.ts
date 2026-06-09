@@ -331,7 +331,6 @@ export type {
   BadgeProps,
   BadgeHeadlessProps,
   BadgeContentProps,
-  BadgeColor,
   BadgeVariants,
 } from "./components/Badge";
 

@@ -540,10 +540,10 @@ describe("DrawerItem — Badge support", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
-  test("renders Badge with primary color when badge config specifies primary", () => {
-    render(<DrawerItem label="Inbox" badge={{ count: 1, color: "primary" }} />);
+  test("renders Badge with error color role (MD3 spec) when badge config is provided", () => {
+    render(<DrawerItem label="Inbox" badge={{ count: 1 }} />);
     const badge = screen.getByRole("status");
-    expect(badge.className).toContain("bg-primary");
+    expect(badge).toHaveClass("bg-error");
   });
 });
 
