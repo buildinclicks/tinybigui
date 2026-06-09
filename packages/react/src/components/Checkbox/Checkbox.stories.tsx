@@ -442,3 +442,59 @@ export const Playground: Story = {
     },
   },
 };
+
+// State Layer Showcase — demonstrates data-* driven Variants-vs-States architecture
+export const StateLayerShowcase: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <div>
+        <p className="text-on-surface-variant mb-3 text-xs font-medium tracking-wide uppercase">
+          Normal States
+        </p>
+        <div className="flex flex-wrap items-center gap-6">
+          <Checkbox>Unchecked</Checkbox>
+          <Checkbox isSelected>Checked</Checkbox>
+          <Checkbox isIndeterminate>Indeterminate</Checkbox>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-on-surface-variant mb-3 text-xs font-medium tracking-wide uppercase">
+          Invalid States
+        </p>
+        <div className="flex flex-wrap items-center gap-6">
+          <Checkbox isInvalid>Invalid unchecked</Checkbox>
+          <Checkbox isInvalid isSelected>
+            Invalid checked
+          </Checkbox>
+          <Checkbox isInvalid isIndeterminate>
+            Invalid indeterminate
+          </Checkbox>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-on-surface-variant mb-3 text-xs font-medium tracking-wide uppercase">
+          Disabled States
+        </p>
+        <div className="flex flex-wrap items-center gap-6">
+          <Checkbox isDisabled>Disabled unchecked</Checkbox>
+          <Checkbox isDisabled isSelected>
+            Disabled checked
+          </Checkbox>
+          <Checkbox isDisabled isIndeterminate>
+            Disabled indeterminate
+          </Checkbox>
+        </div>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates the Variants-vs-States architecture: all interaction and selection states are driven by data-* attributes on the root element consumed by group-data Tailwind selectors — no state variants in CVA.",
+      },
+    },
+  },
+};

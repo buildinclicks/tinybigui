@@ -4,16 +4,20 @@ export { Checkbox } from "./Checkbox";
 // Layer 2: Headless Component (for advanced customization)
 export { CheckboxHeadless } from "./CheckboxHeadless";
 
-// CVA Variants
+// CVA Variants (slot-based, Variants-vs-States architecture)
 export {
-  checkboxVariants,
-  checkboxContainerVariants,
-  checkboxIconBoxVariants,
+  checkboxRootVariants,
+  checkboxControlVariants,
+  checkboxStateLayerVariants,
+  checkboxFocusRingVariants,
+  checkboxBoxVariants,
   checkboxIconVariants,
   checkboxLabelVariants,
-  type CheckboxVariants,
-  type CheckboxContainerVariants,
-  type CheckboxIconBoxVariants,
+  type CheckboxRootVariants,
+  type CheckboxControlVariants,
+  type CheckboxStateLayerVariants,
+  type CheckboxFocusRingVariants,
+  type CheckboxBoxVariants,
   type CheckboxIconVariants,
   type CheckboxLabelVariants,
 } from "./Checkbox.variants";
