@@ -16,6 +16,7 @@ import {
   checkboxIconVariants,
   checkboxLabelVariants,
 } from "./Checkbox.variants";
+import { CheckboxCheckIcon, CheckboxIndeterminateIcon } from "./Checkbox.icons";
 import type { CheckboxProps } from "./Checkbox.types";
 
 /**
@@ -168,41 +169,17 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
           {/* Box — 18dp visual checkbox square */}
           <div className={cn(checkboxBoxVariants())} aria-hidden="true">
-            {/* Check icon */}
+            {/* Check icon — 18dp MD3 checkmark */}
             {isSelected && !isIndeterminate && (
               <span className={cn(checkboxIconVariants())}>
-                <svg
-                  width="12"
-                  height="10"
-                  viewBox="0 0 12 10"
-                  fill="none"
-                  aria-hidden="true"
-                  className="fill-current"
-                >
-                  <path
-                    d="M1 5L4.5 8.5L11 1.5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <CheckboxCheckIcon />
               </span>
             )}
 
             {/* Dash icon — indeterminate state */}
             {isIndeterminate && (
               <span className={cn(checkboxIconVariants())}>
-                <svg
-                  width="10"
-                  height="2"
-                  viewBox="0 0 10 2"
-                  fill="none"
-                  aria-hidden="true"
-                  className="fill-current"
-                >
-                  <rect x="0" y="0" width="10" height="2" rx="1" fill="currentColor" />
-                </svg>
+                <CheckboxIndeterminateIcon />
               </span>
             )}
           </div>
