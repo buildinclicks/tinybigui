@@ -28,66 +28,65 @@ describe("Divider", () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Orientation classes
+  // Orientation classes (bg-fill approach, CSS-var thickness)
   // ---------------------------------------------------------------------------
 
   describe("Orientation classes", () => {
-    test("applies border-t for horizontal orientation", () => {
+    test("applies bg-outline-variant as the fill color", () => {
       render(<Divider />);
-      expect(screen.getByRole("separator")).toHaveClass("border-t");
+      expect(screen.getByRole("separator")).toHaveClass("bg-outline-variant");
     });
 
-    test("applies border-l for vertical orientation", () => {
+    test("applies horizontal size class for horizontal orientation", () => {
+      render(<Divider />);
+      const el = screen.getByRole("separator");
+      expect(el).toHaveClass("w-full");
+    });
+
+    test("applies vertical size class for vertical orientation", () => {
       render(<Divider orientation="vertical" />);
-      expect(screen.getByRole("separator")).toHaveClass("border-l");
+      const el = screen.getByRole("separator");
+      expect(el).toHaveClass("self-stretch");
+    });
+
+    test("does not apply border-t for horizontal orientation", () => {
+      render(<Divider />);
+      expect(screen.getByRole("separator")).not.toHaveClass("border-t");
+    });
+
+    test("does not apply border-l for vertical orientation", () => {
+      render(<Divider orientation="vertical" />);
+      expect(screen.getByRole("separator")).not.toHaveClass("border-l");
     });
   });
 
   // ---------------------------------------------------------------------------
-  // Inset classes
+  // Inset classes — logical inline properties (RTL-aware)
   // ---------------------------------------------------------------------------
 
   describe("Inset variants", () => {
-    test('applies ml-4 when inset="start"', () => {
+    test('applies ms-4 when inset="start"', () => {
       render(<Divider inset="start" />);
-      expect(screen.getByRole("separator")).toHaveClass("ml-4");
+      expect(screen.getByRole("separator")).toHaveClass("ms-4");
     });
 
-    test('applies mr-4 when inset="end"', () => {
+    test('applies me-4 when inset="end"', () => {
       render(<Divider inset="end" />);
-      expect(screen.getByRole("separator")).toHaveClass("mr-4");
+      expect(screen.getByRole("separator")).toHaveClass("me-4");
     });
 
-    test('applies both ml-4 and mr-4 when inset="both"', () => {
+    test('applies both ms-4 and me-4 when inset="both"', () => {
       render(<Divider inset="both" />);
       const separator = screen.getByRole("separator");
-      expect(separator).toHaveClass("ml-4");
-      expect(separator).toHaveClass("mr-4");
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // Label / subheader variant
-  // ---------------------------------------------------------------------------
-
-  describe("Label / subheader variant", () => {
-    test("renders label text when label prop is provided", () => {
-      render(<Divider label="Section" />);
-      expect(screen.getByText("Section")).toBeInTheDocument();
+      expect(separator).toHaveClass("ms-4");
+      expect(separator).toHaveClass("me-4");
     });
 
-    test("label text element has text-on-surface-variant and text-label-large classes", () => {
-      render(<Divider label="Section" />);
-      const labelEl = screen.getByText("Section");
-      expect(labelEl).toHaveClass("text-on-surface-variant");
-      expect(labelEl).toHaveClass("text-label-large");
-    });
-
-    test("with label renders two separator elements plus label span", () => {
-      render(<Divider label="Section" />);
-      const separators = screen.getAllByRole("separator");
-      expect(separators).toHaveLength(2);
-      expect(screen.getByText("Section").tagName).toBe("SPAN");
+    test('applies no inset classes when inset="none"', () => {
+      render(<Divider inset="none" />);
+      const separator = screen.getByRole("separator");
+      expect(separator).not.toHaveClass("ms-4");
+      expect(separator).not.toHaveClass("me-4");
     });
   });
 
@@ -100,6 +99,11 @@ describe("Divider", () => {
       render(<Divider className="my-custom-class" />);
       expect(screen.getByRole("separator")).toHaveClass("my-custom-class");
     });
+
+    test("accepts and applies custom className to vertical divider", () => {
+      render(<Divider orientation="vertical" className="my-custom-class" />);
+      expect(screen.getByRole("separator")).toHaveClass("my-custom-class");
+    });
   });
 
   // ---------------------------------------------------------------------------
@@ -107,9 +111,15 @@ describe("Divider", () => {
   // ---------------------------------------------------------------------------
 
   describe("Ref forwarding", () => {
-    test("forwards ref correctly", () => {
+    test("forwards ref correctly for horizontal divider", () => {
       const ref = createRef<HTMLElement>();
       render(<Divider ref={ref} />);
+      expect(ref.current).toBeInstanceOf(HTMLElement);
+    });
+
+    test("forwards ref correctly for vertical divider", () => {
+      const ref = createRef<HTMLElement>();
+      render(<Divider ref={ref} orientation="vertical" />);
       expect(ref.current).toBeInstanceOf(HTMLElement);
     });
   });
@@ -135,8 +145,8 @@ describe("Divider", () => {
       expect(results).toHaveNoViolations();
     });
 
-    test("axe: no violations for labeled divider", async () => {
-      const { container } = render(<Divider label="Section" />);
+    test("axe: no violations for inset divider", async () => {
+      const { container } = render(<Divider inset="start" />);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
@@ -156,5 +166,10 @@ describe("DividerHeadless", () => {
   test("renders a div element for vertical orientation", () => {
     render(<DividerHeadless orientation="vertical" />);
     expect(screen.getByRole("separator").tagName).toBe("DIV");
+  });
+
+  test("accepts and applies custom className", () => {
+    render(<DividerHeadless className="test-class" />);
+    expect(screen.getByRole("separator")).toHaveClass("test-class");
   });
 });

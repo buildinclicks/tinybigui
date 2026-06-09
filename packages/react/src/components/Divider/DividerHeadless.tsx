@@ -15,19 +15,18 @@ import type { DividerHeadlessProps } from "./Divider.types";
  * - Horizontal → renders `<hr>` (implicit ARIA separator role)
  * - Vertical   → renders `<div>` with explicit `role="separator"`
  *
- * Bring your own styles via the `className` prop.
+ * Bring your own styles via the `className` or `style` props.
  *
  * @example
  * ```tsx
- * // Used inside the styled Divider, or directly for custom styling:
  * <DividerHeadless
  *   orientation="horizontal"
- *   className="border-t border-outline-variant w-full"
+ *   className="w-full h-px bg-outline-variant"
  * />
  * ```
  */
 export const DividerHeadless = forwardRef<HTMLElement, DividerHeadlessProps>(
-  ({ orientation = "horizontal", className }, ref) => {
+  ({ orientation = "horizontal", className, style }, ref) => {
     const { separatorProps } = useSeparator({
       orientation,
       elementType: orientation === "vertical" ? "div" : "hr",
@@ -35,7 +34,12 @@ export const DividerHeadless = forwardRef<HTMLElement, DividerHeadlessProps>(
 
     if (orientation === "vertical") {
       return (
-        <div {...separatorProps} ref={ref as ForwardedRef<HTMLDivElement>} className={className} />
+        <div
+          {...separatorProps}
+          ref={ref as ForwardedRef<HTMLDivElement>}
+          className={className}
+          style={style}
+        />
       );
     }
 
@@ -45,6 +49,7 @@ export const DividerHeadless = forwardRef<HTMLElement, DividerHeadlessProps>(
         aria-orientation="horizontal"
         ref={ref as ForwardedRef<HTMLHRElement>}
         className={className}
+        style={style}
       />
     );
   }

@@ -762,7 +762,7 @@ describe("List — insetDivider", () => {
     expect(divider).toBeInTheDocument();
   });
 
-  test("52. Inset Divider has ml-4 class (16dp inset from start)", () => {
+  test("52. Inset Divider has ms-4 class (16dp logical inset from start)", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Item 1" insetDivider />
@@ -770,7 +770,7 @@ describe("List — insetDivider", () => {
     );
     const item = screen.getByRole("listitem");
     const divider = item.querySelector("hr");
-    expect(divider).toHaveClass("ml-4");
+    expect(divider).toHaveClass("ms-4");
   });
 
   test("53. insetDivider={false} (default): no Divider inside item", () => {
@@ -812,7 +812,7 @@ describe("List — divider composition", () => {
     const list = container.querySelector("[role='list']")!;
     const betweenDivider = list.querySelector(":scope > hr");
     expect(betweenDivider).toBeInTheDocument();
-    expect(betweenDivider).not.toHaveClass("ml-4");
+    expect(betweenDivider).not.toHaveClass("ms-4");
     expect(betweenDivider).toHaveClass("w-full");
   });
 
@@ -824,7 +824,7 @@ describe("List — divider composition", () => {
     );
     const item = screen.getByRole("listitem");
     const divider = item.querySelector("hr");
-    expect(divider).toHaveClass("ml-4");
+    expect(divider).toHaveClass("ms-4");
   });
 });
 

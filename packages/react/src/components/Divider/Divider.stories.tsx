@@ -11,10 +11,11 @@ const meta: Meta<typeof Divider> = {
       description: {
         component:
           "Material Design 3 Divider — a thin line that groups content in lists and containers. " +
-          "Supports horizontal and vertical orientations, four inset variants (none, start, end, both), " +
-          "and an optional subheader label that renders centered text between two rule lines. " +
+          "Supports horizontal and vertical orientations, and four inset variants " +
+          "(none, start, end, both) using RTL-aware logical inline properties. " +
+          "Thickness is controlled via the `--md-divider-thickness` CSS custom property (default 1px). " +
           'Built on React Aria `useSeparator` for WCAG-compliant `role="separator"` semantics. ' +
-          "[MD3 spec](https://m3.material.io/components/divider/overview)",
+          "[MD3 spec](https://m3.material.io/components/divider/specs)",
       },
     },
   },
@@ -29,13 +30,9 @@ const meta: Meta<typeof Divider> = {
     inset: {
       control: "select",
       options: ["none", "start", "end", "both"],
-      description: "Shifts the start and/or end of the rule by 16dp to align with list content.",
-      table: { defaultValue: { summary: "none" } },
-    },
-    label: {
-      control: "text",
       description:
-        "Subheader label text. When provided, renders centered text between two rule lines.",
+        "Shifts the start and/or end of the rule by 16dp (logical inline offset — RTL-aware).",
+      table: { defaultValue: { summary: "none" } },
     },
     className: {
       control: "text",
@@ -60,7 +57,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Full-bleed horizontal divider with no inset or label. Use the controls panel " +
+          "Full-bleed horizontal divider with no inset. Use the controls panel " +
           "to explore all prop combinations.",
       },
     },
@@ -102,8 +99,7 @@ export const Vertical: Story = {
       description: {
         story:
           "Vertical divider inside a `flex` row separating two text blocks. " +
-          "Give the divider an explicit height (e.g. `h-8`) so it fills the desired span " +
-          "within the flex container.",
+          "`self-stretch` automatically fills the flex container's block axis.",
       },
     },
   },
@@ -125,8 +121,8 @@ export const InsetStart: Story = {
     docs: {
       description: {
         story:
-          '`inset="start"` adds a 16dp leading margin. Typical use: list rows where an avatar ' +
-          "or icon occupies the leading edge and the divider should align with the text.",
+          '`inset="start"` adds a 16dp logical inline-start margin (RTL-aware). ' +
+          "Typical use: list rows where an avatar or icon occupies the leading edge.",
       },
     },
   },
@@ -144,8 +140,8 @@ export const InsetEnd: Story = {
     docs: {
       description: {
         story:
-          '`inset="end"` adds a 16dp trailing margin, visually associating the rule with content ' +
-          "that stops before the trailing edge.",
+          '`inset="end"` adds a 16dp logical inline-end margin (RTL-aware), ' +
+          "visually associating the rule with content that stops before the trailing edge.",
       },
     },
   },
@@ -163,8 +159,8 @@ export const InsetBoth: Story = {
     docs: {
       description: {
         story:
-          '`inset="both"` adds 16dp margins on both ends, centering the rule between the ' +
-          "container edges.",
+          '`inset="both"` adds 16dp margins on both inline edges, centering the rule ' +
+          "between the container edges.",
       },
     },
   },
@@ -188,54 +184,85 @@ export const AllInsetVariants: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "All four inset variants stacked vertically with labels, so you can compare the " +
-          "visual offset side-by-side.",
+        story: "All four inset variants stacked vertically with labels for easy visual comparison.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// Subheader (labeled) variant
+// Thickness (CSS custom property override)
 // ---------------------------------------------------------------------------
 
-export const WithSubheaderLabel: Story = {
+export const Thickness: Story = {
   render: () => (
-    <div className="bg-surface w-80 rounded-lg p-4">
-      <Divider label="Section Title" />
+    <div className="bg-surface w-80 space-y-4 rounded-lg p-4">
+      <div>
+        <p className="text-on-surface-variant text-label-small mb-1 tracking-wider uppercase">
+          1px (default)
+        </p>
+        <Divider />
+      </div>
+      <div>
+        <p className="text-on-surface-variant text-label-small mb-1 tracking-wider uppercase">
+          2px
+        </p>
+        <Divider style={{ "--md-divider-thickness": "2px" }} />
+      </div>
+      <div>
+        <p className="text-on-surface-variant text-label-small mb-1 tracking-wider uppercase">
+          4px
+        </p>
+        <Divider style={{ "--md-divider-thickness": "4px" }} />
+      </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "When `label` is provided the component renders a subheader divider: the text is " +
-          "centered between two horizontal rule lines, styled with `text-on-surface-variant` " +
-          'and `text-label-large`. The wrapper uses `role="group"` with `aria-label` for ' +
-          "accessible semantics.",
+          "Thickness is driven by the `--md-divider-thickness` CSS custom property " +
+          "(MD3 default: 1dp). Override it via the `style` prop — no new React prop needed. " +
+          "This matches the `md-web` `MdDivider` API.",
       },
     },
   },
 };
 
-export const SubheaderVariants: Story = {
+// ---------------------------------------------------------------------------
+// RTL — logical insets adapt to writing direction
+// ---------------------------------------------------------------------------
+
+export const RTLInsets: Story = {
   render: () => (
-    <div className="bg-surface w-80 rounded-lg p-6">
-      <p className="text-on-surface text-body-medium mb-4">Starred messages</p>
-      <Divider label="Today" />
-      <p className="text-on-surface text-body-medium my-4">Recent messages</p>
-      <Divider label="Yesterday" />
-      <p className="text-on-surface text-body-medium my-4">Older messages</p>
-      <Divider label="Last week" />
+    <div className="flex gap-8">
+      <div className="bg-surface w-60 rounded-lg p-4" dir="ltr">
+        <p className="text-on-surface-variant text-label-small mb-2 tracking-wider uppercase">
+          LTR
+        </p>
+        <p className="text-on-surface text-body-small mb-2">
+          inset=&quot;start&quot; (leading margin left)
+        </p>
+        <Divider inset="start" />
+      </div>
+      <div className="bg-surface w-60 rounded-lg p-4" dir="rtl">
+        <p className="text-on-surface-variant text-label-small mb-2 tracking-wider uppercase">
+          RTL
+        </p>
+        <p className="text-on-surface text-body-small mb-2">
+          inset=&quot;start&quot; (leading margin right)
+        </p>
+        <Divider inset="start" />
+      </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Three subheader dividers used as date-group separators in a message list, " +
-          "demonstrating a real-world subheader pattern.",
+          'Logical `inset="start"` uses `margin-inline-start` under the hood. ' +
+          "In LTR the indent appears on the left; in RTL it flips to the right automatically — " +
+          "no extra code needed.",
       },
     },
   },
@@ -266,9 +293,7 @@ export const InLayoutContext: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Horizontal divider used as a card section separator between two address blocks, " +
-          "a typical use case in checkout or profile screens.",
+        story: "Horizontal divider used as a card section separator between two address blocks.",
       },
     },
   },
@@ -351,7 +376,7 @@ export const VerticalInToolbar: Story = {
     docs: {
       description: {
         story:
-          "Vertical dividers separating logical action groups inside a text-formatting toolbar. ",
+          "Vertical dividers separating logical action groups inside a text-formatting toolbar.",
       },
     },
   },
@@ -372,7 +397,6 @@ export const LightAndDarkTheme: Story = {
           <Divider orientation="vertical" />
           <p className="text-on-surface-variant text-body-small flex-1">Right</p>
         </div>
-        <Divider label="Section" />
       </div>
       <div className="dark bg-surface shadow-elevation-1 w-64 rounded-xl p-6">
         <p className="text-on-surface text-label-medium mb-3 font-medium">Dark theme</p>
@@ -382,7 +406,6 @@ export const LightAndDarkTheme: Story = {
           <Divider orientation="vertical" />
           <p className="text-on-surface-variant text-body-small flex-1">Right</p>
         </div>
-        <Divider label="Section" />
       </div>
     </div>
   ),
@@ -390,9 +413,8 @@ export const LightAndDarkTheme: Story = {
     docs: {
       description: {
         story:
-          "Side-by-side light and dark surface containers, each showing a horizontal divider, " +
-          "a vertical divider inside a flex row, and a labeled subheader divider. " +
-          "Demonstrates that all divider variants adapt correctly to the active theme.",
+          "Side-by-side light and dark surface containers, each showing a horizontal and a " +
+          "vertical divider. Demonstrates that all variants adapt correctly to the active theme.",
       },
     },
   },
@@ -406,13 +428,11 @@ export const Playground: Story = {
   args: {
     orientation: "horizontal",
     inset: "none",
-    label: "",
     className: "",
   },
   render: (args: {
     orientation?: "horizontal" | "vertical";
     inset?: "none" | "start" | "end" | "both";
-    label?: string;
     className?: string;
   }) => (
     <div
@@ -421,7 +441,6 @@ export const Playground: Story = {
       <Divider
         orientation={args.orientation}
         inset={args.inset}
-        label={args.label ?? undefined}
         className={
           args.orientation === "vertical" ? `h-12 ${args.className ?? ""}` : args.className
         }
@@ -432,9 +451,8 @@ export const Playground: Story = {
     docs: {
       description: {
         story:
-          "Fully controllable story — use the controls panel to combine all props and explore " +
-          "every Divider state. The container switches between a flex row (vertical) and a " +
-          "block layout (horizontal) automatically.",
+          "Fully controllable story — use the controls panel to combine all props. " +
+          "The container switches between a flex row (vertical) and a block layout (horizontal) automatically.",
       },
     },
   },
