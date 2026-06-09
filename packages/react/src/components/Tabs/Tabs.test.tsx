@@ -375,18 +375,28 @@ describe("Tabs", () => {
   // ─── Variants ─────────────────────────────────────────────────────────────
 
   describe("Variants", () => {
-    test("primary variant: selected tab has text-primary class", () => {
+    test("primary variant: selected tab has data-selected attribute", () => {
       render(<BasicTabs defaultSelectedKey="photos" variant="primary" />);
-      expect(screen.getByRole("tab", { name: "Photos" })).toHaveClass("text-primary");
+      // Variants-vs-States: selection state is expressed as data-selected attribute,
+      // not a direct class. The group-data-[selected]/tab:text-primary CSS selector
+      // applies text-primary color when data-selected is present.
+      expect(screen.getByRole("tab", { name: "Photos" })).toHaveAttribute("data-selected");
     });
 
-    test("secondary variant: selected tab has text-on-surface class", () => {
+    test("primary variant: unselected tabs do not have data-selected attribute", () => {
+      render(<BasicTabs defaultSelectedKey="photos" variant="primary" />);
+      expect(screen.getByRole("tab", { name: "Music" })).not.toHaveAttribute("data-selected");
+    });
+
+    test("secondary variant: selected tab has data-selected attribute", () => {
       render(<BasicTabs defaultSelectedKey="photos" variant="secondary" />);
-      expect(screen.getByRole("tab", { name: "Photos" })).toHaveClass("text-on-surface");
+      // Variants-vs-States: group-data-[selected]/tab:text-on-surface applies on selection.
+      expect(screen.getByRole("tab", { name: "Photos" })).toHaveAttribute("data-selected");
     });
 
     test("unselected tab has text-on-surface-variant class for both variants", () => {
       const { rerender } = render(<BasicTabs defaultSelectedKey="photos" variant="primary" />);
+      // text-on-surface-variant is the base (inactive) color class applied directly
       expect(screen.getByRole("tab", { name: "Music" })).toHaveClass("text-on-surface-variant");
 
       rerender(
@@ -402,6 +412,20 @@ describe("Tabs", () => {
         </Tabs>
       );
       expect(screen.getByRole("tab", { name: "Music" })).toHaveClass("text-on-surface-variant");
+    });
+
+    test("tab renders a state layer slot (aria-hidden span)", () => {
+      render(<BasicTabs defaultSelectedKey="photos" variant="primary" />);
+      const tab = screen.getByRole("tab", { name: "Photos" });
+      // The state layer is the first child span with aria-hidden="true"
+      const stateLayer = tab.querySelector('span[aria-hidden="true"]');
+      expect(stateLayer).toBeInTheDocument();
+    });
+
+    test("tab renders data-tab-content span wrapping icon/label", () => {
+      render(<BasicTabs defaultSelectedKey="photos" variant="primary" />);
+      const tab = screen.getByRole("tab", { name: "Photos" });
+      expect(tab.querySelector("[data-tab-content]")).toBeInTheDocument();
     });
   });
 
@@ -488,7 +512,7 @@ describe("Tabs", () => {
       expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Videos" }));
     });
 
-    test("disabled tab has opacity-38 class", () => {
+    test("disabled tab has data-disabled attribute (drives opacity-38 via CSS)", () => {
       render(
         <Tabs aria-label="Test" defaultSelectedKey="photos">
           <TabList>
@@ -499,7 +523,9 @@ describe("Tabs", () => {
           <TabPanel id="music">Music</TabPanel>
         </Tabs>
       );
-      expect(screen.getByRole("tab", { name: "Music" })).toHaveClass("opacity-38");
+      // Variants-vs-States: disabled is expressed as data-disabled presence attribute.
+      // The data-[disabled]:opacity-38 Tailwind selector applies the 38% opacity.
+      expect(screen.getByRole("tab", { name: "Music" })).toHaveAttribute("data-disabled");
     });
   });
 
@@ -601,11 +627,12 @@ describe("Tabs", () => {
       expect(indicator).toHaveClass("bg-primary");
     });
 
-    test("secondary indicator has bg-on-surface-variant class", () => {
+    test("secondary indicator has bg-primary class (MD3: both variants use primary color)", () => {
       render(<BasicTabs defaultSelectedKey="photos" variant="secondary" />);
       const tablist = screen.getByRole("tablist");
       const indicator = tablist.querySelector("[data-tab-indicator]");
-      expect(indicator).toHaveClass("bg-on-surface-variant");
+      // MD3 spec: active indicator for secondary tabs uses --md-sys-color-primary (same as primary)
+      expect(indicator).toHaveClass("bg-primary");
     });
   });
 
