@@ -11,4 +11,4 @@ export { BadgeContent } from "./BadgeContent";
 export { badgeVariants, type BadgeVariants } from "./Badge.variants";
 
 // Types
-export type { BadgeProps, BadgeHeadlessProps, BadgeContentProps, BadgeColor } from "./Badge.types";
+export type { BadgeProps, BadgeHeadlessProps, BadgeContentProps } from "./Badge.types";

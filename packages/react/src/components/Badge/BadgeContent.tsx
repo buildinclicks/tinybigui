@@ -33,7 +33,17 @@ const getAriaLabel = (count: number | undefined, override: string | undefined): 
  * Badge Content Indicator
  *
  * Renders the badge's visual element — either a small dot (no count)
- * or a count pill. Applies CVA variants for size, color, and visibility.
+ * or a count pill. Applies the `badgeVariants` base classes and sets
+ * content/visibility data flags directly on the element.
+ *
+ * Content flags (structural — not interaction state):
+ *   `data-dot`       → element is a dot badge (no count)
+ *   `data-invisible` → element is hidden (scale-0)
+ *
+ * Motion:
+ *   `transition-transform duration-expressive-fast-spatial ease-expressive-fast-spatial`
+ *   is applied when `reducedMotion` is false (component-level guard, per
+ *   md3-motion.mdc: JS-driven animations must guard at the component level).
  *
  * Uses `role="status"` so screen readers announce changes to the count.
  */
@@ -42,7 +52,6 @@ export const BadgeContent = forwardRef<HTMLSpanElement, BadgeContentProps>(
     {
       count,
       max = 999,
-      color = "error",
       invisible = false,
       "aria-label": ariaLabelOverride,
       reducedMotion = false,
@@ -50,7 +59,7 @@ export const BadgeContent = forwardRef<HTMLSpanElement, BadgeContentProps>(
     },
     ref
   ) => {
-    const size = count === undefined ? "small" : "large";
+    const isDot = count === undefined;
     const displayValue = getDisplayValue(count, max);
     const ariaLabel = getAriaLabel(count, ariaLabelOverride);
 
@@ -59,7 +68,20 @@ export const BadgeContent = forwardRef<HTMLSpanElement, BadgeContentProps>(
         ref={ref}
         role="status"
         aria-label={ariaLabel}
-        className={cn(badgeVariants({ size, color, invisible, reducedMotion }), className)}
+        // ── Content flag: dot vs count ──────────────────────────────────────
+        data-dot={isDot ? "" : undefined}
+        // ── Visibility runtime flag ─────────────────────────────────────────
+        data-invisible={invisible ? "" : undefined}
+        className={cn(
+          badgeVariants(),
+          // MD3 Expressive spatial motion for show/hide scale animation.
+          // Spatial pairing: scale transform → expressive-fast-spatial token.
+          // Guarded at the component level; do NOT use CSS-only reduced-motion
+          // because this is a JS-conditional class, not a persistent transition.
+          !reducedMotion &&
+            "duration-expressive-fast-spatial ease-expressive-fast-spatial transition-transform",
+          className
+        )}
       >
         {displayValue}
       </span>

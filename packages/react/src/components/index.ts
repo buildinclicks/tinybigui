@@ -233,13 +233,7 @@ export type {
   ListItemVariants,
 } from "./List";
 export { Badge, BadgeHeadless, BadgeContent, badgeVariants } from "./Badge";
-export type {
-  BadgeProps,
-  BadgeHeadlessProps,
-  BadgeContentProps,
-  BadgeColor,
-  BadgeVariants,
-} from "./Badge";
+export type { BadgeProps, BadgeHeadlessProps, BadgeContentProps, BadgeVariants } from "./Badge";
 
 export {
   FABMenu,

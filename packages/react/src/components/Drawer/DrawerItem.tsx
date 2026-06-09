@@ -14,12 +14,7 @@ import type { DrawerItemProps, DrawerItemBadgeConfig } from "./Drawer.types";
  * Distinguishes config objects from React elements / primitives.
  */
 function isBadgeConfig(badge: unknown): badge is DrawerItemBadgeConfig {
-  return (
-    typeof badge === "object" &&
-    badge !== null &&
-    !isValidElement(badge) &&
-    ("count" in badge || "color" in badge)
-  );
+  return typeof badge === "object" && badge !== null && !isValidElement(badge) && "count" in badge;
 }
 
 /**
@@ -36,7 +31,7 @@ function isBadgeConfig(badge: unknown): badge is DrawerItemBadgeConfig {
  * - Ripple effect on interaction
  * - Hover/focus/pressed state layers (MD3 spec: 8% / 12%)
  * - Optional leading icon (24dp slot)
- * - Optional trailing badge — `ReactNode` or `{ count, color }` config
+ * - Optional trailing badge — `ReactNode` or `{ count }` config
  * - Icon-only mode: label hidden, `title` tooltip via `DrawerIconOnlyContext`
  * - Disabled state: `opacity-38`, non-interactive
  *
@@ -45,8 +40,8 @@ function isBadgeConfig(badge: unknown): badge is DrawerItemBadgeConfig {
  * // Active item with icon
  * <DrawerItem icon={<HomeIcon />} label="Home" isActive onPress={() => navigate('/')} />
  *
- * // Item with Badge config
- * <DrawerItem label="Inbox" badge={{ count: 5, color: 'primary' }} />
+ * // Item with Badge config (uses MD3 error color role)
+ * <DrawerItem label="Inbox" badge={{ count: 5 }} />
  *
  * // Disabled
  * <DrawerItem label="Disabled Feature" isDisabled />
@@ -88,10 +83,7 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
       if (isBadgeConfig(badge)) {
         return (
           <span className="relative z-10 ml-auto flex shrink-0 items-center pr-2">
-            <Badge
-              {...(badge.count !== undefined ? { count: badge.count } : {})}
-              {...(badge.color !== undefined ? { color: badge.color } : {})}
-            >
+            <Badge {...(badge.count !== undefined ? { count: badge.count } : {})}>
               <span />
             </Badge>
           </span>

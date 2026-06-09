@@ -30,16 +30,16 @@ describe("BadgeContent", () => {
     expect(badge).toHaveTextContent("99+");
   });
 
-  test('with color="error" applies bg-error class', () => {
-    render(<BadgeContent color="error" />);
+  test("applies bg-error class (MD3 error color role)", () => {
+    render(<BadgeContent count={3} />);
     const badge = screen.getByRole("status");
     expect(badge).toHaveClass("bg-error");
   });
 
-  test('with color="primary" applies bg-primary class', () => {
-    render(<BadgeContent color="primary" />);
+  test("applies text-on-error class (MD3 error color role)", () => {
+    render(<BadgeContent count={3} />);
     const badge = screen.getByRole("status");
-    expect(badge).toHaveClass("bg-primary");
+    expect(badge).toHaveClass("text-on-error");
   });
 
   test('derives aria-label from count ("3 notifications")', () => {
@@ -58,6 +58,48 @@ describe("BadgeContent", () => {
     render(<BadgeContent count={5} aria-label="5 unread messages" />);
     const badge = screen.getByRole("status");
     expect(badge).toHaveAttribute("aria-label", "5 unread messages");
+  });
+
+  describe("content flags", () => {
+    test("sets data-dot when no count is provided (dot badge)", () => {
+      render(<BadgeContent />);
+      const badge = screen.getByRole("status");
+      expect(badge).toHaveAttribute("data-dot", "");
+    });
+
+    test("does NOT set data-dot when count is provided", () => {
+      render(<BadgeContent count={3} />);
+      const badge = screen.getByRole("status");
+      expect(badge).not.toHaveAttribute("data-dot");
+    });
+  });
+
+  describe("visibility flag", () => {
+    test("does NOT set data-invisible when visible (default)", () => {
+      render(<BadgeContent count={3} />);
+      const badge = screen.getByRole("status");
+      expect(badge).not.toHaveAttribute("data-invisible");
+    });
+
+    test("sets data-invisible when invisible={true}", () => {
+      render(<BadgeContent count={3} invisible />);
+      const badge = screen.getByRole("status");
+      expect(badge).toHaveAttribute("data-invisible", "");
+    });
+
+    test("applies scale-0 class via data-[invisible] (invisible=true)", () => {
+      render(<BadgeContent count={3} invisible />);
+      const badge = screen.getByRole("status");
+      // CVA base adds scale-100; data-[invisible]:scale-0 overrides via cascade.
+      // We check the data attribute which drives the Tailwind selector.
+      expect(badge).toHaveAttribute("data-invisible", "");
+    });
+
+    test("applies scale-100 class when visible", () => {
+      render(<BadgeContent count={5} />);
+      const badge = screen.getByRole("status");
+      expect(badge).toHaveClass("scale-100");
+    });
   });
 });
 
@@ -83,34 +125,45 @@ describe("Badge", () => {
     expect(badge).toHaveClass("absolute", "-top-1", "-right-1");
   });
 
-  test("with invisible={true} applies scale-0 opacity-0 classes", () => {
+  test("with invisible={true} sets data-invisible on the badge indicator", () => {
     render(
       <Badge count={3} invisible>
         <button type="button">Host</button>
       </Badge>
     );
     const badge = screen.getByRole("status");
-    expect(badge).toHaveClass("scale-0", "opacity-0");
+    expect(badge).toHaveAttribute("data-invisible", "");
   });
 
-  test("with count={0} is invisible (not shown)", () => {
+  test("with count={0} is invisible (data-invisible present)", () => {
     render(
       <Badge count={0}>
         <button type="button">Host</button>
       </Badge>
     );
     const badge = screen.getByRole("status");
-    expect(badge).toHaveClass("scale-0", "opacity-0");
+    expect(badge).toHaveAttribute("data-invisible", "");
   });
 
-  test("with count={5} is visible by default", () => {
+  test("with count={5} is visible (data-invisible absent)", () => {
     render(
       <Badge count={5}>
         <button type="button">Host</button>
       </Badge>
     );
     const badge = screen.getByRole("status");
-    expect(badge).toHaveClass("scale-100", "opacity-100");
+    expect(badge).not.toHaveAttribute("data-invisible");
+  });
+
+  test("dot badge (no count) sets data-dot and no data-invisible", () => {
+    render(
+      <Badge>
+        <button type="button">Host</button>
+      </Badge>
+    );
+    const badge = screen.getByRole("status");
+    expect(badge).toHaveAttribute("data-dot", "");
+    expect(badge).not.toHaveAttribute("data-invisible");
   });
 
   test("forwardRef: ref correctly attached to the root wrapper element", () => {

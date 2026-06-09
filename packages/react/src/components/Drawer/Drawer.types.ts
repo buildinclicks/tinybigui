@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import type { AriaButtonProps, AriaDialogProps, AriaLinkOptions } from "react-aria";
-import type { BadgeColor } from "../Badge/Badge.types";
 
 /**
  * Structural variant of the Navigation Drawer.
@@ -21,8 +20,6 @@ export type DrawerVariant = "standard" | "modal";
 export interface DrawerItemBadgeConfig {
   /** Numeric count to display. Omit for a dot indicator. */
   count?: number;
-  /** Badge color role. @default 'error' */
-  color?: BadgeColor;
 }
 
 /**
@@ -158,8 +155,8 @@ export interface DrawerItemProps extends AriaButtonProps, Pick<AriaLinkOptions, 
    * // ReactNode badge (backward compatible)
    * <DrawerItem label="Inbox" badge={<span>3</span>} />
    *
-   * // Config badge (renders Badge component)
-   * <DrawerItem label="Inbox" badge={{ count: 3, color: 'primary' }} />
+   * // Config badge (renders Badge component using MD3 error color role)
+   * <DrawerItem label="Inbox" badge={{ count: 3 }} />
    * ```
    */
   badge?: ReactNode | DrawerItemBadgeConfig;
