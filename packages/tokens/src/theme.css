@@ -465,11 +465,11 @@
 
   /* Scale in (menu/dialog enter) — expressive fast spatial: 350ms */
   --animate-md-scale-in: md-scale-in var(--md-sys-motion-expressive-fast-spatial-duration)
-    var(--md-sys-motion-expressive-fast-spatial-easing) forwards;
+    var(--md-sys-motion-expressive-fast-spatial-easing) both;
 
   /* Scale out (menu/dialog exit) — legacy emphasized accelerate: 200ms */
   --animate-md-scale-out: md-scale-out var(--md-sys-motion-duration-short4)
-    var(--md-sys-motion-easing-emphasized-accelerate) forwards;
+    var(--md-sys-motion-easing-emphasized-accelerate) both;
 
   /* Slide in from bottom (sheets, nav bar) — standard default spatial: 500ms */
   --animate-md-slide-in-bottom: md-slide-in-bottom

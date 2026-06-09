@@ -27,3 +27,4 @@
 - Trigger FAB icon morph (+→×) now uses `expressive-fast-spatial` motion tokens, guarded by `useReducedMotion`.
 - Ripple effect on menu items.
 - Full React Aria keyboard accessibility via `useButton`/`useHover`/`useFocusRing`.
+- Staggered items no longer flash on open/close: `--animate-md-scale-in` and `--animate-md-scale-out` tokens now use fill-mode `both`, holding the keyframe start frame during the stagger `animation-delay`.
