@@ -7,6 +7,7 @@ import {
   isValidElement,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -89,8 +90,12 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
     }, [setIsOpen]);
 
     // Manage exit animation: keep items mounted while scale-out plays, then unmount.
+    // useLayoutEffect (not useEffect) is intentional: it fires synchronously after React
+    // commits but before the browser paints. Without this, the browser would paint a
+    // single frame with isOpen=false AND isExiting=false — items gone — before
+    // setIsExiting(true) re-mounts them for the scale-out animation, causing the blink.
     const prevIsOpenRef = useRef<boolean | undefined>(undefined);
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (prevIsOpenRef.current === undefined) {
         prevIsOpenRef.current = isOpen;
         return;
