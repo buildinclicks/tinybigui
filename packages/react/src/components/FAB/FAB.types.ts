@@ -2,112 +2,163 @@ import type { AriaButtonProps } from "react-aria";
 import type React from "react";
 
 /**
- * FAB size types
+ * FAB size types — MD3 Expressive scale.
+ *
+ * | Value      | Height | Icon  | Corner | Notes                        |
+ * |------------|--------|-------|--------|------------------------------|
+ * | `fab`      | 56dp   | 24dp  | 16dp   | Default. Regular FAB.        |
+ * | `medium`   | 80dp   | 28dp  | 20dp   | Medium FAB (M3 Expressive).  |
+ * | `large`    | 96dp   | 36dp  | 28dp   | Large FAB.                   |
+ * | `extended` | 56dp   | 24dp  | 16dp   | Extended FAB with text label.|
+ * | `small`    | 40dp   | 24dp  | 12dp   | @deprecated — Use `fab`.     |
+ *
+ * @default 'fab'
  */
-export type FABSize = "small" | "medium" | "large" | "extended";
+export type FABSize = "fab" | "medium" | "large" | "extended" | "small";
 
 /**
- * FAB color scheme
+ * FAB color styles — MD3 Expressive color roles.
+ *
+ * **Container styles (default set):**
+ * - `primary-container` — bg-primary-container / text-on-primary-container (default)
+ * - `secondary-container` — bg-secondary-container / text-on-secondary-container
+ * - `tertiary-container` — bg-tertiary-container / text-on-tertiary-container
+ *
+ * **Solid styles (M3 Expressive):**
+ * - `primary` — bg-primary / text-on-primary
+ * - `secondary` — bg-secondary / text-on-secondary
+ * - `tertiary` — bg-tertiary / text-on-tertiary
+ *
+ * **Deprecated:**
+ * - `surface` — @deprecated Use `primary-container`. Maps to surface-container-high.
+ *
+ * @default 'primary-container'
  */
-export type FABColor = "primary" | "secondary" | "tertiary" | "surface";
+export type FABColor =
+  | "primary-container"
+  | "secondary-container"
+  | "tertiary-container"
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "surface";
 
 /**
  * Material Design 3 FAB (Floating Action Button) Component Props
  *
- * High-emphasis button for primary screen action.
- * Supports 4 sizes: small (40px), medium (56px), large (96px), extended (variable width with text)
- *
- * ⚠️ IMPORTANT:
- * - Only ONE FAB per screen
- * - aria-label is REQUIRED (even for extended FAB with text)
- * - Use for primary constructive actions only (create, add, compose)
- * - NOT for destructive (delete), navigation (back), or secondary actions
+ * High-emphasis button for the primary screen action.
+ * Implements the MD3 Expressive FAB spec with a slot-based architecture
+ * matching Button and Switch for consistent interaction state handling.
  *
  * @example
  * ```tsx
- * // Standard FAB (medium)
- * <FAB aria-label="Create new item" icon={<IconAdd />} />
+ * // Default FAB (56dp)
+ * <FAB aria-label="Create" icon={<IconAdd />} />
  *
- * // Small FAB
- * <FAB aria-label="Add photo" icon={<IconCamera />} size="small" />
+ * // Medium FAB (80dp, M3 Expressive)
+ * <FAB aria-label="Create" icon={<IconAdd />} size="medium" />
  *
- * // Large FAB
+ * // Large FAB (96dp)
  * <FAB aria-label="Compose" icon={<IconEdit />} size="large" />
  *
- * // Extended FAB (with text)
- * <FAB aria-label="Create new document" icon={<IconAdd />} size="extended">
+ * // Extended FAB (with text label)
+ * <FAB aria-label="Create document" icon={<IconAdd />} size="extended">
  *   Create
  * </FAB>
  *
+ * // Solid primary color (M3 Expressive)
+ * <FAB aria-label="Add" icon={<IconAdd />} color="primary" />
+ *
  * // Loading state
  * <FAB aria-label="Creating" icon={<IconAdd />} loading />
- *
- * // Secondary color
- * <FAB aria-label="Edit" icon={<IconEdit />} color="secondary" />
  * ```
  */
 export interface FABProps extends AriaButtonProps {
   /**
-   * FAB size variant
-   * - small: 40×40px (24px icon)
-   * - medium: 56×56px (24px icon) - default
-   * - large: 96×96px (36px icon)
-   * - extended: Variable width with text (24px icon)
-   * @default 'medium'
+   * FAB size variant.
+   *
+   * - `fab` (56dp) — Default. Standard FAB.
+   * - `medium` (80dp) — Medium FAB. M3 Expressive. Previously 56dp; now remapped.
+   * - `large` (96dp) — Large FAB.
+   * - `extended` (56dp height) — Extended FAB with icon and text label.
+   * - `small` (40dp) — @deprecated. Use `fab` instead.
+   *
+   * @default 'fab'
    */
   size?: FABSize;
 
   /**
-   * Color scheme
-   * @default 'primary'
+   * Color style for the FAB.
+   *
+   * - `primary-container` — Default. bg-primary-container / text-on-primary-container.
+   * - `secondary-container` — bg-secondary-container / text-on-secondary-container.
+   * - `tertiary-container` — bg-tertiary-container / text-on-tertiary-container.
+   * - `primary` — Solid. bg-primary / text-on-primary (M3 Expressive).
+   * - `secondary` — Solid. bg-secondary / text-on-secondary (M3 Expressive).
+   * - `tertiary` — Solid. bg-tertiary / text-on-tertiary (M3 Expressive).
+   * - `surface` — @deprecated. Use `primary-container`.
+   *
+   * @default 'primary-container'
    */
   color?: FABColor;
 
   /**
    * Icon content (required).
-   * Recommended sizes:
-   * - small/medium/extended: 24x24px
-   * - large: 36x36px
+   * Recommended icon sizes per variant:
+   * - `fab` / `extended` / `small`: 24×24px
+   * - `medium`: 28×28px
+   * - `large`: 36×36px
    */
   icon: React.ReactNode;
 
   /**
-   * Text label (required for extended FAB, ignored for other sizes)
+   * Text label — only rendered for `size="extended"`.
    */
   children?: React.ReactNode;
 
   /**
-   * Mandatory accessible label for the FAB.
-   * This is crucial for screen readers as FAB is icon-based.
-   * Even extended FAB with text requires aria-label.
+   * Mandatory accessible label for all FAB sizes.
+   * Required even for extended FABs that have visible text.
    */
   "aria-label": string;
 
   /**
-   * Loading state - shows spinner, disables interaction
+   * Shows a loading spinner and disables interaction.
    * @default false
    */
   loading?: boolean;
 
   /**
-   * Disable ripple effect
+   * Disables the MD3 ripple press-feedback animation.
    * @default false
    */
   disableRipple?: boolean;
 
   /**
-   * Additional CSS classes (Tailwind)
-   * Can be used for positioning (e.g., "fixed bottom-4 right-4")
+   * Additional Tailwind classes — commonly used for positioning
+   * (e.g. `className="fixed bottom-4 right-4"`).
    */
   className?: string;
 
   /**
-   * HTML title attribute for tooltip
+   * HTML title attribute for tooltip.
    */
   title?: string;
 
   /**
-   * Mouse down handler (for ripple effect and custom handling)
+   * Mouse down handler (merged with the internal ripple handler).
    */
   onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+
+  /**
+   * Tab index for keyboard navigation.
+   * @default 0
+   */
+  tabIndex?: number | undefined;
+
+  /**
+   * Button type attribute.
+   * @default 'button'
+   */
+  type?: "button" | "submit" | "reset";
 }

@@ -1,25 +1,37 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, useRef, useState, useCallback } from "react";
 import type React from "react";
+import { useHover, useFocusRing, mergeProps } from "react-aria";
 import { FABHeadless } from "./FABHeadless";
-import { fabVariants, type FABVariants } from "./FAB.variants";
+import {
+  fabVariants,
+  fabStateLayerVariants,
+  fabFocusRingVariants,
+  fabIconVariants,
+  fabLabelVariants,
+  type FABVariants,
+} from "./FAB.variants";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
 import type { FABProps } from "./FAB.types";
-import { mergeProps } from "@react-aria/utils";
 
 /**
- * Loading spinner component
+ * Loading spinner — matches Button's Spinner for consistency.
  */
 const Spinner = (): React.ReactElement => (
   <svg
     role="progressbar"
     aria-label="Loading"
-    className="h-6 w-6 animate-spin"
+    className="relative z-10 animate-spin"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
+    // Spinner matches the icon slot width/height via inherited size from parent span
+    width="1em"
+    height="1em"
+    style={{ fontSize: "inherit" }}
   >
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
     <path
@@ -31,123 +43,171 @@ const Spinner = (): React.ReactElement => (
 );
 
 /**
- * Material Design 3 FAB (Floating Action Button) Component
+ * Material Design 3 FAB (Floating Action Button) — M3 Expressive
  *
- * High-emphasis button for primary screen action.
- * Supports 4 sizes: small, medium, large, extended
- * Implementation uses Tailwind CSS classes mapped to MD3 tokens.
+ * High-emphasis button for the primary screen action.
+ * Implements the Variants-vs-States architecture: all interaction states are
+ * expressed as data-* attributes on the root and consumed by each slot via
+ * group-data-[x]/fab Tailwind selectors — no state variants in CVA.
+ *
+ * Features:
+ * - ✅ MD3 Expressive size scale: fab (56dp), medium (80dp), large (96dp), extended, small (dep)
+ * - ✅ Container + solid color styles (primary-container, primary, secondary*, tertiary*)
+ * - ✅ Elevation 3 base → 4 hover → 3 focus/pressed per MD3 spec
+ * - ✅ State-layer color = icon/on-color per MD3 spec
+ * - ✅ Correct state-layer opacities: hover 8% / focus 10% / pressed 10%
+ * - ✅ Dedicated focus ring slot (inset-[-3px], keyboard-only)
+ * - ✅ Loading state with spinner
+ * - ✅ Ripple effect (Material Design)
+ * - ✅ Full keyboard accessibility via React Aria
+ *
+ * @example
+ * ```tsx
+ * // Default FAB (56dp, primary-container)
+ * <FAB aria-label="Create" icon={<IconAdd />} />
+ *
+ * // Medium FAB (80dp, M3 Expressive)
+ * <FAB aria-label="Create" icon={<IconAdd />} size="medium" />
+ *
+ * // Solid primary color (M3 Expressive)
+ * <FAB aria-label="Add" icon={<IconAdd />} color="primary" />
+ *
+ * // Extended FAB with text
+ * <FAB aria-label="Create document" icon={<IconAdd />} size="extended">
+ *   Create
+ * </FAB>
+ * ```
  */
-export const FAB = forwardRef<HTMLButtonElement, FABProps & Omit<FABVariants, "isDisabled">>(
+export const FAB = forwardRef<HTMLButtonElement, FABProps & Omit<FABVariants, never>>(
   (
     {
-      // Variant props (CVA)
-      size = "medium",
-      color = "primary",
-      // FAB specific props
+      // Variant props
+      size = "fab",
+      color = "primary-container",
+
+      // Content
       icon,
       children,
-      "aria-label": ariaLabel,
+
+      // State
       loading = false,
       disableRipple = false,
+      isDisabled = false,
+
+      // Styling
       className,
-      // React Aria props
-      isDisabled: propIsDisabled = false,
-      onPress,
-      onMouseDown,
+
+      // Accessibility
+      "aria-label": ariaLabel,
       title,
+
+      // Passthrough — forwarded to FABHeadless
+      tabIndex = 0,
+      type = "button",
+
+      // Passed through to FABHeadless → useButton
       ...props
     },
     ref
   ) => {
-    // Development warnings
+    const fabRef = useRef<HTMLButtonElement>(null);
+    const resolvedRef = (ref ?? fabRef) as React.RefObject<HTMLButtonElement>;
+
+    const isFABDisabled = isDisabled || loading;
+
+    // ── Interaction state tracking ──────────────────────────────────────────
+    const [isPressed, setIsPressed] = useState(false);
+    const handlePressStart = useCallback(() => setIsPressed(true), []);
+    const handlePressEnd = useCallback(() => setIsPressed(false), []);
+
+    const { isHovered, hoverProps } = useHover({ isDisabled: isFABDisabled });
+    const { isFocusVisible, focusProps } = useFocusRing();
+
+    // Ripple effect
+    const { onMouseDown: handleRipple, ripples } = useRipple({
+      disabled: isFABDisabled || disableRipple,
+    });
+
+    // ── Development warnings ─────────────────────────────────────────────────
     if (process.env.NODE_ENV === "development") {
       if (!icon) {
-        console.warn("[FAB] FAB must have an icon. Please provide the icon prop.");
+        console.warn("[FAB] FAB must have an icon. Please provide the `icon` prop.");
       }
-
       if (size === "extended" && !children) {
-        console.warn("[FAB] Extended FAB requires text label as children.");
+        console.warn("[FAB] Extended FAB requires a text label as `children`.");
       }
-
       if (size !== "extended" && children) {
         console.warn(
-          "[FAB] Children (text) is only used for extended FAB. For icon-only FAB, use icon prop only."
+          "[FAB] `children` (text label) is only rendered for `size='extended'`. For icon-only FABs, use the `icon` prop only."
+        );
+      }
+      // Deprecation warnings
+      if (size === "small") {
+        console.warn(
+          "[FAB] `size='small'` is deprecated in M3 Expressive. Use `size='fab'` (56dp) instead."
+        );
+      }
+      if (color === "surface") {
+        console.warn(
+          "[FAB] `color='surface'` is deprecated in M3 Expressive. Use `color='primary-container'` instead."
         );
       }
     }
 
-    // Combine disabled states
-    const isDisabled = propIsDisabled || loading;
-
-    // Ripple effect
-    const { onMouseDown: handleRipple, ripples } = useRipple({
-      disabled: isDisabled || disableRipple,
-    });
-
-    // Merge user's onMouseDown with ripple handler
-    const mergedOnMouseDown = (e: React.MouseEvent<HTMLButtonElement>): void => {
-      onMouseDown?.(e);
-      handleRipple(e);
-    };
-
-    const mergedPropsValue = mergeProps(props, {
-      ...(onPress && { onPress }),
-      onMouseDown: mergedOnMouseDown,
-      isDisabled,
-    });
-
     return (
       <FABHeadless
-        ref={ref}
+        {...mergeProps(
+          hoverProps,
+          focusProps,
+          { onPressStart: handlePressStart, onPressEnd: handlePressEnd },
+          props
+        )}
+        ref={resolvedRef}
+        type={type}
+        isDisabled={isFABDisabled}
+        tabIndex={tabIndex}
+        onMouseDown={handleRipple}
+        aria-label={ariaLabel}
+        {...(title !== undefined && { title })}
+        // ── Interaction data attributes ─────────────────────────────────────
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          isDisabled: isFABDisabled,
+        })}
+        // ── Content flags ───────────────────────────────────────────────────
+        data-with-icon={icon ? "" : undefined}
+        data-loading={loading ? "" : undefined}
         className={cn(
-          // Base classes
-          "relative inline-flex items-center justify-center",
-          "overflow-hidden transition-all duration-200",
-          "focus-visible:outline-primary focus-visible:outline-2 focus-visible:outline-offset-2",
-          "shrink-0",
-
-          // State layers (hover, focus, active)
-          "before:absolute before:inset-0 before:rounded-[inherit] before:transition-opacity before:duration-200",
-          "before:bg-current before:opacity-0",
-          "hover:before:opacity-8",
-          "focus-visible:before:opacity-12",
-          "active:before:opacity-12",
-
-          // Elevation
-          "shadow-elevation-3 hover:shadow-elevation-4",
-
-          // CVA variants
-          fabVariants({ size, color, isDisabled }),
-
-          // User custom classes
+          fabVariants({ size, color }),
+          // group/fab: enables group-data-[x]/fab child selectors in all slots
+          "group/fab",
           className
         )}
-        aria-label={ariaLabel}
-        {...(title && { title })}
-        {...mergedPropsValue}
       >
         {/* Ripple effect */}
         {ripples}
 
-        {/* Icon (hidden when loading) */}
-        {icon && (
-          <span className={cn("relative z-10 inline-flex shrink-0", loading && "invisible")}>
-            {icon}
-          </span>
-        )}
+        {/* State layer — absolute overlay; transitions opacity on interaction */}
+        <span className={cn(fabStateLayerVariants({ color }))} aria-hidden="true" />
 
-        {/* Loading spinner (shown when loading, overlays icon position) */}
+        {/* Focus ring — absolute, extends 3px outside boundary; keyboard-only */}
+        <span className={cn(fabFocusRingVariants())} aria-hidden="true" />
+
+        {/* Icon — invisible (not hidden) when loading so layout stays stable */}
+        {icon && <span className={cn(fabIconVariants({ size, hidden: loading }))}>{icon}</span>}
+
+        {/* Loading spinner — overlays icon position */}
         {loading && (
-          <span className="relative z-10">
+          <span className={cn(fabIconVariants({ size }))}>
             <Spinner />
           </span>
         )}
 
-        {/* Text label (extended FAB only) */}
+        {/* Text label — extended FAB only */}
         {size === "extended" && children && (
-          <span className="relative z-10 inline-flex items-center text-sm font-medium tracking-[0.1px]">
-            {children}
-          </span>
+          <span className={cn(fabLabelVariants())}>{children}</span>
         )}
       </FABHeadless>
     );
