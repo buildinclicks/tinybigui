@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Card** — MD3 styling refactor: standard motion tier (`duration-spring-standard-default-effects`), corrected `CardMedia` 4:3 aspect ratio, `title-medium` headline typescale, broadened root transitions for disabled/outlined states; exports `cardStateLayerVariants` and `cardFocusRingVariants`
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.11.0] - 2026-06-09
 
 ### Changed

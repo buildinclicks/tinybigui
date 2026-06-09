@@ -8,7 +8,8 @@ import type { CardMediaProps } from "./Card.types";
  *
  * MD3 spec: full-bleed media slot at the top of a card.
  * - `16/9` → `aspect-video` (16:9 native Tailwind utility)
- * - `4/3`  → `aspect-video` (closest available token without arbitrary values)
+ * - `4/3`  → `aspect-[4/3]` (exact ratio; no MD3 token maps to 4:3 so an
+ *             arbitrary value is the correct choice here)
  * - `1/1`  → `aspect-square`
  * - `auto` → no aspect constraint (natural image dimensions)
  */
@@ -16,7 +17,7 @@ const cardMediaVariants = cva("w-full object-cover", {
   variants: {
     aspectRatio: {
       "16/9": "aspect-video",
-      "4/3": "aspect-video",
+      "4/3": "aspect-[4/3]",
       "1/1": "aspect-square",
       auto: "",
     },

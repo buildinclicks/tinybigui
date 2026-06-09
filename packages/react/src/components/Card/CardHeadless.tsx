@@ -2,52 +2,48 @@
 
 import { forwardRef, useRef } from "react";
 import type React from "react";
-import { useButton, useFocusRing } from "react-aria";
+import { useButton } from "react-aria";
 import { mergeProps } from "@react-aria/utils";
 import type { CardHeadlessProps } from "./Card.types";
 
 /**
  * `CardHeadless` — Layer 2 headless primitive.
  *
- * Provides all MD3 Card interaction semantics without any visual styling.
+ * Provides MD3 Card interaction semantics (press, keyboard activation, link
+ * behavior) without any visual styling. Pure behavior — all interaction-state
+ * styling is driven by the Layer 3 `Card` via forwarded `data-*` attributes.
  *
  * ## Dual-mode behavior
  *
- * | Condition | Role | Keyboard | Focus ring |
- * |---|---|---|---|
- * | `onPress` or `href` present | `role="button"` | Enter / Space activate | `data-focus-visible="true"` on keyboard focus |
- * | Neither present | `role="article"` | No activation | Not applicable |
+ * | Condition | Role | Keyboard |
+ * |---|---|---|
+ * | `onPress` or `href` present | `role="button"` | Enter / Space activate |
+ * | Neither present | `role="article"` | No activation, not a tab stop |
  *
- * Both `useButton` and `useFocusRing` are **always** called (React Rules of Hooks).
- * When the card is non-interactive, `buttonProps` are not spread onto the element
- * so no keyboard interaction or tab-stop is added.
+ * `useButton` is always called (Rules of Hooks); its `buttonProps` are only
+ * applied to the element when the card is interactive, so a static card adds
+ * no tab stop or keyboard handlers.
  *
- * ## Focus ring
+ * ## Prop passthrough
  *
- * The `data-focus-visible` attribute is set to `"true"` only when focus was
- * triggered by keyboard navigation (`useFocusRing` → `isFocusVisible`).
- * Mouse/touch focus leaves the attribute unset. The styled Card layer reads
- * this attribute to conditionally render the MD3 focus ring.
+ * Any `data-*` attributes (e.g. `data-hovered`, `data-pressed`, `data-dragged`,
+ * `data-interactive`) and DOM event handlers (`onMouseDown`, `onFocus`, …) are
+ * spread onto the root element so the styled layer can drive `group-data-[x]/card`
+ * selectors and ripple/drag tracking.
  *
  * @example
  * ```tsx
  * // Interactive
- * <CardHeadless
- *   onPress={handlePress}
- *   aria-label="View details"
- *   className="rounded-xl p-4"
- * >
+ * <CardHeadless onPress={handlePress} aria-label="View details" className="rounded-xl p-4">
  *   Card content
  * </CardHeadless>
  *
  * // Static
- * <CardHeadless className="rounded-xl p-4">
- *   Card content
- * </CardHeadless>
+ * <CardHeadless className="rounded-xl p-4">Card content</CardHeadless>
  * ```
  */
 export const CardHeadless = forwardRef<HTMLDivElement, CardHeadlessProps>(function CardHeadless(
-  { className, children, ...ariaButtonProps },
+  { className, children, onMouseDown, onMouseUp, onMouseLeave, ...rest },
   forwardedRef
 ) {
   const internalRef = useRef<HTMLDivElement>(null);
@@ -55,22 +51,32 @@ export const CardHeadless = forwardRef<HTMLDivElement, CardHeadlessProps>(functi
   // Prefer the forwarded ref; fall back to internal ref for React Aria hooks.
   const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLDivElement>;
 
-  const isInteractive = !!(ariaButtonProps.onPress ?? ariaButtonProps.href);
+  const isInteractive = !!(rest.onPress ?? rest.href);
 
-  // Always call both hooks unconditionally (Rules of Hooks).
-  // All AriaButtonProps flow through the spread to satisfy exactOptionalPropertyTypes —
-  // explicitly re-listing optional props as `key: value` would force `T | undefined`
-  // onto required positions and cause TS2769.
-  // `buttonProps` is only applied to the element when isInteractive is true.
-  const { buttonProps } = useButton({ elementType: "div", ...ariaButtonProps }, ref);
+  // Always call the hook unconditionally (Rules of Hooks). buttonProps are only
+  // applied to the element when isInteractive is true.
+  const { buttonProps } = useButton({ elementType: "div", ...rest }, ref);
 
-  const { focusProps, isFocusVisible } = useFocusRing();
+  // Strip React Aria press/disabled/link props that must not land on the DOM.
+  // Everything left in `htmlAttrs` (data-*, aria-label, forwarded handlers) is
+  // safe to spread onto the root element.
+  const {
+    isDisabled: _isDisabled,
+    onPress: _onPress,
+    onPressStart: _onPressStart,
+    onPressEnd: _onPressEnd,
+    onPressChange: _onPressChange,
+    onPressUp: _onPressUp,
+    href: _href,
+    target: _target,
+    rel: _rel,
+    ...htmlAttrs
+  } = rest as Record<string, unknown>;
+
+  const mouseHandlers = { onMouseDown, onMouseUp, onMouseLeave };
 
   if (isInteractive) {
-    const interactiveProps = mergeProps(buttonProps, focusProps, {
-      className,
-      "data-focus-visible": isFocusVisible ? "true" : undefined,
-    });
+    const interactiveProps = mergeProps(buttonProps, mouseHandlers, htmlAttrs, { className });
 
     return (
       <div {...interactiveProps} ref={ref}>
@@ -80,7 +86,7 @@ export const CardHeadless = forwardRef<HTMLDivElement, CardHeadlessProps>(functi
   }
 
   return (
-    <div role="article" className={className} ref={ref}>
+    <div role="article" className={className} ref={ref} {...mouseHandlers} {...htmlAttrs}>
       {children}
     </div>
   );
