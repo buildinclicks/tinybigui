@@ -29,7 +29,7 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(function C
 ) {
   return (
     <div ref={ref} className={cn("p-4", className)}>
-      <h3 className="text-on-surface text-title-large">{headline}</h3>
+      <h3 className="text-on-surface text-title-medium">{headline}</h3>
       {subheader !== undefined && (
         <p className="text-on-surface-variant text-body-medium mt-1">{subheader}</p>
       )}
