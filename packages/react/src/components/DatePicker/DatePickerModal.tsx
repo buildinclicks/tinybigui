@@ -73,6 +73,8 @@ export const DatePickerModal = forwardRef<HTMLDivElement, DatePickerModalProps>(
       onConfirm,
       onClear,
       className,
+      slots,
+      ActionButtonComponent,
     } = props;
 
     const internalRef = useRef<HTMLDivElement>(null);
@@ -251,6 +253,7 @@ export const DatePickerModal = forwardRef<HTMLDivElement, DatePickerModalProps>(
               {...(minValue ? { minValue } : {})}
               {...(maxValue ? { maxValue } : {})}
               {...(isDateUnavailable ? { isDateUnavailable } : {})}
+              {...(slots ? { slots } : {})}
             />
           ) : (
             <CalendarCore
@@ -262,6 +265,7 @@ export const DatePickerModal = forwardRef<HTMLDivElement, DatePickerModalProps>(
               {...(minValue ? { minValue } : {})}
               {...(maxValue ? { maxValue } : {})}
               {...(isDateUnavailable ? { isDateUnavailable } : {})}
+              {...(slots ? { slots } : {})}
             />
           )}
           <DatePickerActions
@@ -272,6 +276,7 @@ export const DatePickerModal = forwardRef<HTMLDivElement, DatePickerModalProps>(
             onCancel={handleCancel}
             onConfirm={handleConfirm}
             onClear={handleClear}
+            {...(ActionButtonComponent ? { ButtonComponent: ActionButtonComponent } : {})}
           />
         </ModalOverlay>
       </FocusScope>

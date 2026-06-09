@@ -25,15 +25,19 @@ import { DatePicker } from "./DatePicker";
 import {
   datePickerContainerVariants,
   calendarCellVariants,
+  calendarCellStateLayerVariants,
+  calendarCellFocusRingVariants,
+  navButtonVariants,
+  navButtonStateLayerVariants,
+  calendarDividerVariants,
   yearItemVariants,
-  datePickerWeekdayVariants,
-  datePickerDividerVariants,
-  datePickerNavVariants,
-  datePickerHeadlineVariants,
-  datePickerSupportingTextVariants,
-  datePickerActionButtonVariants,
-  datePickerRangeIndicatorVariants,
+  yearItemStateLayerVariants,
+  weekdayVariants,
+  actionButtonVariants,
+  headlineVariants,
+  supportingTextVariants,
 } from "./DatePicker.variants";
+import { DOCKED_MOTION_STRUCTURAL, MODAL_MOTION_STRUCTURAL } from "./datePickerStructuralStyles";
 
 // ─── M01: Type Tests ──────────────────────────────────────────────────────────
 
@@ -1694,105 +1698,130 @@ describe("DatePicker — styled layer", () => {
     expect(classes).toContain("rounded-3xl");
   });
 
-  // Test 109
-  test("CalendarCell default has text-on-surface", () => {
-    const classes = calendarCellVariants({ cellType: "default" });
+  // Test 109 — Two-axis model: cell base class carries all data-* state tokens
+  test("CalendarCell base has text-on-surface and data-[selected] token for bg-primary", () => {
+    const classes = calendarCellVariants();
     expect(classes).toContain("text-on-surface");
+    // Selected state driven by data-* attribute selector, not CVA variant
+    expect(classes).toContain("data-[selected]:bg-primary");
+    expect(classes).toContain("data-[selected]:text-on-primary");
   });
 
   // Test 110
-  test("CalendarCell today has text-primary and border-primary", () => {
-    const classes = calendarCellVariants({ cellType: "today" });
+  test("CalendarCell carries today data-* selectors for text-primary and border-primary", () => {
+    const classes = calendarCellVariants();
     expect(classes).toContain("text-primary");
     expect(classes).toContain("border-primary");
   });
 
   // Test 111
-  test("CalendarCell selected has bg-primary and text-on-primary", () => {
-    const classes = calendarCellVariants({ cellType: "selected" });
-    expect(classes).toContain("bg-primary");
-    expect(classes).toContain("text-on-primary");
-  });
-
-  // Test 112
-  test("CalendarCell range-middle has bg-secondary-container", () => {
-    const classes = calendarCellVariants({ cellType: "selected-range-middle" });
+  test("CalendarCell carries range-middle data-* selector for bg-secondary-container", () => {
+    const classes = calendarCellVariants();
     expect(classes).toContain("bg-secondary-container");
   });
 
-  // Test 113
-  test("CalendarCell outside-month has text-on-surface-variant", () => {
-    const classes = calendarCellVariants({ cellType: "outside-month" });
+  // Test 112
+  test("CalendarCell carries outside-month data-* selector for text-on-surface-variant", () => {
+    const classes = calendarCellVariants();
     expect(classes).toContain("text-on-surface-variant");
   });
 
-  // Test 114
-  test("CalendarCell disabled has opacity 38%", () => {
-    const classes = calendarCellVariants({ cellType: "disabled" });
+  // Test 113
+  test("CalendarCell carries disabled data-* selector for text-on-surface/38", () => {
+    const classes = calendarCellVariants();
     expect(classes).toContain("text-on-surface/38");
   });
 
-  // Test 115
-  test("Year item selected has bg-primary and text-on-primary", () => {
-    const classes = yearItemVariants({ selected: true });
-    expect(classes).toContain("bg-primary");
-    expect(classes).toContain("text-on-primary");
+  // Test 114 — State layer carries group-data hover/focus/pressed opacities
+  test("CalendarCell state layer has group-data-[hovered] and group-data-[focus-visible] opacity selectors", () => {
+    const stateLayerClasses = calendarCellStateLayerVariants();
+    expect(stateLayerClasses).toContain("group-data-[hovered]/calendar-cell:opacity-8");
+    expect(stateLayerClasses).toContain("group-data-[focus-visible]/calendar-cell:opacity-10");
+    expect(stateLayerClasses).toContain("group-data-[pressed]/calendar-cell:opacity-10");
   });
 
-  // Test 116
-  test("Year item unselected has text-on-surface-variant", () => {
-    const classes = yearItemVariants({ selected: false });
-    expect(classes).toContain("text-on-surface-variant");
+  // Test 115 — State layer switches color for selected
+  test("CalendarCell state layer switches to bg-on-primary when selected", () => {
+    const stateLayerClasses = calendarCellStateLayerVariants();
+    expect(stateLayerClasses).toContain("group-data-[selected]/calendar-cell:bg-on-primary");
   });
 
-  // Test 117
-  test("Year item has w-[88px] and h-[52px]", () => {
-    const classes = yearItemVariants({});
+  // Test 116 — Focus ring
+  test("CalendarCell focus ring is visible only on group-data-[focus-visible]", () => {
+    const focusRingClasses = calendarCellFocusRingVariants();
+    expect(focusRingClasses).toContain("group-data-[focus-visible]/calendar-cell:opacity-100");
+  });
+
+  // Test 117 — Year item two-axis model
+  test("Year item has w-[88px] and h-[52px] in base classes", () => {
+    const classes = yearItemVariants();
     expect(classes).toContain("w-[88px]");
     expect(classes).toContain("h-[52px]");
   });
 
-  // Test 118
-  test("Weekday labels have text-body-small and text-on-surface", () => {
-    const classes = datePickerWeekdayVariants();
-    expect(classes).toContain("text-body-small");
-    expect(classes).toContain("text-on-surface");
+  test("Year item carries data-[selected] selector for bg-primary and text-on-primary", () => {
+    const classes = yearItemVariants();
+    expect(classes).toContain("data-[selected]:bg-primary");
+    expect(classes).toContain("data-[selected]:text-on-primary");
   });
 
-  // Test 119
-  test("Divider has border-outline-variant", () => {
-    const classes = datePickerDividerVariants();
-    expect(classes).toContain("border-outline-variant");
-  });
-
-  // Test 120
-  test("Navigation icons have text-on-surface-variant", () => {
-    const classes = datePickerNavVariants();
+  test("Year item unselected base has text-on-surface-variant", () => {
+    const classes = yearItemVariants();
     expect(classes).toContain("text-on-surface-variant");
   });
 
-  // Test 121
-  test("Headline text uses text-headline-small for modal", () => {
-    const classes = datePickerHeadlineVariants({ variant: "modal" });
-    expect(classes).toContain("text-headline-small");
+  test("Year item state layer switches color for selected", () => {
+    const stateLayerClasses = yearItemStateLayerVariants();
+    expect(stateLayerClasses).toContain("group-data-[selected]/year-item:bg-on-primary");
   });
 
-  // Test 122
-  test("Supporting text uses text-label-large", () => {
-    const classes = datePickerSupportingTextVariants();
+  // Test 118 — Weekday labels
+  test("Weekday labels have text-body-small and text-on-surface-variant", () => {
+    const classes = weekdayVariants();
+    expect(classes).toContain("text-body-small");
+    expect(classes).toContain("text-on-surface-variant");
+  });
+
+  // Test 119 — Divider
+  test("Calendar divider has border-outline-variant", () => {
+    const classes = calendarDividerVariants();
+    expect(classes).toContain("border-outline-variant");
+  });
+
+  // Test 120 — Nav button
+  test("Nav button has text-on-surface-variant", () => {
+    const classes = navButtonVariants();
+    expect(classes).toContain("text-on-surface-variant");
+  });
+
+  test("Nav button state layer has group-data-[hovered]/nav-button:opacity-8", () => {
+    const stateLayerClasses = navButtonStateLayerVariants();
+    expect(stateLayerClasses).toContain("group-data-[hovered]/nav-button:opacity-8");
+  });
+
+  // Test 121 — Headline
+  test("Headline text uses text-label-large", () => {
+    const classes = headlineVariants();
     expect(classes).toContain("text-label-large");
   });
 
-  // Test 123
+  // Test 122 — Supporting text
+  test("Supporting text uses text-headline-large", () => {
+    const classes = supportingTextVariants();
+    expect(classes).toContain("text-headline-large");
+  });
+
+  // Test 123 — Action button
   test("Action button text uses text-primary", () => {
-    const classes = datePickerActionButtonVariants();
+    const classes = actionButtonVariants();
     expect(classes).toContain("text-primary");
   });
 
-  // Test 124
-  test("index.ts exports DatePicker, DatePickerDocked, all variants and types", async () => {
+  // Test 124 — Exports check (new slot API)
+  test("index.ts exports DatePicker, DatePickerDocked, all new slot variants and styled slots", async () => {
     const exports = await import("./index");
 
+    // Layer 2/3 components
     expect(exports.DatePicker).toBeDefined();
     expect(exports.DatePickerDocked).toBeDefined();
     expect(exports.DatePickerModal).toBeDefined();
@@ -1800,79 +1829,84 @@ describe("DatePicker — styled layer", () => {
     expect(exports.CalendarCore).toBeDefined();
     expect(exports.DateField).toBeDefined();
 
+    // New styled slot components
+    expect(exports.StyledCalendarCell).toBeDefined();
+    expect(exports.StyledNavButton).toBeDefined();
+    expect(exports.StyledCalendarTitle).toBeDefined();
+    expect(exports.StyledYearItem).toBeDefined();
+    expect(exports.StyledWeekday).toBeDefined();
+    expect(exports.StyledActionButton).toBeDefined();
+
+    // New CVA slot variants
     expect(exports.datePickerContainerVariants).toBeDefined();
     expect(exports.calendarCellVariants).toBeDefined();
-    expect(exports.datePickerHeaderVariants).toBeDefined();
-    expect(exports.datePickerNavVariants).toBeDefined();
+    expect(exports.calendarCellStateLayerVariants).toBeDefined();
+    expect(exports.calendarCellFocusRingVariants).toBeDefined();
+    expect(exports.navButtonVariants).toBeDefined();
+    expect(exports.navButtonStateLayerVariants).toBeDefined();
     expect(exports.yearItemVariants).toBeDefined();
-    expect(exports.datePickerDividerVariants).toBeDefined();
-    expect(exports.datePickerActionVariants).toBeDefined();
-    expect(exports.datePickerActionButtonVariants).toBeDefined();
-    expect(exports.datePickerWeekdayVariants).toBeDefined();
-    expect(exports.datePickerRangeIndicatorVariants).toBeDefined();
-    expect(exports.datePickerHeadlineVariants).toBeDefined();
-    expect(exports.datePickerSupportingTextVariants).toBeDefined();
-    expect(exports.datePickerScrimVariants).toBeDefined();
+    expect(exports.yearItemStateLayerVariants).toBeDefined();
+    expect(exports.weekdayVariants).toBeDefined();
+    expect(exports.calendarDividerVariants).toBeDefined();
+    expect(exports.actionButtonVariants).toBeDefined();
+    expect(exports.headlineVariants).toBeDefined();
+    expect(exports.supportingTextVariants).toBeDefined();
   });
 
-  // Test 125
-  test("Range indicator has bg-secondary-container", () => {
-    const classes = datePickerRangeIndicatorVariants();
-    expect(classes).toContain("bg-secondary-container");
+  // Test 125 — Range middle uses data-* selector
+  test("CalendarCell range-middle uses data-[range-middle] selector for bg-secondary-container", () => {
+    const classes = calendarCellVariants();
+    expect(classes).toContain("data-[range-middle]:bg-secondary-container");
   });
 });
 
 // ─── M10: Motion and Animation Tests ──────────────────────────────────────────
 
 describe("DatePicker — motion and animation", () => {
-  // Test 126
-  test("Docked popover enter: has duration-short3 and ease-standard-decelerate", async () => {
-    const { DOCKED_MOTION_STYLES } = await import("./DatePickerDockedStyled");
-    expect(DOCKED_MOTION_STYLES).toContain("duration-short3");
-    expect(DOCKED_MOTION_STYLES).toContain("ease-standard-decelerate");
+  // Test 126 — Docked popover enter motion (screen-level, standard legacy)
+  test("Docked popover enter: has duration-short3 and ease-standard-decelerate", () => {
+    expect(DOCKED_MOTION_STRUCTURAL).toContain("duration-short3");
+    expect(DOCKED_MOTION_STRUCTURAL).toContain("ease-standard-decelerate");
   });
 
-  // Test 127
-  test("Docked popover exit: has duration-short2 and ease-standard-accelerate", async () => {
-    const { DOCKED_MOTION_STYLES } = await import("./DatePickerDockedStyled");
-    expect(DOCKED_MOTION_STYLES).toContain("duration-short2");
-    expect(DOCKED_MOTION_STYLES).toContain("ease-standard-accelerate");
+  // Test 127 — Docked popover exit motion
+  test("Docked popover exit: has duration-short2 and ease-standard-accelerate", () => {
+    expect(DOCKED_MOTION_STRUCTURAL).toContain("duration-short2");
+    expect(DOCKED_MOTION_STRUCTURAL).toContain("ease-standard-accelerate");
   });
 
-  // Test 128
-  test("Modal enter: has duration-medium2 and ease-standard-decelerate", async () => {
-    const { MODAL_MOTION_STYLES } = await import("./DatePickerModalStyled");
-    expect(MODAL_MOTION_STYLES).toContain("duration-medium2");
-    expect(MODAL_MOTION_STYLES).toContain("ease-standard-decelerate");
+  // Test 128 — Modal enter motion
+  test("Modal enter: has duration-medium2 and ease-standard-decelerate", () => {
+    expect(MODAL_MOTION_STRUCTURAL).toContain("duration-medium2");
+    expect(MODAL_MOTION_STRUCTURAL).toContain("ease-standard-decelerate");
   });
 
-  // Test 129
-  test("Modal exit: has duration-medium1 and ease-standard-accelerate", async () => {
-    const { MODAL_MOTION_STYLES } = await import("./DatePickerModalStyled");
-    expect(MODAL_MOTION_STYLES).toContain("duration-medium1");
-    expect(MODAL_MOTION_STYLES).toContain("ease-standard-accelerate");
+  // Test 129 — Modal exit motion
+  test("Modal exit: has duration-medium1 and ease-standard-accelerate", () => {
+    expect(MODAL_MOTION_STRUCTURAL).toContain("duration-medium1");
+    expect(MODAL_MOTION_STRUCTURAL).toContain("ease-standard-accelerate");
   });
 
-  // Test 130
-  test("Calendar month slide has ease-emphasized-decelerate", async () => {
-    const { DOCKED_MOTION_STYLES } = await import("./DatePickerDockedStyled");
-    const { MODAL_MOTION_STYLES } = await import("./DatePickerModalStyled");
-    expect(DOCKED_MOTION_STYLES).toContain("ease-emphasized-decelerate");
-    expect(MODAL_MOTION_STYLES).toContain("ease-emphasized-decelerate");
+  // Test 130 — Cell state layer uses spring-standard-fast effects motion
+  test("Calendar cell state layer uses spring-standard-fast effects transition", () => {
+    const stateLayerClasses = calendarCellStateLayerVariants();
+    expect(stateLayerClasses).toContain("transition-opacity");
+    expect(stateLayerClasses).toContain("duration-spring-standard-fast-effects");
+    expect(stateLayerClasses).toContain("ease-spring-standard-fast-effects");
   });
 
-  // Test 131
-  test("Calendar cell selection has duration-short2 and ease-standard", async () => {
-    const { DOCKED_MOTION_STYLES } = await import("./DatePickerDockedStyled");
-    expect(DOCKED_MOTION_STYLES).toContain("duration-short2");
-    expect(DOCKED_MOTION_STYLES).toContain("ease-standard");
+  // Test 131 — Nav button uses spring-standard-fast effects motion
+  test("Nav button uses spring-standard-fast effects transition for color", () => {
+    const classes = navButtonVariants();
+    expect(classes).toContain("transition-colors");
+    expect(classes).toContain("duration-spring-standard-fast-effects");
   });
 
-  // Test 132
-  test("State layer has transition-opacity and duration-short1", async () => {
-    const { DOCKED_MOTION_STYLES } = await import("./DatePickerDockedStyled");
-    expect(DOCKED_MOTION_STYLES).toContain("transition-opacity");
-    expect(DOCKED_MOTION_STYLES).toContain("duration-short1");
+  // Test 132 — Year item state layer uses spring-standard-fast effects motion
+  test("Year item state layer uses spring-standard-fast effects transition", () => {
+    const stateLayerClasses = yearItemStateLayerVariants();
+    expect(stateLayerClasses).toContain("transition-opacity");
+    expect(stateLayerClasses).toContain("duration-spring-standard-fast-effects");
   });
 
   // Test 133
@@ -1929,12 +1963,9 @@ describe("DatePicker — motion and animation", () => {
     window.matchMedia = originalMatchMedia;
   });
 
-  // Test 135
-  test("No hardcoded duration-[Xms] or ease-[cubic-bezier] values", async () => {
-    const { DOCKED_MOTION_STYLES } = await import("./DatePickerDockedStyled");
-    const { MODAL_MOTION_STYLES } = await import("./DatePickerModalStyled");
-
-    const allMotion = DOCKED_MOTION_STYLES + MODAL_MOTION_STYLES;
+  // Test 135 — No hardcoded arbitrary duration/ease values in motion strings
+  test("No hardcoded duration-[Xms] or ease-[cubic-bezier] values in motion structural strings", () => {
+    const allMotion = DOCKED_MOTION_STRUCTURAL + MODAL_MOTION_STRUCTURAL;
     expect(allMotion).not.toMatch(/duration-\[\d+ms\]/);
     expect(allMotion).not.toMatch(/ease-\[cubic-bezier/);
   });
@@ -2100,16 +2131,13 @@ describe("DatePicker — accessibility hardening", () => {
     }
   });
 
-  // Test 147
-  test("All date cells meet 48dp minimum touch target", () => {
-    const { container } = render(
-      <DatePicker variant="docked" label="Test" aria-label="Test date" defaultOpen />
-    );
-
-    const rootEl = container.firstElementChild;
-    const className = rootEl?.className ?? "";
-    expect(className).toContain("[&_td>div]:w-[48px]");
-    expect(className).toContain("[&_td>div]:h-[48px]");
+  // Test 147 — 48dp touch target via StyledCalendarCell CVA
+  test("All date cells meet 48dp minimum touch target via calendarCellVariants", () => {
+    // With slot injection, the 48dp touch target is applied by calendarCellVariants
+    // directly to the cell button element — not via container descendant selectors.
+    const cellClasses = calendarCellVariants();
+    expect(cellClasses).toContain("w-[48px]");
+    expect(cellClasses).toContain("h-[48px]");
   });
 
   // Test 148

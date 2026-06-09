@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { forwardRef, useRef, useCallback, useEffect } from "react";
 import {
   useDatePicker,
@@ -8,6 +9,9 @@ import {
   useButton,
   useLocale,
   usePopover,
+  useHover,
+  useFocusRing,
+  mergeProps,
   DismissButton,
 } from "react-aria";
 import { useDatePickerState, useDateFieldState } from "react-stately";
@@ -15,10 +19,12 @@ import { createCalendar } from "@internationalized/date";
 
 import { CalendarCore } from "./CalendarCore";
 import { DatePickerActions } from "./DatePickerActions";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 
 import type { DateSegment as DateSegmentType } from "react-stately";
 import type { DateValue } from "@internationalized/date";
 import type { DatePickerDockedProps } from "./DatePicker.types";
+import type { ActionButtonSlotProps } from "./DatePickerActions";
 
 /**
  * Internal segment renderer for the date field inside the picker.
@@ -103,6 +109,8 @@ function PopoverContent({
   confirmLabel,
   onCancel,
   onConfirm,
+  slots,
+  ActionButtonComponent,
 }: {
   popoverRef: React.RefObject<HTMLDivElement>;
   triggerRef: React.RefObject<HTMLButtonElement>;
@@ -113,6 +121,8 @@ function PopoverContent({
   confirmLabel: string;
   onCancel: () => void;
   onConfirm: () => void;
+  slots?: DatePickerDockedProps["slots"] | undefined;
+  ActionButtonComponent?: React.ComponentType<ActionButtonSlotProps> | undefined;
 }): JSX.Element {
   const { popoverProps } = usePopover(
     {
@@ -153,12 +163,16 @@ function PopoverContent({
               : {}),
           }}
           aria-label={(calendarProps as { "aria-label"?: string })["aria-label"] ?? "Calendar"}
+          {...(slots ? { slots } : {})}
         />
         <DatePickerActions
           cancelLabel={cancelLabel}
           confirmLabel={confirmLabel}
           onCancel={onCancel}
           onConfirm={onConfirm}
+          {...(ActionButtonComponent !== undefined
+            ? { ButtonComponent: ActionButtonComponent }
+            : {})}
         />
       </div>
       <DismissButton onDismiss={() => state.close()} />
@@ -172,12 +186,15 @@ function PopoverContent({
  * Provides the complete docked date picker behavior:
  * - Segmented date field trigger (MM/DD/YYYY)
  * - Calendar icon button to toggle the calendar popover
- * - Inline popover containing the CalendarCore from M02
+ * - Inline popover containing the CalendarCore
  * - Action buttons (Cancel, OK) at the bottom
  * - Open/close state management via React Aria overlays
  *
+ * Accepts `slots` and `ActionButtonComponent` to allow Layer-3 styled wrappers
+ * to inject CVA-styled sub-components without modifying this headless layer.
+ *
  * This is a headless component — it provides behavior, ARIA semantics, and
- * data attributes only. No styling classes are applied.
+ * data attributes only. No styling classes are applied to internal elements.
  *
  * @example
  * ```tsx
@@ -195,6 +212,8 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
       onCancel,
       onConfirm,
       className,
+      slots,
+      ActionButtonComponent,
       ...datePickerProps
     } = props;
 
@@ -245,7 +264,14 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
       calendarProps,
     } = useDatePicker(stateProps, state, ref);
 
-    const { buttonProps: iconButtonProps } = useButton(triggerButtonAriaProps, triggerRef);
+    const { buttonProps: iconButtonProps, isPressed: isTriggerPressed } = useButton(
+      triggerButtonAriaProps,
+      triggerRef
+    );
+    const { isFocusVisible: isTriggerFocusVisible, focusProps: triggerFocusProps } = useFocusRing();
+    const { isHovered: isTriggerHovered, hoverProps: triggerHoverProps } = useHover({
+      isDisabled: datePickerProps.isDisabled ?? false,
+    });
 
     const valueBeforeOpenRef = useRef<DateValue | null>(null);
 
@@ -278,8 +304,8 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
         ref={ref}
         className={className}
         data-variant="docked"
-        data-open={state.isOpen ?? undefined}
-        data-disabled={datePickerProps.isDisabled ?? undefined}
+        data-open={state.isOpen ? "" : undefined}
+        data-disabled={datePickerProps.isDisabled ? "" : undefined}
       >
         {datePickerProps.label && (
           <label {...labelProps} data-label>
@@ -288,7 +314,18 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
         )}
         <div {...groupProps} data-field-group>
           <PickerDateField fieldProps={fieldProps as Record<string, unknown>} />
-          <button {...iconButtonProps} ref={triggerRef} type="button" data-trigger>
+          <button
+            {...mergeProps(iconButtonProps, triggerFocusProps, triggerHoverProps)}
+            ref={triggerRef}
+            type="button"
+            data-trigger
+            {...getInteractionDataAttributes({
+              isHovered: isTriggerHovered,
+              isFocusVisible: isTriggerFocusVisible,
+              isPressed: isTriggerPressed,
+              isDisabled: datePickerProps.isDisabled ?? false,
+            })}
+          >
             <CalendarTriggerIcon />
           </button>
         </div>
@@ -303,6 +340,8 @@ export const DatePickerDocked = forwardRef<HTMLDivElement, DatePickerDockedProps
             confirmLabel={confirmLabel}
             onCancel={handleCancel}
             onConfirm={handleConfirm}
+            {...(slots !== undefined ? { slots } : {})}
+            {...(ActionButtonComponent !== undefined ? { ActionButtonComponent } : {})}
           />
         )}
       </div>

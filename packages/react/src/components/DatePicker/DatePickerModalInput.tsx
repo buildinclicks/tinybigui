@@ -72,6 +72,7 @@ export const DatePickerModalInput = forwardRef<HTMLDivElement, DatePickerModalIn
       onConfirm,
       onModeToggle,
       className,
+      ActionButtonComponent,
     } = props;
 
     const internalRef = useRef<HTMLDivElement>(null);
@@ -332,6 +333,7 @@ export const DatePickerModalInput = forwardRef<HTMLDivElement, DatePickerModalIn
             onCancel={handleCancel}
             onConfirm={handleConfirm}
             isConfirmDisabled={!isFormValid}
+            {...(ActionButtonComponent ? { ButtonComponent: ActionButtonComponent } : {})}
           />
         </ModalInputOverlay>
       </FocusScope>

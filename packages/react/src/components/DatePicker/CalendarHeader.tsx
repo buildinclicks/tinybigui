@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useRef } from "react";
 import { useButton } from "react-aria";
 
@@ -20,6 +21,26 @@ interface CalendarNavigationButtonProps {
 }
 
 /**
+ * Props for a slot navigation button component.
+ * Receives all CalendarNavigationButtonProps plus children (the icon).
+ */
+export interface NavButtonComponentProps extends CalendarNavigationButtonProps {
+  children?: React.ReactNode;
+}
+
+/**
+ * Props for a slot title component.
+ */
+export interface TitleComponentProps {
+  /** The formatted title string (e.g., "August 2025") */
+  title: string;
+  /** Handler when the title is clicked to toggle year view */
+  onClick?: (() => void) | undefined;
+  /** Whether to show the dropdown indicator */
+  showDropdownIndicator?: boolean | undefined;
+}
+
+/**
  * Internal props for the CalendarHeader headless component.
  * @internal
  */
@@ -34,10 +55,21 @@ interface CalendarHeaderProps {
   onTitleClick?: () => void;
   /** Whether to show the dropdown indicator on the title */
   showDropdownIndicator?: boolean;
+  /**
+   * Optional slot component for rendering each nav button.
+   * Defaults to the built-in unstyled NavigationButton.
+   */
+  NavButtonComponent?: React.ComponentType<NavButtonComponentProps>;
+  /**
+   * Optional slot component for rendering the title.
+   * Defaults to the built-in unstyled title div/button.
+   */
+  TitleComponent?: React.ComponentType<TitleComponentProps>;
 }
 
 /**
  * Navigation button using React Aria's `useButton` for accessibility.
+ * Default unstyled implementation.
  * @internal
  */
 function NavigationButton({
@@ -45,7 +77,7 @@ function NavigationButton({
   isDisabled,
   onPress,
   "aria-label": ariaLabel,
-}: CalendarNavigationButtonProps & { children?: React.ReactNode }): JSX.Element {
+}: NavButtonComponentProps): JSX.Element {
   const ref = useRef<HTMLButtonElement>(null);
   const { buttonProps } = useButton(
     {
@@ -91,11 +123,36 @@ function ChevronRightIcon(): JSX.Element {
  * Dropdown arrow SVG icon for year selection toggle.
  * @internal
  */
-function DropdownArrowIcon(): JSX.Element {
+export function DropdownArrowIcon(): JSX.Element {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M7 10l5 5 5-5z" />
     </svg>
+  );
+}
+
+/**
+ * Default unstyled title renderer.
+ * @internal
+ */
+function DefaultTitle({ title, onClick, showDropdownIndicator }: TitleComponentProps): JSX.Element {
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        data-calendar-title
+        aria-label={`${title}, click to select year`}
+      >
+        <h2 aria-live="polite">{title}</h2>
+        {showDropdownIndicator && <DropdownArrowIcon />}
+      </button>
+    );
+  }
+  return (
+    <div data-calendar-title>
+      <h2 aria-live="polite">{title}</h2>
+    </div>
   );
 }
 
@@ -106,8 +163,9 @@ function DropdownArrowIcon(): JSX.Element {
  * Includes previous/next month buttons and an `aria-live="polite"` heading
  * for screen reader announcements of month changes.
  *
- * The title can be made clickable to toggle year selection view by
- * providing the `onTitleClick` callback.
+ * The `NavButtonComponent` and `TitleComponent` slots allow the styled layer
+ * to inject CVA-styled navigation buttons and the title pill without touching
+ * this headless layer.
  *
  * @internal
  */
@@ -117,6 +175,8 @@ export function CalendarHeader({
   nextButtonProps,
   onTitleClick,
   showDropdownIndicator = false,
+  NavButtonComponent = NavigationButton,
+  TitleComponent = DefaultTitle,
 }: CalendarHeaderProps): JSX.Element {
   const enhancedPrevProps: CalendarNavigationButtonProps = {
     ...prevButtonProps,
@@ -130,28 +190,18 @@ export function CalendarHeader({
 
   return (
     <div data-calendar-header>
-      {onTitleClick ? (
-        <button
-          type="button"
-          onClick={onTitleClick}
-          data-calendar-title
-          aria-label={`${title}, click to select year`}
-        >
-          <h2 aria-live="polite">{title}</h2>
-          {showDropdownIndicator && <DropdownArrowIcon />}
-        </button>
-      ) : (
-        <div data-calendar-title>
-          <h2 aria-live="polite">{title}</h2>
-        </div>
-      )}
+      <TitleComponent
+        title={title}
+        onClick={onTitleClick}
+        showDropdownIndicator={showDropdownIndicator}
+      />
       <div data-calendar-nav>
-        <NavigationButton {...enhancedPrevProps}>
+        <NavButtonComponent {...enhancedPrevProps}>
           <ChevronLeftIcon />
-        </NavigationButton>
-        <NavigationButton {...enhancedNextProps}>
+        </NavButtonComponent>
+        <NavButtonComponent {...enhancedNextProps}>
           <ChevronRightIcon />
-        </NavigationButton>
+        </NavButtonComponent>
       </div>
     </div>
   );
