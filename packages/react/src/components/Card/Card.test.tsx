@@ -109,37 +109,43 @@ describe("CardHeadless — interactive (onPress)", () => {
 
 // ─── Focus ring ───────────────────────────────────────────────────────────────
 
-describe("CardHeadless — focus ring", () => {
-  test('9. data-focus-visible="true" applied when focused via keyboard', async () => {
+// Focus ring state is managed by the styled Card layer (useFocusRing +
+// getInteractionDataAttributes) — not by CardHeadless directly.
+// These tests verify the styled Card emits the presence-based data-focus-visible
+// attribute (empty string ""), matching the component-variants architecture.
+
+describe("Card — focus ring (styled layer)", () => {
+  test('9. data-focus-visible="" applied when focused via keyboard (styled Card)', async () => {
     const user = userEvent.setup();
 
     render(
-      <CardHeadless onPress={vi.fn()} aria-label="Card">
+      <Card onPress={vi.fn()} aria-label="Card">
         Card
-      </CardHeadless>
+      </Card>
     );
 
     // Tab moves focus via keyboard, which triggers isFocusVisible = true
     await user.tab();
 
     const card = screen.getByRole("button");
-    expect(card).toHaveAttribute("data-focus-visible", "true");
+    // Presence-based encoding: attribute is "" (present) on keyboard focus
+    expect(card).toHaveAttribute("data-focus-visible", "");
   });
 
-  test("10. data-focus-visible NOT set when focused via mouse", async () => {
+  test("10. data-focus-visible not set when focused via mouse (styled Card)", async () => {
     const user = userEvent.setup();
 
     render(
-      <CardHeadless onPress={vi.fn()} aria-label="Card">
+      <Card onPress={vi.fn()} aria-label="Card">
         Card
-      </CardHeadless>
+      </Card>
     );
 
     // Pointer click — focus is not keyboard-triggered
     await user.click(screen.getByRole("button"));
 
     const card = screen.getByRole("button");
-    expect(card).not.toHaveAttribute("data-focus-visible", "true");
+    expect(card).not.toHaveAttribute("data-focus-visible");
   });
 });
 
@@ -268,13 +274,15 @@ describe("Card — state layer", () => {
     expect(screen.getByTestId("card-state-layer")).toHaveClass("opacity-0");
   });
 
-  test("23. interactive: state layer has group-hover:opacity-8 class", () => {
+  test("23. interactive: state layer has group-data-[hovered]/card:opacity-8 class", () => {
     render(
       <Card onPress={vi.fn()} aria-label="Interactive card">
         Card
       </Card>
     );
-    expect(screen.getByTestId("card-state-layer")).toHaveClass("group-hover:opacity-8");
+    expect(screen.getByTestId("card-state-layer")).toHaveClass(
+      "group-data-[hovered]/card:opacity-8"
+    );
   });
 
   test("24. non-interactive: no ripple container present", () => {
@@ -299,6 +307,23 @@ describe("Card — sub-components", () => {
     const img = container.querySelector("img");
     expect(img).toHaveAttribute("role", "presentation");
     expect(img).toHaveAttribute("alt", "");
+  });
+
+  test("26a. CardMedia aspectRatio 16/9 applies aspect-video", () => {
+    const { container } = render(<CardMedia src="/test.jpg" alt="Test" aspectRatio="16/9" />);
+    expect(container.querySelector("img")).toHaveClass("aspect-video");
+  });
+
+  test("26b. CardMedia aspectRatio 4/3 applies aspect-[4/3] (not aspect-video)", () => {
+    const { container } = render(<CardMedia src="/test.jpg" alt="Test" aspectRatio="4/3" />);
+    const img = container.querySelector("img");
+    expect(img).toHaveClass("aspect-[4/3]");
+    expect(img).not.toHaveClass("aspect-video");
+  });
+
+  test("26c. CardMedia aspectRatio 1/1 applies aspect-square", () => {
+    const { container } = render(<CardMedia src="/test.jpg" alt="Test" aspectRatio="1/1" />);
+    expect(container.querySelector("img")).toHaveClass("aspect-square");
   });
 
   test("27. CardHeader renders headline text", () => {

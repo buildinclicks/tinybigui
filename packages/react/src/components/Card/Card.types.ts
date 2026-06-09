@@ -131,6 +131,13 @@ export interface CardHeadlessProps
    * Card content.
    */
   children?: ReactNode;
+
+  /**
+   * Presence-based interaction/content `data-*` attributes forwarded onto the
+   * root element (e.g. `data-hovered`, `data-pressed`, `data-interactive`,
+   * `data-dragged`). Consumed by slot `group-data-[x]/card:` selectors.
+   */
+  [dataAttr: `data-${string}`]: unknown;
 }
 
 // ─── CardMediaProps ───────────────────────────────────────────────────────────
