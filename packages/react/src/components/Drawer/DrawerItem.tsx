@@ -3,7 +3,7 @@
 import type React from "react";
 import { forwardRef, isValidElement, useContext } from "react";
 import { HeadlessDrawerItem, DrawerIconOnlyContext } from "./DrawerHeadless";
-import { Badge } from "../Badge";
+import { badgeStaticVariants } from "../Badge/Badge.variants";
 import { drawerItemVariants } from "./Drawer.variants";
 import { cn } from "../../utils/cn";
 import { useRipple } from "../../hooks/useRipple";
@@ -15,6 +15,26 @@ import type { DrawerItemProps, DrawerItemBadgeConfig } from "./Drawer.types";
  */
 function isBadgeConfig(badge: unknown): badge is DrawerItemBadgeConfig {
   return typeof badge === "object" && badge !== null && !isValidElement(badge) && "count" in badge;
+}
+
+/**
+ * Derives the visible text for the trailing badge pill.
+ * - No `count` → empty string (dot)
+ * - `count` ≤ `max` → count as string
+ * - `count` > `max` → `"${max}+"`
+ */
+function getBadgeDisplayValue(count: number | undefined, max: number): string {
+  if (count === undefined) return "";
+  return count > max ? `${max}+` : count.toString();
+}
+
+/**
+ * Derives the accessible label for the trailing badge pill.
+ * - No `count` → `"New"`
+ * - With `count` → `"${count} notifications"`
+ */
+function getBadgeAriaLabel(count: number | undefined): string {
+  return count === undefined ? "New" : `${count} notifications`;
 }
 
 /**
@@ -81,11 +101,24 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
       if (!badge) return null;
 
       if (isBadgeConfig(badge)) {
+        // Drawer trailing badge: rendered as an inline static pill (not anchored/overlaid).
+        // Uses badgeStaticVariants so colors, sizing, and dot/invisible flags are identical
+        // to the anchored BadgeContent, but without the absolute translate positioning.
+        const max = 999;
+        const isDot = badge.count === undefined;
+        const displayValue = getBadgeDisplayValue(badge.count, max);
+        const ariaLabel = getBadgeAriaLabel(badge.count);
+
         return (
           <span className="relative z-10 ml-auto flex shrink-0 items-center pr-2">
-            <Badge {...(badge.count !== undefined ? { count: badge.count } : {})}>
-              <span />
-            </Badge>
+            <span
+              role="status"
+              aria-label={ariaLabel}
+              data-dot={isDot ? "" : undefined}
+              className={cn(badgeStaticVariants())}
+            >
+              {displayValue}
+            </span>
           </span>
         );
       }

@@ -8,7 +8,12 @@ export { BadgeHeadless } from "./BadgeHeadless";
 export { BadgeContent } from "./BadgeContent";
 
 // CVA Variants
-export { badgeVariants, type BadgeVariants } from "./Badge.variants";
+export {
+  badgeVariants,
+  badgeStaticVariants,
+  type BadgeVariants,
+  type BadgeStaticVariants,
+} from "./Badge.variants";
 
 // Types
 export type { BadgeProps, BadgeHeadlessProps, BadgeContentProps } from "./Badge.types";

@@ -115,14 +115,23 @@ describe("Badge", () => {
     expect(wrapper).toHaveClass("relative");
   });
 
-  test("renders BadgeContent absolutely positioned", () => {
+  test("renders BadgeContent with MD3 corner-overlap placement classes", () => {
     render(
       <Badge count={3}>
         <button type="button">Host</button>
       </Badge>
     );
     const badge = screen.getByRole("status");
-    expect(badge).toHaveClass("absolute", "-top-1", "-right-1");
+    // MD3 spec: badge center straddles the wrapped element's top-right corner.
+    // top-0 right-0 positions the badge's top-right at the host's top-right,
+    // then -translate-y-1/2 translate-x-1/2 moves the center onto that corner.
+    expect(badge).toHaveClass(
+      "absolute",
+      "top-0",
+      "right-0",
+      "-translate-y-1/2",
+      "translate-x-1/2"
+    );
   });
 
   test("with invisible={true} sets data-invisible on the badge indicator", () => {
