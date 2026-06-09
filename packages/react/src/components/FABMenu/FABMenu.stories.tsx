@@ -55,7 +55,7 @@ const meta: Meta<typeof FABMenu> = {
     docs: {
       description: {
         component:
-          "MD3 FAB Menu — a speed-dial pattern extending the FAB with expandable action items. https://m3.material.io/components/floating-action-button/overview",
+          "MD3 Expressive FAB Menu — a speed-dial pattern extending the FAB with expandable pill-shaped action items. Each item is a full-rounded 56dp button with a leading icon and inline label. https://m3.material.io/components/fab-menu/specs",
       },
     },
   },
@@ -104,9 +104,9 @@ export const Default: Story = {
   render: (args) => (
     <div className="flex items-center justify-center p-32">
       <FABMenu {...args}>
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
@@ -114,7 +114,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default FABMenu expanding upward with three action items. Click the + FAB to toggle the speed-dial open or closed.",
+          "Default FABMenu expanding upward with three MD3 Expressive pill action items. Click the + FAB to toggle the speed-dial open or closed.",
       },
     },
   },
@@ -128,9 +128,9 @@ export const DirectionUp: Story = {
   render: () => (
     <div className="flex items-center justify-center p-32">
       <FABMenu aria-label="Actions expanding up" direction="up">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
@@ -148,9 +148,9 @@ export const DirectionLeft: Story = {
   render: () => (
     <div className="flex items-center justify-center p-32">
       <FABMenu aria-label="Actions expanding left" direction="left">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
@@ -168,9 +168,9 @@ export const DirectionRight: Story = {
   render: () => (
     <div className="flex items-center justify-center p-32">
       <FABMenu aria-label="Actions expanding right" direction="right">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
@@ -188,9 +188,9 @@ export const DirectionDown: Story = {
   render: () => (
     <div className="flex items-center justify-center p-32">
       <FABMenu aria-label="Actions expanding down" direction="down">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
@@ -205,24 +205,98 @@ export const DirectionDown: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// WithLabels
+// Colors
 // ---------------------------------------------------------------------------
 
-export const WithLabels: Story = {
+export const Colors: Story = {
   render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Quick actions with labels" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
-      </FABMenu>
+    <div className="flex flex-col items-center gap-12 p-16">
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">primary-container (default)</p>
+        <FABMenu aria-label="Primary container actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" color="primary-container" />
+          <FABMenuItem icon={<IconShare />} label="Share" color="primary-container" />
+        </FABMenu>
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">secondary-container</p>
+        <FABMenu aria-label="Secondary container actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" color="secondary-container" />
+          <FABMenuItem icon={<IconShare />} label="Share" color="secondary-container" />
+        </FABMenu>
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">tertiary-container</p>
+        <FABMenu aria-label="Tertiary container actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" color="tertiary-container" />
+          <FABMenuItem icon={<IconShare />} label="Share" color="tertiary-container" />
+        </FABMenu>
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">primary (solid, M3 Expressive)</p>
+        <FABMenu aria-label="Primary solid actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" color="primary" />
+          <FABMenuItem icon={<IconShare />} label="Share" color="primary" />
+        </FABMenu>
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">secondary (solid, M3 Expressive)</p>
+        <FABMenu aria-label="Secondary solid actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" color="secondary" />
+          <FABMenuItem icon={<IconShare />} label="Share" color="secondary" />
+        </FABMenu>
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">tertiary (solid, M3 Expressive)</p>
+        <FABMenu aria-label="Tertiary solid actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" color="tertiary" />
+          <FABMenuItem icon={<IconShare />} label="Share" color="tertiary" />
+        </FABMenu>
+      </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Each action item shows a text label chip alongside the mini FAB icon, improving discoverability and reducing reliance on icon recognition alone.",
+          "All 6 MD3 Expressive color roles: 3 container variants (default) and 3 solid variants (M3 Expressive). State-layer color equals the on-color for each variant per MD3 spec.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// States
+// ---------------------------------------------------------------------------
+
+export const States: Story = {
+  render: () => (
+    <div className="flex items-center justify-center gap-8 p-16">
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">Normal</p>
+        <FABMenu aria-label="Normal actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" />
+        </FABMenu>
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-label-small text-on-surface-variant">Disabled</p>
+        <FABMenu aria-label="Disabled actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconEdit />} label="Edit" isDisabled />
+        </FABMenu>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Normal and disabled states for FABMenu action items. Hover, focus, and pressed states are driven by data-* attributes via React Aria — interact with the Normal item to see the state layer and elevation responses.",
       },
     },
   },
@@ -236,9 +310,9 @@ export const ThreeActions: Story = {
   render: () => (
     <div className="flex items-center justify-center p-32">
       <FABMenu aria-label="Three actions" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
@@ -246,7 +320,7 @@ export const ThreeActions: Story = {
     docs: {
       description: {
         story:
-          "Three action items demonstrating the stagger animation: each mini FAB scales in with a 30 ms delay offset for a fluid cascade effect.",
+          "Three action items demonstrating the stagger animation: each pill scales in with a 30ms delay offset for a fluid cascade effect.",
       },
     },
   },
@@ -256,8 +330,8 @@ export const TwoActions: Story = {
   render: () => (
     <div className="flex items-center justify-center p-32">
       <FABMenu aria-label="Two actions" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
       </FABMenu>
     </div>
   ),
@@ -265,7 +339,7 @@ export const TwoActions: Story = {
     docs: {
       description: {
         story:
-          "Minimal two-item speed-dial — the recommended minimum when a regular FAB isn't enough but three actions would be excessive.",
+          "Minimal two-item speed-dial — the recommended minimum when a regular FAB is not enough but three actions would be excessive.",
       },
     },
   },
@@ -294,9 +368,9 @@ const ControlledOpenExample = (): React.ReactElement => {
         open={open}
         onOpenChange={setOpen}
       >
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   );
@@ -338,9 +412,9 @@ export const KeyboardNavigation: Story = {
       </div>
 
       <FABMenu aria-label="Keyboard-navigable quick actions" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
@@ -355,16 +429,16 @@ export const KeyboardNavigation: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// WithIcons
+// WithIcons (variety)
 // ---------------------------------------------------------------------------
 
 export const WithIcons: Story = {
   render: () => (
     <div className="flex items-center justify-center p-32">
       <FABMenu aria-label="Media actions" direction="up">
-        <FABMenuItem icon={<IconCamera />} label="Camera" aria-label="Take photo" />
-        <FABMenuItem icon={<IconBookmark />} label="Save" aria-label="Bookmark" />
-        <FABMenuItem icon={<IconPrint />} label="Print" aria-label="Print" />
+        <FABMenuItem icon={<IconCamera />} label="Camera" />
+        <FABMenuItem icon={<IconBookmark />} label="Save" />
+        <FABMenuItem icon={<IconPrint />} label="Print" />
       </FABMenu>
     </div>
   ),
@@ -372,7 +446,7 @@ export const WithIcons: Story = {
     docs: {
       description: {
         story:
-          "Action items with a variety of Material Design icon shapes — demonstrates that the mini FAB container handles different icon geometries consistently.",
+          "Action items with a variety of Material Design icon shapes — demonstrates that the pill container handles different icon geometries consistently.",
       },
     },
   },
@@ -391,9 +465,9 @@ export const Playground: Story = {
   render: (args) => (
     <div className="flex items-center justify-center p-32">
       <FABMenu {...args}>
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
     </div>
   ),
