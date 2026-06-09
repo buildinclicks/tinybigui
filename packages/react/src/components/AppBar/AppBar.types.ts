@@ -159,6 +159,9 @@ export interface AppBarProps {
  * Renders a `<header role="banner">` and manages scroll elevation state.
  * Use this for full visual control when the styled `AppBar` is not sufficient.
  *
+ * Extends `React.HTMLAttributes<HTMLElement>` so all standard HTML attributes
+ * (including `data-*` attributes) are forwarded to the underlying `<header>`.
+ *
  * @example
  * ```tsx
  * <AppBarHeadless
@@ -170,12 +173,7 @@ export interface AppBarProps {
  * </AppBarHeadless>
  * ```
  */
-export interface AppBarHeadlessProps {
-  /**
-   * Additional CSS classes
-   */
-  className?: string;
-
+export interface AppBarHeadlessProps extends React.HTMLAttributes<HTMLElement> {
   /**
    * The content to render inside the header
    */
