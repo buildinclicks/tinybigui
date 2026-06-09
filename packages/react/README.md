@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.9.0** (2026-06-09)
+> **Latest Release: v0.10.0** (2026-06-09)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -149,13 +149,13 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 2: Navigation ✅
 
-| Component          | Status | Description                          |
-| ------------------ | ------ | ------------------------------------ |
-| `AppBar`           | ✅     | Four size variants, scroll elevation |
-| `Tabs`             | ✅     | Primary and secondary tab variants   |
-| `NavigationDrawer` | ✅     | Modal and standard navigation drawer |
-| `NavigationBar`    | ✅     | Bottom navigation with badges        |
-| `Search`           | ✅     | SearchBar and SearchView overlay     |
+| Component          | Status | Description                                                         |
+| ------------------ | ------ | ------------------------------------------------------------------- |
+| `AppBar`           | ✅     | M3 expressive flexible slot architecture, subtitle growth (v0.10.0) |
+| `Tabs`             | ✅     | Primary and secondary tab variants                                  |
+| `NavigationDrawer` | ✅     | Modal and standard navigation drawer                                |
+| `NavigationBar`    | ✅     | Bottom navigation with badges                                       |
+| `Search`           | ✅     | SearchBar and SearchView overlay                                    |
 
 ### Phase 3: Feedback ✅
 

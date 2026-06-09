@@ -1,80 +1,187 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 /**
- * Material Design 3 Top App Bar Variants (CVA)
+ * Material Design 3 Top App Bar — Slot CVA Variants
  *
- * Type-safe variant management for AppBar component.
- * Uses Tailwind CSS classes mapped to MD3 design tokens.
+ * Architecture: Variants vs States
+ * - CVA holds design-time structure only (variant = size/layout choice).
+ * - Scroll elevation state is driven by data-scrolled on the root via
+ *   group-data-[scrolled]/appbar selectors — NOT a CVA variant.
+ * - With-subtitle growth (136/152dp) is driven by data-with-subtitle via
+ *   group-data-[with-subtitle]/appbar selectors.
  *
- * Variants:
- * - `small`: 64dp height (h-appbar-small), title left-aligned, title-large
- * - `center-aligned`: 64dp height (h-appbar-small), title centered, title-large
- * - `medium`: min 112dp height (min-h-appbar-medium), title bottom-left, headline-medium
- * - `large`: min 120dp height (min-h-appbar-large), title bottom-left, display-small
+ * Slot responsibilities:
+ *   appBarVariants          — root <header>; container color, elevation, motion, scroll state
+ *   appBarTopRowVariants    — leading nav + collapsed title + trailing actions row
+ *   appBarLeadingVariants   — nav icon slot wrapper (leading)
+ *   appBarHeadlineBlockVariants — collapsed title+subtitle block (small / center-aligned only)
+ *   appBarTitleVariants     — title text; per-variant type scale
+ *   appBarSubtitleVariants  — subtitle text; per-variant type scale (M3 Expressive flexible)
+ *   appBarTrailingVariants  — action icon slot wrapper (trailing)
+ *   appBarExpandedTitleVariants — expanded title+subtitle block (medium / large only)
  *
- * Scroll state:
- * - `false`: flat surface, bg-surface, shadow-elevation-0
- * - `true`: bg-surface-container + shadow-elevation-2 (MD3 on-scroll spec)
+ * M3 Expressive Flexible type scales:
+ *   Title:
+ *     small / center-aligned (collapsed): title-large
+ *     medium (expanded):                  headline-medium
+ *     large (expanded):                   display-small
  *
- * @see https://m3.material.io/components/top-app-bar/specs
+ *   Subtitle (M3 Expressive Flexible — corrected from prior implementation):
+ *     small / center-aligned (collapsed): label-medium
+ *     medium (expanded):                  label-large
+ *     large (expanded):                   title-medium
+ *
+ *   Subtitle color: always on-surface-variant (corrected for medium/large)
+ *
+ * Heights (M3 Expressive flexible):
+ *   small / center-aligned: 64dp (fixed)
+ *   medium: 112dp no subtitle / 136dp with subtitle
+ *   large:  120dp no subtitle / 152dp with subtitle
+ *
+ * Scroll state (MD3):
+ *   At rest:   bg-surface + shadow-elevation-0
+ *   On scroll: bg-surface-container + shadow-elevation-2
+ *
+ * Motion:
+ *   background-color + box-shadow are effects properties → standard effects spring pair
+ *   (duration-spring-standard-default-effects + ease-spring-standard-default-effects)
+ *
+ * @see https://m3.material.io/components/app-bars/specs
+ */
+
+// ─── ROOT / CONTAINER ─────────────────────────────────────────────────────────
+
+/**
+ * Root <header> element.
+ *
+ * - Scroll elevation state is driven by group-data-[scrolled]/appbar selectors.
+ * - With-subtitle height growth uses group-data-[with-subtitle]/appbar selectors.
+ * - Motion: background-color and box-shadow are effects properties — use the
+ *   standard effects spring pair (no overshoot on color/opacity).
  */
 export const appBarVariants = cva(
   [
-    // Base classes (always applied)
-    "w-full",
+    // Layout
+    "w-full flex flex-col",
+    // Color (base — at rest)
     "bg-surface text-on-surface",
-    "flex flex-col",
-    // Elevation transition using MD3 motion tokens
-    "transition-shadow duration-medium2 ease-standard",
+    // Elevation base
+    "shadow-elevation-0",
+    // Scroll state — effects properties animated with standard spring (no overshoot)
+    "transition-[background-color,box-shadow]",
+    "duration-spring-standard-default-effects",
+    "ease-spring-standard-default-effects",
+    // On scroll: surface-container background + elevation-2
+    "group-data-[scrolled]/appbar:bg-surface-container",
+    "group-data-[scrolled]/appbar:shadow-elevation-2",
   ],
   {
     variants: {
       /**
-       * Size variant (MD3 specification)
-       * Controls bar height, title placement, and type scale
+       * Size variant — controls bar height and which title row is shown.
+       * With-subtitle height growth is handled via group-data-[with-subtitle]/appbar below.
        */
       variant: {
-        /** 64dp, title left-aligned, title-large */
+        /** 64dp fixed — title left-aligned in top row */
         small: "h-appbar-small",
-        /** 64dp, title centered, title-large */
-        "center-aligned": "h-appbar-small variant-center-aligned",
-        /** min 112dp, title bottom-left, headline-medium (grows with subtitle) */
-        medium: "min-h-appbar-medium",
-        /** min 120dp, title bottom-left, display-small (grows with subtitle) */
-        large: "min-h-appbar-large",
-      },
-
-      /**
-       * Scroll state — controls surface elevation and background color
-       * MD3: flat surface at rest → surface-container background + elevation-2 on scroll
-       */
-      scrolled: {
-        false: "shadow-elevation-0",
-        true: "bg-surface-container shadow-elevation-2",
+        /** 64dp fixed — title centered in top row */
+        "center-aligned": "h-appbar-small",
+        /**
+         * 112dp no-subtitle / 136dp with-subtitle — title in expanded bottom row.
+         * group-data-[with-subtitle]/appbar switches to the taller token.
+         */
+        medium: [
+          "min-h-appbar-medium",
+          "group-data-[with-subtitle]/appbar:min-h-appbar-medium-subtitle",
+        ],
+        /**
+         * 120dp no-subtitle / 152dp with-subtitle — title in expanded bottom row.
+         * group-data-[with-subtitle]/appbar switches to the taller token.
+         */
+        large: [
+          "min-h-appbar-large",
+          "group-data-[with-subtitle]/appbar:min-h-appbar-large-subtitle",
+        ],
       },
     },
-
     defaultVariants: {
       variant: "small",
-      scrolled: false,
     },
   }
 );
 
+// ─── TOP ROW ──────────────────────────────────────────────────────────────────
+
 /**
- * Title typography classes per variant
- * Used to apply the correct MD3 type scale to the title element
+ * The top row containing the leading nav slot, optional collapsed title block,
+ * and trailing actions slot.
+ *
+ * - small / center-aligned: flex-1 to fill the full fixed bar height.
+ * - medium / large: fixed 64dp (h-16) so title block can be positioned below.
+ */
+export const appBarTopRowVariants = cva(["flex items-center justify-between", "px-1"], {
+  variants: {
+    variant: {
+      small: "flex-1",
+      "center-aligned": "flex-1",
+      medium: "h-16 shrink-0",
+      large: "h-16 shrink-0",
+    },
+  },
+  defaultVariants: {
+    variant: "small",
+  },
+});
+
+// ─── LEADING SLOT (nav icon) ───────────────────────────────────────────────────
+
+/**
+ * Wrapper for the navigation icon in the leading position.
+ * Provides correct color context for icon buttons that inherit currentColor.
+ */
+export const appBarLeadingVariants = cva(["flex shrink-0 items-center", "text-on-surface"]);
+
+// ─── HEADLINE BLOCK (collapsed title + subtitle — small / center-aligned) ────
+
+/**
+ * The title + subtitle block rendered in the top row.
+ * Only shown for small and center-aligned variants.
+ *
+ * center-aligned: title and subtitle are horizontally centered.
+ */
+export const appBarHeadlineBlockVariants = cva(
+  ["flex min-w-0 flex-1 flex-col justify-center", "px-1"],
+  {
+    variants: {
+      variant: {
+        small: "",
+        "center-aligned": "items-center text-center",
+        medium: "",
+        large: "",
+      },
+    },
+    defaultVariants: {
+      variant: "small",
+    },
+  }
+);
+
+// ─── TITLE ────────────────────────────────────────────────────────────────────
+
+/**
+ * Title text element.
+ *
+ * Type scales per M3 Expressive flexible spec:
+ *   small / center-aligned: title-large (22px / 28px), truncated
+ *   medium expanded:        headline-medium (28px / 36px)
+ *   large expanded:         display-small (36px / 44px)
  */
 export const appBarTitleVariants = cva("text-on-surface font-normal", {
   variants: {
     variant: {
-      /** title-large: 22px / 28px line-height */
       small: "text-title-large truncate",
-      /** title-large: 22px / 28px line-height, centered */
       "center-aligned": "text-title-large truncate",
-      /** headline-medium: 28px / 36px line-height */
       medium: "text-headline-medium",
-      /** display-small: 36px / 44px line-height */
       large: "text-display-small",
     },
   },
@@ -83,24 +190,26 @@ export const appBarTitleVariants = cva("text-on-surface font-normal", {
   },
 });
 
+// ─── SUBTITLE ─────────────────────────────────────────────────────────────────
+
 /**
- * Subtitle typography classes per variant
- * Used to apply the correct MD3 type scale and color to the subtitle element.
- * Per MD3 spec (M3 Expressive):
- * - small/center-aligned: title-medium + on-surface-variant (secondary text)
- * - medium/large expanded: title-large/headline-small + on-surface (primary text area)
+ * Subtitle text element (M3 Expressive flexible — corrected type scales).
+ *
+ * Type scales per M3 Expressive Flexible AppBar spec:
+ *   small / center-aligned: label-medium (11px / 16px), on-surface-variant, truncated
+ *   medium expanded:        label-large (14px / 20px), on-surface-variant
+ *   large expanded:         title-medium (16px / 24px), on-surface-variant
+ *
+ * Note: subtitle is always on-surface-variant across all variants
+ * (corrected from prior implementation which used on-surface for medium/large).
  */
-export const appBarSubtitleVariants = cva("font-normal", {
+export const appBarSubtitleVariants = cva("text-on-surface-variant font-normal", {
   variants: {
     variant: {
-      /** title-medium: 16px / 24px, on-surface-variant color */
-      small: "text-title-medium text-on-surface-variant truncate",
-      /** title-medium: 16px / 24px, centered, on-surface-variant color */
-      "center-aligned": "text-title-medium text-on-surface-variant truncate",
-      /** title-large: 22px / 28px, on-surface color */
-      medium: "text-title-large text-on-surface",
-      /** headline-small: 24px / 32px, on-surface color */
-      large: "text-headline-small text-on-surface",
+      small: "text-label-medium truncate",
+      "center-aligned": "text-label-medium truncate",
+      medium: "text-label-large",
+      large: "text-title-medium",
     },
   },
   defaultVariants: {
@@ -108,7 +217,34 @@ export const appBarSubtitleVariants = cva("font-normal", {
   },
 });
 
+// ─── TRAILING SLOT (action icons) ─────────────────────────────────────────────
+
 /**
- * Extract variant prop types from CVA
+ * Wrapper for trailing action icon buttons.
+ * Provides secondary icon color context per MD3 spec.
  */
+export const appBarTrailingVariants = cva([
+  "flex shrink-0 items-center gap-0.5",
+  "text-on-surface-variant",
+]);
+
+// ─── EXPANDED TITLE BLOCK (medium / large only) ────────────────────────────────
+
+/**
+ * The expanded title + subtitle block rendered below the top row.
+ * Only shown for medium and large variants.
+ *
+ * Grows to fill remaining space, positioning title at the bottom of the bar.
+ */
+export const appBarExpandedTitleVariants = cva([
+  "flex flex-1 flex-col justify-end",
+  "gap-0.5 px-4 pb-4",
+]);
+
+// ─── EXPORTED TYPES ───────────────────────────────────────────────────────────
+
 export type AppBarVariants = VariantProps<typeof appBarVariants>;
+export type AppBarTopRowVariants = VariantProps<typeof appBarTopRowVariants>;
+export type AppBarHeadlineBlockVariants = VariantProps<typeof appBarHeadlineBlockVariants>;
+export type AppBarTitleVariants = VariantProps<typeof appBarTitleVariants>;
+export type AppBarSubtitleVariants = VariantProps<typeof appBarSubtitleVariants>;

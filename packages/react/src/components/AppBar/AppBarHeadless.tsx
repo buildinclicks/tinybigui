@@ -36,14 +36,20 @@ import type { AppBarHeadlessProps } from "./AppBar.types";
  * ```
  */
 export const AppBarHeadless = forwardRef<HTMLElement, AppBarHeadlessProps>(
-  ({ className, children, scrolled: scrolledProp, onScrollStateChange }, ref) => {
+  ({ className, children, scrolled: scrolledProp, onScrollStateChange, ...htmlProps }, ref) => {
     const { isScrolled } = useScrollElevation({
       scrolled: scrolledProp,
       onScrollStateChange,
     });
 
     return (
-      <header ref={ref} role="banner" className={className} data-scrolled={isScrolled}>
+      <header
+        {...htmlProps}
+        ref={ref}
+        role="banner"
+        className={className}
+        data-scrolled={isScrolled ? "" : undefined}
+      >
         {children}
       </header>
     );

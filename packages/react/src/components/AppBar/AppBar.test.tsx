@@ -131,10 +131,13 @@ describe("AppBar", () => {
       expect(header).toHaveClass("bg-surface");
     });
 
-    test("renders center-aligned variant with centered title", () => {
+    test("renders center-aligned variant with centered title headline block", () => {
       render(<AppBar title="Page Title" variant="center-aligned" />);
       const header = screen.getByRole("banner");
-      expect(header).toHaveClass("variant-center-aligned");
+      const topRow = header.querySelector("[data-slot='top-row']");
+      // The headline block inside the top row has text-center for center-aligned
+      const headlineBlock = topRow?.querySelector(".text-center");
+      expect(headlineBlock).toBeInTheDocument();
     });
 
     test("renders medium variant with title in bottom area", () => {
@@ -189,10 +192,24 @@ describe("AppBar", () => {
       expect(screen.queryByTestId("appbar-subtitle")).not.toBeInTheDocument();
     });
 
-    test("subtitle in small variant has title-medium typography class", () => {
+    test("sets data-with-subtitle attribute when subtitle is provided", () => {
+      render(<AppBar title="Title" subtitle="Sub" />);
+      const header = screen.getByRole("banner");
+      expect(header).toHaveAttribute("data-with-subtitle", "");
+    });
+
+    test("does not set data-with-subtitle attribute when subtitle is absent", () => {
+      render(<AppBar title="Title" />);
+      const header = screen.getByRole("banner");
+      expect(header).not.toHaveAttribute("data-with-subtitle");
+    });
+
+    // ── M3 Expressive Flexible subtitle type scales ──
+
+    test("subtitle in small variant has label-medium typography class", () => {
       render(<AppBar title="Title" subtitle="Sub" variant="small" />);
       const subtitleEl = screen.getByTestId("appbar-subtitle");
-      expect(subtitleEl).toHaveClass("text-title-medium");
+      expect(subtitleEl).toHaveClass("text-label-medium");
     });
 
     test("subtitle in small variant has on-surface-variant color class", () => {
@@ -201,10 +218,10 @@ describe("AppBar", () => {
       expect(subtitleEl).toHaveClass("text-on-surface-variant");
     });
 
-    test("subtitle in center-aligned variant has title-medium typography class", () => {
+    test("subtitle in center-aligned variant has label-medium typography class", () => {
       render(<AppBar title="Title" subtitle="Sub" variant="center-aligned" />);
       const subtitleEl = screen.getByTestId("appbar-subtitle");
-      expect(subtitleEl).toHaveClass("text-title-medium");
+      expect(subtitleEl).toHaveClass("text-label-medium");
     });
 
     test("subtitle in center-aligned variant has on-surface-variant color class", () => {
@@ -213,28 +230,28 @@ describe("AppBar", () => {
       expect(subtitleEl).toHaveClass("text-on-surface-variant");
     });
 
-    test("subtitle in medium variant has title-large typography class", () => {
+    test("subtitle in medium variant has label-large typography class", () => {
       render(<AppBar title="Title" subtitle="Sub" variant="medium" />);
       const subtitleEl = screen.getByTestId("appbar-subtitle");
-      expect(subtitleEl).toHaveClass("text-title-large");
+      expect(subtitleEl).toHaveClass("text-label-large");
     });
 
-    test("subtitle in medium variant has on-surface color class", () => {
+    test("subtitle in medium variant has on-surface-variant color class", () => {
       render(<AppBar title="Title" subtitle="Sub" variant="medium" />);
       const subtitleEl = screen.getByTestId("appbar-subtitle");
-      expect(subtitleEl).toHaveClass("text-on-surface");
+      expect(subtitleEl).toHaveClass("text-on-surface-variant");
     });
 
-    test("subtitle in large variant has headline-small typography class", () => {
+    test("subtitle in large variant has title-medium typography class", () => {
       render(<AppBar title="Title" subtitle="Sub" variant="large" />);
       const subtitleEl = screen.getByTestId("appbar-subtitle");
-      expect(subtitleEl).toHaveClass("text-headline-small");
+      expect(subtitleEl).toHaveClass("text-title-medium");
     });
 
-    test("subtitle in large variant has on-surface color class", () => {
+    test("subtitle in large variant has on-surface-variant color class", () => {
       render(<AppBar title="Title" subtitle="Sub" variant="large" />);
       const subtitleEl = screen.getByTestId("appbar-subtitle");
-      expect(subtitleEl).toHaveClass("text-on-surface");
+      expect(subtitleEl).toHaveClass("text-on-surface-variant");
     });
 
     test("renders subtitle as ReactNode", () => {
@@ -275,43 +292,61 @@ describe("AppBar", () => {
       expect(topRow).toBeInTheDocument();
       expect(topRow).toHaveTextContent("Sub");
     });
+
+    // ── With-subtitle height growth (M3 Expressive flexible) ──
+
+    test("medium variant with subtitle has with-subtitle height group-data class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="medium" />);
+      const header = screen.getByRole("banner");
+      // data-with-subtitle drives group-data-[with-subtitle]/appbar:min-h-appbar-medium-subtitle
+      expect(header).toHaveAttribute("data-with-subtitle", "");
+      expect(header).toHaveClass("min-h-appbar-medium");
+    });
+
+    test("large variant with subtitle has with-subtitle height group-data class", () => {
+      render(<AppBar title="Title" subtitle="Sub" variant="large" />);
+      const header = screen.getByRole("banner");
+      expect(header).toHaveAttribute("data-with-subtitle", "");
+      expect(header).toHaveClass("min-h-appbar-large");
+    });
   });
 
   describe("Scroll State", () => {
-    test("renders without elevation by default (unscrolled)", () => {
+    test("renders without scrolled attribute by default (unscrolled)", () => {
       render(<AppBar title="Page Title" />);
       const header = screen.getByRole("banner");
-      expect(header).toHaveClass("shadow-elevation-0");
+      expect(header).not.toHaveAttribute("data-scrolled");
     });
 
-    test("renders with elevation when scrolled={true} (controlled)", () => {
+    test("renders with data-scrolled attribute when scrolled={true}", () => {
       render(<AppBar title="Page Title" scrolled={true} />);
       const header = screen.getByRole("banner");
-      expect(header).toHaveClass("shadow-elevation-2");
+      expect(header).toHaveAttribute("data-scrolled", "");
     });
 
-    test("renders without elevation when scrolled={false} (controlled)", () => {
+    test("does not have data-scrolled attribute when scrolled={false}", () => {
+      render(<AppBar title="Page Title" scrolled={false} />);
+      const header = screen.getByRole("banner");
+      expect(header).not.toHaveAttribute("data-scrolled");
+    });
+
+    test("has shadow-elevation-0 base class at rest", () => {
       render(<AppBar title="Page Title" scrolled={false} />);
       const header = screen.getByRole("banner");
       expect(header).toHaveClass("shadow-elevation-0");
     });
 
-    test("applies surface-container background when scrolled", () => {
-      render(<AppBar title="Page Title" scrolled={true} />);
-      const header = screen.getByRole("banner");
-      expect(header).toHaveClass("bg-surface-container");
-    });
-
-    test("does not apply surface-container background when not scrolled", () => {
+    test("has bg-surface base class at rest", () => {
       render(<AppBar title="Page Title" scrolled={false} />);
       const header = screen.getByRole("banner");
-      expect(header).not.toHaveClass("bg-surface-container");
+      expect(header).toHaveClass("bg-surface");
     });
 
-    test("has elevation transition classes for smooth animation", () => {
+    test("has MD3 effects spring transition classes for smooth animation", () => {
       render(<AppBar title="Page Title" />);
       const header = screen.getByRole("banner");
-      expect(header).toHaveClass("transition-shadow");
+      expect(header).toHaveClass("duration-spring-standard-default-effects");
+      expect(header).toHaveClass("ease-spring-standard-default-effects");
     });
 
     test("calls onScrollStateChange when scroll state changes (uncontrolled)", () => {
@@ -328,17 +363,17 @@ describe("AppBar", () => {
       );
       fireEvent.scroll(window, { target: { scrollY: 100 } });
       const header = screen.getByRole("banner");
-      expect(header).toHaveClass("shadow-elevation-0");
+      expect(header).not.toHaveAttribute("data-scrolled");
     });
 
     test("transitions from unscrolled to scrolled state", () => {
       const { rerender } = render(<AppBar title="Page Title" scrolled={false} />);
       let header = screen.getByRole("banner");
-      expect(header).toHaveClass("shadow-elevation-0");
+      expect(header).not.toHaveAttribute("data-scrolled");
 
       rerender(<AppBar title="Page Title" scrolled={true} />);
       header = screen.getByRole("banner");
-      expect(header).toHaveClass("shadow-elevation-2");
+      expect(header).toHaveAttribute("data-scrolled", "");
     });
   });
 
@@ -577,6 +612,26 @@ describe("AppBarHeadless", () => {
     expect(ref.current).toBeInstanceOf(HTMLElement);
   });
 
+  test("forwards additional HTML attributes to the header element", () => {
+    render(
+      <AppBarHeadless data-with-subtitle="" data-testid="headless-header">
+        Content
+      </AppBarHeadless>
+    );
+    const header = screen.getByTestId("headless-header");
+    expect(header).toHaveAttribute("data-with-subtitle", "");
+  });
+
+  test("presence-based data-scrolled: absent when not scrolled", () => {
+    render(<AppBarHeadless scrolled={false}>Content</AppBarHeadless>);
+    expect(screen.getByRole("banner")).not.toHaveAttribute("data-scrolled");
+  });
+
+  test("presence-based data-scrolled: present when scrolled", () => {
+    render(<AppBarHeadless scrolled={true}>Content</AppBarHeadless>);
+    expect(screen.getByRole("banner")).toHaveAttribute("data-scrolled", "");
+  });
+
   test("manages uncontrolled scroll state internally", () => {
     render(<AppBarHeadless>Content</AppBarHeadless>);
     expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -584,10 +639,10 @@ describe("AppBarHeadless", () => {
 
   test("uses controlled scrolled prop when provided", () => {
     const { rerender } = render(<AppBarHeadless scrolled={false}>Content</AppBarHeadless>);
-    expect(screen.getByRole("banner")).toBeInTheDocument();
+    expect(screen.getByRole("banner")).not.toHaveAttribute("data-scrolled");
 
     rerender(<AppBarHeadless scrolled={true}>Content</AppBarHeadless>);
-    expect(screen.getByRole("banner")).toBeInTheDocument();
+    expect(screen.getByRole("banner")).toHaveAttribute("data-scrolled", "");
   });
 
   test("calls onScrollStateChange when scroll occurs (uncontrolled)", () => {
