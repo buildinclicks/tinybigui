@@ -278,7 +278,31 @@ describe("FABMenu (Styled)", () => {
       expect(screen.getByRole("button", { name: "Add" })).toBeInTheDocument();
     });
 
-    test("20. direction='up' applies flex-col-reverse", () => {
+    test("20. direction='up' — overlay (role=group) has flex-col-reverse and absolute", () => {
+      render(
+        <FABMenu aria-label="Actions" direction="up" defaultOpen>
+          <FABMenuItem icon={<IconAdd />} label="Add" />
+        </FABMenu>
+      );
+
+      const group = screen.getByRole("group");
+      expect(group).toHaveClass("flex-col-reverse");
+      expect(group).toHaveClass("absolute");
+    });
+
+    test("21. direction='left' — overlay (role=group) has flex-row-reverse and absolute", () => {
+      render(
+        <FABMenu aria-label="Actions" direction="left" defaultOpen>
+          <FABMenuItem icon={<IconAdd />} label="Add" />
+        </FABMenu>
+      );
+
+      const group = screen.getByRole("group");
+      expect(group).toHaveClass("flex-row-reverse");
+      expect(group).toHaveClass("absolute");
+    });
+
+    test("22b. root is relative; items overlay is absolute (FAB never shifts on open)", () => {
       render(
         <FABMenu aria-label="Actions" direction="up" defaultOpen>
           <FABMenuItem icon={<IconAdd />} label="Add" />
@@ -286,20 +310,14 @@ describe("FABMenu (Styled)", () => {
       );
 
       const trigger = screen.getByRole("button", { name: "Actions" });
-      const root = trigger.parentElement;
-      expect(root).toHaveClass("flex-col-reverse");
-    });
-
-    test("21. direction='left' applies flex-row-reverse", () => {
-      render(
-        <FABMenu aria-label="Actions" direction="left" defaultOpen>
-          <FABMenuItem icon={<IconAdd />} label="Add" />
-        </FABMenu>
-      );
-
-      const trigger = screen.getByRole("button", { name: "Actions" });
-      const root = trigger.parentElement;
-      expect(root).toHaveClass("flex-row-reverse");
+      const root = trigger.parentElement!;
+      // Root collapses to FAB size — it is relative but NOT a flex-direction container
+      expect(root).toHaveClass("relative");
+      expect(root).not.toHaveClass("flex-col-reverse");
+      expect(root).not.toHaveClass("flex-col");
+      // The overlay is absolute, not the root
+      const group = screen.getByRole("group");
+      expect(group).toHaveClass("absolute");
     });
   });
 

@@ -64,7 +64,7 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
     const internalRef = useRef<HTMLButtonElement>(null);
     const buttonRef = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
-    const { isOpen, isExiting, reducedMotion, itemCount } = useFABMenuContext();
+    const { isOpen, isExiting, reducedMotion, itemCount, direction } = useFABMenuContext();
 
     // ── Development warnings ───────────────────────────────────────────────
     if (process.env.NODE_ENV === "development") {
@@ -106,6 +106,16 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
       : isExiting
         ? Math.max(0, itemCount - 1 - index) * 30
         : index * 30;
+
+    // Transform-origin matches the list overlay direction so items scale in/out
+    // from the FAB edge rather than the item's own center.
+    const DIRECTION_ORIGIN: Record<string, string> = {
+      up: "origin-bottom",
+      down: "origin-top",
+      left: "origin-right",
+      right: "origin-left",
+    };
+    const originClass = reducedMotion ? undefined : DIRECTION_ORIGIN[direction];
 
     const animationClass = reducedMotion
       ? undefined
@@ -157,6 +167,8 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
           fabMenuItemVariants({ color }),
           // group/fab-menu-item: enables group-data-[x]/fab-menu-item child selectors in all slots
           "group/fab-menu-item",
+          // Scale pivot toward the FAB so items appear to emanate from the trigger
+          originClass,
           // Stagger animation class (animate-md-scale-in / animate-md-scale-out)
           animationClass,
           className

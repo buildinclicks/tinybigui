@@ -16,7 +16,7 @@ import { cn } from "../../utils/cn";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { FABMenuContext } from "./FABMenuHeadless";
 import { FAB } from "../FAB/FAB";
-import { fabMenuVariants } from "./FABMenu.variants";
+import { fabMenuVariants, fabMenuListVariants } from "./FABMenu.variants";
 import type { FABMenuProps, FABMenuContextValue } from "./FABMenu.types";
 
 /**
@@ -169,20 +169,10 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
     return (
       <FABMenuContext.Provider value={contextValue}>
         {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <div
-          ref={rootRef}
-          className={cn(fabMenuVariants({ direction }), className)}
-          onKeyDown={handleKeyDown}
-        >
+        <div ref={rootRef} className={cn(fabMenuVariants(), className)} onKeyDown={handleKeyDown}>
           {(isOpen || isExiting) && (
             <div
-              className={cn(
-                "inline-flex items-center gap-2",
-                direction === "up" && "flex-col-reverse",
-                direction === "down" && "flex-col",
-                direction === "left" && "flex-row-reverse",
-                direction === "right" && "flex-row"
-              )}
+              className={cn(fabMenuListVariants({ direction }))}
               role="group"
               aria-label={`${ariaLabel} actions`}
             >

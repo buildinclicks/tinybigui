@@ -36,15 +36,55 @@ import { cva, type VariantProps } from "class-variance-authority";
 // ─── ROOT CONTAINER (FABMenu) ─────────────────────────────────────────────────
 
 /**
- * Root container for FABMenu — controls expansion direction layout.
+ * Root container for FABMenu.
+ *
+ * The root is sized to the trigger FAB only — `inline-flex` collapses to the
+ * FAB's intrinsic size. The items overlay is absolutely positioned, so the
+ * container never grows and the FAB never shifts position when the menu opens.
  */
-export const fabMenuVariants = cva(["relative", "inline-flex", "items-end"], {
+export const fabMenuVariants = cva(["relative", "inline-flex"]);
+
+// ─── MENU ITEMS OVERLAY (FABMenu) ────────────────────────────────────────────
+
+/**
+ * Absolutely positioned overlay that holds the menu item list.
+ *
+ * Anchored to the trigger FAB via logical insets so placement is correct in
+ * both LTR and RTL document directions — no consumer intervention needed.
+ *
+ * `transform-origin` on each direction aligns the `animate-md-scale-in/out`
+ * pivot with the FAB edge so items appear to emanate from the trigger:
+ *   up    → origin-bottom  (list grows upward from the FAB top edge)
+ *   down  → origin-top     (list grows downward from the FAB bottom edge)
+ *   left  → origin-right   (list grows leftward from the FAB start edge)
+ *   right → origin-left    (list grows rightward from the FAB end edge)
+ *
+ * Logical properties used (`end-0`, `start-full`, `me-3`, etc.) to respect
+ * RTL layout automatically.
+ */
+export const fabMenuListVariants = cva(["absolute", "z-10", "flex", "gap-3"], {
   variants: {
     direction: {
-      up: ["flex-col-reverse", "gap-3"],
-      down: ["flex-col", "gap-3"],
-      left: ["flex-row-reverse", "gap-3", "items-center"],
-      right: ["flex-row", "gap-3", "items-center"],
+      up: ["bottom-full", "mb-3", "end-0", "flex-col-reverse", "items-end", "origin-bottom"],
+      down: ["top-full", "mt-3", "end-0", "flex-col", "items-end", "origin-top"],
+      left: [
+        "end-full",
+        "me-3",
+        "top-1/2",
+        "-translate-y-1/2",
+        "flex-row-reverse",
+        "items-center",
+        "origin-right",
+      ],
+      right: [
+        "start-full",
+        "ms-3",
+        "top-1/2",
+        "-translate-y-1/2",
+        "flex-row",
+        "items-center",
+        "origin-left",
+      ],
     },
   },
   defaultVariants: {
@@ -247,6 +287,7 @@ export const fabMenuItemLabelVariants = cva([
 // ─── EXPORTED TYPES ───────────────────────────────────────────────────────────
 
 export type FABMenuVariants = VariantProps<typeof fabMenuVariants>;
+export type FABMenuListVariants = VariantProps<typeof fabMenuListVariants>;
 export type FABMenuItemVariants = VariantProps<typeof fabMenuItemVariants>;
 export type FABMenuItemStateLayerVariants = VariantProps<typeof fabMenuItemStateLayerVariants>;
 export type FABMenuItemFocusRingVariants = VariantProps<typeof fabMenuItemFocusRingVariants>;

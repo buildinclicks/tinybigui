@@ -3,6 +3,7 @@ export { FABMenuItem } from "./FABMenuItem";
 export { FABMenuHeadless, FABMenuContext, useFABMenuContext } from "./FABMenuHeadless";
 export {
   fabMenuVariants,
+  fabMenuListVariants,
   fabMenuItemVariants,
   fabMenuItemStateLayerVariants,
   fabMenuItemFocusRingVariants,
@@ -19,6 +20,7 @@ export type {
 } from "./FABMenu.types";
 export type {
   FABMenuVariants,
+  FABMenuListVariants,
   FABMenuItemVariants,
   FABMenuItemStateLayerVariants,
   FABMenuItemFocusRingVariants,
