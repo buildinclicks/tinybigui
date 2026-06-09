@@ -1,6 +1,34 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-// ─── Animation variants ───────────────────────────────────────────────────────
+/**
+ * Material Design 3 Bottom Sheet Variants
+ *
+ * Architecture: Variants vs States
+ * - CVA holds design-time structure only (no state variants, no state compoundVariants).
+ * - The drag handle's interaction states are driven by data-* attributes on its wrapper
+ *   via group-data-[x]/handle Tailwind selectors in each slot's base classes.
+ * - Content flags (data-dragging) are set explicitly by the component, not via helper.
+ *
+ * Slot responsibilities:
+ *   bottomSheetVariants               — fixed container; surface, shape, elevation, snap spring
+ *   bottomSheetScrimVariants          — modal scrim overlay; opacity fade (screen-level token)
+ *   bottomSheetAnimationVariants      — enter/exit animation state machine classes
+ *   bottomSheetHandleWrapperVariants  — 48dp touch target; carries `group/handle`; data-* host
+ *   bottomSheetHandleStateLayerVariants — hover/focus/pressed/dragged opacity ring around pill
+ *   bottomSheetHandleFocusRingVariants  — keyboard focus outline overlay (opacity-driven)
+ *   bottomSheetHandlePillVariants     — 32×4dp pill decoration; pointer-events-none
+ *
+ * MD3 Spec:
+ *   Container surface: surface-container-low, elevation level-1
+ *   Shape: extra-large top corners (28dp), square bottom (attached to screen edge)
+ *   Width: full width up to 640dp; centered at max-width 640dp on wider viewports
+ *   Top margin: 72dp default, 56dp when viewport > 640dp
+ *   Drag handle: 32dp × 4dp, on-surface-variant, centered, 22dp top/bottom padding → 48dp target
+ *   Scrim: bg-scrim, 32% opacity
+ *   State-layer opacities: hover 8% | focus 10% | pressed 10% | dragged 16%
+ */
+
+// ─── ANIMATION VARIANTS ───────────────────────────────────────────────────────
 
 /**
  * CVA animation state variants for the Bottom Sheet panel.
@@ -8,7 +36,7 @@ import { cva, type VariantProps } from "class-variance-authority";
  * Motion decision rationale:
  * - Bottom sheet is a standard-size component → `default` speed tier
  * - Slides in/out of screen → composite `animate-md-*` utilities (not manual spring tokens)
- * - Scrim opacity is an effects property → `duration-short4 ease-standard` (legacy screen-level token)
+ * - Scrim opacity is an effects property → `duration-short4 ease-standard` (legacy screen-level)
  * - Snap spring is a spatial on-screen transition → `ease-spring-standard-default-spatial` +
  *   `duration-spring-standard-default-spatial` (applied in bottomSheetVariants base)
  * - Standard personality (not expressive) — sheets are utility UI, not moments of delight
@@ -17,7 +45,6 @@ export const bottomSheetAnimationVariants = cva("", {
   variants: {
     animationState: {
       // entering: initial mount frame — sheet starts below viewport (translateY(100%))
-      // The CSS is handled inside animate-md-slide-in-bottom keyframes
       entering: ["opacity-0"],
       // visible: entry animation active — animate-md-slide-in-bottom runs once
       visible: ["animate-md-slide-in-bottom"],
@@ -34,30 +61,29 @@ export const bottomSheetAnimationVariants = cva("", {
 
 export type BottomSheetAnimationVariants = VariantProps<typeof bottomSheetAnimationVariants>;
 
-// ─── Sheet container ──────────────────────────────────────────────────────────
+// ─── CONTAINER ────────────────────────────────────────────────────────────────
 
 /**
- * CVA variants for the Bottom Sheet container panel.
+ * Root container — the bottom sheet panel.
  *
  * MD3 tokens applied:
  * - Surface: bg-surface-container-low
  * - Elevation: shadow-elevation-1
- * - Shape: rounded-t-xl (top-left + top-right 28dp, bottom 0)
- * - Width: full width up to 640dp; centered at max-width 640dp on wider viewports
- *   (`mx-auto + max-w-[640px]` — at 752dp viewport this naturally produces the MD3-spec 56dp side margins)
- * - Height: constrained by max-height (72dp top margin by default, 56dp on > 640dp viewport)
- *   The sheet is always anchored to `bottom-0`; "top margin" is expressed as max-height so
- *   the sheet cannot overlap the top portion of the screen.
- * - Drag resize: height animates via `transition-[height]`; the sheet grows/shrinks from the
- *   bottom edge, always staying anchored — matching the MD3 spec "resize to another height" behaviour.
+ * - Shape: extra-large top corners (28dp via rounded-t-xl), square bottom (attached to edge)
+ * - Width: full width up to 640dp (mx-auto + w-[640px] max-w-full)
+ * - Height: snap-point driven via inline style; constrained by max-height to enforce top margin
+ *   Default: 72dp top margin → max-h-[calc(100vh-72px)]
+ *   Wide (> 640dp): 56dp top margin → sm:max-h-[calc(100vh-56px)]
+ * - Snap spring: spatial on-screen transition → spring-standard default spatial pair
+ *   data-[dragging]:transition-none suppresses spring during active drag (1:1 pointer tracking)
+ *
+ * NOTE: overflow-hidden clips content during height transitions. The handle's state layer and
+ * focus-ring overlay are sized/positioned to fit within the wrapper, so they are not clipped.
  */
 export const bottomSheetVariants = cva(
   [
     // Position: fixed to bottom edge, full width
-    "fixed",
-    "bottom-0",
-    "left-0",
-    "right-0",
+    "fixed bottom-0 left-0 right-0",
 
     // Surface token
     "bg-surface-container-low",
@@ -65,49 +91,38 @@ export const bottomSheetVariants = cva(
     // Elevation level 1 per MD3 spec
     "shadow-elevation-1",
 
-    // Shape: extra-large top corners (28dp), bottom corners are 0 (attached to screen edge)
+    // Shape: extra-large top corners (28dp), square bottom (screen-attached)
+    // NOTE: measurement-derived value from MD3 spec; permitted exception per component-variants rule
     "rounded-t-xl",
 
     // Layout
-    "flex",
-    "flex-col",
+    "flex flex-col",
 
-    // Max width constraint (full width up to 640dp)
+    // Width constraint (full width up to 640dp)
     "mx-auto",
     // NOTE: measurement-derived value from MD3 spec; permitted exception
     "w-[640px] max-w-full",
 
-    // Clip content during height transitions (sheet shrinks/grows from bottom edge)
+    // Clip content during height transitions
     "overflow-hidden",
 
-    // Transition: height for snap spring (MD3 spec — sheet "resizes" between heights)
-    // Standard personality, default speed tier, spatial: no overshoot.
-    // During drag, data-[dragging=true]:transition-none suppresses this so the
-    // sheet height follows the pointer 1:1 without transition lag.
-    // After drag release, the spring transition animates height to the new snap position.
+    // Snap spring: spatial property (height), standard personality, default tier
     "transition-[height]",
     "duration-spring-standard-default-spatial",
     "ease-spring-standard-default-spatial",
-    "data-[dragging=true]:transition-none",
+    // Suppress spring while dragging so the sheet follows the pointer 1:1
+    "data-[dragging]:transition-none",
     "will-change-[height]",
 
-    // Responsive layout: when viewport > 640dp, apply wider top margin per MD3 spec.
-    // The sheet remains bottom-anchored at all sizes. Side centering is handled by
-    // mx-auto + max-w-[640px] — at 752dp viewport this naturally produces 56dp side
-    // margins on each side (exactly matching MD3 measurements).
-    // Top margin is expressed as max-height so the sheet cannot overlap the top edge:
-    // - Default: 72dp top margin (max-h-[calc(100vh-72px)])
-    // - Wide viewport (> 640dp): 56dp top margin (sm:max-h-[calc(100vh-56px)])
+    // Responsive layout: top margin expressed as max-height
     // NOTE: measurement-derived values from MD3 spec; permitted exception
     "max-h-[calc(100vh-72px)]",
     "sm:max-h-[calc(100vh-56px)]",
-    // Top corners rounded at wide layout (sheet floats away from screen edge)
-    "rounded-t-xl",
   ],
   {
     variants: {
       variant: {
-        // Modal: above scrim (z-50)
+        // Modal: rendered above the scrim (z-50)
         modal: "z-50",
         // Standard: sits above normal content but below overlays
         standard: "z-10",
@@ -121,84 +136,174 @@ export const bottomSheetVariants = cva(
 
 export type BottomSheetVariants = VariantProps<typeof bottomSheetVariants>;
 
-// ─── Scrim overlay ────────────────────────────────────────────────────────────
+// ─── SCRIM ────────────────────────────────────────────────────────────────────
 
 /**
- * CVA for the scrim overlay (modal variant only).
+ * Scrim overlay (modal variant only).
  *
  * MD3 tokens applied:
  * - bg-scrim: scrim surface role
  * - opacity-32: 32% opacity per MD3 spec
- * - Transition: opacity fade (scrim is an effects property — legacy screen-level tokens)
+ * - Transition: opacity fade (scrim is a screen-level effects property → legacy duration tokens)
  */
 export const bottomSheetScrimVariants = cva([
-  "fixed",
-  "inset-0",
-  "z-40",
-  "bg-scrim",
-  "opacity-32",
-  "transition-opacity",
-  "duration-short4",
-  "ease-standard",
+  "fixed inset-0 z-40",
+  "bg-scrim opacity-32",
+  // Screen-level effects transition (scrim enters/exits the screen, not an on-screen state change)
+  "transition-opacity duration-short4 ease-standard",
 ]);
 
 export type BottomSheetScrimVariants = VariantProps<typeof bottomSheetScrimVariants>;
 
-// ─── Drag handle ──────────────────────────────────────────────────────────────
+// ─── HANDLE WRAPPER ───────────────────────────────────────────────────────────
 
 /**
- * CVA for the drag handle wrapper (touch/click target area).
+ * Drag handle wrapper — 48dp touch target area + group scope host.
  *
- * MD3 spec: the top 48dp of the sheet is the interactive touch target area
- * when the drag handle is present. The wrapper provides this touch target.
+ * Carries `group/handle` so all handle child slots can consume data-* interaction
+ * states via `group-data-[x]/handle:` Tailwind selectors without any CVA variant props.
+ *
+ * MD3 spec: 22dp top + 4dp handle + 22dp bottom = 48dp interaction zone.
+ * NOTE: py-[22px] is a measurement-derived value from MD3 spec; permitted exception.
+ *
+ * `relative` provides positioning context for the state layer and focus ring overlays.
+ * `focus-visible:outline-none` suppresses the browser default — the focus ring overlay
+ * in `bottomSheetHandleFocusRingVariants` provides the MD3-spec visible indicator instead.
  */
 export const bottomSheetHandleWrapperVariants = cva([
-  // Center the handle pill horizontally
-  "flex",
-  "items-center",
-  "justify-center",
+  // Center the pill horizontally; provide positioning context for overlays
+  "relative flex items-center justify-center w-full",
 
-  // Top/bottom padding creates the 48dp touch target area
-  // 22dp top + 4dp handle + 22dp bottom ≈ 48dp interaction zone (per MD3 measurements)
+  // 48dp touch target (22dp top + 4dp pill + 22dp bottom)
   // NOTE: measurement-derived value from MD3 spec; permitted exception
   "py-[22px]",
 
-  // Full width so the touch target spans the sheet
-  "w-full",
-
-  // Focus ring styling for keyboard/switch navigation
-  // MD3 spec: focus indicator color = secondary, thickness = 3dp, offset = 2dp
+  // Suppress browser default focus outline — the focus-ring overlay slot handles it
   "focus-visible:outline-none",
-  "focus-visible:ring-3",
-  "focus-visible:ring-secondary",
-  "focus-visible:ring-offset-2",
-  "focus-visible:rounded-sm",
 
-  // Cursor affordance
+  // Cursor affordance for drag interaction
   "cursor-ns-resize",
 ]);
 
+export type BottomSheetHandleWrapperVariants = VariantProps<
+  typeof bottomSheetHandleWrapperVariants
+>;
+
+// ─── HANDLE STATE LAYER ───────────────────────────────────────────────────────
+
 /**
- * CVA for the drag handle pill visual element.
+ * Drag handle state layer — the semi-transparent interaction feedback ring.
  *
- * MD3 tokens applied:
- * - bg-on-surface-variant: handle color
- * - w-8: 32dp width per MD3 spec
- * - h-1: 4dp height per MD3 spec
- * - rounded-full: fully rounded pill shape
- * - opacity-40: per MD3 spec (token deprecated but value still in spec)
+ * Positioned to wrap the pill snugly (not the full 48dp target) to keep the
+ * visual feedback proportional to the pill. Sized as a wide pill shape that
+ * encapsulates the 32dp × 4dp handle with generous rounded ends.
+ *
+ * Color: on-surface-variant (matches the pill's own color role per MD3).
+ * Opacity progression:
+ *   0 at rest
+ *   8%  hover
+ *   10% focus-visible / pressed
+ *   16% dragged (MD3 "dragged" state = 16%)
+ *
+ * Disabled on the handle is not applicable (handle is always interactive when sheet is open).
  */
-export const bottomSheetHandlePillVariants = cva([
-  "bg-on-surface-variant",
-  "opacity-40",
+export const bottomSheetHandleStateLayerVariants = cva([
+  // Overlay positioned centrally — sits behind the pill
+  "absolute pointer-events-none",
+  // Pill-shaped to complement the handle's form
   "rounded-full",
+  // Sized wider than the pill to provide a visible state layer halo
+  // 48dp wide × 16dp tall — centred by the flex wrapper
+  "w-12 h-4",
 
-  // Dimensions: 32dp × 4dp per MD3 spec (measurement-derived; permitted exception)
-  "w-8", // 32dp = 2rem = w-8
-  "h-1", // 4dp = 0.25rem = h-1
+  // State-layer color (same role as the pill)
+  "bg-on-surface-variant",
 
-  // Pill itself is decorative; the wrapper handles interaction
-  "pointer-events-none",
+  // Effects transition — opacity must NOT overshoot
+  "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+
+  // Opacity at rest
+  "opacity-0",
+
+  // Hover: 8%
+  "group-data-[hovered]/handle:opacity-8",
+  // Focus-visible: 10%
+  "group-data-[focus-visible]/handle:opacity-10",
+  // Pressed: 10% (doubled selector wins over hover at same cascade position)
+  "group-data-[pressed]/handle:group-data-[pressed]/handle:opacity-10",
+  // Dragging: 16% (MD3 dragged state — highest on-screen opacity)
+  // Doubled selector wins over hover + pressed
+  "group-data-[dragging]/handle:group-data-[dragging]/handle:opacity-16",
 ]);
 
-export type BottomSheetHandleVariants = VariantProps<typeof bottomSheetHandleWrapperVariants>;
+export type BottomSheetHandleStateLayerVariants = VariantProps<
+  typeof bottomSheetHandleStateLayerVariants
+>;
+
+// ─── HANDLE FOCUS RING ────────────────────────────────────────────────────────
+
+/**
+ * Drag handle focus ring overlay.
+ *
+ * Rendered as an absolutely-positioned element that is always in the DOM
+ * (opacity-0 at rest, opacity-100 on keyboard/programmatic focus). The
+ * opacity-driven approach avoids layout shifts and enables a smooth transition.
+ *
+ * Positioned to wrap the pill tightly — slightly larger than the state layer
+ * to remain legible. Uses `outline` rather than `border` to avoid layout impact.
+ *
+ * MD3 spec: focus indicator color = secondary, weight ≈ 2–3dp.
+ * We use `outline-2 outline-secondary` to meet the intent with token classes.
+ *
+ * This element MUST be outside the pill's z-stack but inside the wrapper so
+ * it is not clipped by the container's `overflow-hidden`.
+ */
+export const bottomSheetHandleFocusRingVariants = cva([
+  "absolute pointer-events-none",
+  "rounded-full",
+  // Sized to sit around the state layer halo
+  "w-14 h-5",
+
+  // MD3 focus indicator: secondary color, 2dp weight
+  "outline outline-2 outline-offset-0 outline-secondary",
+
+  // Effects transition — opacity change must NOT overshoot
+  "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+
+  // Hidden at rest; shown on keyboard/programmatic focus
+  "opacity-0",
+  "group-data-[focus-visible]/handle:opacity-100",
+]);
+
+export type BottomSheetHandleFocusRingVariants = VariantProps<
+  typeof bottomSheetHandleFocusRingVariants
+>;
+
+// ─── HANDLE PILL ──────────────────────────────────────────────────────────────
+
+/**
+ * Drag handle pill — the visible 32×4dp decoration.
+ *
+ * MD3 tokens applied:
+ * - bg-on-surface-variant: handle color (muted, low-emphasis by role — no opacity override needed)
+ * - w-8 / h-1: 32dp × 4dp per MD3 spec (measurement-derived; permitted exception)
+ * - rounded-full: fully-rounded pill shape
+ *
+ * `pointer-events-none` — all interaction is handled by the wrapper.
+ * `relative z-10` — renders above the state layer overlay.
+ */
+export const bottomSheetHandlePillVariants = cva([
+  "relative z-10 pointer-events-none",
+  "bg-on-surface-variant",
+  "rounded-full",
+  // Dimensions: 32dp × 4dp per MD3 spec (measurement-derived; permitted exception)
+  "w-8", // 32dp = 2rem
+  "h-1", // 4dp  = 0.25rem
+]);
+
+export type BottomSheetHandlePillVariants = VariantProps<typeof bottomSheetHandlePillVariants>;
+
+// ─── LEGACY TYPE ALIAS ────────────────────────────────────────────────────────
+
+// Kept for backward-compat with existing exports; prefer the specific slot types above.
+export type BottomSheetHandleVariants = BottomSheetHandleWrapperVariants;

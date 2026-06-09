@@ -701,7 +701,12 @@ describe("BottomSheet — styled layer", () => {
   // Test 40
   it("BottomSheetHandle pill has w-8 and h-1 classes", () => {
     render(<BottomSheet open aria-label="Test" />);
-    const pill = document.querySelector('span[aria-hidden="true"]');
+    // The handle wrapper contains three aria-hidden spans: state layer, focus ring, then pill.
+    // The pill is the last span and carries the w-8 / h-1 dimension classes.
+    const allSpans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const pill = allSpans[allSpans.length - 1];
     expect(pill).toHaveClass("w-8");
     expect(pill).toHaveClass("h-1");
   });
@@ -709,15 +714,22 @@ describe("BottomSheet — styled layer", () => {
   // Test 41
   it("BottomSheetHandle pill has bg-on-surface-variant class", () => {
     render(<BottomSheet open aria-label="Test" />);
-    const pill = document.querySelector('span[aria-hidden="true"]');
+    const allSpans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const pill = allSpans[allSpans.length - 1];
     expect(pill).toHaveClass("bg-on-surface-variant");
   });
 
-  // Test 42
-  it("BottomSheetHandle pill has opacity-40 class", () => {
+  // Test 42 — opacity-40 was removed in the MD3 refactor.
+  // on-surface-variant is already a low-emphasis color role; no opacity override is needed.
+  it("BottomSheetHandle pill does NOT have opacity-40 class (removed in MD3 refactor)", () => {
     render(<BottomSheet open aria-label="Test" />);
-    const pill = document.querySelector('span[aria-hidden="true"]');
-    expect(pill).toHaveClass("opacity-40");
+    const allSpans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const pill = allSpans[allSpans.length - 1];
+    expect(pill).not.toHaveClass("opacity-40");
   });
 
   // Test 43
@@ -856,18 +868,22 @@ describe("BottomSheet — accessibility", () => {
     expect(handle).toHaveAttribute("tabindex", "0");
   });
 
-  // Test 59
-  it("drag handle has focus-visible:ring-3 class", () => {
+  // Test 59 — raw focus-visible:ring-* replaced by the focus-ring overlay slot pattern.
+  it("drag handle wrapper does NOT have focus-visible:ring-3 class (replaced by overlay slot)", () => {
     render(<BottomSheet open aria-label="Test sheet" />);
     const handle = screen.getByTestId("bottom-sheet-handle");
-    expect(handle).toHaveClass("focus-visible:ring-3");
+    expect(handle).not.toHaveClass("focus-visible:ring-3");
   });
 
-  // Test 60
-  it("drag handle has focus-visible:ring-secondary class", () => {
+  // Test 60 — the focus ring overlay span carries outline-secondary instead.
+  it("drag handle has a focus-ring overlay slot with outline-secondary class", () => {
     render(<BottomSheet open aria-label="Test sheet" />);
-    const handle = screen.getByTestId("bottom-sheet-handle");
-    expect(handle).toHaveClass("focus-visible:ring-secondary");
+    // Focus ring is the second aria-hidden span inside the handle wrapper.
+    const allSpans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const focusRing = allSpans[1];
+    expect(focusRing).toHaveClass("outline-secondary");
   });
 
   // Test 61
@@ -937,8 +953,8 @@ describe("BottomSheet — panel snap height and drag style", () => {
     expect(panel).toHaveStyle({ height: "40%" });
   });
 
-  // Test 69
-  it("modal panel has data-dragging=true while handle is being dragged", () => {
+  // Test 69 — data-dragging uses presence-based ternary encoding (value is "", not "true")
+  it("modal panel has data-dragging attribute while handle is being dragged", () => {
     render(<BottomSheet open aria-label="Test" snapPoints={["50%"]} />);
     const handle = screen.getByTestId("bottom-sheet-handle");
     handle.setPointerCapture = vi.fn();
@@ -946,11 +962,12 @@ describe("BottomSheet — panel snap height and drag style", () => {
     act(() => {
       handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
     });
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "true");
+    // Ternary encoding: attribute is present with value "" (not "true")
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "");
   });
 
-  // Test 70
-  it("standard panel has data-dragging=true while handle is being dragged", () => {
+  // Test 70 — presence-based ternary encoding on the standard variant panel
+  it("standard panel has data-dragging attribute while handle is being dragged", () => {
     render(<BottomSheet variant="standard" open aria-label="Test" snapPoints={["50%"]} />);
     const handle = screen.getByTestId("bottom-sheet-handle");
     handle.setPointerCapture = vi.fn();
@@ -958,7 +975,8 @@ describe("BottomSheet — panel snap height and drag style", () => {
       handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
     });
     const panel = document.querySelector("[data-animation-state]");
-    expect(panel).toHaveAttribute("data-dragging", "true");
+    // Ternary encoding: attribute is present with value "" (not "true")
+    expect(panel).toHaveAttribute("data-dragging", "");
   });
 
   // Test 71: Verify dragTranslateY in context becomes a finite number during drag.
@@ -987,9 +1005,9 @@ describe("BottomSheet — panel snap height and drag style", () => {
       handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, clientY: 200 }));
     });
 
-    // Wait for isDragging to propagate to the panel
+    // Wait for isDragging to propagate to the panel (ternary encoding: value is "")
     await waitFor(() => {
-      expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "true");
+      expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "");
     });
 
     // Dispatch pointermove — deltaY = 300 - 200 = 100 → dragTranslateY = 100
@@ -1020,9 +1038,97 @@ describe("BottomSheet — panel snap height and drag style", () => {
     act(() => {
       handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
     });
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "true");
+    // Ternary encoding: attribute is present with value ""
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-dragging", "");
     fireEvent.pointerUp(handle, { clientY: 200, pointerId: 1 });
     expect(screen.getByRole("dialog")).not.toHaveAttribute("data-dragging");
+  });
+});
+
+// ─── BottomSheet — handle slot structure (Variants-vs-States refactor) ───────
+
+describe("BottomSheet — handle slot structure", () => {
+  it("handle wrapper carries group/handle class", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle.className).toContain("group/handle");
+  });
+
+  it("handle wrapper has three aria-hidden child spans (state-layer, focus-ring, pill)", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const spans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    expect(spans).toHaveLength(3);
+  });
+
+  it("state-layer slot has bg-on-surface-variant and opacity-0 classes", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const spans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const stateLayer = spans[0];
+    expect(stateLayer).toHaveClass("bg-on-surface-variant");
+    expect(stateLayer).toHaveClass("opacity-0");
+  });
+
+  it("state-layer slot has transition-opacity and spring-standard-fast-effects classes", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const spans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const stateLayer = spans[0];
+    expect(stateLayer).toHaveClass("transition-opacity");
+    expect(stateLayer).toHaveClass("duration-spring-standard-fast-effects");
+    expect(stateLayer).toHaveClass("ease-spring-standard-fast-effects");
+  });
+
+  it("focus-ring slot has outline-secondary and opacity-0 classes", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const spans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const focusRing = spans[1];
+    expect(focusRing).toHaveClass("outline-secondary");
+    expect(focusRing).toHaveClass("opacity-0");
+  });
+
+  it("focus-ring slot has transition-opacity class", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const spans = document.querySelectorAll(
+      '[data-testid="bottom-sheet-handle"] span[aria-hidden="true"]'
+    );
+    const focusRing = spans[1];
+    expect(focusRing).toHaveClass("transition-opacity");
+  });
+
+  it("handle wrapper does NOT have raw focus-visible:ring-* classes (replaced by overlay slot)", () => {
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    expect(handle).not.toHaveClass("focus-visible:ring-3");
+    expect(handle).not.toHaveClass("focus-visible:ring-secondary");
+    expect(handle).not.toHaveClass("focus-visible:ring-offset-2");
+  });
+
+  it("handle wrapper emits data-hovered attribute on hover", async () => {
+    const user = userEvent.setup();
+    render(<BottomSheet open aria-label="Test sheet" />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    await user.hover(handle);
+    expect(handle).toHaveAttribute("data-hovered", "");
+    await user.unhover(handle);
+    expect(handle).not.toHaveAttribute("data-hovered");
+  });
+
+  it("handle wrapper emits data-dragging with empty string value (ternary encoding) during drag", () => {
+    render(<BottomSheet open aria-label="Test sheet" snapPoints={["50%"]} />);
+    const handle = screen.getByTestId("bottom-sheet-handle");
+    handle.setPointerCapture = vi.fn();
+    act(() => {
+      handle.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+    });
+    // Ternary encoding: presence-based, value is "" not "true"
+    expect(handle).toHaveAttribute("data-dragging", "");
   });
 });
 

@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.10.0** (2026-06-09)
+> **Latest Release: v0.11.0** (2026-06-09)
 >
-> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,010 tests** passing.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,019 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,7 +94,7 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.10.0  | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.11.0  | Released |
 | [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.10.0  | Released |
 
 ---
@@ -146,7 +146,7 @@ This is a monorepo containing multiple packages:
 - [x] Snackbar — provider, stacking, imperative API (v0.3.0)
 - [x] Menu — dropdown, context menu, submenus (v0.3.0)
 - [x] Progress — linear and circular indicators (v0.3.0)
-- [x] BottomSheet — standard and modal variants (v0.4.0)
+- [x] BottomSheet — MD3 expressive handle refactor, variants-vs-states architecture (v0.11.0)
 - [x] Tooltip + RichTooltip — portal rendering, smart positioning (v0.4.0)
 
 ### Phase 4: Data Display ✅
