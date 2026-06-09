@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Divider** — MD3 expressive slot-based CVA refactor; background-fill styling (`bg-outline-variant`) matching `@material/web`; `--md-divider-thickness` CSS custom property; logical RTL insets (`ms-*` / `me-*`); `label` prop removed (subheader variant not in MD3 spec)
+
+#### `@tinybigui/tokens`
+
+- Version bump aligned with `@tinybigui/react` v0.12.0
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.11.2] - 2026-06-09
 
 ### Changed

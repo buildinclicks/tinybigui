@@ -7,32 +7,51 @@ import type React from "react";
 export type DividerOrientation = "horizontal" | "vertical";
 
 /**
- * Divider inset — controls which end(s) of the rule are inset by 16dp.
- * Per MD3 spec: insets create visual association with list content.
+ * Divider inset — controls which end(s) of the rule are offset by 16dp.
+ *
+ * Uses logical inline properties (inline-start / inline-end) so insets adapt
+ * correctly to RTL writing modes.
+ *
  * @default 'none'
  */
 export type DividerInset = "none" | "start" | "end" | "both";
 
 /**
+ * CSS custom properties supported by the Divider component.
+ * Extends `React.CSSProperties` to allow the `--md-divider-thickness` variable.
+ */
+export interface DividerCSSProperties extends React.CSSProperties {
+  /** Thickness of the divider rule. MD3 default: 1dp (1px). */
+  "--md-divider-thickness"?: string;
+}
+
+/**
  * Material Design 3 Divider Component Props
  *
  * A thin line that groups content in lists and containers.
- * Supports horizontal/vertical orientations, inset variants, and a
- * subheader label variant.
+ * Supports horizontal/vertical orientations and four inset variants.
+ *
+ * Thickness is controlled via the `--md-divider-thickness` CSS custom property
+ * (default `1px`, matching the MD3 1dp specification). Override it with a style
+ * prop or an arbitrary Tailwind property:
+ *
+ * ```tsx
+ * <Divider style={{ "--md-divider-thickness": "2px" }} />
+ * ```
  *
  * @example
  * ```tsx
  * // Full-bleed horizontal divider (default)
  * <Divider />
  *
- * // Inset divider (16dp from start)
+ * // Inset divider — logical 16dp from inline-start (RTL-aware)
  * <Divider inset="start" />
  *
- * // Vertical divider
+ * // Vertical divider inside a flex row
  * <Divider orientation="vertical" />
  *
- * // Subheader / labeled divider
- * <Divider label="Section Title" />
+ * // Custom thickness
+ * <Divider style={{ "--md-divider-thickness": "2px" }} />
  * ```
  */
 export interface DividerProps {
@@ -43,21 +62,21 @@ export interface DividerProps {
   orientation?: DividerOrientation;
 
   /**
-   * Inset — shifts the start and/or end of the rule by 16dp.
+   * Inset — shifts the start and/or end of the rule by 16dp (logical, RTL-aware).
    * @default 'none'
    */
   inset?: DividerInset;
 
   /**
-   * When provided, renders a subheader (labeled) divider with the text
-   * centered between two rule lines.
-   */
-  label?: string;
-
-  /**
    * Additional Tailwind CSS classes.
    */
   className?: string;
+
+  /**
+   * Inline styles. Supports the `--md-divider-thickness` CSS custom property
+   * to override the default 1dp thickness.
+   */
+  style?: DividerCSSProperties;
 }
 
 /**
@@ -70,7 +89,7 @@ export interface DividerProps {
  * ```tsx
  * <DividerHeadless
  *   orientation="horizontal"
- *   className="border-t border-outline-variant w-full"
+ *   className="w-full h-px bg-outline-variant"
  * />
  * ```
  */
@@ -87,14 +106,7 @@ export interface DividerHeadlessProps {
   className?: string;
 
   /**
-   * Subheader label text. Declared for interface completeness;
-   * rendering is handled by the styled `Divider` layer.
+   * Inline styles forwarded to the underlying element.
    */
-  label?: string;
-
-  /**
-   * Child content. Declared for interface extensibility;
-   * the headless primitive itself is a void/leaf element.
-   */
-  children?: React.ReactNode;
+  style?: DividerCSSProperties;
 }
