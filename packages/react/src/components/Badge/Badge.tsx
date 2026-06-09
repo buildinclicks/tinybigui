@@ -13,8 +13,8 @@ import type { BadgeProps } from "./Badge.types";
  * (dot or count indicator). Automatically hides the badge when
  * `count` is `0` or `invisible` is `true`.
  *
- * Respects `prefers-reduced-motion` — transitions are omitted when
- * the user has requested reduced motion.
+ * Respects `prefers-reduced-motion` — the scale transition is omitted
+ * when the user has requested reduced motion.
  *
  * @example
  * ```tsx
@@ -35,18 +35,7 @@ import type { BadgeProps } from "./Badge.types";
  * ```
  */
 export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
-  (
-    {
-      count,
-      max = 999,
-      color = "error",
-      invisible = false,
-      "aria-label": ariaLabel,
-      className,
-      children,
-    },
-    ref
-  ) => {
+  ({ count, max = 999, invisible = false, "aria-label": ariaLabel, className, children }, ref) => {
     const isReduced = useReducedMotion();
     const shouldShow = !invisible && (count === undefined || count > 0);
 
@@ -56,7 +45,6 @@ export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
         <BadgeContent
           count={count}
           max={max}
-          color={color}
           invisible={!shouldShow}
           aria-label={ariaLabel}
           reducedMotion={isReduced}

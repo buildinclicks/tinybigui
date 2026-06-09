@@ -1,11 +1,6 @@
 import type React from "react";
 
 /**
- * Badge color roles (Material Design 3)
- */
-export type BadgeColor = "error" | "primary";
-
-/**
  * Props for the BadgeContent indicator element.
  *
  * Renders either a small dot (no count) or a count pill (with count).
@@ -23,13 +18,7 @@ export interface BadgeContentProps {
   max?: number;
 
   /**
-   * Badge color role mapped to MD3 design tokens.
-   * @default 'error'
-   */
-  color?: BadgeColor;
-
-  /**
-   * Whether the badge is invisible (scale-0 / opacity-0).
+   * Whether the badge is invisible (scale-0).
    * @default false
    */
   invisible?: boolean;
@@ -101,11 +90,6 @@ export interface BadgeHeadlessProps {
  * <Badge count={1200} max={99}>
  *   <IconButton icon={<MailIcon />} aria-label="Messages" />
  * </Badge>
- *
- * // Primary color
- * <Badge count={5} color="primary">
- *   <IconButton icon={<BellIcon />} aria-label="Alerts" />
- * </Badge>
  * ```
  */
 export interface BadgeProps {
@@ -119,12 +103,6 @@ export interface BadgeProps {
    * @default 999
    */
   max?: number;
-
-  /**
-   * Badge color role mapped to MD3 design tokens.
-   * @default 'error'
-   */
-  color?: BadgeColor;
 
   /**
    * When `true`, hides the badge indicator.

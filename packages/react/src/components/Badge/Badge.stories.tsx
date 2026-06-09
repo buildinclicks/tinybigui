@@ -15,6 +15,22 @@ const IconMail = (): React.ReactElement => (
   </svg>
 );
 
+/**
+ * A 24dp icon host — wraps the SVG in a span so the badge wrapper has a
+ * fixed-size element to straddle. Using a bare icon (not a full IconButton)
+ * matches the MD3 spec diagram where the badge center sits on the top-right
+ * corner of the icon shape itself.
+ */
+const IconHost = ({
+  children,
+  className = "text-on-surface-variant",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}): React.ReactElement => (
+  <span className={`inline-flex h-6 w-6 items-center justify-center ${className}`}>{children}</span>
+);
+
 const meta: Meta<typeof Badge> = {
   title: "Components/Badge",
   component: Badge,
@@ -23,7 +39,7 @@ const meta: Meta<typeof Badge> = {
     docs: {
       description: {
         component:
-          "MD3 Badge — a small status indicator overlaid on icons and navigation items. Supports dot (small) and count (large) variants. https://m3.material.io/components/badges/overview",
+          "MD3 Badge — a small status indicator overlaid on icons and navigation items. The badge center straddles the wrapped element's top-right corner (`top-0 right-0 -translate-y-1/2 translate-x-1/2`), matching the MD3 spec. Uses the MD3 error color role (bg-error / text-on-error). Supports dot (small 6dp) and count (large 16dp) forms. https://m3.material.io/components/badges/overview",
       },
     },
   },
@@ -36,11 +52,6 @@ const meta: Meta<typeof Badge> = {
     max: {
       control: "number",
       description: "Maximum count before overflow truncation (e.g. '999+').",
-    },
-    color: {
-      control: "select",
-      options: ["error", "primary"],
-      description: "Badge color role mapped to MD3 design tokens.",
     },
     invisible: {
       control: "boolean",
@@ -59,20 +70,19 @@ type Story = StoryObj<typeof Badge>;
 export const Default: Story = {
   args: {
     count: 3,
-    color: "error",
   },
   render: (args) => (
     <Badge {...args}>
-      <IconButton aria-label="Notifications">
+      <IconHost>
         <IconBell />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Default Badge wrapping an IconButton with error color and count=3. All controls in the panel are wired for interactive exploration.",
+          "Default Badge wrapping a 24dp icon host with count=3. The badge center sits on the icon's top-right corner (MD3 spec). All controls in the panel are wired for interactive exploration.",
       },
     },
   },
@@ -81,16 +91,16 @@ export const Default: Story = {
 export const DotBadge: Story = {
   render: () => (
     <Badge>
-      <IconButton aria-label="Notifications">
+      <IconHost>
         <IconBell />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Dot badge — no count provided, so a small dot indicator is rendered. Use to signal new unread activity without a specific count.",
+          "Dot badge — no count provided, so a 6dp dot indicator is rendered. The dot center sits on the icon's top-right corner. Use to signal new unread activity without a specific count.",
       },
     },
   },
@@ -99,16 +109,16 @@ export const DotBadge: Story = {
 export const CountBadge: Story = {
   render: () => (
     <Badge count={5}>
-      <IconButton aria-label="Messages">
+      <IconHost>
         <IconMail />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Large count badge showing 5. The badge adopts the pill shape whenever a count is provided.",
+          "Large count badge (16dp height) showing 5. The pill center straddles the icon's top-right corner, matching the MD3 spec diagram.",
       },
     },
   },
@@ -117,9 +127,9 @@ export const CountBadge: Story = {
 export const SingleDigit: Story = {
   render: () => (
     <Badge count={7}>
-      <IconButton aria-label="Alerts">
+      <IconHost>
         <IconBell />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
@@ -134,9 +144,9 @@ export const SingleDigit: Story = {
 export const MultiDigit: Story = {
   render: () => (
     <Badge count={42}>
-      <IconButton aria-label="Notifications">
+      <IconHost>
         <IconBell />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
@@ -152,9 +162,9 @@ export const MultiDigit: Story = {
 export const Overflow: Story = {
   render: () => (
     <Badge count={1000} max={999}>
-      <IconButton aria-label="Notifications">
+      <IconHost>
         <IconBell />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
@@ -170,9 +180,9 @@ export const Overflow: Story = {
 export const CustomMax: Story = {
   render: () => (
     <Badge count={50} max={9}>
-      <IconButton aria-label="Messages">
+      <IconHost>
         <IconMail />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
@@ -185,49 +195,14 @@ export const CustomMax: Story = {
   },
 };
 
-export const PrimaryColor: Story = {
-  render: () => (
-    <Badge count={4} color="primary">
-      <IconButton aria-label="Notifications">
-        <IconBell />
-      </IconButton>
-    </Badge>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Badge with color='primary', using the MD3 primary color role instead of the default error role.",
-      },
-    },
-  },
-};
-
-export const ErrorColor: Story = {
-  render: () => (
-    <Badge count={4} color="error">
-      <IconButton aria-label="Notifications">
-        <IconBell />
-      </IconButton>
-    </Badge>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: "Badge with color='error' (the default). Maps to the MD3 error design token.",
-      },
-    },
-  },
-};
-
 const InvisibleBadgeDemo = (): React.ReactElement => {
   const [invisible, setInvisible] = React.useState(false);
   return (
     <div className="flex flex-col items-center gap-6">
       <Badge count={3} invisible={invisible}>
-        <IconButton aria-label="Notifications">
+        <IconHost>
           <IconBell />
-        </IconButton>
+        </IconHost>
       </Badge>
       <button
         type="button"
@@ -246,7 +221,7 @@ export const InvisibleBadge: Story = {
     docs: {
       description: {
         story:
-          "invisible=true hides the badge with a scale-out / opacity transition. Click the toggle button to animate the hide and show and observe the reduced-motion-aware transition.",
+          "invisible=true hides the badge with a scale-out transition (MD3 Expressive fast-spatial spring). The badge scales to zero from its corner-anchored position. Click the toggle button to animate show and hide, observing the reduced-motion-aware behaviour.",
       },
     },
   },
@@ -255,9 +230,9 @@ export const InvisibleBadge: Story = {
 export const ZeroCount: Story = {
   render: () => (
     <Badge count={0}>
-      <IconButton aria-label="Notifications">
+      <IconHost>
         <IconBell />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
@@ -272,7 +247,7 @@ export const ZeroCount: Story = {
 
 export const WrappingIconButton: Story = {
   render: () => (
-    <Badge count={3} color="error">
+    <Badge count={3}>
       <IconButton aria-label="Messages" variant="filled">
         <IconMail />
       </IconButton>
@@ -282,7 +257,7 @@ export const WrappingIconButton: Story = {
     docs: {
       description: {
         story:
-          "Badge composing an existing IconButton with variant='filled' — demonstrates transparent wrapping of any component variant.",
+          "Badge composing a full IconButton (variant='filled'). The badge center straddles the button's top-right corner — the larger host pushes the badge further out from the icon. For spec-precise icon-corner placement, wrap a bare icon host as shown in the Default story.",
       },
     },
   },
@@ -305,7 +280,7 @@ export const WrappingNavigationItem: Story = {
     docs: {
       description: {
         story:
-          "Badge composing a navigation item mockup with count=3. Mirrors MD3 bottom navigation badge usage where the badge overlays a nav pill chip.",
+          "Badge composing a navigation item mockup with count=3. The badge straddles the top-right corner of the nav pill chip. Mirrors MD3 bottom navigation badge usage.",
       },
     },
   },
@@ -316,47 +291,38 @@ export const AllVariants: Story = {
     <div className="flex flex-row items-end gap-8">
       <div className="flex flex-col items-center gap-3">
         <Badge>
-          <IconButton aria-label="Dot badge demo">
+          <IconHost>
             <IconBell />
-          </IconButton>
+          </IconHost>
         </Badge>
         <span className="text-on-surface text-xs">Dot</span>
       </div>
 
       <div className="flex flex-col items-center gap-3">
         <Badge count={7}>
-          <IconButton aria-label="Single-digit badge demo">
+          <IconHost>
             <IconBell />
-          </IconButton>
+          </IconHost>
         </Badge>
         <span className="text-on-surface text-xs">Single digit</span>
       </div>
 
       <div className="flex flex-col items-center gap-3">
         <Badge count={42}>
-          <IconButton aria-label="Multi-digit badge demo">
+          <IconHost>
             <IconBell />
-          </IconButton>
+          </IconHost>
         </Badge>
         <span className="text-on-surface text-xs">Multi-digit</span>
       </div>
 
       <div className="flex flex-col items-center gap-3">
         <Badge count={1000} max={999}>
-          <IconButton aria-label="Overflow badge demo">
+          <IconHost>
             <IconBell />
-          </IconButton>
+          </IconHost>
         </Badge>
         <span className="text-on-surface text-xs">Overflow</span>
-      </div>
-
-      <div className="flex flex-col items-center gap-3">
-        <Badge count={4} color="primary">
-          <IconButton aria-label="Primary color badge demo">
-            <IconBell />
-          </IconButton>
-        </Badge>
-        <span className="text-on-surface text-xs">Primary</span>
       </div>
     </div>
   ),
@@ -364,7 +330,7 @@ export const AllVariants: Story = {
     docs: {
       description: {
         story:
-          "Side-by-side showcase of all Badge variants: dot, single-digit, multi-digit, overflow ('999+'), and primary color.",
+          "Side-by-side showcase of all Badge forms: dot (6dp), single-digit, multi-digit, and overflow ('999+'). All use the MD3 error color role and corner-overlap placement anchored to a 24dp icon host.",
       },
     },
   },
@@ -374,21 +340,20 @@ export const Playground: Story = {
   args: {
     count: 3,
     max: 999,
-    color: "error",
     invisible: false,
   },
   render: (args) => (
     <Badge {...args}>
-      <IconButton aria-label="Playground notifications">
+      <IconHost>
         <IconBell />
-      </IconButton>
+      </IconHost>
     </Badge>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Fully interactive playground — use the controls panel to adjust count, max, color, invisible, and aria-label and see all combinations live.",
+          "Fully interactive playground — use the controls panel to adjust count, max, invisible, and aria-label and see all combinations live.",
       },
     },
   },
