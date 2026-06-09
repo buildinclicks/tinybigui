@@ -140,7 +140,7 @@ export const StandardBottomSheet: Story = {
             <p className="text-title-medium text-on-surface">Midnight Drive</p>
             <p className="text-body-medium text-on-surface-variant">The Coastal Waves</p>
           </div>
-          <div className="bg-on-surface-variant h-1 w-full rounded-full opacity-40" />
+          <div className="bg-outline-variant h-px w-full" />
           <div className="flex items-center justify-center gap-4">
             <Button variant="text" aria-label="Previous track">
               ⏮
