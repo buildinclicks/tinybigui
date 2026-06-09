@@ -1,62 +1,104 @@
 "use client";
 
-import { forwardRef, useRef } from "react";
+import { forwardRef, useRef, useState, useCallback } from "react";
 import type React from "react";
-import { useButton } from "react-aria";
-import { mergeProps } from "@react-aria/utils";
+import { useHover, useFocusRing, useButton, mergeProps } from "react-aria";
 
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
 import { useFABMenuContext } from "./FABMenuHeadless";
+import {
+  fabMenuItemVariants,
+  fabMenuItemStateLayerVariants,
+  fabMenuItemFocusRingVariants,
+  fabMenuItemIconVariants,
+  fabMenuItemLabelVariants,
+} from "./FABMenu.variants";
 import type { FABMenuItemProps } from "./FABMenu.types";
 
 /**
- * FABMenuItem — Individual action item rendered as a mini FAB (40dp) with
- * optional label chip. Consumes FABMenuContext for open state and direction.
+ * FABMenuItem — MD3 Expressive FAB Menu action item (Layer 3).
  *
- * Applies stagger animation via `animation-delay` based on `index` prop
- * (provided by the parent FABMenu). Skips animations when `reducedMotion`
- * is active.
+ * Renders as a full-rounded 56dp pill button with a leading icon and an
+ * inline text label. Implements the Variants-vs-States architecture:
+ * all interaction states are expressed as data-* attributes on the root
+ * and consumed by each slot via group-data-[x]/fab-menu-item selectors.
+ *
+ * Features:
+ * - ✅ MD3 Expressive pill shape (56dp height, full-rounded)
+ * - ✅ 6 color roles: 3 container + 3 solid (M3 Expressive)
+ * - ✅ Elevation 3 base → 4 hover → 3 focus/pressed per MD3 spec
+ * - ✅ Correct state-layer opacities: hover 8% / focus 10% / pressed 10%
+ * - ✅ Dedicated focus ring slot (inset-[-3px], keyboard-only)
+ * - ✅ Ripple effect (Material Design)
+ * - ✅ Stagger enter/exit animation (animate-md-scale-in/out), reduce-motion guarded
+ * - ✅ Full keyboard accessibility via React Aria
  *
  * @example
  * ```tsx
  * <FABMenuItem
  *   icon={<IconEdit />}
  *   label="Edit"
- *   aria-label="Edit item"
  *   onPress={() => handleEdit()}
- *   index={0}
  * />
+ *
+ * // Solid color role
+ * <FABMenuItem icon={<IconAdd />} label="Add" color="primary" />
  * ```
  */
 export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { index?: number }>(
   (
-    { icon, label, onPress, "aria-label": ariaLabel, isDisabled = false, className, index = 0 },
+    {
+      icon,
+      label,
+      "aria-label": ariaLabel,
+      onPress,
+      color = "primary-container",
+      isDisabled = false,
+      className,
+      index = 0,
+    },
     forwardedRef
   ) => {
     const internalRef = useRef<HTMLButtonElement>(null);
     const buttonRef = (forwardedRef ?? internalRef) as React.RefObject<HTMLButtonElement>;
 
-    const { isOpen, isExiting, direction, reducedMotion, itemCount } = useFABMenuContext();
+    const { isOpen, isExiting, reducedMotion, itemCount, direction } = useFABMenuContext();
 
+    // ── Development warnings ───────────────────────────────────────────────
+    if (process.env.NODE_ENV === "development") {
+      if (!label && !ariaLabel) {
+        console.warn(
+          "[FABMenuItem] Either `label` or `aria-label` must be provided for accessibility."
+        );
+      }
+    }
+
+    // ── Interaction state tracking ─────────────────────────────────────────
+    const [isPressed, setIsPressed] = useState(false);
+    const handlePressStart = useCallback(() => setIsPressed(true), []);
+    const handlePressEnd = useCallback(() => setIsPressed(false), []);
+
+    const { isHovered, hoverProps } = useHover({ isDisabled });
+    const { isFocusVisible, focusProps } = useFocusRing();
+
+    // useButton: provides keyboard/pointer interaction handling for accessibility
     const { buttonProps } = useButton(
       {
-        ...(onPress && { onPress }),
-        "aria-label": ariaLabel,
+        ...(onPress ? { onPress } : {}),
         isDisabled,
+        onPressStart: handlePressStart,
+        onPressEnd: handlePressEnd,
+        ...(ariaLabel ? { "aria-label": ariaLabel } : {}),
+        elementType: "button",
       },
       buttonRef
     );
 
-    const { onMouseDown: handleRipple, ripples } = useRipple({
-      disabled: isDisabled,
-    });
+    const { onMouseDown: handleRipple, ripples } = useRipple({ disabled: isDisabled });
 
-    const mergedProps = mergeProps(buttonProps, {
-      type: "button" as const,
-      onMouseDown: handleRipple,
-    });
-
+    // ── Stagger animation ──────────────────────────────────────────────────
     // Entry: stagger forward (0ms, 30ms, 60ms…)
     // Exit: stagger in reverse so the last item exits first
     const staggerDelay = reducedMotion
@@ -64,6 +106,16 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
       : isExiting
         ? Math.max(0, itemCount - 1 - index) * 30
         : index * 30;
+
+    // Transform-origin matches the list overlay direction so items scale in/out
+    // from the FAB edge rather than the item's own center.
+    const DIRECTION_ORIGIN: Record<string, string> = {
+      up: "origin-bottom",
+      down: "origin-top",
+      left: "origin-right",
+      right: "origin-left",
+    };
+    const originClass = reducedMotion ? undefined : DIRECTION_ORIGIN[direction];
 
     const animationClass = reducedMotion
       ? undefined
@@ -73,54 +125,79 @@ export const FABMenuItem = forwardRef<HTMLButtonElement, FABMenuItemProps & { in
           ? "animate-md-scale-out"
           : undefined;
 
-    const labelPosition = direction === "right" ? "after" : "before";
+    // Merge React Aria button props with hover + focus props
+    const mergedButtonProps = mergeProps(buttonProps, hoverProps, focusProps, {
+      onMouseDown: handleRipple,
+    });
 
-    const labelChip = label ? (
-      <span className="bg-surface-container text-label-large text-on-surface shadow-elevation-1 rounded-full px-3 py-1">
-        {label}
-      </span>
-    ) : null;
+    // Strip React Aria-specific props from the merged result before putting on DOM
+    const {
+      isDisabled: _isDisabled,
+      onPress: _onPress,
+      onPressStart: _onPressStart,
+      onPressEnd: _onPressEnd,
+      onPressChange: _onPressChange,
+      onPressUp: _onPressUp,
+      ...htmlButtonProps
+    } = mergedButtonProps as unknown as Record<string, unknown>;
 
-    // Keep item visible (opacity-100) during exit animation; hide only when fully closed.
-    const isVisible = isOpen || isExiting;
+    void _isDisabled;
+    void _onPress;
+    void _onPressStart;
+    void _onPressEnd;
+    void _onPressChange;
+    void _onPressUp;
 
     return (
-      <div
+      <button
+        {...(htmlButtonProps as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+        ref={buttonRef}
+        type="button"
+        // ── Interaction data attributes ──────────────────────────────────────
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          isDisabled,
+        })}
+        // ── Content flags ────────────────────────────────────────────────────
+        data-with-icon={icon ? "" : undefined}
+        data-with-label={label ? "" : undefined}
         className={cn(
-          "relative flex cursor-pointer items-center gap-3",
-          isVisible ? "opacity-100" : "opacity-0",
-          isOpen ? "pointer-events-auto" : "pointer-events-none",
+          fabMenuItemVariants({ color }),
+          // group/fab-menu-item: enables group-data-[x]/fab-menu-item child selectors in all slots
+          "group/fab-menu-item",
+          // Scale pivot toward the FAB so items appear to emanate from the trigger
+          originClass,
+          // Stagger animation class (animate-md-scale-in / animate-md-scale-out)
+          animationClass,
           className
         )}
+        style={staggerDelay > 0 ? { animationDelay: `${staggerDelay}ms` } : undefined}
       >
-        {labelPosition === "before" && labelChip}
+        {/* Ripple effect */}
+        {ripples}
 
-        {/* eslint-disable-next-line react/button-has-type -- type is set via mergeProps */}
-        <button
-          {...mergedProps}
-          ref={buttonRef}
-          className={cn(
-            "relative flex size-10 items-center justify-center overflow-hidden rounded-xl",
-            "bg-primary-container text-on-primary-container shadow-elevation-3",
-            animationClass
-          )}
-          style={staggerDelay > 0 ? { animationDelay: `${staggerDelay}ms` } : undefined}
-        >
-          {/* State layer */}
-          <span
-            data-state-layer
-            className="bg-on-primary-container duration-spring-standard-fast-effects ease-spring-standard-fast-effects pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity hover:opacity-8"
-          />
+        {/* State layer — absolute overlay that transitions opacity on interaction */}
+        <span
+          className={cn(fabMenuItemStateLayerVariants({ color }))}
+          data-state-layer
+          aria-hidden="true"
+        />
 
-          {/* Ripple */}
-          {ripples}
+        {/* Focus ring — absolute, extends 3px outside boundary; keyboard-only */}
+        <span className={cn(fabMenuItemFocusRingVariants())} aria-hidden="true" />
 
-          {/* Icon */}
-          <span className="relative z-10 inline-flex shrink-0">{icon}</span>
-        </button>
+        {/* Leading icon */}
+        {icon && (
+          <span className={cn(fabMenuItemIconVariants())} aria-hidden="true">
+            {icon}
+          </span>
+        )}
 
-        {labelPosition === "after" && labelChip}
-      </div>
+        {/* Inline label */}
+        {label && <span className={cn(fabMenuItemLabelVariants())}>{label}</span>}
+      </button>
     );
   }
 );

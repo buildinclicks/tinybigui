@@ -7,6 +7,7 @@ import {
   isValidElement,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -16,15 +17,18 @@ import { cn } from "../../utils/cn";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { FABMenuContext } from "./FABMenuHeadless";
 import { FAB } from "../FAB/FAB";
-import { fabMenuVariants } from "./FABMenu.variants";
+import { fabMenuVariants, fabMenuListVariants } from "./FABMenu.variants";
 import type { FABMenuProps, FABMenuContextValue } from "./FABMenu.types";
 
 /**
- * FABMenu — Material Design 3 styled FAB Menu (Layer 3).
+ * FABMenu — Material Design 3 Expressive FAB Menu (Layer 3).
  *
- * Renders a trigger FAB that expands a list of mini FAB action items
+ * Renders a trigger FAB that expands a list of MD3 Expressive pill menu items
  * in the specified direction. Manages stagger animation-delay on children,
- * elevation changes on the trigger, and icon rotation.
+ * elevation changes on the trigger, and icon rotation (+ → ×).
+ *
+ * The trigger FAB icon morphs using expressive spring spatial tokens to convey
+ * the energetic, high-emphasis nature of the interaction.
  *
  * Built on top of FABMenuContext for state sharing with FABMenuItem children.
  * Uses the existing `FAB` component as the trigger button.
@@ -32,8 +36,8 @@ import type { FABMenuProps, FABMenuContextValue } from "./FABMenu.types";
  * @example
  * ```tsx
  * <FABMenu aria-label="Quick actions" direction="up">
- *   <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
- *   <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
+ *   <FABMenuItem icon={<IconEdit />} label="Edit" />
+ *   <FABMenuItem icon={<IconShare />} label="Share" />
  * </FABMenu>
  * ```
  */
@@ -86,8 +90,12 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
     }, [setIsOpen]);
 
     // Manage exit animation: keep items mounted while scale-out plays, then unmount.
+    // useLayoutEffect (not useEffect) is intentional: it fires synchronously after React
+    // commits but before the browser paints. Without this, the browser would paint a
+    // single frame with isOpen=false AND isExiting=false — items gone — before
+    // setIsExiting(true) re-mounts them for the scale-out animation, causing the blink.
     const prevIsOpenRef = useRef<boolean | undefined>(undefined);
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (prevIsOpenRef.current === undefined) {
         prevIsOpenRef.current = isOpen;
         return;
@@ -166,20 +174,10 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
     return (
       <FABMenuContext.Provider value={contextValue}>
         {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <div
-          ref={rootRef}
-          className={cn(fabMenuVariants({ direction }), className)}
-          onKeyDown={handleKeyDown}
-        >
+        <div ref={rootRef} className={cn(fabMenuVariants(), className)} onKeyDown={handleKeyDown}>
           {(isOpen || isExiting) && (
             <div
-              className={cn(
-                "inline-flex items-center gap-3",
-                direction === "up" && "flex-col-reverse",
-                direction === "down" && "flex-col",
-                direction === "left" && "flex-row-reverse",
-                direction === "right" && "flex-row"
-              )}
+              className={cn(fabMenuListVariants({ direction }))}
               role="group"
               aria-label={`${ariaLabel} actions`}
             >
@@ -198,7 +196,11 @@ export const FABMenu = forwardRef<HTMLDivElement, FABMenuProps>(
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 className={cn(
-                  "duration-short4 ease-standard h-6 w-6 transition-transform",
+                  // Expressive fast-spatial: FAB icon is small, high-emphasis — matches FAB enter motion
+                  "h-6 w-6 transition-transform",
+                  reducedMotion
+                    ? ""
+                    : "duration-expressive-fast-spatial ease-expressive-fast-spatial",
                   isOpen && "rotate-45"
                 )}
                 aria-hidden="true"

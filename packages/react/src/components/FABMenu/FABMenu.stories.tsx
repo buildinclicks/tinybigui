@@ -44,6 +44,32 @@ const IconPrint = (): React.ReactElement => (
 );
 
 // ---------------------------------------------------------------------------
+// Screen frame helper
+//
+// A bounded "app screen" frame that gives the FABMenu a realistic anchoring
+// context. The FABMenu is placed in the appropriate corner via absolute
+// positioning — matching MD3 Scaffold semantics where the FAB Menu is sticky
+// to the bottom-end (LTR) or bottom-start (RTL) corner.
+//
+// No overflow-hidden: item elevation shadows and focus rings must not be clipped.
+// ---------------------------------------------------------------------------
+
+interface ScreenFrameProps {
+  children: React.ReactNode;
+  dir?: "ltr" | "rtl";
+  className?: string;
+}
+
+const ScreenFrame = ({ children, dir, className }: ScreenFrameProps): React.ReactElement => (
+  <div
+    dir={dir}
+    className={`bg-surface-container-low ring-outline-variant relative h-96 w-80 overflow-visible rounded-[28px] ring-1 ${className ?? ""}`}
+  >
+    {children}
+  </div>
+);
+
+// ---------------------------------------------------------------------------
 // Meta
 // ---------------------------------------------------------------------------
 
@@ -55,7 +81,7 @@ const meta: Meta<typeof FABMenu> = {
     docs: {
       description: {
         component:
-          "MD3 FAB Menu — a speed-dial pattern extending the FAB with expandable action items. https://m3.material.io/components/floating-action-button/overview",
+          "MD3 Expressive FAB Menu — a speed-dial pattern extending the FAB with expandable pill-shaped action items. Each item is a full-rounded 56dp button with a leading icon and inline label. The FAB stays anchored in place; menu items render as an absolutely-positioned overlay and never reflow the trigger. Place the FABMenu in the bottom-end corner of your app scaffold (bottom-right in LTR, bottom-left in RTL). https://m3.material.io/components/fab-menu/specs",
       },
     },
   },
@@ -93,7 +119,7 @@ export default meta;
 type Story = StoryObj<typeof FABMenu>;
 
 // ---------------------------------------------------------------------------
-// Default
+// Default — bottom-end corner (up, LTR)
 // ---------------------------------------------------------------------------
 
 export const Default: Story = {
@@ -102,19 +128,19 @@ export const Default: Story = {
     direction: "up",
   },
   render: (args) => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu {...args}>
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+    <ScreenFrame>
+      <FABMenu {...args} className="absolute end-4 bottom-4">
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
-    </div>
+    </ScreenFrame>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Default FABMenu expanding upward with three action items. Click the + FAB to toggle the speed-dial open or closed.",
+          "Default FABMenu anchored to the bottom-end corner, expanding upward. The trigger FAB stays fixed in place — action items appear as an absolutely-positioned overlay so the FAB never shifts. Click the + FAB to toggle open or closed.",
       },
     },
   },
@@ -126,59 +152,19 @@ export const Default: Story = {
 
 export const DirectionUp: Story = {
   render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Actions expanding up" direction="up">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+    <ScreenFrame>
+      <FABMenu aria-label="Actions expanding up" direction="up" className="absolute end-4 bottom-4">
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
-    </div>
+    </ScreenFrame>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Action items expand upward from the trigger FAB — the default and most common layout for bottom-right placement.",
-      },
-    },
-  },
-};
-
-export const DirectionLeft: Story = {
-  render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Actions expanding left" direction="left">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
-      </FABMenu>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Action items expand to the left in a horizontal row — suited for right-edge placements where vertical space is limited.",
-      },
-    },
-  },
-};
-
-export const DirectionRight: Story = {
-  render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Actions expanding right" direction="right">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
-      </FABMenu>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Action items expand to the right — suitable for left-edge placement such as a bottom-left FAB.",
+          "Action items expand upward — the default and most common layout for bottom-end placement. Items overlay the screen above the trigger; the FAB stays pinned to the corner.",
       },
     },
   },
@@ -186,43 +172,185 @@ export const DirectionRight: Story = {
 
 export const DirectionDown: Story = {
   render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Actions expanding down" direction="down">
-        <FABMenuItem icon={<IconEdit />} aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} aria-label="Delete" />
+    <ScreenFrame>
+      <FABMenu
+        aria-label="Actions expanding down"
+        direction="down"
+        className="absolute end-4 top-4"
+      >
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
-    </div>
+    </ScreenFrame>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Action items expand downward — useful when the FAB is anchored near the top of the viewport.",
+          "Action items expand downward — suited for top-end placement such as a top app bar FAB. The trigger stays at the top-end corner.",
+      },
+    },
+  },
+};
+
+export const DirectionLeft: Story = {
+  render: () => (
+    <ScreenFrame>
+      <FABMenu
+        aria-label="Actions expanding left"
+        direction="left"
+        className="absolute end-4 bottom-4"
+      >
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
+      </FABMenu>
+    </ScreenFrame>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Action items expand to the left in a horizontal row — suited for right-edge placement where vertical space is limited. Trigger stays anchored.",
+      },
+    },
+  },
+};
+
+export const DirectionRight: Story = {
+  render: () => (
+    <ScreenFrame>
+      <FABMenu
+        aria-label="Actions expanding right"
+        direction="right"
+        className="absolute start-4 bottom-4"
+      >
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
+      </FABMenu>
+    </ScreenFrame>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Action items expand to the right — suitable for bottom-start placement such as a bottom-left FAB in LTR layouts.",
       },
     },
   },
 };
 
 // ---------------------------------------------------------------------------
-// WithLabels
+// RTL
 // ---------------------------------------------------------------------------
 
-export const WithLabels: Story = {
+export const RTL: Story = {
   render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Quick actions with labels" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
+    <ScreenFrame dir="rtl">
+      <FABMenu aria-label="إجراءات سريعة" direction="up" className="absolute end-4 bottom-4">
+        <FABMenuItem icon={<IconEdit />} label="تحرير" />
+        <FABMenuItem icon={<IconShare />} label="مشاركة" />
+        <FABMenuItem icon={<IconDelete />} label="حذف" />
       </FABMenu>
+    </ScreenFrame>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Right-to-left layout: `end-4` anchors the FAB to the physical bottom-left corner automatically. Logical insets (`end-0`, `me-3`, etc.) in the overlay ensure items expand in the correct direction without any RTL-specific code.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Colors
+// ---------------------------------------------------------------------------
+
+export const Colors: Story = {
+  render: () => (
+    <div className="grid grid-cols-3 gap-8 p-8">
+      {(
+        [
+          { color: "primary-container", label: "primary-container (default)" },
+          { color: "secondary-container", label: "secondary-container" },
+          { color: "tertiary-container", label: "tertiary-container" },
+          { color: "primary", label: "primary (solid)" },
+          { color: "secondary", label: "secondary (solid)" },
+          { color: "tertiary", label: "tertiary (solid)" },
+        ] as const
+      ).map(({ color, label }) => (
+        <div key={color} className="flex flex-col items-center gap-3">
+          <p className="text-label-small text-on-surface-variant text-center">{label}</p>
+          <ScreenFrame className="h-48 w-48">
+            <FABMenu
+              aria-label={`${label} actions`}
+              direction="up"
+              defaultOpen
+              className="absolute end-4 bottom-4"
+            >
+              <FABMenuItem icon={<IconEdit />} label="Edit" color={color} />
+              <FABMenuItem icon={<IconShare />} label="Share" color={color} />
+            </FABMenu>
+          </ScreenFrame>
+        </div>
+      ))}
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Each action item shows a text label chip alongside the mini FAB icon, improving discoverability and reducing reliance on icon recognition alone.",
+          "All 6 MD3 Expressive color roles: 3 container variants and 3 solid variants. State-layer color equals the on-color for each role per MD3 spec.",
+      },
+    },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// States
+// ---------------------------------------------------------------------------
+
+export const States: Story = {
+  render: () => (
+    <div className="flex gap-12 p-8">
+      <div className="flex flex-col items-center gap-3">
+        <p className="text-label-small text-on-surface-variant">Normal</p>
+        <ScreenFrame className="h-52 w-48">
+          <FABMenu
+            aria-label="Normal actions"
+            direction="up"
+            defaultOpen
+            className="absolute end-4 bottom-4"
+          >
+            <FABMenuItem icon={<IconEdit />} label="Edit" />
+          </FABMenu>
+        </ScreenFrame>
+      </div>
+
+      <div className="flex flex-col items-center gap-3">
+        <p className="text-label-small text-on-surface-variant">Disabled</p>
+        <ScreenFrame className="h-52 w-48">
+          <FABMenu
+            aria-label="Disabled actions"
+            direction="up"
+            defaultOpen
+            className="absolute end-4 bottom-4"
+          >
+            <FABMenuItem icon={<IconEdit />} label="Edit" isDisabled />
+          </FABMenu>
+        </ScreenFrame>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Normal and disabled states. Hover, focus, and pressed states are driven by data-* attributes via React Aria — interact with the Normal item to see the state layer and elevation responses.",
       },
     },
   },
@@ -234,19 +362,19 @@ export const WithLabels: Story = {
 
 export const ThreeActions: Story = {
   render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Three actions" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
+    <ScreenFrame>
+      <FABMenu aria-label="Three actions" direction="up" className="absolute end-4 bottom-4">
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
-    </div>
+    </ScreenFrame>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Three action items demonstrating the stagger animation: each mini FAB scales in with a 30 ms delay offset for a fluid cascade effect.",
+          "Three action items with stagger animation: each pill scales in with a 30ms delay offset for a fluid cascade effect from the trigger FAB.",
       },
     },
   },
@@ -254,18 +382,18 @@ export const ThreeActions: Story = {
 
 export const TwoActions: Story = {
   render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Two actions" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
+    <ScreenFrame>
+      <FABMenu aria-label="Two actions" direction="up" className="absolute end-4 bottom-4">
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
       </FABMenu>
-    </div>
+    </ScreenFrame>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Minimal two-item speed-dial — the recommended minimum when a regular FAB isn't enough but three actions would be excessive.",
+          "Minimal two-item speed-dial — the recommended minimum when a regular FAB is not enough but three actions would be excessive.",
       },
     },
   },
@@ -279,7 +407,7 @@ const ControlledOpenExample = (): React.ReactElement => {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div className="flex flex-col items-center gap-8 p-32">
+    <div className="flex flex-col items-center gap-6">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -288,16 +416,19 @@ const ControlledOpenExample = (): React.ReactElement => {
         {open ? "Close FAB Menu" : "Open FAB Menu"}
       </button>
 
-      <FABMenu
-        aria-label="Controlled quick actions"
-        direction="up"
-        open={open}
-        onOpenChange={setOpen}
-      >
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
-      </FABMenu>
+      <ScreenFrame>
+        <FABMenu
+          aria-label="Controlled quick actions"
+          direction="up"
+          open={open}
+          onOpenChange={setOpen}
+          className="absolute end-4 bottom-4"
+        >
+          <FABMenuItem icon={<IconEdit />} label="Edit" />
+          <FABMenuItem icon={<IconShare />} label="Share" />
+          <FABMenuItem icon={<IconDelete />} label="Delete" />
+        </FABMenu>
+      </ScreenFrame>
     </div>
   );
 };
@@ -308,7 +439,7 @@ export const ControlledOpen: Story = {
     docs: {
       description: {
         story:
-          "Controlled mode: the external 'Open / Close FAB Menu' button drives `open` state via `onOpenChange`. Both the trigger FAB and the button stay in sync.",
+          "Controlled mode: the external button drives `open` state via `onOpenChange`. Both the trigger FAB and the button stay in sync.",
       },
     },
   },
@@ -320,8 +451,8 @@ export const ControlledOpen: Story = {
 
 export const KeyboardNavigation: Story = {
   render: () => (
-    <div className="flex flex-col items-center gap-6 p-32">
-      <div className="bg-surface-container text-on-surface rounded-xl px-4 py-3 text-sm">
+    <div className="flex flex-col items-center gap-6">
+      <div className="bg-surface-container text-on-surface w-72 rounded-xl px-4 py-3 text-sm">
         <p className="font-medium">Keyboard instructions</p>
         <ul className="text-on-surface-variant mt-1 list-inside list-disc space-y-1">
           <li>
@@ -337,11 +468,17 @@ export const KeyboardNavigation: Story = {
         </ul>
       </div>
 
-      <FABMenu aria-label="Keyboard-navigable quick actions" direction="up">
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
-      </FABMenu>
+      <ScreenFrame>
+        <FABMenu
+          aria-label="Keyboard-navigable quick actions"
+          direction="up"
+          className="absolute end-4 bottom-4"
+        >
+          <FABMenuItem icon={<IconEdit />} label="Edit" />
+          <FABMenuItem icon={<IconShare />} label="Share" />
+          <FABMenuItem icon={<IconDelete />} label="Delete" />
+        </FABMenu>
+      </ScreenFrame>
     </div>
   ),
   parameters: {
@@ -355,24 +492,24 @@ export const KeyboardNavigation: Story = {
 };
 
 // ---------------------------------------------------------------------------
-// WithIcons
+// WithIcons (variety)
 // ---------------------------------------------------------------------------
 
 export const WithIcons: Story = {
   render: () => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu aria-label="Media actions" direction="up">
-        <FABMenuItem icon={<IconCamera />} label="Camera" aria-label="Take photo" />
-        <FABMenuItem icon={<IconBookmark />} label="Save" aria-label="Bookmark" />
-        <FABMenuItem icon={<IconPrint />} label="Print" aria-label="Print" />
+    <ScreenFrame>
+      <FABMenu aria-label="Media actions" direction="up" className="absolute end-4 bottom-4">
+        <FABMenuItem icon={<IconCamera />} label="Camera" />
+        <FABMenuItem icon={<IconBookmark />} label="Save" />
+        <FABMenuItem icon={<IconPrint />} label="Print" />
       </FABMenu>
-    </div>
+    </ScreenFrame>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "Action items with a variety of Material Design icon shapes — demonstrates that the mini FAB container handles different icon geometries consistently.",
+          "Action items with a variety of Material Design icon shapes — demonstrates that the pill container handles different icon geometries consistently.",
       },
     },
   },
@@ -389,13 +526,13 @@ export const Playground: Story = {
     defaultOpen: false,
   },
   render: (args) => (
-    <div className="flex items-center justify-center p-32">
-      <FABMenu {...args}>
-        <FABMenuItem icon={<IconEdit />} label="Edit" aria-label="Edit" />
-        <FABMenuItem icon={<IconShare />} label="Share" aria-label="Share" />
-        <FABMenuItem icon={<IconDelete />} label="Delete" aria-label="Delete" />
+    <ScreenFrame>
+      <FABMenu {...args} className="absolute end-4 bottom-4">
+        <FABMenuItem icon={<IconEdit />} label="Edit" />
+        <FABMenuItem icon={<IconShare />} label="Share" />
+        <FABMenuItem icon={<IconDelete />} label="Delete" />
       </FABMenu>
-    </div>
+    </ScreenFrame>
   ),
   parameters: {
     docs: {
