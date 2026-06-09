@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-06-09
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **BottomSheet** — MD3 expressive handle refactor with variants-vs-states architecture; new `bottomSheetHandleStateLayerVariants` and `bottomSheetHandleFocusRingVariants` slots; React Aria hover/focus wiring via `data-*` attributes; presence-based `data-dragging` encoding
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.10.0] - 2026-06-09
 
 ### Changed

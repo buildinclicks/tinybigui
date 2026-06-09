@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.10.0** (2026-06-09)
+> **Latest Release: v0.11.0** (2026-06-09)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -159,14 +159,14 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 3: Feedback ✅
 
-| Component     | Status | Description                             |
-| ------------- | ------ | --------------------------------------- |
-| `Dialog`      | ✅     | Basic and fullscreen modal dialogs      |
-| `Snackbar`    | ✅     | Provider, stacking, imperative API      |
-| `Menu`        | ✅     | Dropdown, context menu, submenus        |
-| `Progress`    | ✅     | Linear and circular indicators          |
-| `BottomSheet` | ✅     | Standard and modal with snap points     |
-| `Tooltip`     | ✅     | Plain and rich tooltip with positioning |
+| Component     | Status | Description                                                      |
+| ------------- | ------ | ---------------------------------------------------------------- |
+| `Dialog`      | ✅     | Basic and fullscreen modal dialogs                               |
+| `Snackbar`    | ✅     | Provider, stacking, imperative API                               |
+| `Menu`        | ✅     | Dropdown, context menu, submenus                                 |
+| `Progress`    | ✅     | Linear and circular indicators                                   |
+| `BottomSheet` | ✅     | MD3 expressive handle, variants-vs-states architecture (v0.11.0) |
+| `Tooltip`     | ✅     | Plain and rich tooltip with positioning                          |
 
 ### Phase 4: Data Display ✅
 

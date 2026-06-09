@@ -4,9 +4,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.10.0 (released 2026-06-09)  
-**Next Release:** v0.11.0  
-**Status:** 29 components published to NPM; 2,010 tests passing
+**Current Version:** v0.11.0 (released 2026-06-09)  
+**Next Release:** v0.12.0  
+**Status:** 29 components published to NPM; 2,019 tests passing
 
 ## Release Timeline
 
@@ -25,6 +25,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.8.1  | —       | Checkbox MD3 variants-vs-states architecture, motion tokens, spec-accurate 18dp icons                                             | Released 2026-06-09 |
 | v0.9.0  | —       | Chip MD3 expressive slot architecture, per-type token corrections, elevated surface for all types                                 | Released 2026-06-09 |
 | v0.10.0 | —       | AppBar M3 expressive flexible slot architecture, subtitle type scales, subtitle-driven height growth, scroll elevation data attrs | Released 2026-06-09 |
+| v0.11.0 | —       | BottomSheet MD3 expressive handle refactor, variants-vs-states architecture, state layer and focus ring slots                     | Released 2026-06-09 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                  | Planned             |
 
 ## Completed Work
@@ -90,7 +91,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
 - [x] CVA variant management with variants-vs-states architecture
-- [x] Vitest + React Testing Library (2,010 tests)
+- [x] Vitest + React Testing Library (2,019 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards
