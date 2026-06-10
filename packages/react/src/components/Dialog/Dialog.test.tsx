@@ -1,6 +1,6 @@
 import { useState, type ComponentProps } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, act, waitFor } from "@testing-library/react";
+import { render, screen, act, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { Dialog } from "./Dialog";
@@ -76,6 +76,24 @@ function ControlledDialog({
 function advanceToVisible(): void {
   act(() => {
     vi.advanceTimersByTime(0);
+  });
+}
+
+// ─── Reduced motion mock helpers ──────────────────────────────────────────────
+
+function mockReducedMotion(reduced: boolean): void {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(prefers-reduced-motion: reduce)" ? reduced : false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
   });
 }
 
@@ -193,7 +211,7 @@ describe("Dialog", () => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
     });
 
-    test("controlled: hides when open prop becomes false after exit animation", () => {
+    test("controlled: hides when open prop becomes false after exit animation fallback", () => {
       vi.useFakeTimers();
       const { rerender } = render(
         <Dialog open onOpenChange={vi.fn()}>
@@ -211,9 +229,9 @@ describe("Dialog", () => {
           <DialogContent>Content</DialogContent>
         </Dialog>
       );
-      // Advance past exit animation fallback (150ms)
+      // Advance past the 250ms exit animation fallback timer
       act(() => {
-        vi.advanceTimersByTime(200);
+        vi.advanceTimersByTime(300);
       });
 
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -311,6 +329,17 @@ describe("Dialog", () => {
       const scrim = screen.getByTestId("dialog-scrim");
       await user.click(scrim);
       expect(onOpenChange).not.toHaveBeenCalled();
+    });
+
+    test("scrim receives animate-md-fade-in class in visible state", () => {
+      vi.useFakeTimers();
+      renderBasicDialog({ open: true });
+      advanceToVisible();
+
+      const scrim = screen.getByTestId("dialog-scrim");
+      expect(scrim.className).toContain("animate-md-fade-in");
+
+      vi.useRealTimers();
     });
   });
 
@@ -416,6 +445,176 @@ describe("Dialog", () => {
       const dialog = screen.getByRole("dialog");
       expect(dialog).toHaveAttribute("data-animation-state", "visible");
     });
+
+    test("visible basic dialog panel has animate-md-scale-in class", () => {
+      renderBasicDialog({ open: true });
+      advanceToVisible();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toContain("animate-md-scale-in");
+    });
+
+    test("visible fullscreen dialog panel has animate-md-slide-in-bottom class", () => {
+      renderFullscreenDialog({ open: true });
+      advanceToVisible();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toContain("animate-md-slide-in-bottom");
+    });
+
+    test("dialog closes when onAnimationEnd fires on the panel itself (exit path)", () => {
+      const { rerender } = render(
+        <Dialog open onOpenChange={vi.fn()}>
+          <DialogContent>Content</DialogContent>
+          <DialogActions>
+            <button type="button">OK</button>
+          </DialogActions>
+        </Dialog>
+      );
+      advanceToVisible();
+
+      rerender(
+        <Dialog open={false} onOpenChange={vi.fn()}>
+          <DialogContent>Content</DialogContent>
+          <DialogActions>
+            <button type="button">OK</button>
+          </DialogActions>
+        </Dialog>
+      );
+
+      const dialog = screen.getByRole("dialog");
+      // Fire animationend on the panel itself — target === currentTarget, handler fires
+      act(() => {
+        fireEvent.animationEnd(dialog);
+      });
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    test("child animationend events do NOT advance exit state (bubbled event)", () => {
+      const { rerender } = render(
+        <Dialog open onOpenChange={vi.fn()}>
+          <DialogContent>Content</DialogContent>
+          <DialogActions>
+            <button type="button">OK</button>
+          </DialogActions>
+        </Dialog>
+      );
+      advanceToVisible();
+
+      rerender(
+        <Dialog open={false} onOpenChange={vi.fn()}>
+          <DialogContent>Content</DialogContent>
+          <DialogActions>
+            <button type="button">OK</button>
+          </DialogActions>
+        </Dialog>
+      );
+
+      // Fire animationend on the child button — it bubbles up to dialog.
+      // e.target = button, e.currentTarget = dialog → guard returns early, no state advance.
+      const button = screen.getByRole("button", { name: "OK" });
+      act(() => {
+        fireEvent.animationEnd(button);
+      });
+
+      // Dialog should still be in the DOM (exiting, not exited)
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+  });
+
+  // ── Hero icon ────────────────────────────────────────────────────────────────
+
+  describe("Hero icon", () => {
+    const TestIcon = () => <svg data-testid="hero-icon" aria-hidden="true" />;
+
+    test("renders icon when icon prop is provided", () => {
+      render(
+        <Dialog open icon={<TestIcon />}>
+          <DialogHeadline>With icon</DialogHeadline>
+          <DialogContent>Content</DialogContent>
+        </Dialog>
+      );
+      expect(screen.getByTestId("hero-icon")).toBeInTheDocument();
+    });
+
+    test("sets data-with-icon on dialog panel when icon is provided", () => {
+      render(
+        <Dialog open icon={<TestIcon />}>
+          <DialogHeadline>With icon</DialogHeadline>
+          <DialogContent>Content</DialogContent>
+        </Dialog>
+      );
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveAttribute("data-with-icon");
+    });
+
+    test("does NOT set data-with-icon when no icon is provided", () => {
+      renderBasicDialog();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).not.toHaveAttribute("data-with-icon");
+    });
+
+    test("does NOT render icon in fullscreen variant", () => {
+      render(
+        <Dialog variant="fullscreen" open icon={<TestIcon />}>
+          <DialogHeadline>Fullscreen</DialogHeadline>
+          <DialogContent>Content</DialogContent>
+        </Dialog>
+      );
+      expect(screen.queryByTestId("hero-icon")).not.toBeInTheDocument();
+    });
+
+    test("passes axe accessibility audit with icon", async () => {
+      const { container } = render(
+        <Dialog open aria-label="Dialog with icon" icon={<TestIcon />}>
+          <DialogHeadline>Save bookmark?</DialogHeadline>
+          <DialogContent>The page will be saved.</DialogContent>
+          <DialogActions>
+            <button type="button">Cancel</button>
+            <button type="button">Save</button>
+          </DialogActions>
+        </Dialog>
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+  });
+
+  // ── Reduced motion ───────────────────────────────────────────────────────────
+
+  describe("Reduced motion", () => {
+    beforeEach(() => {
+      mockReducedMotion(true);
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    test("dialog panel does not have animate-md-scale-in when reduced motion is on", () => {
+      renderBasicDialog({ open: true });
+      advanceToVisible();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).not.toContain("animate-md-scale-in");
+    });
+
+    test("dialog panel has transition-none when reduced motion is on", () => {
+      renderBasicDialog({ open: true });
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toContain("transition-none");
+    });
+
+    test("scrim does not have animate-md-fade-in when reduced motion is on", () => {
+      renderBasicDialog({ open: true });
+      advanceToVisible();
+      const scrim = screen.getByTestId("dialog-scrim");
+      expect(scrim.className).not.toContain("animate-md-fade-in");
+    });
+
+    test("dialog still renders and is accessible with reduced motion", () => {
+      renderBasicDialog({ open: true });
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
   });
 
   // ── Custom className ─────────────────────────────────────────────────────────
@@ -502,6 +701,18 @@ describe("DialogContent", () => {
     );
     const content = screen.getByText("Content");
     expect(content.id).toBeTruthy();
+  });
+
+  test("does not have scroll-divider attributes when content fits without scrolling", () => {
+    render(
+      <Dialog open>
+        <DialogContent>Short content</DialogContent>
+      </Dialog>
+    );
+    const content = document.getElementById(screen.getByText("Short content").id);
+    // In JSDOM, scrollHeight === clientHeight for non-overflowing content
+    expect(content).not.toHaveAttribute("data-scroll-divider-top");
+    expect(content).not.toHaveAttribute("data-scroll-divider-bottom");
   });
 });
 
