@@ -8,79 +8,121 @@ import { cva } from "class-variance-authority";
  * The root element carries:
  * - `group/slider` — scope for track/stop disabled-state selectors
  *   (`group-data-[disabled]/slider:*`)
+ *
+ * Horizontal layout: CSS grid with label (col 1) + output (col 2) in the first
+ * row, and the full-width track region spanning both columns in the second row.
+ * This matches the canonical React Aria / MD3 layout and prevents the track
+ * from collapsing when label + output are inline siblings.
+ *
+ * Vertical layout: flex-col so label is above the track.
+ * The size-based HEIGHT lives on the track region, not here (the container is
+ * auto-height in horizontal so it wraps the grid rows naturally).
  */
-export const sliderContainerVariants = cva(
-  ["group/slider", "flex", "items-center", "w-full", "relative", "select-none"],
-  {
-    variants: {
-      orientation: {
-        horizontal: "flex-row",
-        vertical: "flex-col w-auto",
-      },
-      size: {
-        xsmall: "h-[44px]",
-        small: "h-[44px]",
-        medium: "h-[52px]",
-        large: "h-[68px]",
-        xlarge: "h-[108px]",
-      },
+export const sliderContainerVariants = cva(["group/slider", "relative", "select-none"], {
+  variants: {
+    orientation: {
+      // Grid: 1fr for label, auto for output value; gap-x for label↔output spacing
+      horizontal: "grid grid-cols-[1fr_auto] items-center gap-x-2 w-full",
+      // Flex column: label → track → output stacked; width = handle height (per size)
+      vertical: "flex flex-col items-center h-full",
     },
-    compoundVariants: [
-      {
-        orientation: "vertical",
-        size: "xsmall",
-        class: "h-full w-[44px]",
-      },
-      {
-        orientation: "vertical",
-        size: "small",
-        class: "h-full w-[44px]",
-      },
-      {
-        orientation: "vertical",
-        size: "medium",
-        class: "h-full w-[52px]",
-      },
-      {
-        orientation: "vertical",
-        size: "large",
-        class: "h-full w-[68px]",
-      },
-      {
-        orientation: "vertical",
-        size: "xlarge",
-        class: "h-full w-[108px]",
-      },
-    ],
-    defaultVariants: {
-      orientation: "horizontal",
-      size: "xsmall",
+    size: {
+      // Vertical orientation: container width = handle height (dimensions transposed)
+      // Applied only for vertical via compoundVariants below
+      // NOTE: measurement-derived values from MD3 spec §4.2; permitted exception
+      xsmall: "",
+      small: "",
+      medium: "",
+      large: "",
+      xlarge: "",
     },
-  }
-);
+  },
+  compoundVariants: [
+    // Vertical: container WIDTH = handle height (MD3 §10.9 — dimensions transposed)
+    // NOTE: measurement-derived values from MD3 spec §4.2; permitted exception
+    { orientation: "vertical", size: "xsmall", class: "w-[44px]" },
+    { orientation: "vertical", size: "small", class: "w-[44px]" },
+    { orientation: "vertical", size: "medium", class: "w-[52px]" },
+    { orientation: "vertical", size: "large", class: "w-[68px]" },
+    { orientation: "vertical", size: "xlarge", class: "w-[108px]" },
+  ],
+  defaultVariants: {
+    orientation: "horizontal",
+    size: "xsmall",
+  },
+});
+
+// ─── Track Region ─────────────────────────────────────────────────────────────
+
+/**
+ * The track region element (`data-track`).
+ *
+ * This is the element that React Aria measures for pointer math. It must have
+ * a defined width (horizontal) or height (vertical) and be `position: relative`
+ * so the absolutely-positioned RA thumb children resolve correctly.
+ *
+ * In horizontal grid layout it spans both columns (`col-span-2`) and carries
+ * the size HEIGHT that was previously on the container. In vertical layout it
+ * fills the full parent height and carries the size WIDTH.
+ *
+ * NOTE: measurement-derived size values from MD3 spec §4.2; permitted exception.
+ */
+export const sliderTrackRegionVariants = cva(["relative", "touch-none"], {
+  variants: {
+    orientation: {
+      horizontal: "col-span-2 w-full",
+      // flex-1 fills the vertical container reliably; h-full collapses when the
+      // container itself is a flex item without an explicit pixel height (CSS spec).
+      // min-h-0 allows the flex child to shrink below its natural size if needed.
+      vertical: "flex-1 min-h-0",
+    },
+    size: {
+      // Horizontal: size controls track region HEIGHT (= handle height)
+      // Vertical: size controls track region WIDTH (= handle height, dimensions transposed)
+      // Applied as compound variants below to avoid cross-orientation conflicts
+      xsmall: "",
+      small: "",
+      medium: "",
+      large: "",
+      xlarge: "",
+    },
+  },
+  compoundVariants: [
+    // Horizontal: height = handle height per MD3 §4.2
+    { orientation: "horizontal", size: "xsmall", class: "h-[44px]" },
+    { orientation: "horizontal", size: "small", class: "h-[44px]" },
+    { orientation: "horizontal", size: "medium", class: "h-[52px]" },
+    { orientation: "horizontal", size: "large", class: "h-[68px]" },
+    { orientation: "horizontal", size: "xlarge", class: "h-[108px]" },
+    // Vertical: width = handle height (transposed per MD3 §10.9)
+    { orientation: "vertical", size: "xsmall", class: "w-[44px]" },
+    { orientation: "vertical", size: "small", class: "w-[44px]" },
+    { orientation: "vertical", size: "medium", class: "w-[52px]" },
+    { orientation: "vertical", size: "large", class: "w-[68px]" },
+    { orientation: "vertical", size: "xlarge", class: "w-[108px]" },
+  ],
+  defaultVariants: {
+    orientation: "horizontal",
+    size: "xsmall",
+  },
+});
 
 // ─── Track Layout ─────────────────────────────────────────────────────────────
 
 /**
- * Inner flex container that holds the active and inactive track segments.
+ * Absolute-fill container that holds the active and inactive track segments.
  *
- * The 6dp gap (MD3 `thumbTrackGapSize`) is preserved here as `gap-[6px]`
- * between the active and inactive track flex items.
+ * Segments are `position: absolute` children sharing the same percentage
+ * coordinate space as the React Aria thumbs, so fills always align with
+ * handle positions regardless of value or orientation.
+ *
+ * The MD3 6dp thumb-track gap (`thumbTrackGapSize`) is applied as a symmetric
+ * 3px offset on each side of the thumb in the parent's inline position styles.
+ *
+ * `pointer-events-none` lets React Aria's track click-to-seek events
+ * reach the `data-track` region without interference.
  */
-export const sliderTrackLayoutVariants = cva(
-  ["relative", "flex", "items-center", "gap-[6px]", "w-full", "h-full"],
-  {
-    variants: {
-      orientation: {
-        horizontal: "flex-row",
-        vertical: "flex-col-reverse h-full",
-      },
-    },
-    defaultVariants: {
-      orientation: "horizontal",
-    },
-  }
-);
+export const sliderTrackLayoutVariants = cva(["absolute", "inset-0", "pointer-events-none"]);
 
 // ─── Active Track ─────────────────────────────────────────────────────────────
 
@@ -90,6 +132,9 @@ export const sliderTrackLayoutVariants = cva(
  * **Color**: `bg-primary`
  * **Disabled**: driven by `group-data-[disabled]/slider:*` — no CVA disabled variant.
  * **Transition**: `flex-basis` spring (spatial) when not dragging/reduced-motion.
+ *
+ * MD3 §6, §10.2: outer corner = size corner token, inner corner (near handle) = 2dp.
+ * NOTE: measurement-derived corner values from MD3 spec §6; permitted exception.
  */
 export const sliderActiveTrackVariants = cva(
   [
@@ -98,25 +143,57 @@ export const sliderActiveTrackVariants = cva(
     // Disabled — driven by root group/slider data-disabled attr
     "group-data-[disabled]/slider:bg-on-surface",
     "group-data-[disabled]/slider:opacity-38",
-    // Layout
-    "flex-shrink-0",
+    // Layout — absolute fill within the track region
+    "absolute",
     "overflow-hidden",
-    "relative",
   ],
   {
     variants: {
       size: {
-        xsmall: "h-[16px] rounded-[8px]",
-        small: "h-[16px] rounded-[8px]",
-        medium: "h-[40px] rounded-[20px]",
-        large: "h-[56px] rounded-[28px]",
-        xlarge: "h-[96px] rounded-[48px]",
+        // Horizontal: left (start) = outer corner, right (near handle) = 2dp inner
+        // NOTE: measurement-derived values from MD3 spec §4.2, §6; permitted exception
+        xsmall: "h-[16px] rounded-l-[16px] rounded-r-[2px]",
+        small: "h-[16px] rounded-l-[16px] rounded-r-[2px]",
+        medium: "h-[40px] rounded-l-[12px] rounded-r-[2px]",
+        large: "h-[56px] rounded-l-[16px] rounded-r-[2px]",
+        xlarge: "h-[96px] rounded-l-[28px] rounded-r-[2px]",
       },
       orientation: {
-        horizontal: "",
-        vertical: "w-full flex-1",
+        // Horizontal: center vertically within track region
+        horizontal: "top-1/2 -translate-y-1/2",
+        // Vertical: center horizontally; length controlled by inline top/height styles
+        vertical: "left-1/2 -translate-x-1/2",
       },
     },
+    compoundVariants: [
+      // Vertical: width = track thickness; bottom = outer corner, top = 2dp inner (near handle)
+      // NOTE: measurement-derived values from MD3 spec §4.2, §6; permitted exception
+      {
+        orientation: "vertical",
+        size: "xsmall",
+        class: "w-[16px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[16px] rounded-br-[16px]",
+      },
+      {
+        orientation: "vertical",
+        size: "small",
+        class: "w-[16px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[16px] rounded-br-[16px]",
+      },
+      {
+        orientation: "vertical",
+        size: "medium",
+        class: "w-[40px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[12px] rounded-br-[12px]",
+      },
+      {
+        orientation: "vertical",
+        size: "large",
+        class: "w-[56px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[16px] rounded-br-[16px]",
+      },
+      {
+        orientation: "vertical",
+        size: "xlarge",
+        class: "w-[96px] rounded-tl-[2px] rounded-tr-[2px] rounded-bl-[28px] rounded-br-[28px]",
+      },
+    ],
     defaultVariants: {
       size: "xsmall",
       orientation: "horizontal",
@@ -131,6 +208,9 @@ export const sliderActiveTrackVariants = cva(
  *
  * **Color**: `bg-secondary-container`
  * **Disabled**: driven by `group-data-[disabled]/slider:*` — no CVA disabled variant.
+ *
+ * MD3 §6, §10.2: inner corner (near handle) = 2dp, outer corner = size corner token.
+ * NOTE: measurement-derived corner values from MD3 spec §6; permitted exception.
  */
 export const sliderInactiveTrackVariants = cva(
   [
@@ -138,25 +218,57 @@ export const sliderInactiveTrackVariants = cva(
     "bg-secondary-container",
     // Disabled — driven by root group/slider data-disabled attr
     "group-data-[disabled]/slider:bg-on-surface/10",
-    // Layout
-    "flex-1",
+    // Layout — absolute fill within the track region
+    "absolute",
     "overflow-hidden",
-    "relative",
   ],
   {
     variants: {
       size: {
-        xsmall: "h-[16px] rounded-[8px]",
-        small: "h-[16px] rounded-[8px]",
-        medium: "h-[40px] rounded-[20px]",
-        large: "h-[56px] rounded-[28px]",
-        xlarge: "h-[96px] rounded-[48px]",
+        // Horizontal: left (near handle) = 2dp inner, right (end) = outer corner
+        // NOTE: measurement-derived values from MD3 spec §4.2, §6; permitted exception
+        xsmall: "h-[16px] rounded-l-[2px] rounded-r-[16px]",
+        small: "h-[16px] rounded-l-[2px] rounded-r-[16px]",
+        medium: "h-[40px] rounded-l-[2px] rounded-r-[12px]",
+        large: "h-[56px] rounded-l-[2px] rounded-r-[16px]",
+        xlarge: "h-[96px] rounded-l-[2px] rounded-r-[28px]",
       },
       orientation: {
-        horizontal: "",
-        vertical: "w-full h-auto",
+        // Horizontal: center vertically within track region
+        horizontal: "top-1/2 -translate-y-1/2",
+        // Vertical: center horizontally; length controlled by inline top/height styles
+        vertical: "left-1/2 -translate-x-1/2",
       },
     },
+    compoundVariants: [
+      // Vertical: width = track thickness; top = outer corner, bottom = 2dp inner (near handle)
+      // NOTE: measurement-derived values from MD3 spec §4.2, §6; permitted exception
+      {
+        orientation: "vertical",
+        size: "xsmall",
+        class: "w-[16px] rounded-tl-[16px] rounded-tr-[16px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "small",
+        class: "w-[16px] rounded-tl-[16px] rounded-tr-[16px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "medium",
+        class: "w-[40px] rounded-tl-[12px] rounded-tr-[12px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "large",
+        class: "w-[56px] rounded-tl-[16px] rounded-tr-[16px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+      {
+        orientation: "vertical",
+        size: "xlarge",
+        class: "w-[96px] rounded-tl-[28px] rounded-tr-[28px] rounded-bl-[2px] rounded-br-[2px]",
+      },
+    ],
     defaultVariants: {
       size: "xsmall",
       orientation: "horizontal",
@@ -203,15 +315,26 @@ export const sliderHandleVariants = cva(
       },
       orientation: {
         horizontal: "",
-        vertical: "h-[4px] w-full",
+        // Vertical: handle is a thin horizontal bar. h-[4px] overrides the base
+        // h-[44px..108px]. Width is explicitly set per size below so the RA thumb
+        // (which is shrink-to-fit) assumes the correct measured width — this also
+        // fixes the hit-area (w-full) and state-layer (inset-0) widths.
+        vertical: "h-[4px]",
       },
     },
     compoundVariants: [
-      // Vertical: override to height-based narrowing
+      // Vertical: override to height-based narrowing on press
       {
         orientation: "vertical",
         class: "group-data-[pressed]/slider-thumb:h-[2px]",
       },
+      // Vertical per-size widths (transposed handle length = track region width per MD3 §10.9)
+      // NOTE: measurement-derived values from MD3 spec §4.2; permitted exception
+      { orientation: "vertical", size: "xsmall", class: "w-[44px]" },
+      { orientation: "vertical", size: "small", class: "w-[44px]" },
+      { orientation: "vertical", size: "medium", class: "w-[52px]" },
+      { orientation: "vertical", size: "large", class: "w-[68px]" },
+      { orientation: "vertical", size: "xlarge", class: "w-[108px]" },
     ],
     defaultVariants: {
       size: "xsmall",
@@ -296,8 +419,9 @@ export const sliderValueIndicatorVariants = cva([
   "pointer-events-none",
   // Z-index above track overlays
   "z-10",
-  // Will-change hint for browser compositing
-  "will-change-[transform,opacity]",
+  // In Tailwind v4, scale-* maps to the CSS `scale` property (not `transform`),
+  // so we must list `scale` here — not `transform` — to animate the reveal.
+  "will-change-[scale,opacity]",
 ]);
 
 // ─── Stop Dots ────────────────────────────────────────────────────────────────

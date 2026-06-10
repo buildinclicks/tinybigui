@@ -9,6 +9,7 @@ import { SliderStops } from "./SliderStops";
 import { SliderValueIndicator } from "./SliderValueIndicator";
 import {
   sliderContainerVariants,
+  sliderTrackRegionVariants,
   sliderActiveTrackVariants,
   sliderInactiveTrackVariants,
   sliderHandleVariants,
@@ -32,6 +33,46 @@ function resolveDefaultValue(
   if (variant === "range") return [25, 75];
   if (variant === "centered") return [0];
   return [minValue];
+}
+
+/**
+ * MD3 thumb-track gap: 6dp total, split symmetrically as 3px per side.
+ * Applied as an offset from the thumb's percentage position.
+ */
+const GAP_PX = 3;
+
+/**
+ * Build inline CSS position styles for an absolutely-positioned track segment.
+ *
+ * All segments share the same `position: absolute` coordinate space as the
+ * React Aria thumbs (`left: pct%` / `bottom: pct%`), so fills always align
+ * with handle positions regardless of value, variant, or orientation.
+ *
+ * Horizontal segments span along the X axis; vertical along Y (bottom = 0).
+ */
+function segmentStyle(
+  orientation: "horizontal" | "vertical",
+  opts: {
+    /** Start edge as a percentage of the track length. `null` = track start (0). */
+    start: number | null;
+    /** End edge as a percentage of the track length. `null` = track end (100). */
+    end: number | null;
+    /** Px offset added to the start edge (gap inset from a thumb). */
+    startGap?: number;
+    /** Px offset subtracted from the end edge (gap inset from a thumb). */
+    endGap?: number;
+  }
+): React.CSSProperties {
+  const { start, end, startGap = 0, endGap = 0 } = opts;
+
+  const startVal = start !== null ? `calc(${start}% + ${startGap}px)` : `${startGap}px`;
+  const endVal = end !== null ? `calc(${100 - end}% + ${endGap}px)` : `${endGap}px`;
+
+  if (orientation === "horizontal") {
+    return { left: startVal, right: endVal };
+  }
+  // Vertical: start = bottom edge, end = top edge (fills upward from 0)
+  return { bottom: startVal, top: endVal };
 }
 
 // ─── Slider ───────────────────────────────────────────────────────────────────
@@ -129,12 +170,16 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
     // ── Motion classes ─────────────────────────────────────────────────────────
 
-    // MD3 spring system: Track fill — spring-standard-fast-spatial.
+    // MD3 spring system: Track segment position/size — spring-standard-fast-spatial.
     // Suppressed during drag (follows pointer immediately) and reduced motion.
+    // Horizontal segments animate left+width; vertical animate top+bottom+height.
+    const springTokens = "duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
     const trackTransition =
       reducedMotion || anyThumbDragging
         ? ""
-        : "transition-[flex-basis] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
+        : orientation === "vertical"
+          ? `transition-[top,bottom,height] ${springTokens}`
+          : `transition-[left,width,right] ${springTokens}`;
 
     // MD3 spring system: Handle width change (4dp → 2dp on press) — spatial spring.
     // Suppressed for reduced motion; applied by the renderThumbContent closure.
@@ -159,6 +204,19 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const renderThumbContent = useCallback(
       ({ value: thumbValue }: SliderThumbRenderState): React.ReactNode => (
         <>
+          {/* Transparent hit-area enlarged beyond the 4dp visual handle so
+              dragging is comfortable. aria-hidden so it is invisible to AT. */}
+          <div
+            aria-hidden="true"
+            className={cn(
+              "absolute",
+              "left-1/2",
+              "top-1/2",
+              "-translate-x-1/2",
+              "-translate-y-1/2",
+              orientation === "vertical" ? "h-[20px] w-full" : "h-full w-[20px]"
+            )}
+          />
           {/* Visual handle — narrows from 4dp to 2dp on press via group-data */}
           <div
             data-slot="handle"
@@ -184,11 +242,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
       return (
         <>
-          {/* Active track — width/height driven by current value percentage */}
+          {/* Active track — spans from track start to 3px before the handle */}
           <div
             data-slot="active-track"
             className={cn(sliderActiveTrackVariants({ size, orientation }), trackTransition)}
-            style={{ flexBasis: `${pct}%` }}
+            style={segmentStyle(orientation, { start: null, end: pct, endGap: GAP_PX })}
           >
             {showIcon && (
               <span
@@ -199,10 +257,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               </span>
             )}
           </div>
-          {/* Inactive track — fills remaining flex space */}
+          {/* Inactive track — spans from 3px after the handle to track end */}
           <div
             data-slot="inactive-track"
             className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+            style={segmentStyle(orientation, { start: pct, startGap: GAP_PX, end: null })}
           >
             {showStops && (
               <span
@@ -222,15 +281,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
       return (
         <>
-          {/* Left inactive track */}
+          {/* Left inactive track — track start to 3px before left handle */}
           <div
             data-slot="inactive-track-left"
-            className={cn(
-              sliderInactiveTrackVariants({ size, orientation }),
-              "flex-shrink-0",
-              trackTransition
-            )}
-            style={{ flexBasis: `${leftPct}%` }}
+            className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+            style={segmentStyle(orientation, { start: null, end: leftPct, endGap: GAP_PX })}
           >
             {showStops && (
               <span
@@ -239,20 +294,26 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               />
             )}
           </div>
-          {/* Active track — area between the two handles */}
+          {/* Active track — 3px after left handle to 3px before right handle */}
           <div
             data-slot="active-track"
             className={cn(
               sliderActiveTrackVariants({ size, orientation }),
-              "rounded-[2px]", // Both ends near handles: 2dp (MD3 §10.2)
+              "rounded-[2px]", // Both ends near handles: 2dp inner (MD3 §10.2)
               trackTransition
             )}
-            style={{ flexBasis: `${rightPct - leftPct}%` }}
+            style={segmentStyle(orientation, {
+              start: leftPct,
+              startGap: GAP_PX,
+              end: rightPct,
+              endGap: GAP_PX,
+            })}
           />
-          {/* Right inactive track */}
+          {/* Right inactive track — 3px after right handle to track end */}
           <div
             data-slot="inactive-track-right"
             className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+            style={segmentStyle(orientation, { start: rightPct, startGap: GAP_PX, end: null })}
           >
             {showStops && (
               <span
@@ -273,61 +334,57 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
 
       if (thumbPct >= zeroPct) {
         // Positive direction: inactive-left | active | inactive-right
-        const activePct = thumbPct - zeroPct;
         return (
           <>
+            {/* Left inactive — track start to zero point (no gap at center) */}
             <div
               data-slot="inactive-track-left"
-              className={cn(
-                sliderInactiveTrackVariants({ size, orientation }),
-                "flex-shrink-0",
-                trackTransition
-              )}
-              style={{ flexBasis: `${zeroPct}%` }}
+              className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, { start: null, end: zeroPct })}
             />
+            {/* Active — zero point to 3px before handle */}
             <div
               data-slot="active-track"
-              className={cn(
-                sliderActiveTrackVariants({ size, orientation }),
-                "flex-shrink-0",
-                trackTransition
-              )}
-              style={{ flexBasis: `${activePct}%` }}
+              className={cn(sliderActiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, {
+                start: zeroPct,
+                end: thumbPct,
+                endGap: GAP_PX,
+              })}
             />
+            {/* Right inactive — 3px after handle to track end */}
             <div
               data-slot="inactive-track-right"
               className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
-              style={{ flexBasis: `${100 - zeroPct - activePct}%` }}
+              style={segmentStyle(orientation, { start: thumbPct, startGap: GAP_PX, end: null })}
             />
           </>
         );
       } else {
         // Negative direction: inactive-left | active | inactive-right
-        const activePct = zeroPct - thumbPct;
         return (
           <>
+            {/* Left inactive — track start to 3px before handle */}
             <div
               data-slot="inactive-track-left"
-              className={cn(
-                sliderInactiveTrackVariants({ size, orientation }),
-                "flex-shrink-0",
-                trackTransition
-              )}
-              style={{ flexBasis: `${thumbPct}%` }}
+              className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, { start: null, end: thumbPct, endGap: GAP_PX })}
             />
+            {/* Active — 3px after handle to zero point (no gap at center) */}
             <div
               data-slot="active-track"
-              className={cn(
-                sliderActiveTrackVariants({ size, orientation }),
-                "flex-shrink-0",
-                trackTransition
-              )}
-              style={{ flexBasis: `${activePct}%` }}
+              className={cn(sliderActiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, {
+                start: thumbPct,
+                startGap: GAP_PX,
+                end: zeroPct,
+              })}
             />
+            {/* Right inactive — zero point to track end */}
             <div
               data-slot="inactive-track-right"
               className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
-              style={{ flexBasis: `${100 - zeroPct}%` }}
+              style={segmentStyle(orientation, { start: zeroPct, end: null })}
             />
           </>
         );
@@ -354,8 +411,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         renderThumbContent={renderThumbContent}
         onThumbDraggingChange={handleThumbDraggingChange}
         className={cn(sliderContainerVariants({ size, orientation }), className)}
+        trackClassName={sliderTrackRegionVariants({ size, orientation })}
       >
-        <div data-slot="track-layout" className={cn(sliderTrackLayoutVariants({ orientation }))}>
+        <div data-slot="track-layout" className={cn(sliderTrackLayoutVariants())}>
           {isRange
             ? renderRangeTrack()
             : isCentered

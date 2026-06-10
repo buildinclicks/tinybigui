@@ -11,6 +11,7 @@ export { SliderValueIndicator } from "./SliderValueIndicator";
 // CVA Variants
 export {
   sliderContainerVariants,
+  sliderTrackRegionVariants,
   sliderActiveTrackVariants,
   sliderInactiveTrackVariants,
   sliderHandleVariants,

@@ -2,9 +2,9 @@
 "@tinybigui/react": minor
 ---
 
-**Slider: MD3 Expressive architecture refactor with spring motion**
+**Slider: MD3 Expressive architecture refactor with spring motion, range/vertical layout fixes, and vertical orientation improvements**
 
-The Slider component has been fully migrated to the "Variants-vs-States" architecture used by Button and Switch, and all motion tokens have been updated to the MD3 spring system.
+The Slider component has been fully migrated to the "Variants-vs-States" architecture used by Button and Switch, all motion tokens have been updated to the MD3 spring system, range/vertical track alignment has been corrected to absolute positioning, and the vertical orientation now renders correctly at all sizes.
 
 **Architecture changes (no API breakage)**
 
@@ -24,6 +24,19 @@ The Slider component has been fully migrated to the "Variants-vs-States" archite
 **Value indicator change (user-visible)**
 
 The value indicator is now always rendered in the DOM when `showValueIndicator=true` (previously only rendered when the thumb was pressed). Visibility is CSS-driven via `group-data-[pressed]/slider-thumb:opacity-100 scale-100`. `aria-hidden="true"` is set permanently since the accessible value is in the React Aria `<output>` element.
+
+The value indicator motion has also been corrected for Tailwind CSS v4: `scale-*` utilities now use the CSS `scale` property (not `transform`), so the transition list uses `transition-[scale,opacity]` instead of `transition-[transform,opacity]`.
+
+**Track layout fixes (range & vertical)**
+
+- All active and inactive track segments are now `position: absolute` within the track region, aligned to the same percentage coordinate space as React Aria's thumb positions. This fixes the range slider fill not meeting handles at extreme values.
+- The MD3 6dp thumb-track gap is implemented as a symmetric 3px inset on each side of the thumb.
+- The vertical slider track region now uses `flex-1 min-h-0` instead of `h-full`, reliably filling its flex container regardless of nesting depth. At `value=0`, the active track collapses to zero height (no longer half-filled).
+
+**Vertical orientation improvements**
+
+- The vertical handle bar now has an explicit per-size width (xsmall/small: 44px, medium: 52px, large: 68px, xlarge: 108px) matching the track region width, per MD3 §10.9 transposed dimensions. The handle bar was previously sized to `w-full` which collapsed to zero width when the RA thumb had no explicit width.
+- Both `standard` and `centered` variants now render correctly in vertical orientation.
 
 **New `SliderHeadless` props**
 

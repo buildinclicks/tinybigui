@@ -62,12 +62,12 @@ export function SliderValueIndicator({
   const reducedMotion = useReducedMotion();
 
   // MD3 spring system: transform/opacity transition for entry/exit.
-  // Scale (transform) uses spatial spring; opacity is coupled to the same
-  // spring for a single unified animation.
+  // In Tailwind v4, scale-* uses the CSS `scale` property (not `transform`),
+  // so the transition list must include `scale` instead of `transform`.
   // Suppressed entirely when prefers-reduced-motion is active.
   const transitionClasses = reducedMotion
     ? ""
-    : "transition-[transform,opacity] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
+    : "transition-[scale,opacity] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
 
   return (
     <div

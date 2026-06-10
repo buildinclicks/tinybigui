@@ -217,6 +217,7 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
       className,
       style,
       children,
+      trackClassName,
       renderThumbContent,
       onThumbDraggingChange,
       ...ariaProps
@@ -294,7 +295,26 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
         data-variant={variant}
         {...(zeroPercent !== undefined ? { "data-zero-percent": zeroPercent } : {})}
       >
-        {label && <label {...labelProps}>{label}</label>}
+        {label && (
+          <label {...labelProps} className={cn(orientation === "vertical" && "sr-only")}>
+            {label}
+          </label>
+        )}
+        <output
+          {...outputProps}
+          className={cn(
+            orientation === "horizontal" && "justify-self-end",
+            orientation === "vertical" && "sr-only"
+          )}
+        >
+          {isRange
+            ? formatValue
+              ? `${formatValue(state.getThumbValue(0))} \u2013 ${formatValue(state.getThumbValue(1))}`
+              : `${state.getThumbValueLabel(0)} \u2013 ${state.getThumbValueLabel(1)}`
+            : formatValue
+              ? formatValue(state.getThumbValue(0))
+              : state.getThumbValueLabel(0)}
+        </output>
         <div
           {...trackProps}
           ref={trackRef}
@@ -304,7 +324,10 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
           // `relative` is required so the absolutely-positioned RA thumbs
           // (which carry all visual content in the new arch) are positioned
           // relative to this element.
-          className={cn("relative", orientation === "vertical" && "h-full w-full")}
+          className={cn(
+            trackClassName ?? "relative w-full",
+            orientation === "vertical" && !trackClassName && "h-full"
+          )}
         >
           {children}
           <SliderThumbInternal
@@ -337,15 +360,6 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
             />
           )}
         </div>
-        <output {...outputProps}>
-          {isRange
-            ? formatValue
-              ? `${formatValue(state.getThumbValue(0))} \u2013 ${formatValue(state.getThumbValue(1))}`
-              : `${state.getThumbValueLabel(0)} \u2013 ${state.getThumbValueLabel(1)}`
-            : formatValue
-              ? formatValue(state.getThumbValue(0))
-              : state.getThumbValueLabel(0)}
-        </output>
       </div>
     );
   }

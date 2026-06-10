@@ -205,6 +205,14 @@ export interface SliderHeadlessProps {
   children?: React.ReactNode;
 
   /**
+   * CSS classes applied to the `data-track` region element.
+   * The styled layer uses this to carry the size-based height/width and
+   * `touch-none` on the element React Aria measures for pointer math.
+   * When omitted, the track region defaults to `relative w-full`.
+   */
+  trackClassName?: string;
+
+  /**
    * Render prop called for each thumb to produce visual thumb content
    * (handle, state layer, value indicator). Receives the thumb's current
    * render state. When provided, visual content is rendered inside the
