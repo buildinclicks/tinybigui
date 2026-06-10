@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.1] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Tooltip** — MD3 slot-based styling refactor; 3-state `animation` variant with `prefers-reduced-motion` support; rich tooltip title token fix (`text-on-surface-variant`); action row layout alignment; reduced-motion unmount guard fixing stuck overlay bug; new rich tooltip slot CVA exports
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.21.0] - 2026-06-10
 
 ### Changed
