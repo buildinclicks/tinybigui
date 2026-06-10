@@ -12,9 +12,15 @@ import type { DialogHeadlineProps } from "./Dialog.types";
  * Renders as an `<h2>` element and registers its `id` with the parent
  * `DialogContext` so the dialog panel can wire `aria-labelledby` correctly.
  *
+ * When the parent dialog has a hero `icon` prop, the panel root carries
+ * `data-with-icon` and `group/dialog`, so the `group-data-[with-icon]/dialog:text-center`
+ * selector in `dialogHeadlineVariants` automatically centers the headline text —
+ * no additional props needed here.
+ *
  * For the `fullscreen` variant, the headline renders as a top app bar row
  * containing optional `closeButton` (leading icon button) and `confirmButton`
- * (trailing text action) per MD3 Full-screen Dialog spec.
+ * (trailing text action) per MD3 Full-screen Dialog spec. The fullscreen app bar
+ * always shows a `border-b border-outline-variant` divider below it.
  *
  * Must be rendered inside a `<Dialog>` or `<DialogHeadless>` component.
  *
@@ -50,7 +56,7 @@ export const DialogHeadline = forwardRef<HTMLHeadingElement, DialogHeadlineProps
 
     if (variant === "fullscreen") {
       return (
-        // Top app bar row for fullscreen variant
+        // Top app bar row for fullscreen variant — always has border-b border-outline-variant
         <div className={cn(dialogHeadlineVariants({ variant: "fullscreen" }), className)}>
           {/* Leading close icon button */}
           {closeButton}
@@ -67,6 +73,9 @@ export const DialogHeadline = forwardRef<HTMLHeadingElement, DialogHeadlineProps
     }
 
     return (
+      // Basic variant: text-headline-small, text-on-surface, mb-4
+      // group-data-[with-icon]/dialog:text-center is applied via the CVA base classes
+      // when the parent panel root has data-with-icon set by DialogHeadless.
       <h2
         ref={ref}
         id={headlineId}

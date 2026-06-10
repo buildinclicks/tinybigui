@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Dialog** — MD3 expressive motion refactor with composite `animate-md-*` keyframe utilities; new `icon` hero slot with auto center-alignment; scroll dividers in `DialogContent` via `ResizeObserver`; `prefers-reduced-motion` support; `dialogIconVariants` export; architecture alignment (`dialogWrapperVariants`, `getScrimClassName`, `getAnimationClassName` props on `DialogHeadless`)
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.21.1] - 2026-06-10
 
 ### Changed

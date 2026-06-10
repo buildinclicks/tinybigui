@@ -6,12 +6,13 @@ import type { ReactNode } from "react";
  * Structural variant of the MD3 Dialog.
  *
  * - `basic` — Floating dialog with headline, body, and action buttons.
- *   Supports scale + fade entry animation. Closes on scrim click or Escape.
- *   Max width 560dp per MD3 spec.
+ *   Supports scale + fade entry animation (MD3 Expressive, `animate-md-scale-in`).
+ *   Closes on scrim click or Escape. Max width 560dp per MD3 spec.
  *
  * - `fullscreen` — Full viewport overlay suited for mobile and complex forms.
  *   Replaces headline with a top app bar row (close icon + confirm action).
- *   Slide-up entry animation. Does NOT close on scrim click per MD3 spec.
+ *   Slide-up entry animation (`animate-md-slide-in-bottom`). Does NOT close on
+ *   scrim click per MD3 spec.
  *
  * @default 'basic'
  */
@@ -22,10 +23,12 @@ export type DialogVariant = "basic" | "fullscreen";
 /**
  * Internal animation state machine for the Dialog.
  *
- * - `entering` — initial mount state before transition fires
- * - `visible`  — fully shown, entry animation complete
- * - `exiting`  — exit animation in progress
- * - `exited`   — removed from DOM
+ * - `entering` — initial mount state; dialog starts invisible before animation fires
+ * - `visible`  — entry animation active (`animate-md-scale-in` / `animate-md-slide-in-bottom`)
+ * - `exiting`  — exit animation active (`animate-md-scale-out` / `animate-md-slide-out-bottom`)
+ * - `exited`   — animation complete; portal removes element from DOM
+ *
+ * The scrim receives the same state for its own fade-in/out animation.
  */
 export type DialogAnimationState = "entering" | "visible" | "exiting" | "exited";
 
@@ -68,7 +71,7 @@ export interface DialogContextValue {
  *   onOpenChange={setOpen}
  *   aria-label="Confirm action"
  *   className="bg-surface-container-high rounded-xl shadow-elevation-3"
- *   scrimClassName="fixed inset-0 z-40 bg-scrim opacity-32"
+ *   scrimClassName="fixed inset-0 z-40 bg-scrim/32"
  * >
  *   <DialogHeadline>Confirm deletion?</DialogHeadline>
  *   <DialogContent>This action cannot be undone.</DialogContent>
@@ -109,6 +112,22 @@ export interface DialogHeadlessProps {
   "aria-label"?: string;
 
   /**
+   * Optional hero icon rendered centered above the headline per MD3 spec.
+   * When present, sets `data-with-icon` on the panel root so headline and
+   * supporting text center-align via `group-data-[with-icon]/dialog:` selectors.
+   *
+   * Only rendered in the `basic` variant.
+   *
+   * @example
+   * ```tsx
+   * <Dialog icon={<BookmarkIcon />}>
+   *   <DialogHeadline>Save bookmark?</DialogHeadline>
+   * </Dialog>
+   * ```
+   */
+  icon?: ReactNode;
+
+  /**
    * Dialog slot content — typically `DialogHeadline`, `DialogContent`, `DialogActions`.
    */
   children: ReactNode;
@@ -119,13 +138,29 @@ export interface DialogHeadlessProps {
   className?: string;
 
   /**
-   * Additional CSS classes applied to the scrim overlay element.
+   * Additional CSS classes applied to the centering/positioning wrapper element.
+   * Consumed from `dialogWrapperVariants` by the styled `Dialog` layer.
    */
-  scrimClassName?: string;
+  wrapperClassName?: string;
+
+  /**
+   * Returns CSS classes for the scrim based on the current animation state.
+   * Called at render time to apply the correct fade-in/out animation.
+   * When `undefined`, falls back to a static base scrim class.
+   *
+   * @example
+   * ```tsx
+   * getScrimClassName={(state) => dialogScrimVariants({ animationState: state })}
+   * ```
+   */
+  getScrimClassName?: (state: DialogAnimationState) => string;
 
   /**
    * Additional CSS classes injected based on the current animation state.
    * Called at render time to merge CVA animation classes onto the panel.
+   *
+   * Returns empty string when `prefers-reduced-motion: reduce` is active
+   * (handled by the styled `Dialog` layer via `useReducedMotion`).
    *
    * @example
    * ```tsx
@@ -156,6 +191,16 @@ export interface DialogHeadlessProps {
  *   <DialogActions>
  *     <Button variant="text" onPress={() => setOpen(false)}>Cancel</Button>
  *     <Button variant="filled" onPress={handleDelete}>Delete</Button>
+ *   </DialogActions>
+ * </Dialog>
+ *
+ * // With hero icon
+ * <Dialog icon={<BookmarkIcon />} open={open} onOpenChange={setOpen}>
+ *   <DialogHeadline>Save bookmark?</DialogHeadline>
+ *   <DialogContent>The page will be saved to your bookmarks.</DialogContent>
+ *   <DialogActions>
+ *     <Button variant="text" onPress={() => setOpen(false)}>Cancel</Button>
+ *     <Button variant="filled" onPress={handleSave}>Save</Button>
  *   </DialogActions>
  * </Dialog>
  *
@@ -200,6 +245,20 @@ export interface DialogProps {
    * Accessible label for the dialog when no `DialogHeadline` is present.
    */
   "aria-label"?: string;
+
+  /**
+   * Optional hero icon rendered centered above the headline per MD3 spec.
+   * When present, headline and supporting text center-align automatically.
+   * Only rendered in the `basic` variant.
+   *
+   * @example
+   * ```tsx
+   * <Dialog icon={<BookmarkIcon />}>
+   *   <DialogHeadline>Save bookmark?</DialogHeadline>
+   * </Dialog>
+   * ```
+   */
+  icon?: ReactNode;
 
   /**
    * Dialog slot content — `DialogHeadline`, `DialogContent`, `DialogActions`.
@@ -268,6 +327,10 @@ export interface DialogHeadlineProps {
  *
  * Renders as a scrollable `<div>` and provides its `id` to `DialogContext`
  * so the parent dialog panel can reference it via `aria-describedby`.
+ *
+ * Shows MD3 scroll dividers (`border-outline-variant`) at the top and/or bottom
+ * of the scroll container when content overflows. Dividers are toggled via
+ * `data-scroll-divider-top` and `data-scroll-divider-bottom` attributes.
  *
  * @example
  * ```tsx
