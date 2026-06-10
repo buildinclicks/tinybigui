@@ -467,6 +467,9 @@ function LinearWavyDeterminate({
   // midY: 2px top padding + amplitude = midline position in px (= VB y-units, since y-scale=1)
   const midY = amplitude + 2;
   const trackHeightClass = thickness === "thick" ? "h-2" : "h-1";
+  // trackPx: the flat-track thickness (= stroke-width). The inactive segment and stop dot
+  // should match this so they look identical to the flat variant.
+  const trackPx = getStrokeWidth(thickness);
 
   // Amplitude ramp: 0 at 0% and 100%, full amplitude between 20% and 80%
   const rampedAmplitude =
@@ -523,19 +526,24 @@ function LinearWavyDeterminate({
         />
       </svg>
 
-      {/* Inactive segment after 4dp gap — DOM element, px-exact */}
+      {/* Inactive segment after 4dp gap — centered on midY, trackPx tall (matches flat variant) */}
       {percentage < 100 && (
         <div
           data-progress-inactive-segment=""
           className={cn(progressInactiveSegmentVariants())}
-          style={{ left: `calc(${percentage}% + ${INDICATOR_TRACK_GAP}px)` }}
+          style={{
+            left: `calc(${percentage}% + ${INDICATOR_TRACK_GAP}px)`,
+            height: trackPx,
+            top: midY - trackPx / 2,
+          }}
         />
       )}
 
-      {/* Stop indicator dot at trailing edge */}
+      {/* Stop indicator dot — centered on the wave's midY baseline */}
       <div
         data-stop-indicator=""
         className={cn(progressStopIndicatorVariants())}
+        style={{ top: midY }}
         aria-hidden="true"
       />
     </div>
@@ -566,6 +574,8 @@ function LinearWavyIndeterminate({
   const containerHeight = (thickness === "thick" ? 8 : 4) + 2 * amplitude + 4;
   const midY = amplitude + 2;
   const trackHeightClass = thickness === "thick" ? "h-2" : "h-1";
+  // trackPx: flat-track thickness so the inactive rail matches the flat variant's height
+  const trackPx = getStrokeWidth(thickness);
 
   const wavePath = buildLinearWavePath(VB_W, LINEAR_WAVE_COUNT, amplitude, midY);
 
@@ -575,8 +585,11 @@ function LinearWavyIndeterminate({
       className={cn("relative w-full overflow-hidden", trackHeightClass)}
       style={{ height: containerHeight }}
     >
-      {/* Full-width inactive track behind the animated segments */}
-      <div className="bg-primary-container absolute inset-0 rounded-full" />
+      {/* Full-width inactive track — trackPx tall, centered on midY (matches flat variant) */}
+      <div
+        className="bg-primary-container absolute right-0 left-0 rounded-full"
+        style={{ height: trackPx, top: midY - trackPx / 2 }}
+      />
 
       {/* Animated segments — same approach as flat but with SVG wave paths */}
       <div data-progress-indeterminate="" className="absolute inset-0">
@@ -808,13 +821,19 @@ function CircularWavyIndeterminate({
   cx,
   cy,
   radius,
-  circumference,
+  circumference: _circumference,
   viewBox,
   strokeWidth,
 }: CircularWavyGeometry): React.JSX.Element {
+  // Clamp amplitude so crests never exceed `radius` (= diameter/2 - strokeWidth/2).
+  // meanRadius is the wave's centreline; crests reach meanRadius + circAmp = radius exactly.
+  const circAmp = Math.min(WAVE_AMPLITUDE_DEFAULT, radius * 0.35);
+  const meanRadius = radius - circAmp;
+  const meanCircumference = 2 * Math.PI * meanRadius;
+
   // Integer waveCount → seamless close (sin(2π·N·1) = sin(2π·N·0) = 0)
-  const waveCount = Math.max(4, Math.round(circumference / WAVE_WAVELENGTH_CIRCULAR));
-  const wavePath = buildCircularWavePath(cx, cy, radius, WAVE_AMPLITUDE_DEFAULT, waveCount);
+  const waveCount = Math.max(4, Math.round(meanCircumference / WAVE_WAVELENGTH_CIRCULAR));
+  const wavePath = buildCircularWavePath(cx, cy, meanRadius, circAmp, waveCount);
 
   return (
     <div
@@ -826,17 +845,19 @@ function CircularWavyIndeterminate({
        * The entire SVG rotates via animate-progress-circular-rotate.
        * The wavy path has a static dash showing ~28% of the ring,
        * so the arc sweeps around as a rotating wavy segment.
+       * Inactive ring drawn at meanRadius so it is concentric with the wave centerline —
+       * no plain circle poking through behind the active wavy arc.
        */}
       <svg
         viewBox={viewBox}
         className="animate-progress-circular-rotate h-full w-full"
         aria-hidden="true"
       >
-        {/* Inactive full ring (primary-container) */}
+        {/* Inactive full ring (primary-container) at meanRadius */}
         <circle
           cx={cx}
           cy={cy}
-          r={radius}
+          r={meanRadius}
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
@@ -882,18 +903,23 @@ function CircularWavyDeterminate({
   cx,
   cy,
   radius,
-  circumference,
+  circumference: _circumference,
   viewBox,
   strokeWidth,
   diameter,
   reducedMotion,
 }: CircularWavyGeometry & { percentage: number; reducedMotion: boolean }): React.JSX.Element {
-  const waveCount = Math.max(4, Math.round(circumference / WAVE_WAVELENGTH_CIRCULAR));
-  const amp = reducedMotion ? 0 : WAVE_AMPLITUDE_DEFAULT;
-  const wavePath = buildCircularWavePath(cx, cy, radius, amp, waveCount);
+  // Clamp amplitude so crests never exceed `radius` → no viewBox clipping.
+  // meanRadius is the wave centreline; crest = meanRadius + circAmp = radius exactly.
+  const circAmp = reducedMotion ? 0 : Math.min(WAVE_AMPLITUDE_DEFAULT, radius * 0.35);
+  const meanRadius = radius - circAmp;
+  const meanCircumference = 2 * Math.PI * meanRadius;
 
-  // Gap expressed in pathLength=100 space
-  const gapPct = (INDICATOR_TRACK_GAP / circumference) * 100;
+  const waveCount = Math.max(4, Math.round(meanCircumference / WAVE_WAVELENGTH_CIRCULAR));
+  const wavePath = buildCircularWavePath(cx, cy, meanRadius, circAmp, waveCount);
+
+  // Gap expressed in pathLength=100 space (computed from meanRadius circumference for accuracy)
+  const gapPct = (INDICATOR_TRACK_GAP / meanCircumference) * 100;
   const activeLen = Math.max(0, percentage - gapPct);
   const inactiveLen = Math.max(0, 100 - percentage - gapPct);
   // Inactive arc starts after active + gap
@@ -905,14 +931,16 @@ function CircularWavyDeterminate({
        * -rotate-90 on the SVG makes both the circle and the wavy path start
        * at the visual 12 o'clock position (path starts at 3 o'clock
        * mathematically, rotated -90° to top visually).
+       * All arcs/rings drawn at meanRadius so they are concentric with the wave centerline —
+       * no plain circle showing through behind the active wavy arc.
        */}
       <svg viewBox={viewBox} className="h-full w-full -rotate-90" aria-hidden="true">
-        {/* Full inactive track at 0% */}
+        {/* Full inactive track at 0% — at meanRadius */}
         {percentage === 0 && (
           <circle
             cx={cx}
             cy={cy}
-            r={radius}
+            r={meanRadius}
             fill="none"
             stroke="currentColor"
             strokeWidth={strokeWidth}
@@ -920,12 +948,12 @@ function CircularWavyDeterminate({
           />
         )}
 
-        {/* Inactive arc (primary-container) — for 0 < percentage < 100 */}
+        {/* Inactive arc (primary-container) — for 0 < percentage < 100, at meanRadius */}
         {percentage > 0 && percentage < 100 && (
           <circle
             cx={cx}
             cy={cy}
-            r={radius}
+            r={meanRadius}
             fill="none"
             stroke="currentColor"
             strokeWidth={strokeWidth}
@@ -937,7 +965,7 @@ function CircularWavyDeterminate({
           />
         )}
 
-        {/* Active wavy arc (primary) — single element, no stacking */}
+        {/* Active wavy arc (primary) — single element, wave built at meanRadius */}
         {percentage > 0 && (
           <path
             data-progress-indicator=""

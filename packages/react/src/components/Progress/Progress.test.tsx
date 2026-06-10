@@ -519,6 +519,41 @@ describe("Progress", () => {
       const paths = container.querySelectorAll("path");
       expect(paths.length).toBe(1);
     });
+
+    // ── Regression guards added by polish pass ───────────────────────────────
+
+    test("linear wavy determinate inactive segment has trackPx height (4px default)", () => {
+      const { container } = render(
+        <Progress type="linear" value={40} shape="wavy" aria-label="Loading" />
+      );
+      const inactive = container.querySelector("[data-progress-inactive-segment]");
+      expect(inactive).toBeInTheDocument();
+      expect((inactive as HTMLElement).style.height).toBe("4px");
+    });
+
+    test("linear wavy determinate inactive segment has trackPx height (8px thick)", () => {
+      const { container } = render(
+        <Progress type="linear" value={40} shape="wavy" thickness="thick" aria-label="Loading" />
+      );
+      const inactive = container.querySelector("[data-progress-inactive-segment]");
+      expect(inactive).toBeInTheDocument();
+      expect((inactive as HTMLElement).style.height).toBe("8px");
+    });
+
+    test("circular wavy determinate active path coordinates are within viewBox bounds", () => {
+      // Medium circle: diameter=48, so all coordinates must be in [0, 48]
+      const { container } = render(
+        <Progress type="circular" value={50} shape="wavy" aria-label="Loading" />
+      );
+      const path = container.querySelector("[data-progress-indicator]");
+      expect(path).toBeInTheDocument();
+      const d = path?.getAttribute("d") ?? "";
+      // Extract all numbers from the path data and verify they are in [0, 48]
+      const nums = d.match(/-?[\d.]+/g)?.map(Number) ?? [];
+      expect(nums.length).toBeGreaterThan(0);
+      const allInBounds = nums.every((n) => n >= 0 && n <= 48);
+      expect(allInBounds).toBe(true);
+    });
   });
 
   // ---------------------------------------------------------------------------
