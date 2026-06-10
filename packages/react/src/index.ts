@@ -82,7 +82,7 @@ export { FAB, FABHeadless } from "./components/FAB";
 export type { FABProps, FABSize, FABColor, FABHeadlessProps } from "./components/FAB";
 
 export { TextField } from "./components/TextField";
-export type { TextFieldProps, TextFieldVariant, TextFieldSize } from "./components/TextField";
+export type { TextFieldProps, TextFieldVariant } from "./components/TextField";
 
 export { Checkbox } from "./components/Checkbox";
 export type { CheckboxProps } from "./components/Checkbox";
