@@ -26,13 +26,16 @@ export type {
   RadioGroupHeadlessProps,
 } from "./Radio.types";
 
-// Variants (for external customization if needed)
+// Variant types (for external customization if needed)
 export type {
-  RadioVariants,
-  RadioGroupVariants,
-  RadioContainerVariants,
-  RadioIconOuterVariants,
-  RadioIconInnerVariants,
+  RadioRootVariants,
+  RadioControlVariants,
+  RadioFocusRingVariants,
+  RadioTargetVariants,
+  RadioStateLayerVariants,
+  RadioRingVariants,
+  RadioDotVariants,
   RadioLabelVariants,
+  RadioGroupVariants,
   RadioGroupLabelVariants,
 } from "./Radio.variants";

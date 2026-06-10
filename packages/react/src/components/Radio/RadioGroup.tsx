@@ -70,7 +70,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
 
       // State props
       orientation = "vertical",
-      isInvalid: _isInvalid = false,
+      isInvalid = false,
       isDisabled = false,
 
       // Styling
@@ -109,17 +109,15 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
       <RadioGroupHeadless
         {...restPropsWithoutHtmlAttrs}
         isDisabled={isDisabled}
+        isInvalid={isInvalid}
         ref={ref}
         className={cn("flex flex-col", className)}
         data-testid={dataTestId}
         renderLabel={(labelProps) => (
           <div
             {...labelProps}
-            className={cn(
-              radioGroupLabelVariants({
-                disabled: isDisabled,
-              })
-            )}
+            data-disabled={isDisabled ? "" : undefined}
+            className={cn(radioGroupLabelVariants())}
           >
             {props.label}
           </div>
@@ -130,7 +128,6 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           className={cn(
             radioGroupVariants({
               orientation,
-              disabled: isDisabled,
             })
           )}
         >
