@@ -209,4 +209,15 @@ export interface SearchBarHeadlessProps extends SearchBarProps {
 export interface SearchViewHeadlessProps extends SearchViewProps {
   /** Ref forwarded to the view container div */
   ref?: React.Ref<HTMLDivElement>;
+  /**
+   * Slot class names applied directly to inner headless elements.
+   * Passed by SearchView so per-slot CVA classes can be applied
+   * without descendant-selector blobs.
+   */
+  headerClassName?: string;
+  backButtonClassName?: string;
+  clearButtonClassName?: string;
+  inputClassName?: string;
+  dividerClassName?: string;
+  contentClassName?: string;
 }

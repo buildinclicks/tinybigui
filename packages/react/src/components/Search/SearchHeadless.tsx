@@ -1,10 +1,49 @@
 "use client";
 
 import { forwardRef, useRef, useCallback } from "react";
+import type React from "react";
 import { createPortal } from "react-dom";
 import { useSearchField, useOverlay, usePreventScroll, useButton, FocusScope } from "react-aria";
 import { useSearchFieldState } from "react-stately";
 import type { SearchBarHeadlessProps, SearchViewHeadlessProps } from "./Search.types";
+
+// ─── MD3 Icons ────────────────────────────────────────────────────────────────
+
+/**
+ * MD3 Arrow Back icon — 24×24, currentColor, aria-hidden.
+ * Used as the leading button in Search View to close/collapse back to bar.
+ */
+const ArrowBackIcon = (): React.ReactElement => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+  </svg>
+);
+
+/**
+ * MD3 Close icon — 24×24, currentColor, aria-hidden.
+ * Used as the clear button in Search View to reset input text.
+ */
+const CloseIcon = (): React.ReactElement => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+  </svg>
+);
+
+// ─── SearchBarHeadless ────────────────────────────────────────────────────────
 
 /**
  * SearchBarHeadless — Layer 2 headless primitive for the MD3 Search bar.
@@ -103,6 +142,8 @@ export const SearchBarHeadless = forwardRef<HTMLFormElement, SearchBarHeadlessPr
 
 SearchBarHeadless.displayName = "SearchBarHeadless";
 
+// ─── SearchViewHeadless ───────────────────────────────────────────────────────
+
 /**
  * SearchViewHeadless — Layer 2 headless primitive for the MD3 Search view.
  *
@@ -116,7 +157,11 @@ SearchBarHeadless.displayName = "SearchBarHeadless";
  * - Body scroll lock when open
  * - Focus trap with auto-focus and restore on close
  * - aria-live region for autosuggest announcements
- * - Back arrow (leading icon) + input + clear button header
+ * - Back arrow (MD3 SVG icon) + input + clear button (MD3 SVG icon) header
+ *
+ * Slot class names (`headerClassName`, `backButtonClassName`, etc.) are passed
+ * from the styled `SearchView` layer so per-slot CVA classes apply directly to
+ * each element — no descendant-selector blobs needed.
  *
  * @example
  * ```tsx
@@ -145,6 +190,12 @@ export const SearchViewHeadless = forwardRef<HTMLDivElement, SearchViewHeadlessP
       leadingIcon,
       trailingActions,
       showDivider,
+      headerClassName,
+      backButtonClassName,
+      clearButtonClassName,
+      inputClassName,
+      dividerClassName,
+      contentClassName,
     },
     forwardedRef
   ) => {
@@ -166,6 +217,12 @@ export const SearchViewHeadless = forwardRef<HTMLDivElement, SearchViewHeadlessP
         {...(onChange !== undefined ? { onChange } : {})}
         {...(onSubmit !== undefined ? { onSubmit } : {})}
         {...(placeholder !== undefined ? { placeholder } : {})}
+        headerClassName={headerClassName}
+        backButtonClassName={backButtonClassName}
+        clearButtonClassName={clearButtonClassName}
+        inputClassName={inputClassName}
+        dividerClassName={dividerClassName}
+        contentClassName={contentClassName}
       >
         {children}
       </SearchViewPanel>,
@@ -176,7 +233,7 @@ export const SearchViewHeadless = forwardRef<HTMLDivElement, SearchViewHeadlessP
 
 SearchViewHeadless.displayName = "SearchViewHeadless";
 
-// ─── SearchViewPanel (internal) ──────────────────────────────────────────────
+// ─── SearchViewPanel (internal) ───────────────────────────────────────────────
 
 interface SearchViewPanelProps {
   onClose: () => void;
@@ -191,6 +248,13 @@ interface SearchViewPanelProps {
   leadingIcon?: React.ReactNode;
   trailingActions?: React.ReactNode[];
   showDivider?: boolean;
+  // Slot class names from the styled layer
+  headerClassName?: string | undefined;
+  backButtonClassName?: string | undefined;
+  clearButtonClassName?: string | undefined;
+  inputClassName?: string | undefined;
+  dividerClassName?: string | undefined;
+  contentClassName?: string | undefined;
 }
 
 /**
@@ -213,6 +277,12 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
       leadingIcon,
       trailingActions,
       showDivider,
+      headerClassName,
+      backButtonClassName,
+      clearButtonClassName,
+      inputClassName,
+      dividerClassName,
+      contentClassName,
     },
     forwardedRef
   ) => {
@@ -259,12 +329,21 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
       onClose();
     }, [onClose]);
 
-    const defaultBackArrow = (
-      <button type="button" aria-label="Back" onClick={handleBackClick} data-slot="back-button">
-        ←
+    // MD3 SVG back arrow — replaces the former literal "←" glyph
+    const defaultBackButton = (
+      <button
+        type="button"
+        aria-label="Back"
+        onClick={handleBackClick}
+        data-slot="back-button"
+        className={backButtonClassName}
+      >
+        <ArrowBackIcon />
       </button>
     );
 
+    // MD3 SVG close icon — replaces the former literal "✕" glyph
+    // Visible only when input has a value (controlled by state.value)
     const clearButton = state.value ? (
       <button
         {...clearBtnDomProps}
@@ -272,18 +351,32 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
         type="button"
         aria-label="Clear search"
         data-slot="clear-button"
+        className={clearButtonClassName}
       >
-        ✕
+        <CloseIcon />
       </button>
     ) : null;
 
     return (
       <FocusScope contain restoreFocus autoFocus>
         <div {...overlayProps} ref={ref} role="search" aria-label={ariaLabel} className={className}>
-          <div data-slot="header">
-            <span data-slot="leading-icon">{leadingIcon ?? defaultBackArrow}</span>
-            <input {...inputProps} ref={inputRef} role="searchbox" />
+          <div data-slot="header" className={headerClassName}>
+            {/* Leading icon: custom override or default MD3 back arrow */}
+            {leadingIcon ?? defaultBackButton}
+
+            {/* Search input */}
+            <input
+              {...inputProps}
+              ref={inputRef}
+              role="searchbox"
+              data-slot="input"
+              className={inputClassName}
+            />
+
+            {/* Clear button */}
             {clearButton}
+
+            {/* Trailing actions (view-state only) */}
             {trailingActions && trailingActions.length > 0 && (
               <span data-slot="trailing-actions">
                 {trailingActions.map((action, index) => (
@@ -294,8 +387,12 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
               </span>
             )}
           </div>
-          {showDivider && <hr data-slot="divider" />}
-          <div data-slot="content" aria-live="polite">
+
+          {/* Divider (divided style only) */}
+          {showDivider && <hr data-slot="divider" className={dividerClassName} />}
+
+          {/* Results / suggestions content area */}
+          <div data-slot="content" aria-live="polite" className={contentClassName}>
             {children}
           </div>
         </div>
