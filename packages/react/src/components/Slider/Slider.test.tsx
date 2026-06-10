@@ -780,32 +780,32 @@ describe("Slider — styled layer", () => {
     expect(handle).toHaveClass("rounded-[2px]");
   });
 
-  // 62. xsmall size: container has h-[44px]
+  // 62. xsmall size: track region has h-[44px]
   test("Slider xsmall size: container has h-[44px]", () => {
-    render(<Slider size="xsmall" label="Vol" defaultValue={[50]} />);
-    const group = screen.getByRole("group");
-    expect(group).toHaveClass("h-[44px]");
+    const { container } = render(<Slider size="xsmall" label="Vol" defaultValue={[50]} />);
+    const track = container.querySelector("[data-track]")!;
+    expect(track).toHaveClass("h-[44px]");
   });
 
-  // 63. medium size: container has h-[52px]
+  // 63. medium size: track region has h-[52px]
   test("Slider medium size: container has h-[52px]", () => {
-    render(<Slider size="medium" label="Vol" defaultValue={[50]} />);
-    const group = screen.getByRole("group");
-    expect(group).toHaveClass("h-[52px]");
+    const { container } = render(<Slider size="medium" label="Vol" defaultValue={[50]} />);
+    const track = container.querySelector("[data-track]")!;
+    expect(track).toHaveClass("h-[52px]");
   });
 
-  // 64. large size: container has h-[68px]
+  // 64. large size: track region has h-[68px]
   test("Slider large size: container has h-[68px]", () => {
-    render(<Slider size="large" label="Vol" defaultValue={[50]} />);
-    const group = screen.getByRole("group");
-    expect(group).toHaveClass("h-[68px]");
+    const { container } = render(<Slider size="large" label="Vol" defaultValue={[50]} />);
+    const track = container.querySelector("[data-track]")!;
+    expect(track).toHaveClass("h-[68px]");
   });
 
-  // 65. xlarge size: container has h-[108px]
+  // 65. xlarge size: track region has h-[108px]
   test("Slider xlarge size: container has h-[108px]", () => {
-    render(<Slider size="xlarge" label="Vol" defaultValue={[50]} />);
-    const group = screen.getByRole("group");
-    expect(group).toHaveClass("h-[108px]");
+    const { container } = render(<Slider size="xlarge" label="Vol" defaultValue={[50]} />);
+    const track = container.querySelector("[data-track]")!;
+    expect(track).toHaveClass("h-[108px]");
   });
 
   // 66. xsmall active track has h-[16px]
@@ -829,35 +829,37 @@ describe("Slider — styled layer", () => {
     expect(activeTrack).toHaveClass("h-[96px]");
   });
 
-  // 69. Track layout has gap-[6px] class
-  test("Slider track layout has gap-[6px] class", () => {
+  // 69. Track layout is absolute/inset-0/pointer-events-none (absolute-fill container)
+  test("Slider track layout is absolute inset-0 pointer-events-none", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
     const trackLayout = container.querySelector('[data-slot="track-layout"]');
     expect(trackLayout).toBeInTheDocument();
-    expect(trackLayout).toHaveClass("gap-[6px]");
+    expect(trackLayout).toHaveClass("absolute");
+    expect(trackLayout).toHaveClass("inset-0");
+    expect(trackLayout).toHaveClass("pointer-events-none");
   });
 
-  // 70. Disabled: active track has bg-on-surface and opacity-38
-  test("Slider disabled: active track has bg-on-surface and opacity-38", () => {
+  // 70. Disabled: active track has group-data-driven disabled classes
+  test("Slider disabled: active track has group-data disabled classes", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} isDisabled />);
     const activeTrack = container.querySelector('[data-slot="active-track"]');
-    expect(activeTrack).toHaveClass("bg-on-surface");
-    expect(activeTrack).toHaveClass("opacity-38");
+    expect(activeTrack).toHaveClass("group-data-[disabled]/slider:bg-on-surface");
+    expect(activeTrack).toHaveClass("group-data-[disabled]/slider:opacity-38");
   });
 
-  // 71. Disabled: inactive track has bg-on-surface/10
-  test("Slider disabled: inactive track has bg-on-surface/10", () => {
+  // 71. Disabled: inactive track has group-data-driven disabled class
+  test("Slider disabled: inactive track has group-data disabled class", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} isDisabled />);
     const inactiveTrack = container.querySelector('[data-slot="inactive-track"]');
-    expect(inactiveTrack).toHaveClass("bg-on-surface/10");
+    expect(inactiveTrack).toHaveClass("group-data-[disabled]/slider:bg-on-surface/10");
   });
 
-  // 72. Disabled: handle has bg-on-surface and opacity-38
-  test("Slider disabled: handle has bg-on-surface and opacity-38", () => {
+  // 72. Disabled: handle has group-data-driven disabled classes
+  test("Slider disabled: handle has group-data disabled classes", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} isDisabled />);
     const handle = container.querySelector('[data-slot="handle"]');
-    expect(handle).toHaveClass("bg-on-surface");
-    expect(handle).toHaveClass("opacity-38");
+    expect(handle).toHaveClass("group-data-[disabled]/slider-thumb:bg-on-surface");
+    expect(handle).toHaveClass("group-data-[disabled]/slider-thumb:opacity-38");
   });
 
   // 73. index.ts exports Slider, SliderHeadless, and all variants
@@ -947,21 +949,24 @@ describe("Slider — stop indicators and value indicator", () => {
     expect(tooltip).not.toBeInTheDocument();
   });
 
-  // 82. value indicator appears when thumb is pressed and showValueIndicator is true
-  test("value indicator appears when thumb is pressed and showValueIndicator is true", () => {
+  // 82. value indicator: pressing slider-thumb sets data-pressed attribute
+  // (CSS group-data-[pressed]/slider-thumb selector then reveals the indicator)
+  test("value indicator: pressing slider-thumb sets data-pressed when showValueIndicator is true", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
+    const thumbEl = container.querySelector('[data-slot="slider-thumb"]')!;
+    expect(thumbEl).toBeInTheDocument();
+    (thumbEl as HTMLElement).setPointerCapture = vi.fn();
+    (thumbEl as HTMLElement).releasePointerCapture = vi.fn();
+    fireEvent.pointerDown(thumbEl, { pointerId: 1, isPrimary: true, button: 0, buttons: 1 });
+    expect(thumbEl).toHaveAttribute("data-pressed");
+    // Indicator is always in DOM when showValueIndicator=true
     const tooltip = container.querySelector('[role="tooltip"]');
-    expect(tooltip).not.toHaveClass("opacity-0");
-    expect(tooltip).not.toHaveClass("scale-0");
+    expect(tooltip).toBeInTheDocument();
   });
 
   // 83. value indicator has bg-inverse-surface class
   test("value indicator has bg-inverse-surface class", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const tooltip = container.querySelector('[role="tooltip"]');
     expect(tooltip).toHaveClass("bg-inverse-surface");
   });
@@ -969,8 +974,6 @@ describe("Slider — stop indicators and value indicator", () => {
   // 84. value indicator has rounded-full class (pill shape)
   test("value indicator has rounded-full class (pill shape)", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const tooltip = container.querySelector('[role="tooltip"]');
     expect(tooltip).toHaveClass("rounded-full");
   });
@@ -978,8 +981,6 @@ describe("Slider — stop indicators and value indicator", () => {
   // 85. value indicator text has text-inverse-on-surface class
   test("value indicator text has text-inverse-on-surface class", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const textSpan = container.querySelector('[role="tooltip"] span');
     expect(textSpan).toHaveClass("text-inverse-on-surface");
   });
@@ -987,8 +988,6 @@ describe("Slider — stop indicators and value indicator", () => {
   // 86. value indicator text has text-label-large class
   test("value indicator text has text-label-large class", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const textSpan = container.querySelector('[role="tooltip"] span');
     expect(textSpan).toHaveClass("text-label-large");
   });
@@ -998,8 +997,6 @@ describe("Slider — stop indicators and value indicator", () => {
     const { container } = render(
       <Slider label="Vol" showValueIndicator formatValue={(v) => `$${v}`} defaultValue={[50]} />
     );
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const tooltip = container.querySelector('[role="tooltip"]');
     expect(tooltip).toHaveTextContent("$50");
   });
@@ -1007,8 +1004,6 @@ describe("Slider — stop indicators and value indicator", () => {
   // 88. value indicator has min-w-[48px] class
   test("value indicator has min-w-[48px] class", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const tooltip = container.querySelector('[role="tooltip"]');
     expect(tooltip).toHaveClass("min-w-[48px]");
   });
@@ -1033,11 +1028,12 @@ describe("Slider — stop indicators and value indicator", () => {
 // ---------------------------------------------------------------------------
 
 describe("Slider — vertical orientation", () => {
-  // 91. Track layout has flex-col-reverse in vertical orientation
-  test("vertical orientation: track layout has flex-col-reverse class", () => {
+  // 91. Track layout is absolute (absolute-fill container, orientation-agnostic)
+  test("vertical orientation: track layout is absolute", () => {
     const { container } = render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
     const trackLayout = container.querySelector('[data-slot="track-layout"]');
-    expect(trackLayout).toHaveClass("flex-col-reverse");
+    expect(trackLayout).toHaveClass("absolute");
+    expect(trackLayout).not.toHaveClass("flex-1");
   });
 
   // 92. Container has data-orientation="vertical"
@@ -1087,12 +1083,13 @@ describe("Slider — vertical orientation", () => {
     expect(group).toHaveClass("w-[52px]");
   });
 
-  // 97. Handle dimensions are swapped in vertical
-  test("vertical orientation: handle has h-[4px] and w-full", () => {
+  // 97. Handle dimensions are swapped in vertical — width is explicitly sized per MD3 §10.9
+  test("vertical orientation: handle has h-[4px] and w-[44px] for xsmall (no w-full)", () => {
     const { container } = render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
     const handle = container.querySelector('[data-slot="handle"]');
     expect(handle).toHaveClass("h-[4px]");
-    expect(handle).toHaveClass("w-full");
+    expect(handle).toHaveClass("w-[44px]");
+    expect(handle).not.toHaveClass("w-full");
   });
 });
 
@@ -1211,11 +1208,11 @@ describe("Slider — motion and animation", () => {
     mockUseReducedMotion.mockReturnValue(false);
   });
 
-  // 109. active track has transition-[flex-basis] class
-  test("active track has transition-[flex-basis] class", () => {
+  // 109. active track has transition-[left,width,right] class (horizontal spring)
+  test("active track has transition-[left,width,right] class", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
     const activeTrack = container.querySelector('[data-slot="active-track"]');
-    expect(activeTrack).toHaveClass("transition-[flex-basis]");
+    expect(activeTrack).toHaveClass("transition-[left,width,right]");
   });
 
   // 110. active track has duration-spring-standard-fast-spatial class
@@ -1239,18 +1236,18 @@ describe("Slider — motion and animation", () => {
     expect(handle).toHaveClass("transition-[width]");
   });
 
-  // 113. handle has duration-short2 class
-  test("handle has duration-short2 class", () => {
+  // 113. handle has duration-spring-standard-fast-spatial class (MD3 spring system)
+  test("handle has duration-spring-standard-fast-spatial class", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
     const handle = container.querySelector('[data-slot="handle"]');
-    expect(handle).toHaveClass("duration-short2");
+    expect(handle).toHaveClass("duration-spring-standard-fast-spatial");
   });
 
-  // 114. handle has ease-standard class for width transition
-  test("handle has ease-standard class for width transition", () => {
+  // 114. handle has ease-spring-standard-fast-spatial class (MD3 spring system)
+  test("handle has ease-spring-standard-fast-spatial class for width transition", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
     const handle = container.querySelector('[data-slot="handle"]');
-    expect(handle).toHaveClass("ease-standard");
+    expect(handle).toHaveClass("ease-spring-standard-fast-spatial");
   });
 
   // 115. state layer has transition-opacity class
@@ -1260,39 +1257,32 @@ describe("Slider — motion and animation", () => {
     expect(stateLayer).toHaveClass("transition-opacity");
   });
 
-  // 116. state layer has duration-short1 class
-  test("state layer has duration-short1 class", () => {
+  // 116. state layer has duration-spring-standard-fast-effects class (MD3 spring effects)
+  test("state layer has duration-spring-standard-fast-effects class", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
     const stateLayer = container.querySelector('[data-slot="state-layer"]');
-    expect(stateLayer).toHaveClass("duration-short1");
+    expect(stateLayer).toHaveClass("duration-spring-standard-fast-effects");
   });
 
-  // 117. value indicator has transition-[transform,opacity] class
-  test("value indicator has transition-[transform,opacity] class", () => {
+  // 117. value indicator has transition-[scale,opacity] class (Tailwind v4: scale is its own property)
+  test("value indicator has transition-[scale,opacity] class", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
     const tooltip = container.querySelector('[role="tooltip"]');
-    expect(tooltip).toHaveClass("transition-[transform,opacity]");
+    expect(tooltip).toHaveClass("transition-[scale,opacity]");
   });
 
-  // 118. value indicator entry: has duration-short3 and ease-standard-decelerate
-  test("value indicator entry: has duration-short3 and ease-standard-decelerate", () => {
+  // 118. value indicator has duration-spring-standard-fast-spatial class (spatial spring)
+  test("value indicator has duration-spring-standard-fast-spatial class", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const tooltip = container.querySelector('[role="tooltip"]');
-    expect(tooltip).toHaveClass("duration-short3");
-    expect(tooltip).toHaveClass("ease-standard-decelerate");
+    expect(tooltip).toHaveClass("duration-spring-standard-fast-spatial");
   });
 
-  // 119. value indicator exit: has duration-short2 and ease-standard-accelerate
-  test("value indicator exit: has duration-short2 and ease-standard-accelerate", () => {
+  // 119. value indicator has ease-spring-standard-fast-spatial class (spatial spring)
+  test("value indicator has ease-spring-standard-fast-spatial class", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
-    fireEvent.pointerUp(handle);
     const tooltip = container.querySelector('[role="tooltip"]');
-    expect(tooltip).toHaveClass("duration-short2");
-    expect(tooltip).toHaveClass("ease-standard-accelerate");
+    expect(tooltip).toHaveClass("ease-spring-standard-fast-spatial");
   });
 
   // 120. reduced motion: no transition classes on active track
@@ -1311,21 +1301,22 @@ describe("Slider — motion and animation", () => {
     expect(handle).not.toHaveClass("transition-[width]");
   });
 
-  // 122. reduced motion: value indicator appears instantly (no scale transition)
-  test("reduced motion: value indicator appears instantly (no scale transition)", () => {
+  // 122. reduced motion: value indicator has no transition class (appears instantly)
+  test("reduced motion: value indicator has no transition class", () => {
     mockUseReducedMotion.mockReturnValue(true);
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
     const tooltip = container.querySelector('[role="tooltip"]');
-    expect(tooltip).not.toHaveClass("transition-[transform,opacity]");
+    expect(tooltip).not.toHaveClass("transition-[scale,opacity]");
   });
 
-  // 123. drag state: active track suppresses transition (transition-none)
+  // 123. drag state: active track suppresses spring transition
+  // Triggered by pressing the slider-thumb (the RA-positioned interactive element)
   test("drag state: active track suppresses spring transition", () => {
     const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
+    const thumbEl = container.querySelector('[data-slot="slider-thumb"]')!;
+    (thumbEl as HTMLElement).setPointerCapture = vi.fn();
+    (thumbEl as HTMLElement).releasePointerCapture = vi.fn();
+    fireEvent.pointerDown(thumbEl, { pointerId: 1, isPrimary: true, button: 0, buttons: 1 });
     const activeTrack = container.querySelector('[data-slot="active-track"]');
     expect(activeTrack).not.toHaveClass("transition-[flex-basis]");
   });
@@ -1502,11 +1493,11 @@ describe("Slider — accessibility", () => {
   // 138. value indicator is not announced to screen reader
   test("value indicator is not announced to screen reader", () => {
     const { container } = render(<Slider label="Vol" showValueIndicator defaultValue={[50]} />);
-    const handle = container.querySelector('[data-slot="handle"]')!;
-    fireEvent.pointerDown(handle);
+    // Indicator is always in DOM when showValueIndicator=true (CSS-driven visibility)
     const indicator = container.querySelector('[data-slot="value-indicator"]');
     expect(indicator).not.toBeNull();
-    // role="tooltip" is a non-live landmark — not a live region; or aria-hidden when collapsed
+    // role="tooltip" is a non-live landmark; aria-hidden="true" permanently since
+    // accessible value is in the <output> element managed by React Aria
     const hasTooltipRole = indicator?.getAttribute("role") === "tooltip";
     const isAriaHidden = indicator?.getAttribute("aria-hidden") === "true";
     expect(hasTooltipRole || isAriaHidden).toBe(true);
@@ -1590,5 +1581,99 @@ describe("Slider — stories", () => {
     const input = container.querySelector('input[type="range"]');
     expect(group).toHaveAttribute("data-disabled");
     expect(input).toBeDisabled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Slider — regression tests (absolute track layout)
+// ---------------------------------------------------------------------------
+
+describe("Slider — absolute track layout regression", () => {
+  // R1. Vertical at value=0: active track is absolute, has no flex-1
+  test("vertical value=0: active track is absolute and has no flex-1", () => {
+    const { container } = render(<Slider label="Vol" orientation="vertical" defaultValue={[0]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("absolute");
+    expect(activeTrack).not.toHaveClass("flex-1");
+  });
+
+  // R2. Range at defaultValue=[0, 50]: renders all three segments without throwing
+  test("range at [0, 50] renders all three track segments", () => {
+    const { container } = render(<Slider variant="range" label="Range" defaultValue={[0, 50]} />);
+    expect(container.querySelector('[data-slot="inactive-track-left"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="active-track"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="inactive-track-right"]')).toBeInTheDocument();
+  });
+
+  // R3. Range at defaultValue=[50, 100]: renders all three segments without throwing
+  test("range at [50, 100] renders all three track segments", () => {
+    const { container } = render(<Slider variant="range" label="Range" defaultValue={[50, 100]} />);
+    expect(container.querySelector('[data-slot="inactive-track-left"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="active-track"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="inactive-track-right"]')).toBeInTheDocument();
+  });
+
+  // R4. Active track is absolute (not flex-shrink-0 / flex-1)
+  test("horizontal active track is absolute", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    expect(activeTrack).toHaveClass("absolute");
+    expect(activeTrack).not.toHaveClass("flex-shrink-0");
+    expect(activeTrack).not.toHaveClass("flex-1");
+  });
+
+  // R5. Inactive track is absolute (not flex-1)
+  test("horizontal inactive track is absolute", () => {
+    const { container } = render(<Slider label="Vol" defaultValue={[50]} />);
+    const inactiveTrack = container.querySelector('[data-slot="inactive-track"]');
+    expect(inactiveTrack).toHaveClass("absolute");
+    expect(inactiveTrack).not.toHaveClass("flex-1");
+  });
+
+  // R6. Vertical track region uses flex-1 (not h-full) so it fills the flex container
+  test("vertical track region has flex-1 and not h-full", () => {
+    const { container } = render(<Slider label="Vol" orientation="vertical" defaultValue={[50]} />);
+    const track = container.querySelector("[data-track]");
+    expect(track).toHaveClass("flex-1");
+    expect(track).not.toHaveClass("h-full");
+  });
+
+  // R7. Vertical handle width scales per size (medium = 52px, xlarge = 108px)
+  test("vertical handle width is w-[52px] for medium size", () => {
+    const { container } = render(
+      <Slider label="Vol" orientation="vertical" size="medium" defaultValue={[50]} />
+    );
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("w-[52px]");
+    expect(handle).not.toHaveClass("w-full");
+  });
+
+  test("vertical handle width is w-[108px] for xlarge size", () => {
+    const { container } = render(
+      <Slider label="Vol" orientation="vertical" size="xlarge" defaultValue={[50]} />
+    );
+    const handle = container.querySelector('[data-slot="handle"]');
+    expect(handle).toHaveClass("w-[108px]");
+    expect(handle).not.toHaveClass("w-full");
+  });
+
+  // R8. Vertical centered variant renders all three track segments (active + 2 inactive)
+  test("vertical centered renders active track and two inactive segments", () => {
+    const { container } = render(
+      <Slider
+        label="Balance"
+        variant="centered"
+        orientation="vertical"
+        minValue={-50}
+        maxValue={50}
+        defaultValue={[20]}
+      />
+    );
+    const activeTrack = container.querySelector('[data-slot="active-track"]');
+    const inactiveTracks = container.querySelectorAll(
+      '[data-slot="inactive-track-left"], [data-slot="inactive-track-right"]'
+    );
+    expect(activeTrack).toBeInTheDocument();
+    expect(inactiveTracks).toHaveLength(2);
   });
 });

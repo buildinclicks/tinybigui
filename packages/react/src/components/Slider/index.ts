@@ -11,6 +11,7 @@ export { SliderValueIndicator } from "./SliderValueIndicator";
 // CVA Variants
 export {
   sliderContainerVariants,
+  sliderTrackRegionVariants,
   sliderActiveTrackVariants,
   sliderInactiveTrackVariants,
   sliderHandleVariants,
@@ -32,6 +33,7 @@ export type {
   SliderHeadlessProps,
   SliderThumbProps,
   SliderProps,
+  SliderThumbRenderState,
   SliderThumbState,
   SliderRenderState,
   SliderRangeThumbLabels,

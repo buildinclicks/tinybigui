@@ -3,7 +3,7 @@
 import type React from "react";
 import { cn } from "../../utils/cn";
 import { sliderStopsContainerVariants, sliderStopDotVariants } from "./Slider.variants";
-import type { SliderVariant } from "./Slider.types";
+import type { SliderSize, SliderVariant } from "./Slider.types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -62,9 +62,10 @@ interface SliderStopsProps {
    */
   variant: SliderVariant;
   /**
-   * Whether the slider is disabled (renders dots at 38% opacity).
+   * Size of the slider (controls dot dimensions).
+   * @default 'xsmall'
    */
-  isDisabled: boolean;
+  size?: SliderSize;
   /**
    * Additional CSS classes for the stops container.
    */
@@ -80,6 +81,9 @@ interface SliderStopsProps {
  * colored `on-primary` on the active track and `on-secondary-container` on
  * the inactive track. Padding of 4dp from track edges.
  *
+ * Disabled dot styling is driven by `group-data-[disabled]/slider:` CSS
+ * selectors on the root slider container — no explicit `isDisabled` prop needed.
+ *
  * This is a purely decorative sub-component. All accessibility information
  * is carried by the underlying `<input type="range">` via React Aria.
  *
@@ -91,7 +95,7 @@ interface SliderStopsProps {
  *   step={10}
  *   values={[50]}
  *   variant="standard"
- *   isDisabled={false}
+ *   size="xsmall"
  * />
  * ```
  */
@@ -101,7 +105,7 @@ export function SliderStops({
   step,
   values,
   variant,
-  isDisabled,
+  size = "xsmall",
   className,
 }: SliderStopsProps): React.JSX.Element {
   const stopCount = Math.floor((maxValue - minValue) / step) + 1;
@@ -120,7 +124,10 @@ export function SliderStops({
             key={i}
             data-slot="stop-dot"
             className={cn(
-              sliderStopDotVariants({ onActiveTrack: isOnActive, disabled: isDisabled })
+              sliderStopDotVariants({
+                region: isOnActive ? "active" : "inactive",
+                size,
+              })
             )}
           />
         );

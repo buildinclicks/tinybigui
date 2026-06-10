@@ -9,6 +9,7 @@ import { SliderStops } from "./SliderStops";
 import { SliderValueIndicator } from "./SliderValueIndicator";
 import {
   sliderContainerVariants,
+  sliderTrackRegionVariants,
   sliderActiveTrackVariants,
   sliderInactiveTrackVariants,
   sliderHandleVariants,
@@ -17,7 +18,7 @@ import {
   sliderTrackStopVariants,
   sliderInsetIconVariants,
 } from "./Slider.variants";
-import type { SliderProps, SliderThumbState } from "./Slider.types";
+import type { SliderProps, SliderThumbRenderState } from "./Slider.types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -34,20 +35,76 @@ function resolveDefaultValue(
   return [minValue];
 }
 
+/**
+ * MD3 thumb-track gap: 6dp total, split symmetrically as 3px per side.
+ * Applied as an offset from the thumb's percentage position.
+ */
+const GAP_PX = 3;
+
+/**
+ * Build inline CSS position styles for an absolutely-positioned track segment.
+ *
+ * All segments share the same `position: absolute` coordinate space as the
+ * React Aria thumbs (`left: pct%` / `bottom: pct%`), so fills always align
+ * with handle positions regardless of value, variant, or orientation.
+ *
+ * Horizontal segments span along the X axis; vertical along Y (bottom = 0).
+ */
+function segmentStyle(
+  orientation: "horizontal" | "vertical",
+  opts: {
+    /** Start edge as a percentage of the track length. `null` = track start (0). */
+    start: number | null;
+    /** End edge as a percentage of the track length. `null` = track end (100). */
+    end: number | null;
+    /** Px offset added to the start edge (gap inset from a thumb). */
+    startGap?: number;
+    /** Px offset subtracted from the end edge (gap inset from a thumb). */
+    endGap?: number;
+  }
+): React.CSSProperties {
+  const { start, end, startGap = 0, endGap = 0 } = opts;
+
+  const startVal = start !== null ? `calc(${start}% + ${startGap}px)` : `${startGap}px`;
+  const endVal = end !== null ? `calc(${100 - end}% + ${endGap}px)` : `${endGap}px`;
+
+  if (orientation === "horizontal") {
+    return { left: startVal, right: endVal };
+  }
+  // Vertical: start = bottom edge, end = top edge (fills upward from 0)
+  return { bottom: startVal, top: endVal };
+}
+
 // ─── Slider ───────────────────────────────────────────────────────────────────
 
 /**
  * Material Design 3 Slider Component (Layer 3: Styled)
  *
- * Wraps SliderHeadless with CVA styling for all five MD3 Expressive sizes.
- * Renders the visual track layout (active track → handle → inactive track) as
- * children inside the headless track element.
+ * Wraps `SliderHeadless` with CVA styling for all five MD3 Expressive sizes.
+ * Renders the visual track layout (active/inactive tracks) as children inside
+ * the headless track element. The visual handle, state layer, and value indicator
+ * are rendered as children of the React Aria thumb element via `renderThumbContent`,
+ * which positions them exactly at the value percentage.
  *
+ * **Architecture (Variants-vs-States)**
+ * - Interaction states (hover, pressed/dragging, disabled, focus) are driven by
+ *   React Aria hooks → `getInteractionDataAttributes` → `data-*` on the RA thumb
+ *   (`group/slider-thumb`) → `group-data-[x]/slider-thumb:*` CSS selectors.
+ * - No manual pointer state machine — React Aria's `isDragging`, `isHovered`,
+ *   and `isFocusVisible` are the single source of truth.
+ * - Disabled track/stop colors use `group-data-[disabled]/slider:*` selectors
+ *   from the root `group/slider` scope.
+ *
+ * **Geometry (documented inline-style exception)**
  * Track widths are driven by runtime values and use inline `flexBasis` styles —
  * a documented exception for geometry that cannot be expressed as design tokens.
  *
- * Motion: MD3 Appendix E token pairings applied; JS-driven animations are
- * guarded with `useReducedMotion()`.
+ * **Motion**
+ * - Track fill: spring-standard-fast-spatial (suppressed during drag + reduced motion)
+ * - Handle width: spring-standard-fast-spatial (suppressed for reduced motion)
+ * - State layer opacity: spring-standard-fast-effects (always present; CSS media
+ *   query handles `prefers-reduced-motion` for CSS-driven changes)
+ * - Value indicator: spring-standard-fast-spatial (suppressed for reduced motion)
  *
  * @example
  * ```tsx
@@ -102,32 +159,33 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       [value, onChange]
     );
 
-    // Thumb interaction states — tracked for state layer opacity
-    const thumbCount = variant === "range" ? 2 : 1;
-    const [thumbStates, setThumbStates] = useState<SliderThumbState[]>(() =>
-      Array<SliderThumbState>(thumbCount).fill("enabled")
-    );
+    // Track whether any thumb is actively dragging so we can suppress the
+    // flex-basis spring transition during pointer drag (immediate feedback).
+    // Driven by onThumbDraggingChange callback from SliderHeadless.
+    const [anyThumbDragging, setAnyThumbDragging] = useState(false);
 
-    // Pointer-pressed on any thumb means the user is actively dragging.
-    // During drag: track fill suppresses transition for immediate pointer response.
-    const isDragging = thumbStates.some((s) => s === "pressed");
+    const handleThumbDraggingChange = useCallback((_index: number, isDragging: boolean) => {
+      setAnyThumbDragging(isDragging);
+    }, []);
 
-    // MD3 Appendix E: Track fill — spring-standard-fast-spatial (spatial, standard, fast).
-    // Suppressed during drag (follows pointer immediately) and when reduced motion is preferred.
+    // ── Motion classes ─────────────────────────────────────────────────────────
+
+    // MD3 spring system: Track segment position/size — spring-standard-fast-spatial.
+    // Suppressed during drag (follows pointer immediately) and reduced motion.
+    // Horizontal segments animate left+width; vertical animate top+bottom+height.
+    const springTokens = "duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
     const trackTransition =
-      reducedMotion || isDragging
+      reducedMotion || anyThumbDragging
         ? ""
-        : "transition-[flex-basis] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
+        : orientation === "vertical"
+          ? `transition-[top,bottom,height] ${springTokens}`
+          : `transition-[left,width,right] ${springTokens}`;
 
-    // MD3 Appendix E: Handle width change — standard, fast (duration-short2 + ease-standard).
-    // Spatial property (width), guarded by reduced motion.
-    const handleMotion = reducedMotion ? "" : "transition-[width] duration-short2 ease-standard";
-
-    // MD3 Appendix E: State layer opacity — effects, standard, fast (duration-short1 + ease-standard).
-    // Effects property (opacity), guarded by reduced motion.
-    const stateLayerMotion = reducedMotion
+    // MD3 spring system: Handle width change (4dp → 2dp on press) — spatial spring.
+    // Suppressed for reduced motion; applied by the renderThumbContent closure.
+    const handleMotion = reducedMotion
       ? ""
-      : "transition-opacity duration-short1 ease-standard";
+      : "transition-[width] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
 
     const isRange = variant === "range";
     const isCentered = variant === "centered";
@@ -139,88 +197,71 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       variant === "standard" &&
       (size === "medium" || size === "large" || size === "xlarge");
 
+    // ── Thumb content render prop ──────────────────────────────────────────────
+    // Renders the visual handle, state layer, and value indicator INSIDE the
+    // React Aria thumb element (absolutely positioned at the value percentage).
+    // All interaction styling is driven by group-data-[x]/slider-thumb selectors.
+    const renderThumbContent = useCallback(
+      ({ value: thumbValue }: SliderThumbRenderState): React.ReactNode => (
+        <>
+          {/* Transparent hit-area enlarged beyond the 4dp visual handle so
+              dragging is comfortable. aria-hidden so it is invisible to AT. */}
+          <div
+            aria-hidden="true"
+            className={cn(
+              "absolute",
+              "left-1/2",
+              "top-1/2",
+              "-translate-x-1/2",
+              "-translate-y-1/2",
+              orientation === "vertical" ? "h-[20px] w-full" : "h-full w-[20px]"
+            )}
+          />
+          {/* Visual handle — narrows from 4dp to 2dp on press via group-data */}
+          <div
+            data-slot="handle"
+            className={cn(sliderHandleVariants({ size, orientation }), handleMotion)}
+          />
+          {/* State layer — opacity driven by group-data hover/focus/pressed */}
+          <div data-slot="state-layer" className={cn(sliderHandleStateLayerVariants())} />
+          {/* Value indicator — always in DOM; CSS shows/hides via group-data-[pressed] */}
+          {showValueIndicator && (
+            <SliderValueIndicator
+              value={thumbValue}
+              {...(formatValue !== undefined ? { formatValue } : {})}
+            />
+          )}
+        </>
+      ),
+      [size, orientation, showValueIndicator, formatValue, handleMotion]
+    );
+
     // ── Standard track render ──────────────────────────────────────────────────
     const renderStandardTrack = (): React.JSX.Element => {
       const pct = clampPercent(currentValues[0] ?? minValue, minValue, maxValue);
-      const thumb0State: SliderThumbState = isDisabled ? "disabled" : (thumbStates[0] ?? "enabled");
 
       return (
         <>
-          {/* Active track — width/height driven by current value percentage */}
+          {/* Active track — spans from track start to 3px before the handle */}
           <div
             data-slot="active-track"
-            className={cn(
-              sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
-              trackTransition
-            )}
-            style={{ flexBasis: `${pct}%` }}
+            className={cn(sliderActiveTrackVariants({ size, orientation }), trackTransition)}
+            style={segmentStyle(orientation, { start: null, end: pct, endGap: GAP_PX })}
           >
             {showIcon && (
               <span
                 data-slot="inset-icon"
-                className={cn(
-                  sliderInsetIconVariants({
-                    size,
-                    orientation,
-                  })
-                )}
+                className={cn(sliderInsetIconVariants({ size, orientation }))}
               >
                 {icon}
               </span>
             )}
           </div>
-          {/* Visual handle — decorative; keyboard/pointer behaviour is in SliderThumbInternal.
-               stopPropagation prevents pointer events from bubbling to the React Aria track
-               which would trigger a position calculation (NaN in JSDOM / no-layout envs). */}
-          <div
-            data-slot="handle"
-            className={cn(
-              sliderHandleVariants({
-                size,
-                disabled: isDisabled,
-                pressed: thumb0State === "pressed",
-                orientation,
-              }),
-              handleMotion
-            )}
-            onPointerEnter={() => {
-              if (!isDisabled) setThumbStates(["hovered"]);
-            }}
-            onPointerLeave={() => {
-              if (!isDisabled) setThumbStates(["enabled"]);
-            }}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              if (!isDisabled) setThumbStates(["pressed"]);
-            }}
-            onPointerUp={(e) => {
-              e.stopPropagation();
-              if (!isDisabled) setThumbStates(["enabled"]);
-            }}
-          >
-            <div
-              data-slot="state-layer"
-              className={cn(
-                sliderHandleStateLayerVariants({ state: thumb0State }),
-                stateLayerMotion
-              )}
-            />
-            {showValueIndicator && (
-              <SliderValueIndicator
-                value={currentValues[0] ?? minValue}
-                isVisible={thumb0State === "pressed"}
-                {...(formatValue !== undefined ? { formatValue } : {})}
-              />
-            )}
-          </div>
-          {/* Inactive track — fills remaining flex space */}
+          {/* Inactive track — spans from 3px after the handle to track end */}
           <div
             data-slot="inactive-track"
-            className={cn(
-              sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
-              trackTransition
-            )}
-            style={{ flexBasis: `${100 - pct}%` }}
+            className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+            style={segmentStyle(orientation, { start: pct, startGap: GAP_PX, end: null })}
           >
             {showStops && (
               <span
@@ -237,24 +278,14 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
     const renderRangeTrack = (): React.JSX.Element => {
       const leftPct = clampPercent(currentValues[0] ?? minValue, minValue, maxValue);
       const rightPct = clampPercent(currentValues[1] ?? maxValue, minValue, maxValue);
-      const thumb0State: SliderThumbState = isDisabled ? "disabled" : (thumbStates[0] ?? "enabled");
-      const thumb1State: SliderThumbState = isDisabled ? "disabled" : (thumbStates[1] ?? "enabled");
-
-      const setThumb0 = (next: SliderThumbState): void =>
-        setThumbStates((s) => [next, s[1] ?? "enabled"] as SliderThumbState[]);
-      const setThumb1 = (next: SliderThumbState): void =>
-        setThumbStates((s) => [s[0] ?? "enabled", next] as SliderThumbState[]);
 
       return (
         <>
-          {/* Left inactive track */}
+          {/* Left inactive track — track start to 3px before left handle */}
           <div
             data-slot="inactive-track-left"
-            className={cn(
-              sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
-              trackTransition
-            )}
-            style={{ flexBasis: `${leftPct}%` }}
+            className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+            style={segmentStyle(orientation, { start: null, end: leftPct, endGap: GAP_PX })}
           >
             {showStops && (
               <span
@@ -263,110 +294,26 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               />
             )}
           </div>
-          {/* Left handle */}
-          <div
-            data-slot="handle"
-            data-index="0"
-            className={cn(
-              sliderHandleVariants({
-                size,
-                disabled: isDisabled,
-                pressed: thumb0State === "pressed",
-                orientation,
-              }),
-              handleMotion
-            )}
-            onPointerEnter={() => {
-              if (!isDisabled) setThumb0("hovered");
-            }}
-            onPointerLeave={() => {
-              if (!isDisabled) setThumb0("enabled");
-            }}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              if (!isDisabled) setThumb0("pressed");
-            }}
-            onPointerUp={(e) => {
-              e.stopPropagation();
-              if (!isDisabled) setThumb0("enabled");
-            }}
-          >
-            <div
-              data-slot="state-layer"
-              className={cn(
-                sliderHandleStateLayerVariants({ state: thumb0State }),
-                stateLayerMotion
-              )}
-            />
-            {showValueIndicator && (
-              <SliderValueIndicator
-                value={currentValues[0] ?? minValue}
-                isVisible={thumb0State === "pressed"}
-                {...(formatValue !== undefined ? { formatValue } : {})}
-              />
-            )}
-          </div>
-          {/* Active track — area between the two handles */}
+          {/* Active track — 3px after left handle to 3px before right handle */}
           <div
             data-slot="active-track"
             className={cn(
-              sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
-              "rounded-[2px]", // Both ends near handles: 2dp (MD3 §10.2)
+              sliderActiveTrackVariants({ size, orientation }),
+              "rounded-[2px]", // Both ends near handles: 2dp inner (MD3 §10.2)
               trackTransition
             )}
-            style={{ flexBasis: `${rightPct - leftPct}%` }}
+            style={segmentStyle(orientation, {
+              start: leftPct,
+              startGap: GAP_PX,
+              end: rightPct,
+              endGap: GAP_PX,
+            })}
           />
-          {/* Right handle */}
-          <div
-            data-slot="handle"
-            data-index="1"
-            className={cn(
-              sliderHandleVariants({
-                size,
-                disabled: isDisabled,
-                pressed: thumb1State === "pressed",
-                orientation,
-              }),
-              handleMotion
-            )}
-            onPointerEnter={() => {
-              if (!isDisabled) setThumb1("hovered");
-            }}
-            onPointerLeave={() => {
-              if (!isDisabled) setThumb1("enabled");
-            }}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              if (!isDisabled) setThumb1("pressed");
-            }}
-            onPointerUp={(e) => {
-              e.stopPropagation();
-              if (!isDisabled) setThumb1("enabled");
-            }}
-          >
-            <div
-              data-slot="state-layer"
-              className={cn(
-                sliderHandleStateLayerVariants({ state: thumb1State }),
-                stateLayerMotion
-              )}
-            />
-            {showValueIndicator && (
-              <SliderValueIndicator
-                value={currentValues[1] ?? maxValue}
-                isVisible={thumb1State === "pressed"}
-                {...(formatValue !== undefined ? { formatValue } : {})}
-              />
-            )}
-          </div>
-          {/* Right inactive track */}
+          {/* Right inactive track — 3px after right handle to track end */}
           <div
             data-slot="inactive-track-right"
-            className={cn(
-              sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
-              trackTransition
-            )}
-            style={{ flexBasis: `${100 - rightPct}%` }}
+            className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+            style={segmentStyle(orientation, { start: rightPct, startGap: GAP_PX, end: null })}
           >
             {showStops && (
               <span
@@ -385,110 +332,59 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       const zeroPct =
         minValue >= 0 ? 0 : maxValue <= 0 ? 100 : ((0 - minValue) / (maxValue - minValue)) * 100;
 
-      const thumb0State: SliderThumbState = isDisabled ? "disabled" : (thumbStates[0] ?? "enabled");
-
-      const handleEl = (
-        <div
-          data-slot="handle"
-          className={cn(
-            sliderHandleVariants({
-              size,
-              disabled: isDisabled,
-              pressed: thumb0State === "pressed",
-              orientation,
-            }),
-            handleMotion
-          )}
-          onPointerEnter={() => {
-            if (!isDisabled) setThumbStates(["hovered"]);
-          }}
-          onPointerLeave={() => {
-            if (!isDisabled) setThumbStates(["enabled"]);
-          }}
-          onPointerDown={(e) => {
-            e.stopPropagation();
-            if (!isDisabled) setThumbStates(["pressed"]);
-          }}
-          onPointerUp={(e) => {
-            e.stopPropagation();
-            if (!isDisabled) setThumbStates(["enabled"]);
-          }}
-        >
-          <div
-            data-slot="state-layer"
-            className={cn(sliderHandleStateLayerVariants({ state: thumb0State }), stateLayerMotion)}
-          />
-          {showValueIndicator && (
-            <SliderValueIndicator
-              value={currentValues[0] ?? minValue}
-              isVisible={thumb0State === "pressed"}
-              {...(formatValue !== undefined ? { formatValue } : {})}
-            />
-          )}
-        </div>
-      );
-
       if (thumbPct >= zeroPct) {
-        // Positive direction: inactive-left | handle | active | inactive-right
-        const activePct = thumbPct - zeroPct;
+        // Positive direction: inactive-left | active | inactive-right
         return (
           <>
+            {/* Left inactive — track start to zero point (no gap at center) */}
             <div
               data-slot="inactive-track-left"
-              className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
-                trackTransition
-              )}
-              style={{ flexBasis: `${zeroPct}%` }}
+              className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, { start: null, end: zeroPct })}
             />
-            {handleEl}
+            {/* Active — zero point to 3px before handle */}
             <div
               data-slot="active-track"
-              className={cn(
-                sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
-                trackTransition
-              )}
-              style={{ flexBasis: `${activePct}%` }}
+              className={cn(sliderActiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, {
+                start: zeroPct,
+                end: thumbPct,
+                endGap: GAP_PX,
+              })}
             />
+            {/* Right inactive — 3px after handle to track end */}
             <div
               data-slot="inactive-track-right"
-              className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
-                trackTransition
-              )}
-              style={{ flexBasis: `${100 - zeroPct - activePct}%` }}
+              className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, { start: thumbPct, startGap: GAP_PX, end: null })}
             />
           </>
         );
       } else {
-        // Negative direction: inactive-left | active | handle | inactive-right
-        const activePct = zeroPct - thumbPct;
+        // Negative direction: inactive-left | active | inactive-right
         return (
           <>
+            {/* Left inactive — track start to 3px before handle */}
             <div
               data-slot="inactive-track-left"
-              className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
-                trackTransition
-              )}
-              style={{ flexBasis: `${thumbPct}%` }}
+              className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, { start: null, end: thumbPct, endGap: GAP_PX })}
             />
+            {/* Active — 3px after handle to zero point (no gap at center) */}
             <div
               data-slot="active-track"
-              className={cn(
-                sliderActiveTrackVariants({ size, disabled: isDisabled, orientation }),
-                trackTransition
-              )}
-              style={{ flexBasis: `${activePct}%` }}
+              className={cn(sliderActiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, {
+                start: thumbPct,
+                startGap: GAP_PX,
+                end: zeroPct,
+              })}
             />
-            {handleEl}
+            {/* Right inactive — zero point to track end */}
             <div
               data-slot="inactive-track-right"
-              className={cn(
-                sliderInactiveTrackVariants({ size, disabled: isDisabled, orientation }),
-                trackTransition
-              )}
-              style={{ flexBasis: `${100 - zeroPct}%` }}
+              className={cn(sliderInactiveTrackVariants({ size, orientation }), trackTransition)}
+              style={segmentStyle(orientation, { start: zeroPct, end: null })}
             />
           </>
         );
@@ -512,12 +408,12 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         {...(value !== undefined ? { value } : {})}
         {...(defaultValue !== undefined ? { defaultValue } : {})}
         {...(onChangeEnd !== undefined ? { onChangeEnd } : {})}
-        className={cn(
-          sliderContainerVariants({ size, disabled: isDisabled, orientation }),
-          className
-        )}
+        renderThumbContent={renderThumbContent}
+        onThumbDraggingChange={handleThumbDraggingChange}
+        className={cn(sliderContainerVariants({ size, orientation }), className)}
+        trackClassName={sliderTrackRegionVariants({ size, orientation })}
       >
-        <div data-slot="track-layout" className={cn(sliderTrackLayoutVariants({ orientation }))}>
+        <div data-slot="track-layout" className={cn(sliderTrackLayoutVariants())}>
           {isRange
             ? renderRangeTrack()
             : isCentered
@@ -530,7 +426,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               step={step}
               values={currentValues}
               variant={variant}
-              isDisabled={isDisabled}
+              size={size}
             />
           )}
         </div>
