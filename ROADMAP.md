@@ -4,9 +4,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.12.0 (released 2026-06-09)  
-**Next Release:** v0.13.0  
-**Status:** 29 components published to NPM; 2,029 tests passing
+**Current Version:** v0.13.0 (released 2026-06-10)  
+**Next Release:** v0.14.0  
+**Status:** 29 components published to NPM; 2,042 tests passing
 
 ## Release Timeline
 
@@ -29,6 +29,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.11.1 | —       | Card MD3 styling refactor — standard motion tier, 4:3 media fix, title-medium headline, `cardStateLayerVariants` / `cardFocusRingVariants` exports | Released 2026-06-09 |
 | v0.11.2 | —       | Tabs MD3 expressive refactor — variants-vs-states architecture, state-layer slot, spring indicator motion, content-width primary indicator         | Released 2026-06-09 |
 | v0.12.0 | —       | Divider MD3 expressive refactor — slot-based CVA, `--md-divider-thickness` CSS var, logical RTL insets, `label` prop removed (breaking)            | Released 2026-06-09 |
+| v0.13.0 | —       | DatePicker MD3 expressive refactor — two-axis slot architecture, styled slot injection API, popover anchoring fix, modal/scrim positioning fix     | Released 2026-06-10 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                   | Planned             |
 
 ## Completed Work
@@ -94,7 +95,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
 - [x] CVA variant management with variants-vs-states architecture
-- [x] Vitest + React Testing Library (2,029 tests)
+- [x] Vitest + React Testing Library (2,042 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards

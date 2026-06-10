@@ -1,5 +1,65 @@
 # @tinybigui/react
 
+## 0.13.0
+
+### Minor Changes
+
+- e4dbe4b: Refactor DatePicker to MD3 Expressive two-axis slot architecture
+
+  **Breaking changes:**
+  - Removed `cellType` and `state` CVA variant axes from `calendarCellVariants` and `yearItemVariants`. These were dead code and violated the component-variants rule by putting runtime interaction states in CVA. All cell states (today, selected, range-start, range-end, range-middle, outside-month, disabled, unavailable) are now driven by presence-based `data-*` attributes on the element and consumed by `group-data-[x]` selectors.
+  - Removed old exported variant names: `datePickerHeaderVariants`, `datePickerNavVariants`, `datePickerDividerVariants`, `datePickerActionVariants`, `datePickerActionButtonVariants`, `datePickerWeekdayVariants`, `datePickerRangeIndicatorVariants`, `datePickerHeadlineVariants`, `datePickerSupportingTextVariants`, `datePickerScrimVariants`.
+  - Removed `CalendarCellProps.cellType` prop (the semantic `CalendarCellType` type is retained for documentation).
+
+  **New exports:**
+
+  Layer-3 styled slot components (injectable into the headless layer):
+  - `StyledCalendarCell`, `StyledNavButton`, `StyledCalendarTitle`, `StyledYearItem`, `StyledWeekday`, `StyledActionButton`
+
+  New CVA slot variants following the two-axis model:
+  - `calendarCellVariants` + `calendarCellStateLayerVariants` + `calendarCellFocusRingVariants`
+  - `navButtonVariants` + `navButtonStateLayerVariants` + `navButtonFocusRingVariants`
+  - `calendarTitleVariants` + `calendarTitleStateLayerVariants`
+  - `yearItemVariants` + `yearItemStateLayerVariants` + `yearItemFocusRingVariants`
+  - `weekdayVariants`, `calendarDividerVariants`, `actionRowVariants`
+  - `actionButtonVariants` + `actionButtonStateLayerVariants` + `actionButtonFocusRingVariants`
+  - `modalDialogVariants`, `modalHeaderVariants`, `headlineVariants`, `supportingTextVariants`
+  - `modeToggleVariants` + `modeToggleStateLayerVariants`
+  - `scrimVariants`, `dateInputFieldVariants`, `dateInputFieldGroupVariants`
+  - `dockedFieldGroupVariants`, `dockedTriggerVariants` + `dockedTriggerStateLayerVariants`
+  - `popoverVariants`
+
+  New slot injection API — `CalendarCore` now accepts a `slots` prop:
+  - `slots.CellComponent` — styled calendar date cell
+  - `slots.NavButtonComponent` — styled prev/next month nav button
+  - `slots.TitleComponent` — styled month/year title pill
+  - `slots.YearItemComponent` — styled year selection item
+  - `slots.WeekdayComponent` — styled weekday header label
+
+  `DatePickerActions` accepts a `ButtonComponent` slot for styled action buttons.
+
+  **Architecture:**
+
+  Replaces three large duplicated `[&_[data-x]]:` descendant-selector blobs in the `*Styled.tsx` wrappers with injected styled slot components. Only purely structural, non-interactive layout wrappers (popover panel, modal dialog, field group, action row container, header row, year grid container) retain a minimal consolidated structural selector string — acceptable for non-interaction-state layout. Motion remains `useReducedMotion`-gated; screen-level container transitions use legacy standard tokens; small interactive elements (`< 48dp`) use spring-standard-fast tokens.
+
+### Patch Changes
+
+- e4dbe4b: fix(date-picker): popover anchoring, grid centering, and modal/scrim positioning
+  - **Popover anchor**: `usePopover` now anchors to the `[data-field-group]` element
+    (the full outlined field) instead of the calendar icon button, so the calendar
+    popover opens directly below the date field as per MD3 spec.
+  - **Calendar grid centering**: Added `[&_table]:mx-auto` to `CALENDAR_GRID_STRUCTURAL`
+    so the fixed-width 336px grid is equally inset within the 360px container.
+  - **Modal/scrim positioning fix**: `className` is now applied directly on
+    `[data-modal-dialog]` using `modalDialogVariants` (providing `fixed` centering
+    immediately), and `scrimClassName` is applied directly on `[data-scrim]` via a
+    new headless prop. Previously both used descendant selectors that never matched —
+    the dialog rendered in-flow and the scrim was invisible.
+  - **New internal exports**: `MODAL_CONTENT_STRUCTURAL`, `MODAL_INPUT_CONTENT_STRUCTURAL`,
+    `MODAL_DIALOG_MOTION` in `datePickerStructuralStyles.ts`.
+  - **Story polish**: Raised `iframeHeight` to 720 and `min-h` to 600px so open
+    docked/modal stories are never clipped in Storybook autodocs.
+
 ## 0.12.0
 
 ### Minor Changes

@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.12.0** (2026-06-09)
+> **Latest Release: v0.13.0** (2026-06-10)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -170,15 +170,15 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 4: Data Display ✅
 
-| Component    | Status | Description                                                              |
-| ------------ | ------ | ------------------------------------------------------------------------ |
-| `Card`       | ✅     | MD3 motion tier, media aspect-ratio fix, CVA export parity (v0.11.1)     |
-| `List`       | ✅     | Static and interactive list items                                        |
-| `Chip`       | ✅     | MD3 expressive slot architecture, elevated surface (v0.9.0)              |
-| `Badge`      | ✅     | MD3 expressive dot/count badges, icon-corner anchoring (v0.8.0)          |
-| `Divider`    | ✅     | MD3 expressive slot CVA, CSS-var thickness, logical RTL insets (v0.12.0) |
-| `DatePicker` | ✅     | Docked, modal, and input variants                                        |
-| `TimePicker` | ✅     | 12h/24h clock dial, range selection                                      |
+| Component    | Status | Description                                                                |
+| ------------ | ------ | -------------------------------------------------------------------------- |
+| `Card`       | ✅     | MD3 motion tier, media aspect-ratio fix, CVA export parity (v0.11.1)       |
+| `List`       | ✅     | Static and interactive list items                                          |
+| `Chip`       | ✅     | MD3 expressive slot architecture, elevated surface (v0.9.0)                |
+| `Badge`      | ✅     | MD3 expressive dot/count badges, icon-corner anchoring (v0.8.0)            |
+| `Divider`    | ✅     | MD3 expressive slot CVA, CSS-var thickness, logical RTL insets (v0.12.0)   |
+| `DatePicker` | ✅     | MD3 expressive two-axis slot architecture, styled slot injection (v0.13.0) |
+| `TimePicker` | ✅     | 12h/24h clock dial, range selection                                        |
 
 ### Planned
 

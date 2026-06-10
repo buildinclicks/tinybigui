@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **DatePicker** — MD3 expressive two-axis slot architecture refactor; styled slot injection API (`CalendarCore.slots`, `DatePickerActions.ButtonComponent`); removed legacy CVA variant axes and old exported variant names; popover anchors to field group; calendar grid centering; modal/scrim positioning fix
+
+#### `@tinybigui/tokens`
+
+- Version bump aligned with `@tinybigui/react` v0.13.0
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.12.0] - 2026-06-09
 
 ### Changed
