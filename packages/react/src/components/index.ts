@@ -16,7 +16,7 @@ export { FAB, FABHeadless } from "./FAB";
 export type { FABProps, FABSize, FABColor, FABHeadlessProps } from "./FAB";
 
 export { TextField } from "./TextField";
-export type { TextFieldProps, TextFieldVariant, TextFieldSize } from "./TextField";
+export type { TextFieldProps, TextFieldVariant } from "./TextField";
 
 export { Checkbox } from "./Checkbox";
 export type { CheckboxProps } from "./Checkbox";

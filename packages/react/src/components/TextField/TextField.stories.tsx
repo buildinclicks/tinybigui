@@ -1,44 +1,54 @@
 /**
  * TextField Component Stories
  *
- * Storybook stories for the Material Design 3 TextField component.
- * Demonstrates all variants, states, and usage patterns.
+ * Storybook stories for the Material Design 3 Expressive TextField component.
+ * Demonstrates filled and outlined variants, all interaction states, icons,
+ * prefix/suffix affixes, multiline, and character counter.
  */
 
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { TextField } from "./TextField";
 
-// Sample icons for stories
+// ── Icon helpers ──────────────────────────────────────────────────────────────
+
 const IconEmail = (): React.ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
   </svg>
 );
 
 const IconSearch = (): React.ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
   </svg>
 );
 
 const IconPerson = (): React.ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
   </svg>
 );
 
 const IconVisibility = (): React.ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
   </svg>
 );
 
 const IconClear = (): React.ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
   </svg>
 );
+
+const IconAttachMoney = (): React.ReactElement => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" />
+  </svg>
+);
+
+// ── Meta ──────────────────────────────────────────────────────────────────────
 
 const meta: Meta<typeof TextField> = {
   title: "Components/TextField",
@@ -48,7 +58,7 @@ const meta: Meta<typeof TextField> = {
     docs: {
       description: {
         component:
-          "Material Design 3 TextField component with filled and outlined variants, full accessibility support, and comprehensive input features.",
+          "Material Design 3 Expressive TextField — single 56dp height, filled and outlined variants, state layer, active indicator, notched outline, floating label, prefix/suffix, icons, and supporting text + counter row. All interaction states are data-* attribute driven (no state in CVA).",
       },
     },
   },
@@ -57,24 +67,27 @@ const meta: Meta<typeof TextField> = {
     variant: {
       control: "select",
       options: ["filled", "outlined"],
-      description: "Visual style variant",
-    },
-    size: {
-      control: "select",
-      options: ["small", "medium", "large"],
-      description: "TextField size",
+      description: "MD3 visual variant",
     },
     label: {
       control: "text",
-      description: "Label text for the input",
+      description: "Label text (floats on focus/value)",
     },
     description: {
       control: "text",
-      description: "Helper text displayed below the input",
+      description: "Supporting text below the field",
     },
     errorMessage: {
       control: "text",
       description: "Error message when invalid",
+    },
+    prefix: {
+      control: "text",
+      description: "Inline prefix text (visible when label is floated)",
+    },
+    suffix: {
+      control: "text",
+      description: "Inline suffix text (visible when label is floated)",
     },
     isDisabled: {
       control: "boolean",
@@ -90,15 +103,15 @@ const meta: Meta<typeof TextField> = {
     },
     fullWidth: {
       control: "boolean",
-      description: "Make input full width",
+      description: "Expand to fill container",
     },
     multiline: {
       control: "boolean",
-      description: "Enable multiline mode (textarea)",
+      description: "Enable multiline (textarea)",
     },
     characterCount: {
       control: "boolean",
-      description: "Show character counter",
+      description: "Show character counter (requires maxLength)",
     },
   },
 };
@@ -106,17 +119,18 @@ const meta: Meta<typeof TextField> = {
 export default meta;
 type Story = StoryObj<typeof TextField>;
 
-// Default Story
+// ── Default ───────────────────────────────────────────────────────────────────
+
 export const Default: Story = {
   args: {
     label: "Email",
     placeholder: "email@example.com",
     variant: "filled",
-    size: "medium",
   },
 };
 
-// Variants
+// ── Variants ──────────────────────────────────────────────────────────────────
+
 export const Filled: Story = {
   args: {
     label: "Email",
@@ -142,33 +156,49 @@ export const AllVariants: Story = {
   ),
 };
 
-// Sizes
-export const Sizes: Story = {
+// ── States side-by-side ───────────────────────────────────────────────────────
+
+export const AllStates: Story = {
   render: () => (
-    <div className="flex flex-col gap-6" style={{ width: 320 }}>
-      <TextField label="Small" size="small" placeholder="Small input" />
-      <TextField label="Medium (default)" size="medium" placeholder="Medium input" />
-      <TextField label="Large" size="large" placeholder="Large input" />
+    <div className="grid grid-cols-2 gap-6" style={{ width: 680 }}>
+      <p className="text-label-large text-on-surface-variant col-span-2">Filled</p>
+      <TextField label="Default" variant="filled" />
+      <TextField label="With value" variant="filled" defaultValue="Hello world" />
+      <TextField label="With description" variant="filled" description="Supporting text" />
+      <TextField
+        label="Error state"
+        variant="filled"
+        isInvalid
+        errorMessage="This field is required"
+      />
+      <TextField label="Disabled" variant="filled" isDisabled defaultValue="Disabled" />
+      <TextField label="Read-only" variant="filled" isReadOnly defaultValue="Read only" />
+
+      <p className="text-label-large text-on-surface-variant col-span-2 mt-4">Outlined</p>
+      <TextField label="Default" variant="outlined" />
+      <TextField label="With value" variant="outlined" defaultValue="Hello world" />
+      <TextField label="With description" variant="outlined" description="Supporting text" />
+      <TextField
+        label="Error state"
+        variant="outlined"
+        isInvalid
+        errorMessage="This field is required"
+      />
+      <TextField label="Disabled" variant="outlined" isDisabled defaultValue="Disabled" />
+      <TextField label="Read-only" variant="outlined" isReadOnly defaultValue="Read only" />
     </div>
   ),
-};
-
-// With Label
-export const WithLabel: Story = {
-  args: {
-    label: "Email address",
-    placeholder: "email@example.com",
+  parameters: {
+    docs: {
+      description: {
+        story: "All six states for both variants rendered side by side.",
+      },
+    },
   },
 };
 
-export const WithoutLabel: Story = {
-  args: {
-    "aria-label": "Search",
-    placeholder: "Search...",
-  },
-};
+// ── Helper text & errors ──────────────────────────────────────────────────────
 
-// With Helper Text
 export const WithHelperText: Story = {
   args: {
     label: "Email",
@@ -177,7 +207,6 @@ export const WithHelperText: Story = {
   },
 };
 
-// With Error
 export const WithError: Story = {
   args: {
     label: "Email",
@@ -207,7 +236,8 @@ export const ErrorStates: Story = {
   ),
 };
 
-// With Icons
+// ── Icons ─────────────────────────────────────────────────────────────────────
+
 export const WithLeadingIcon: Story = {
   args: {
     label: "Email",
@@ -245,11 +275,67 @@ export const IconExamples: Story = {
         trailingIcon={<IconClear />}
         placeholder="Type to search..."
       />
+      <TextField
+        label="Outlined with icon"
+        variant="outlined"
+        leadingIcon={<IconEmail />}
+        placeholder="email@example.com"
+      />
     </div>
   ),
 };
 
-// Disabled State
+// ── Prefix & Suffix ───────────────────────────────────────────────────────────
+
+export const WithPrefix: Story = {
+  args: {
+    label: "Price",
+    prefix: "$",
+    placeholder: "0.00",
+  },
+};
+
+export const WithSuffix: Story = {
+  args: {
+    label: "Weight",
+    suffix: "kg",
+    placeholder: "0",
+  },
+};
+
+export const PrefixSuffixExamples: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6" style={{ width: 320 }}>
+      <TextField
+        label="Price"
+        prefix="$"
+        suffix="USD"
+        leadingIcon={<IconAttachMoney />}
+        placeholder="0.00"
+        variant="filled"
+      />
+      <TextField
+        label="Website"
+        prefix="https://"
+        suffix=".com"
+        placeholder="example"
+        variant="outlined"
+      />
+      <TextField label="Rate" suffix="%" placeholder="0" type="number" variant="filled" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Prefix and suffix text are only visible when the label has floated (on focus, with a value, placeholder, or a prefix). Prefix also automatically triggers float.",
+      },
+    },
+  },
+};
+
+// ── Disabled ──────────────────────────────────────────────────────────────────
+
 export const Disabled: Story = {
   render: () => (
     <div className="flex flex-col gap-6" style={{ width: 320 }}>
@@ -275,7 +361,8 @@ export const Disabled: Story = {
   ),
 };
 
-// Required Field
+// ── Required ──────────────────────────────────────────────────────────────────
+
 export const RequiredField: Story = {
   args: {
     label: "Email",
@@ -285,7 +372,8 @@ export const RequiredField: Story = {
   },
 };
 
-// Full Width
+// ── Full width ────────────────────────────────────────────────────────────────
+
 export const FullWidth: Story = {
   args: {
     label: "Full width input",
@@ -297,7 +385,8 @@ export const FullWidth: Story = {
   },
 };
 
-// Multiline (Textarea)
+// ── Multiline ─────────────────────────────────────────────────────────────────
+
 export const Multiline: Story = {
   args: {
     label: "Message",
@@ -318,12 +407,14 @@ export const MultilineExamples: Story = {
         rows={4}
         description="Maximum 500 characters"
         placeholder="Enter your bio..."
+        variant="outlined"
       />
     </div>
   ),
 };
 
-// Character Counter
+// ── Character counter ─────────────────────────────────────────────────────────
+
 export const WithCharacterCounter: Story = {
   args: {
     label: "Bio",
@@ -337,33 +428,55 @@ export const WithCharacterCounter: Story = {
 export const CharacterCounterExamples: Story = {
   render: () => (
     <div className="flex flex-col gap-6" style={{ width: 320 }}>
-      <TextField label="Short text" characterCount maxLength={50} placeholder="Max 50 characters" />
+      <TextField
+        label="Short text"
+        characterCount
+        maxLength={50}
+        description="Supporting text + counter on one row"
+        placeholder="Max 50 characters"
+      />
+      <TextField
+        label="Counter only (no description)"
+        characterCount
+        maxLength={50}
+        placeholder="Max 50 characters"
+      />
       <TextField
         label="Bio"
         multiline
         rows={4}
         characterCount
         maxLength={200}
+        description="Tell us about yourself"
         placeholder="Max 200 characters"
+        variant="outlined"
       />
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Supporting text and the character counter live on the same flex row below the field, per MD3 spec. The counter turns error-colored when the limit is exceeded.",
+      },
+    },
+  },
 };
 
-// Interactive Example
+// ── Interactive ───────────────────────────────────────────────────────────────
+
 const InteractiveExample = (): React.ReactElement => {
   const [value, setValue] = useState("");
   const [isValid, setIsValid] = useState(true);
 
   const handleChange = (newValue: string): void => {
     setValue(newValue);
-    // Simple email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setIsValid(emailRegex.test(newValue) || newValue === "");
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4" style={{ width: 320 }}>
       <TextField
         label="Email"
         value={value}
@@ -373,8 +486,9 @@ const InteractiveExample = (): React.ReactElement => {
         leadingIcon={<IconEmail />}
         placeholder="email@example.com"
         description="Enter your email address"
+        fullWidth
       />
-      <div className="text-on-surface-variant text-sm">
+      <div className="text-on-surface-variant text-body-small">
         Value: <code>{value || "(empty)"}</code>
       </div>
     </div>
@@ -386,13 +500,14 @@ export const Interactive: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Interactive example with live validation and state management.",
+        story: "Live validation — watch the label float, error state, and state layer respond.",
       },
     },
   },
 };
 
-// Accessibility
+// ── Accessibility showcase ────────────────────────────────────────────────────
+
 export const Accessibility: Story = {
   render: () => (
     <div className="flex flex-col gap-6" style={{ width: 320 }}>
@@ -417,19 +532,25 @@ export const Accessibility: Story = {
         errorMessage="Error messages are linked via aria-describedby"
         defaultValue="invalid"
       />
+      <TextField
+        label="Outlined with notch"
+        variant="outlined"
+        description="The fieldset/legend notch is aria-hidden — only the visible label is announced"
+      />
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          "All inputs have proper ARIA attributes, labels, and descriptions for screen readers. Focus indicators are visible for keyboard navigation.",
+          "All inputs have proper ARIA attributes from React Aria. The outlined fieldset/legend notch is aria-hidden so it does not interfere with screen readers.",
       },
     },
   },
 };
 
-// Form Example
+// ── Form integration ──────────────────────────────────────────────────────────
+
 const FormExample = (): React.ReactElement => {
   const [formData, setFormData] = useState({
     email: "",
@@ -470,6 +591,7 @@ const FormExample = (): React.ReactElement => {
         trailingIcon={<IconVisibility />}
         isRequired
         description="At least 8 characters"
+        variant="outlined"
       />
       <TextField
         label="Bio"
@@ -480,6 +602,7 @@ const FormExample = (): React.ReactElement => {
         characterCount
         maxLength={200}
         description="Tell us about yourself"
+        variant="outlined"
       />
       <button type="submit" className="bg-primary text-on-primary rounded-full px-6 py-3">
         Submit
@@ -493,33 +616,42 @@ export const FormIntegration: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Example of TextField used in a complete form with validation.",
+        story: "Complete form mixing filled and outlined variants with validation.",
       },
     },
   },
 };
 
-// Input Types
+// ── Input types ───────────────────────────────────────────────────────────────
+
 export const InputTypes: Story = {
   render: () => (
     <div className="flex flex-col gap-6" style={{ width: 320 }}>
       <TextField label="Email" type="email" placeholder="email@example.com" />
       <TextField label="Password" type="password" placeholder="Password" />
-      <TextField label="Number" type="number" placeholder="123" />
+      <TextField label="Number" type="number" prefix="#" placeholder="0" />
       <TextField label="Telephone" type="tel" placeholder="(555) 123-4567" />
-      <TextField label="URL" type="url" placeholder="https://example.com" />
+      <TextField
+        label="URL"
+        type="url"
+        prefix="https://"
+        placeholder="example.com"
+        variant="outlined"
+      />
     </div>
   ),
 };
 
-// Playground
+// ── Playground ────────────────────────────────────────────────────────────────
+
 export const Playground: Story = {
   args: {
     label: "Playground",
     variant: "filled",
-    size: "medium",
     placeholder: "Try changing the props...",
-    description: "This is a helper text",
+    description: "This is helper text",
+    prefix: "",
+    suffix: "",
     isRequired: false,
     isDisabled: false,
     isInvalid: false,
@@ -530,7 +662,7 @@ export const Playground: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Play around with all the component props to see how the TextField behaves.",
+        story: "Play with all props to see how the MD3 TextField behaves.",
       },
     },
   },
