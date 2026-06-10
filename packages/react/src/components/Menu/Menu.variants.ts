@@ -3,77 +3,77 @@ import { cva, type VariantProps } from "class-variance-authority";
 /**
  * Material Design 3 Menu container variants (CVA).
  *
- * Elevation: `shadow-elevation-2` (both styles)
- * Width: min 112dp / max 280dp per MD3 spec
+ * Architecture: Variants vs States
+ * - CVA holds design-time structure only (menuStyle, colorScheme).
+ * - Enter/exit animation uses composite MD3 utilities (animate-md-scale-in/out)
+ *   sourced from the token system — no hardcoded durations or beziers.
+ * - Placement-aware transform-origin is set via data-placement data attributes
+ *   emitted by React Aria's Popover.
  *
  * Shape per menuStyle:
- * - baseline: `rounded-xs` (4dp extra-small)
- * - vertical: `rounded-lg` (16dp large)
+ *   baseline: `rounded-xs` (4dp extra-small)
+ *   vertical: `rounded-lg` (16dp large, MD3 Expressive)
  *
- * Background per colorScheme + menuStyle:
- * - baseline + standard: `bg-surface-container`
- * - vertical + standard: `bg-surface-container-low`
- * - vertical + vibrant:  `bg-tertiary-container`
+ * Background per menuStyle × colorScheme:
+ *   baseline + standard:  bg-surface-container
+ *   vertical + standard:  bg-surface-container-low
+ *   vertical + vibrant:   bg-tertiary-container
  *
  * @see https://m3.material.io/components/menus/specs
  */
 export const menuContainerVariants = cva(
   [
-    // Elevation
+    // Elevation: level 2
     "shadow-elevation-2",
-    // Width constraints per MD3 spec (112dp min / 280dp max)
+    // Width constraints: 112dp min / 280dp max per MD3 spec
     "min-w-28 max-w-70",
     // Layout
     "py-2",
-    // Scroll: show scrollbar when content overflows; max height avoids clipping
+    // Scroll behaviour
     "overflow-y-auto",
     "max-h-[calc(var(--visual-viewport-height,100vh)-2rem)]",
     // Stacking
     "z-50",
-    // Focus outline handled by React Aria
+    // Focus outline delegated to React Aria
     "outline-none",
-    // GPU compositing — promotes menu to its own compositor layer so
-    // scale + opacity animations run without triggering layout reflow.
+    // Promote to compositor layer — scale + opacity animations run without layout reflow
     "will-change-[transform,opacity]",
-    // Pointer events blocked during animation to prevent accidental clicks
-    // on menu items while the panel is still animating in or out.
+    // Block pointer events during animation to prevent accidental item clicks
     "data-[entering]:pointer-events-none data-[exiting]:pointer-events-none",
-    // ── Enter animation ────────────────────────────────────────────────────
-    // @keyframes menu-enter (defined in styles.css): scale(0.8)+opacity:0 →
-    // scale(1)+opacity:1 in 120ms with cubic-bezier(0,0,0.2,1) (standard
-    // decelerate — matches Angular Material's _mat-menu-enter keyframe).
-    "data-[entering]:animate-[menu-enter_120ms_cubic-bezier(0,0,0.2,1)_both]",
-    // ── Exit animation ─────────────────────────────────────────────────────
-    // @keyframes menu-exit (defined in styles.css): opacity:1 → opacity:0
-    // in 100ms after 25ms delay, linear — matches Angular Material's
-    // _mat-menu-exit keyframe (fade-only, no reverse scale).
-    "data-[exiting]:animate-[menu-exit_100ms_25ms_linear_both]",
-    // ── Transform origin (placement-aware) ────────────────────────────────
-    // RAC sets data-placement="bottom|top|left|right" on the Popover element.
-    // Default (bottom): origin at top edge (menu expands downward).
+
+    // ── Enter animation ─────────────────────────────────────────────────────
+    // animate-md-scale-in: scale(0.85)+opacity:0 → scale(1)+opacity:1
+    // Duration: 350ms expressive-fast-spatial spring (intentional overshoot)
+    "data-[entering]:animate-md-scale-in",
+
+    // ── Exit animation ──────────────────────────────────────────────────────
+    // animate-md-scale-out: scale(1)+opacity:1 → scale(0.85)+opacity:0
+    // Duration: 200ms emphasized-accelerate (accelerating exit)
+    "data-[exiting]:animate-md-scale-out",
+
+    // ── Transform origin (placement-aware) ──────────────────────────────────
+    // RAC sets data-placement on the Popover element.
+    // Default (bottom): origin at top edge (menu expands downward)
     "origin-top",
-    // top: origin at bottom edge (menu expands upward)
     "data-[placement=top]:origin-bottom",
-    // left: origin at right edge
     "data-[placement=left]:origin-right",
-    // right: origin at left edge
     "data-[placement=right]:origin-left",
-    // ── Reduced motion ────────────────────────────────────────────────────
-    // Skip both animations entirely for users who prefer reduced motion.
+
+    // ── Reduced motion ───────────────────────────────────────────────────────
     "motion-reduce:data-[entering]:animate-none motion-reduce:data-[exiting]:animate-none",
   ],
   {
     variants: {
       /**
-       * Color scheme — drives the container background.
-       * baseline+standard uses a separate compound variant.
+       * Color scheme — drives the container background (vertical style only).
+       * baseline always uses surface-container regardless of colorScheme.
        */
       colorScheme: {
         standard: [],
         vibrant: [],
       },
       /**
-       * Visual style — drives corner radius and baseline vs vertical background.
+       * Visual style — drives corner radius and container background.
        */
       menuStyle: {
         baseline: ["rounded-xs", "bg-surface-container"],
@@ -81,7 +81,7 @@ export const menuContainerVariants = cva(
       },
     },
     compoundVariants: [
-      // Vertical + vibrant: tertiary container background
+      // vertical + vibrant → tertiary container background
       {
         menuStyle: "vertical",
         colorScheme: "vibrant",
@@ -95,25 +95,30 @@ export const menuContainerVariants = cva(
   }
 );
 
+// ─── MENU ITEM ROOT ───────────────────────────────────────────────────────────
+
 /**
- * Material Design 3 Menu item variants (CVA).
+ * Material Design 3 Menu item root variants (CVA).
  *
- * Typography: `text-body-large` per MD3 baseline spec (16sp / 400 weight).
- * Padding: `px-3` (12dp left/right), `gap-3` (12dp between elements).
+ * Architecture: Variants vs States
+ * - CVA holds only design-time decisions: colorScheme, menuStyle.
+ * - All interaction/selection states are driven by data-* attributes that RAC
+ *   MenuItem emits natively (data-hovered, data-pressed, data-focus-visible,
+ *   data-selected, data-disabled) — read via group-data-[x]/menuitem selectors.
+ * - The root element sets group/menuitem so all slot children can read state.
  *
- * State layers (MD3 spec):
- * - Hover:         `opacity-8`  on state layer
- * - Focus visible: `opacity-12` on state layer
- * - Pressed:       `opacity-12` on state layer
- * - Disabled:      `opacity-38` on entire item
+ * Typography: Label Large per MD3 menu spec (14sp / 500 weight).
+ * Height: 48/44/40/36dp controlled by density via context (not CVA).
+ * Padding: 12dp left/right, 12dp gap between elements.
  *
- * Selection colors per menuStyle + colorScheme:
- * - baseline (any):         `bg-surface-container-highest`
- * - vertical + standard:    `bg-tertiary-container text-on-tertiary-container`
- * - vertical + vibrant:     `bg-tertiary text-on-tertiary`
+ * Selected backgrounds per menuStyle × colorScheme:
+ *   baseline (any):          data-[selected]:bg-surface-container-highest
+ *   vertical + standard:     data-[selected]:bg-tertiary-container
+ *   vertical + vibrant:      data-[selected]:bg-tertiary
  *
- * Note: item height (48/44/40/36dp) is controlled by density via context,
- * applied directly in MenuItem component (not CVA) to avoid negative key issues.
+ * Disabled:
+ *   The root itself gets data-[disabled]:pointer-events-none/cursor-not-allowed.
+ *   Content (label, icons) are coloured at 38% via per-slot selectors.
  *
  * @see https://m3.material.io/components/menus/specs
  */
@@ -122,99 +127,189 @@ export const menuItemVariants = cva(
     // Layout — height set by density context in MenuItem component
     "relative flex w-full items-center",
     "px-3 gap-3",
-    // Typography: Body Large per MD3 baseline spec
-    "text-body-large",
+    // Typography: Label Large per MD3 menu spec
+    "text-label-large",
     // Interaction
     "cursor-pointer select-none outline-none",
-    // State layer pseudo-element
-    "before:absolute before:inset-0 before:rounded-[inherit]",
-    "before:transition-opacity before:duration-short2 before:ease-standard",
-    "before:opacity-0",
-    // Hover state layer
-    "hover:before:opacity-8",
-    // Focus visible state layer
-    "focus-visible:before:opacity-12",
-    // Active pressed state layer
-    "active:before:opacity-12",
-    // Color transition for selection
-    "transition-colors duration-short2 ease-standard",
+    // Color transition (effects — no overshoot)
+    "transition-colors duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+    // Disabled — self-targeting data-[x]: selectors (RAC emits data-disabled)
+    "data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed",
   ],
   {
     variants: {
       /**
-       * Disabled state: reduces opacity and blocks interaction.
-       */
-      isDisabled: {
-        true: ["opacity-38 cursor-not-allowed pointer-events-none"],
-        false: [],
-      },
-      /**
-       * Selected state: background and text color driven by compound variants.
-       */
-      isSelected: {
-        true: [],
-        false: [],
-      },
-      /**
-       * Color scheme: drives default text and state layer colors.
-       * - standard: on-surface text, on-surface state layer
-       * - vibrant (vertical only): on-tertiary-container text + state layer
+       * Color scheme — drives default text color, state-layer color, and
+       * selection text colors.
        */
       colorScheme: {
-        standard: ["text-on-surface", "before:bg-on-surface"],
-        vibrant: ["text-on-tertiary-container", "before:bg-on-tertiary-container"],
+        standard: ["text-on-surface"],
+        vibrant: ["text-on-tertiary-container"],
       },
       /**
-       * Visual style: drives corner radius on items (vertical uses rounded-lg
-       * inherited from container, items stay flat inside).
+       * Visual style — drives corner radius on items and selection background.
        */
       menuStyle: {
-        baseline: [],
+        baseline: [
+          // Selected: surface-container-highest, text stays on-surface
+          "data-[selected]:bg-surface-container-highest",
+        ],
         vertical: [],
       },
     },
     compoundVariants: [
-      // ── Baseline selection (both colorSchemes) ──────────────────────────
+      // vertical + standard: selected → tertiary-container
       {
-        isSelected: true,
-        menuStyle: "baseline",
-        class: [
-          "bg-surface-container-highest",
-          // text-on-surface already applied by standard colorScheme variant
-        ],
-      },
-      // ── Vertical + Standard selection ───────────────────────────────────
-      {
-        isSelected: true,
         menuStyle: "vertical",
         colorScheme: "standard",
         class: [
-          "bg-tertiary-container",
-          "text-on-tertiary-container",
-          "before:bg-on-tertiary-container",
+          "data-[selected]:bg-tertiary-container",
+          "data-[selected]:text-on-tertiary-container",
         ],
       },
-      // ── Vertical + Vibrant selection ─────────────────────────────────────
+      // vertical + vibrant: selected → tertiary
       {
-        isSelected: true,
         menuStyle: "vertical",
         colorScheme: "vibrant",
-        class: ["bg-tertiary", "text-on-tertiary", "before:bg-on-tertiary"],
+        class: ["data-[selected]:bg-tertiary", "data-[selected]:text-on-tertiary"],
       },
     ],
     defaultVariants: {
-      isDisabled: false,
-      isSelected: false,
       colorScheme: "standard",
       menuStyle: "baseline",
     },
   }
 );
 
+// ─── MENU ITEM STATE LAYER ────────────────────────────────────────────────────
+
+/**
+ * State layer slot — absolute inset overlay that transitions opacity on
+ * hover / focus / press interaction states.
+ *
+ * Architecture mirrors buttonStateLayerVariants:
+ * - Opacity driven by group-data-[x]/menuitem selectors (no CSS pseudo-classes)
+ * - Pressed (opacity-10) uses doubled attribute selector to beat hover (opacity-8)
+ * - Hidden entirely when disabled — no state layer on disabled items
+ * - Color is variant-driven (on-surface for standard, on-tertiary-container for
+ *   vibrant), with selected override per menuStyle × colorScheme
+ *
+ * State-layer opacities per MD3 spec:
+ *   Hover:         8%   (opacity-8)
+ *   Focus visible: 10%  (opacity-10)
+ *   Pressed:       10%  (opacity-10, doubled selector wins over hover)
+ *
+ * @see https://m3.material.io/components/menus/specs#state-layers
+ */
+export const menuItemStateLayerVariants = cva(
+  [
+    "absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none opacity-0",
+    // Effects transition — opacity must NOT overshoot
+    "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+    // Hover: 8%
+    "group-data-[hovered]/menuitem:opacity-8",
+    // Focus visible: 10%
+    "group-data-[focus-visible]/menuitem:opacity-10",
+    // Pressed: 10%, doubled selector wins over hover at same cascade position
+    "group-data-[pressed]/menuitem:group-data-[pressed]/menuitem:opacity-10",
+    // No state layer when disabled
+    "group-data-[disabled]/menuitem:hidden",
+  ],
+  {
+    variants: {
+      colorScheme: {
+        standard: ["bg-on-surface"],
+        vibrant: ["bg-on-tertiary-container"],
+      },
+      menuStyle: {
+        baseline: [],
+        vertical: [],
+      },
+    },
+    compoundVariants: [
+      // vertical + standard selected: state layer switches to on-tertiary-container
+      {
+        menuStyle: "vertical",
+        colorScheme: "standard",
+        class: ["group-data-[selected]/menuitem:bg-on-tertiary-container"],
+      },
+      // vertical + vibrant selected: state layer switches to on-tertiary
+      {
+        menuStyle: "vertical",
+        colorScheme: "vibrant",
+        class: ["group-data-[selected]/menuitem:bg-on-tertiary"],
+      },
+    ],
+    defaultVariants: {
+      colorScheme: "standard",
+      menuStyle: "baseline",
+    },
+  }
+);
+
+// ─── MENU ITEM ICON ───────────────────────────────────────────────────────────
+
+/**
+ * Icon slot (leading and trailing icons) for menu items.
+ *
+ * Base: 24×24dp, on-surface-variant color.
+ * Selected: color follows the menuStyle × colorScheme selection color.
+ * Disabled: on-surface/38 per MD3 spec.
+ * Transition: effects spring (no overshoot on color).
+ *
+ * @see https://m3.material.io/components/menus/specs#anatomy
+ */
+export const menuItemIconVariants = cva(
+  [
+    "relative z-10 flex h-6 w-6 shrink-0 items-center justify-center",
+    "text-on-surface-variant",
+    "transition-colors duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+    // Disabled: 38% opacity on icon color
+    "group-data-[disabled]/menuitem:text-on-surface/38",
+  ],
+  {
+    variants: {
+      colorScheme: {
+        standard: [],
+        vibrant: [
+          // Vibrant unselected icon: on-tertiary-container
+          "text-on-tertiary-container",
+        ],
+      },
+      menuStyle: {
+        baseline: [],
+        vertical: [],
+      },
+    },
+    compoundVariants: [
+      // vertical + standard selected: icon → on-tertiary-container
+      {
+        menuStyle: "vertical",
+        colorScheme: "standard",
+        class: ["group-data-[selected]/menuitem:text-on-tertiary-container"],
+      },
+      // vertical + vibrant selected: icon → on-tertiary
+      {
+        menuStyle: "vertical",
+        colorScheme: "vibrant",
+        class: ["group-data-[selected]/menuitem:text-on-tertiary"],
+      },
+    ],
+    defaultVariants: {
+      colorScheme: "standard",
+      menuStyle: "baseline",
+    },
+  }
+);
+
+// ─── MENU SECTION ─────────────────────────────────────────────────────────────
+
 /**
  * Menu section container variants (CVA).
  */
 export const menuSectionVariants = cva(["flex flex-col w-full"]);
+
+// ─── MENU SECTION HEADER ──────────────────────────────────────────────────────
 
 /**
  * Menu section header variants (CVA).
@@ -227,50 +322,65 @@ export const menuSectionHeaderVariants = cva([
   "select-none",
 ]);
 
+// ─── MENU DIVIDER ─────────────────────────────────────────────────────────────
+
 /**
  * Menu item divider variants (CVA).
  *
- * Renders a horizontal separator with `border-outline-variant`.
+ * Horizontal separator with `border-outline-variant`.
  * Padding: 8dp top/bottom (`my-2`) per MD3 spec.
  *
  * @see https://m3.material.io/components/menus/specs — Measurements
  */
 export const menuDividerVariants = cva(["border-t border-outline-variant", "my-2 mx-0"]);
 
+// ─── MENU GAP ────────────────────────────────────────────────────────────────
+
 /**
  * Menu gap variants (CVA).
  *
- * A visual spacer for M3 Expressive vertical menus. Uses spacing instead of
- * a border line to separate item groups. `aria-hidden` and `role="none"`.
+ * A visual spacer for MD3 Expressive vertical menus. Uses spacing instead of
+ * a border line to separate item groups. Set aria-hidden and role="none" in
+ * the component.
  *
  * @see https://m3.material.io/components/menus/guidelines#gaps-and-dividers
  */
 export const menuGapVariants = cva(["h-2 w-full"]);
+
+// ─── MENU ITEM TRAILING TEXT ──────────────────────────────────────────────────
 
 /**
  * Trailing text (keyboard shortcut) variants (CVA).
  *
  * Color: `text-on-surface-variant`, size: `text-label-large` (14sp).
  * The element also carries `aria-keyshortcuts` for screen reader support.
+ * Disabled: on-surface/38 to match the rest of the item content.
  */
 export const menuItemTrailingTextVariants = cva([
   "ml-auto shrink-0 text-label-large text-on-surface-variant",
   "select-none",
+  "group-data-[disabled]/menuitem:text-on-surface/38",
 ]);
+
+// ─── MENU ITEM DESCRIPTION ────────────────────────────────────────────────────
 
 /**
  * Menu item description (supporting text) variants (CVA).
  *
  * Rendered below the label text.
  * Typography: `text-body-medium text-on-surface-variant`.
+ * Disabled: on-surface/38.
  */
 export const menuItemDescriptionVariants = cva([
   "text-body-medium text-on-surface-variant",
   "select-none",
+  "group-data-[disabled]/menuitem:text-on-surface/38",
 ]);
 
-// ─── Type exports ─────────────────────────────────────────────────────────────
+// ─── TYPE EXPORTS ─────────────────────────────────────────────────────────────
 
 export type MenuContainerVariants = VariantProps<typeof menuContainerVariants>;
 export type MenuItemVariants = VariantProps<typeof menuItemVariants>;
+export type MenuItemStateLayerVariants = VariantProps<typeof menuItemStateLayerVariants>;
+export type MenuItemIconVariants = VariantProps<typeof menuItemIconVariants>;
 export type MenuSectionVariants = VariantProps<typeof menuSectionVariants>;

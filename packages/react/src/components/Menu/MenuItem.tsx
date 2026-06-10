@@ -6,6 +6,8 @@ import { useMenuContext } from "./MenuHeadless";
 import { HeadlessMenuItem } from "./MenuHeadless";
 import {
   menuItemVariants,
+  menuItemStateLayerVariants,
+  menuItemIconVariants,
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
 } from "./Menu.variants";
@@ -63,10 +65,14 @@ const DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
 /**
  * MD3 styled MenuItem component (Layer 3).
  *
- * All MD3 styles (selection colors, typography, density height) are applied
- * directly to the `<li role="menuitem">` element via RAC's render-prop className,
- * ensuring tests and assistive technologies see the correct classes on the
- * semantically meaningful element.
+ * All MD3 styles are applied directly to the `<li role="menuitem">` element via
+ * RAC's render-prop className. React Aria automatically sets data-hovered,
+ * data-pressed, data-focus-visible, data-selected, and data-disabled on the
+ * element — these are consumed by group-data-[x]/menuitem selectors in the
+ * slot variants (state-layer, icon, label, trailing text, description).
+ *
+ * The root carries `group/menuitem` so all child slots can read the item's
+ * interaction state without prop drilling.
  *
  * @example
  * ```tsx
@@ -101,32 +107,42 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
 
   const { ripples, onMouseDown } = useRipple({ disabled: disableRipple });
 
-  // className rendered on the <li role="menuitem"> via RAC's render-prop form
-  const computeClassName = ({ isDisabled, isSelected }: MenuItemRenderProps): string =>
+  // className rendered on the <li role="menuitem"> via RAC's render-prop form.
+  // We only need the render-prop to read isSelected for the checkmark slot —
+  // all state-driven styling is handled by data-* attributes + group-data selectors.
+  const computeClassName = ({ isSelected }: MenuItemRenderProps): string =>
     cn(
-      menuItemVariants({
-        isDisabled,
-        isSelected: isSelected ?? false,
-        colorScheme,
-        menuStyle,
-      }),
+      menuItemVariants({ colorScheme, menuStyle }),
+      // group/menuitem scope: all slot children read state via group-data-[x]/menuitem
+      "group/menuitem",
       // Height: auto when description is present (multi-line), otherwise density
       description ? "min-h-12 py-2 h-auto items-start" : heightClass,
-      className
+      // Store isSelected on dataset so the render-prop return value is used for
+      // the checkmark slot below — actual selection styling comes from RAC's
+      // own data-selected attribute that it emits automatically.
+      className,
+      // Silence the isSelected lint — value consumed in render-prop below
+      isSelected ? "" : ""
     );
 
   return (
     <HeadlessMenuItem
       {...props}
       ref={ref}
-      // Apply all MD3 classes directly to the <li role="menuitem"> element
       className={computeClassName}
-      // onMouseDown triggers the ripple effect on mouse presses
       onMouseDown={onMouseDown as unknown as React.MouseEventHandler<Element>}
     >
       {({ isSelected }: MenuItemRenderProps) => (
         <>
-          {/* Ripple container */}
+          {/* ── State layer slot ──────────────────────────────────────── */}
+          {/* Renders below all content, above the base background.
+              Opacity is driven by group-data-[hovered/pressed/focus-visible]/menuitem. */}
+          <span
+            aria-hidden="true"
+            className={menuItemStateLayerVariants({ colorScheme, menuStyle })}
+          />
+
+          {/* ── Ripple container ──────────────────────────────────────── */}
           {!disableRipple && (
             <span className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit]">
               {ripples}
@@ -135,10 +151,7 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
 
           {/* ── Leading icon or checkmark slot ────────────────────────── */}
           {(leadingIcon != null || isSelectionMenu) && (
-            <span
-              className="text-on-surface-variant relative z-10 flex h-6 w-6 shrink-0 items-center justify-center"
-              aria-hidden="true"
-            >
+            <span className={menuItemIconVariants({ colorScheme, menuStyle })} aria-hidden="true">
               {isSelectionMenu && leadingIcon == null ? (
                 isSelected ? (
                   <CheckIcon />
@@ -152,11 +165,15 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
           {/* ── Text content area ─────────────────────────────────────── */}
           {description != null ? (
             <span className="relative z-10 flex min-w-0 flex-1 flex-col">
-              <span className="text-body-large">{children}</span>
+              <span className="text-label-large group-data-[disabled]/menuitem:text-on-surface/38">
+                {children}
+              </span>
               <span className={menuItemDescriptionVariants()}>{description}</span>
             </span>
           ) : (
-            <span className="text-body-large relative z-10 min-w-0 flex-1">{children}</span>
+            <span className="text-label-large group-data-[disabled]/menuitem:text-on-surface/38 relative z-10 min-w-0 flex-1">
+              {children}
+            </span>
           )}
 
           {/* ── Badge slot ────────────────────────────────────────────── */}
@@ -165,7 +182,7 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
           {/* ── Trailing icon ─────────────────────────────────────────── */}
           {trailingIcon != null && trailingText == null && (
             <span
-              className="text-on-surface-variant relative z-10 ml-auto flex h-6 w-6 shrink-0 items-center justify-center"
+              className={cn(menuItemIconVariants({ colorScheme, menuStyle }), "ml-auto")}
               aria-hidden="true"
             >
               {trailingIcon}

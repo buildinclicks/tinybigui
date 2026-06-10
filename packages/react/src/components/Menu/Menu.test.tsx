@@ -10,7 +10,11 @@ import { MenuGap } from "./MenuGap";
 import { SubmenuTrigger } from "./SubmenuTrigger";
 import { ContextMenuTrigger } from "./ContextMenuTrigger";
 import { HeadlessMenuTrigger } from "./MenuHeadless";
-import { menuContainerVariants, menuItemVariants } from "./Menu.variants";
+import {
+  menuContainerVariants,
+  menuItemVariants,
+  menuItemStateLayerVariants,
+} from "./Menu.variants";
 
 // ─── Test Icon Mocks ───────────────────────────────────────────────────────────
 
@@ -283,11 +287,11 @@ describe("MenuItem", () => {
       expect(screen.getByRole("menuitem", { name: "Cut" })).toBeInTheDocument();
     });
 
-    test("uses body-large typography for label text", async () => {
+    test("uses label-large typography for label text", async () => {
       renderBasicMenu();
       await openMenu();
       const item = screen.getByRole("menuitem", { name: "Cut" });
-      expect(item).toHaveClass("text-body-large");
+      expect(item).toHaveClass("text-label-large");
     });
 
     test("renders leading icon when provided", async () => {
@@ -447,6 +451,20 @@ describe("MenuItem", () => {
       );
       await openMenu();
       expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("custom-item");
+    });
+
+    test("item root carries group/menuitem scope class", async () => {
+      renderBasicMenu();
+      await openMenu();
+      expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("group/menuitem");
+    });
+
+    test("item contains a state-layer span slot", async () => {
+      renderBasicMenu();
+      await openMenu();
+      const item = screen.getByRole("menuitem", { name: "Cut" });
+      const stateLayer = item.querySelector("span[aria-hidden='true']");
+      expect(stateLayer).toBeInTheDocument();
     });
   });
 
@@ -854,7 +872,9 @@ describe("Selection mode", () => {
     );
     await openMenu();
     const selectedItem = screen.getByRole("menuitemradio", { name: "Grid view" });
-    expect(selectedItem).toHaveClass("bg-surface-container-highest");
+    // RAC emits data-selected on the element; CVA applies data-[selected]:bg-surface-container-highest
+    expect(selectedItem).toHaveAttribute("data-selected");
+    expect(selectedItem).toHaveClass("data-[selected]:bg-surface-container-highest");
   });
 
   test("selected item in vertical standard has tertiary container background", async () => {
@@ -875,7 +895,8 @@ describe("Selection mode", () => {
     );
     await openMenu();
     const selectedItem = screen.getByRole("menuitemradio", { name: "Grid view" });
-    expect(selectedItem).toHaveClass("bg-tertiary-container");
+    expect(selectedItem).toHaveAttribute("data-selected");
+    expect(selectedItem).toHaveClass("data-[selected]:bg-tertiary-container");
   });
 
   test("selected item in vertical vibrant has tertiary background", async () => {
@@ -896,7 +917,8 @@ describe("Selection mode", () => {
     );
     await openMenu();
     const selectedItem = screen.getByRole("menuitemradio", { name: "Grid view" });
-    expect(selectedItem).toHaveClass("bg-tertiary");
+    expect(selectedItem).toHaveAttribute("data-selected");
+    expect(selectedItem).toHaveClass("data-[selected]:bg-tertiary");
   });
 
   test("checkmark appears on selected item when selectionMode is set and no leadingIcon", async () => {
@@ -1264,35 +1286,52 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("bg-tertiary-container");
   });
 
-  test("menuItemVariants: uses text-body-large", () => {
+  test("menuItemVariants: uses text-label-large", () => {
     const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "baseline" });
-    expect(cls).toContain("text-body-large");
+    expect(cls).toContain("text-label-large");
   });
 
-  test("menuItemVariants: baseline selected uses bg-surface-container-highest", () => {
+  test("menuItemVariants: baseline includes data-[selected] bg class for surface-container-highest", () => {
     const cls = menuItemVariants({
-      isSelected: true,
       colorScheme: "standard",
       menuStyle: "baseline",
     });
-    expect(cls).toContain("bg-surface-container-highest");
+    expect(cls).toContain("data-[selected]:bg-surface-container-highest");
   });
 
-  test("menuItemVariants: vertical standard selected uses bg-tertiary-container", () => {
+  test("menuItemVariants: vertical standard includes data-[selected] bg class for tertiary-container", () => {
     const cls = menuItemVariants({
-      isSelected: true,
       colorScheme: "standard",
       menuStyle: "vertical",
     });
-    expect(cls).toContain("bg-tertiary-container");
+    expect(cls).toContain("data-[selected]:bg-tertiary-container");
   });
 
-  test("menuItemVariants: vertical vibrant selected uses bg-tertiary", () => {
+  test("menuItemVariants: vertical vibrant includes data-[selected] bg class for tertiary", () => {
     const cls = menuItemVariants({
-      isSelected: true,
       colorScheme: "vibrant",
       menuStyle: "vertical",
     });
-    expect(cls).toContain("bg-tertiary");
+    expect(cls).toContain("data-[selected]:bg-tertiary");
+  });
+
+  test("menuItemStateLayerVariants: standard uses bg-on-surface", () => {
+    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("bg-on-surface");
+  });
+
+  test("menuItemStateLayerVariants: vibrant uses bg-on-tertiary-container", () => {
+    const cls = menuItemStateLayerVariants({ colorScheme: "vibrant", menuStyle: "baseline" });
+    expect(cls).toContain("bg-on-tertiary-container");
+  });
+
+  test("menuItemStateLayerVariants: includes hover opacity-8 selector", () => {
+    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("group-data-[hovered]/menuitem:opacity-8");
+  });
+
+  test("menuItemStateLayerVariants: includes focus-visible opacity-10 selector", () => {
+    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("group-data-[focus-visible]/menuitem:opacity-10");
   });
 });
