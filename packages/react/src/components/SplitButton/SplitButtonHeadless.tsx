@@ -12,12 +12,12 @@ import type { SplitButtonHeadlessProps, SplitButtonMenuItem } from "./SplitButto
  * Provides behavior only — bring your own styles.
  *
  * Structure:
- * - Primary segment: triggers the main action
- * - Divider: visual separator (1dp vertical line)
- * - Dropdown trigger: opens/closes the dropdown menu
+ * - Leading segment: triggers the main action
+ * - Trailing segment: opens/closes the dropdown menu
+ *   (separated by a 2dp gap in the styled layer; no divider element here)
  *
  * Both segments are independently focusable via Tab navigation.
- * The dropdown trigger manages `aria-haspopup` and `aria-expanded`.
+ * The trailing trigger manages `aria-haspopup` and `aria-expanded`.
  *
  * @example
  * ```tsx
@@ -43,22 +43,22 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
     },
     forwardedRef
   ) => {
-    const primaryRef = useRef<HTMLButtonElement>(null);
-    const dropdownRef = useRef<HTMLButtonElement>(null);
+    const leadingRef = useRef<HTMLButtonElement>(null);
+    const trailingRef = useRef<HTMLButtonElement>(null);
     const menuRef = useRef<HTMLUListElement>(null);
 
     const menuState = useMenuTriggerState({});
 
-    const { buttonProps: primaryButtonProps } = useButton(
+    const { buttonProps: leadingButtonProps } = useButton(
       {
         isDisabled,
         onPress: onPrimaryAction,
         elementType: "button",
       },
-      primaryRef
+      leadingRef
     );
 
-    const handleDropdownPress = useCallback(() => {
+    const handleTrailingPress = useCallback(() => {
       if (menuState.isOpen) {
         menuState.close();
       } else {
@@ -66,13 +66,13 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
       }
     }, [menuState]);
 
-    const { buttonProps: dropdownButtonProps } = useButton(
+    const { buttonProps: trailingButtonProps } = useButton(
       {
         isDisabled,
-        onPress: handleDropdownPress,
+        onPress: handleTrailingPress,
         elementType: "button",
       },
-      dropdownRef
+      trailingRef
     );
 
     const handleMenuItemSelect = useCallback(
@@ -91,14 +91,12 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
       const handleGlobalKeyDown = (e: KeyboardEvent): void => {
         if (e.key === "Escape") {
           menuState.close();
-          dropdownRef.current?.focus();
+          trailingRef.current?.focus();
         }
       };
 
       document.addEventListener("keydown", handleGlobalKeyDown);
-      return () => {
-        document.removeEventListener("keydown", handleGlobalKeyDown);
-      };
+      return () => document.removeEventListener("keydown", handleGlobalKeyDown);
     }, [menuState, menuState.isOpen]);
 
     const handleMenuKeyDown = useCallback(
@@ -133,7 +131,7 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
           }
           case "Escape": {
             menuState.close();
-            dropdownRef.current?.focus();
+            trailingRef.current?.focus();
             break;
           }
           default:
@@ -143,8 +141,7 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
       [menuState]
     );
 
-    // Auto-focus the first enabled menu item when the menu opens so keyboard
-    // users can navigate immediately without an extra Tab press.
+    // Auto-focus first enabled menu item when the menu opens
     useEffect(() => {
       if (menuState.isOpen && menuRef.current) {
         const firstItem = menuRef.current.querySelector<HTMLElement>(
@@ -172,23 +169,20 @@ export const SplitButtonHeadless = forwardRef<HTMLDivElement, SplitButtonHeadles
         aria-label={ariaLabel ?? `${primaryLabel} split button`}
         className={className}
       >
-        {/* Primary action segment */}
+        {/* Leading action segment */}
         <button
-          {...primaryButtonProps}
-          ref={primaryRef}
+          {...leadingButtonProps}
+          ref={leadingRef}
           type="button"
           tabIndex={isDisabled ? -1 : 0}
         >
           {primaryLabel}
         </button>
 
-        {/* Visual divider */}
-        <span aria-hidden="true" />
-
-        {/* Dropdown trigger segment */}
+        {/* Trailing dropdown trigger segment — no divider element; gap comes from parent layout */}
         <button
-          {...dropdownButtonProps}
-          ref={dropdownRef}
+          {...trailingButtonProps}
+          ref={trailingRef}
           type="button"
           tabIndex={isDisabled ? -1 : 0}
           aria-haspopup="menu"

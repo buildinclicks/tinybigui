@@ -355,8 +355,14 @@ export {
   SplitButtonHeadless,
   splitButtonVariants,
   splitButtonContainerVariants,
-  splitButtonPrimaryVariants,
-  splitButtonDropdownVariants,
+  splitButtonLeadingVariants,
+  splitButtonTrailingVariants,
+  splitButtonStateLayerVariants,
+  splitButtonFocusRingVariants,
+  splitButtonLabelVariants,
+  splitButtonIconVariants,
+  splitButtonMenuVariants,
+  splitButtonMenuItemVariants,
 } from "./components/SplitButton";
 export type {
   SplitButtonProps,
@@ -365,8 +371,12 @@ export type {
   SplitButtonSize,
   SplitButtonMenuItem,
   SplitButtonContainerVariants,
-  SplitButtonPrimaryVariants,
-  SplitButtonDropdownVariants,
+  SplitButtonLeadingVariants,
+  SplitButtonTrailingVariants,
+  SplitButtonStateLayerVariants,
+  SplitButtonFocusRingVariants,
+  SplitButtonIconVariants,
+  SplitButtonMenuItemVariantProps,
 } from "./components/SplitButton";
 
 export {

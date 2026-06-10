@@ -1,17 +1,29 @@
 import type { PressEvent } from "react-aria";
 
 /**
- * Split Button variant types (Material Design 3).
+ * Split Button variant types (Material Design 3 Expressive).
  *
- * Split buttons only support filled, tonal, and outlined variants
- * per the MD3 specification.
+ * Split buttons support elevated, filled, tonal, and outlined variants,
+ * mirroring the standard Button color schemes per the MD3 Expressive spec.
+ *
+ * @see https://m3.material.io/components/split-button/specs
  */
-export type SplitButtonVariant = "filled" | "tonal" | "outlined";
+export type SplitButtonVariant = "elevated" | "filled" | "tonal" | "outlined";
 
 /**
- * Split Button size options.
+ * Split Button size options (MD3 Expressive size scale).
+ *
+ * | Token | Height | Typography         |
+ * |-------|--------|--------------------|
+ * | xs    | 32dp   | Label Large        |
+ * | sm    | 40dp   | Label Large        |
+ * | md    | 56dp   | Title Medium       |
+ * | lg    | 96dp   | Headline Small     |
+ * | xl    | 136dp  | Headline Large     |
+ *
+ * @default 'sm'
  */
-export type SplitButtonSize = "small" | "medium" | "large";
+export type SplitButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 /**
  * Represents a single item in the split button dropdown menu.
@@ -39,9 +51,9 @@ export interface SplitButtonMenuItem {
 /**
  * Props for the headless `SplitButtonHeadless` primitive (Layer 2).
  *
- * A Split Button groups a primary action with a dropdown trigger that reveals
- * secondary actions in a menu. Both segments are independently focusable and
- * accessible.
+ * A Split Button groups a leading action button with a trailing dropdown
+ * trigger that reveals secondary actions in a menu. Both segments are
+ * independently focusable and accessible.
  *
  * @example
  * ```tsx
@@ -63,18 +75,18 @@ export interface SplitButtonHeadlessProps {
   variant?: SplitButtonVariant;
 
   /**
-   * Size of the split button.
-   * @default 'medium'
+   * Size of the split button per the MD3 Expressive size scale.
+   * @default 'sm'
    */
   size?: SplitButtonSize;
 
-  /** Label text displayed in the primary action segment. */
+  /** Label text displayed in the leading action segment. */
   primaryLabel: string;
 
-  /** Callback invoked when the primary action segment is pressed. */
+  /** Callback invoked when the leading action segment is pressed. */
   onPrimaryAction: (e: PressEvent) => void;
 
-  /** Menu items displayed in the dropdown when the trigger is activated. */
+  /** Menu items displayed in the dropdown when the trailing trigger is activated. */
   items: SplitButtonMenuItem[];
 
   /**
@@ -94,6 +106,7 @@ export interface SplitButtonHeadlessProps {
  * Props for the styled `SplitButton` component (Layer 3).
  *
  * Extends the headless props with identical API surface; the styled layer
- * applies MD3 visual tokens and CVA variants on top of the headless primitive.
+ * applies MD3 Expressive visual tokens and CVA variants on top of the
+ * headless primitive.
  */
 export type SplitButtonProps = SplitButtonHeadlessProps;

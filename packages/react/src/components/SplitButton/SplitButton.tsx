@@ -1,55 +1,83 @@
 "use client";
 
-import { forwardRef, useRef, useCallback, useEffect, type MouseEvent } from "react";
-import { useButton } from "react-aria";
+import { forwardRef, useRef, useCallback, useEffect, useState, type MouseEvent } from "react";
+import { useButton, useHover, useFocusRing, mergeProps } from "react-aria";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useMenuTriggerState } from "react-stately";
 import {
   splitButtonContainerVariants,
-  splitButtonPrimaryVariants,
-  splitButtonDropdownVariants,
+  splitButtonLeadingVariants,
+  splitButtonTrailingVariants,
+  splitButtonStateLayerVariants,
+  splitButtonFocusRingVariants,
+  splitButtonLabelVariants,
+  splitButtonIconVariants,
+  splitButtonMenuVariants,
+  splitButtonMenuItemVariants,
 } from "./SplitButton.variants";
 import { useRipple } from "../../hooks/useRipple";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { cn } from "../../utils/cn";
 import type { SplitButtonProps, SplitButtonMenuItem } from "./SplitButton.types";
 
 /**
- * Chevron-down SVG icon for the dropdown trigger.
- * Rotates 180° when the menu is open.
+ * Chevron-down icon for the trailing dropdown trigger.
+ * Rotates 180° when the menu is open, using the MD3 spatial spring token.
+ * When reduced motion is preferred the rotation is instant (no transition).
  */
-const ChevronIcon = ({ isOpen }: { isOpen: boolean }): React.ReactElement => (
+const ChevronIcon = ({
+  isOpen,
+  reducedMotion,
+}: {
+  isOpen: boolean;
+  reducedMotion: boolean;
+}): React.ReactElement => (
   <svg
     aria-hidden="true"
     data-testid="split-button-chevron"
-    width="18"
-    height="18"
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className={cn("duration-short4 ease-standard transition-transform", isOpen && "rotate-180")}
+    className={cn(
+      "size-full",
+      !reducedMotion &&
+        "duration-expressive-fast-spatial ease-expressive-fast-spatial transition-transform",
+      isOpen && "rotate-180"
+    )}
   >
     <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
   </svg>
 );
 
 /**
- * Material Design 3 Split Button Component (Layer 3: Styled)
+ * Material Design 3 Expressive Split Button Component (Layer 3: Styled)
  *
- * Combines a primary action button with a dropdown trigger that reveals
- * secondary actions in a menu. Both segments include MD3 state layers and
- * ripple effects.
+ * Combines a leading action button with a trailing dropdown trigger that reveals
+ * secondary actions in a menu. Both segments have full MD3 Expressive state layers,
+ * per-segment focus rings, and inner-corner shape morphing.
+ *
+ * Implements the Variants-vs-States architecture: all interaction states are
+ * expressed as data-* attributes on each segment root and consumed by child
+ * slots via group-data-[x]/sb-leading and group-data-[x]/sb-trailing selectors.
  *
  * Features:
- * - 3 MD3 variants: filled, tonal, outlined
- * - Per-segment state layers (hover 8%, focus/pressed 12%)
+ * - 4 MD3 variants: elevated, filled, tonal, outlined
+ * - 5 MD3 Expressive sizes: xs, sm, md, lg, xl
+ * - Per-segment React Aria interaction tracking (hover, focus, press)
+ * - Per-segment MD3 state layers (hover 8%, focus 10%, pressed 10%)
+ * - Per-segment focus rings (extends outside overflow-hidden)
  * - Ripple effect on both segments
+ * - Inner-corner shape morphing on interaction (MD3 Expressive signature)
+ * - 2dp gap between segments per MD3 spec
  * - Chevron rotation animation on menu open
- * - Visual divider between segments per MD3 spec
+ * - useReducedMotion guard on all JS-driven transitions
  * - Full keyboard accessibility via React Aria
  *
  * @example
  * ```tsx
  * <SplitButton
  *   variant="filled"
+ *   size="sm"
  *   primaryLabel="Save"
  *   onPrimaryAction={() => console.log('saved')}
  *   items={[
@@ -63,7 +91,7 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
   (
     {
       variant = "filled",
-      size = "medium",
+      size = "sm",
       primaryLabel,
       onPrimaryAction,
       items,
@@ -73,22 +101,47 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
     },
     forwardedRef
   ) => {
-    const primaryRef = useRef<HTMLButtonElement>(null);
-    const dropdownRef = useRef<HTMLButtonElement>(null);
+    const leadingRef = useRef<HTMLButtonElement>(null);
+    const trailingRef = useRef<HTMLButtonElement>(null);
     const menuRef = useRef<HTMLUListElement>(null);
+
+    const reducedMotion = useReducedMotion();
 
     const menuState = useMenuTriggerState({});
 
-    const { buttonProps: primaryButtonProps } = useButton(
+    // ── Leading segment interaction state ────────────────────────────────────
+    const [isLeadingPressed, setIsLeadingPressed] = useState(false);
+    const handleLeadingPressStart = useCallback(() => setIsLeadingPressed(true), []);
+    const handleLeadingPressEnd = useCallback(() => setIsLeadingPressed(false), []);
+
+    const { isHovered: isLeadingHovered, hoverProps: leadingHoverProps } = useHover({
+      isDisabled,
+    });
+    const { isFocusVisible: isLeadingFocusVisible, focusProps: leadingFocusProps } = useFocusRing();
+
+    const { buttonProps: leadingButtonProps } = useButton(
       {
         isDisabled,
         onPress: onPrimaryAction,
+        onPressStart: handleLeadingPressStart,
+        onPressEnd: handleLeadingPressEnd,
         elementType: "button",
       },
-      primaryRef
+      leadingRef
     );
 
-    const handleDropdownPress = useCallback(() => {
+    // ── Trailing segment interaction state ────────────────────────────────────
+    const [isTrailingPressed, setIsTrailingPressed] = useState(false);
+    const handleTrailingPressStart = useCallback(() => setIsTrailingPressed(true), []);
+    const handleTrailingPressEnd = useCallback(() => setIsTrailingPressed(false), []);
+
+    const { isHovered: isTrailingHovered, hoverProps: trailingHoverProps } = useHover({
+      isDisabled,
+    });
+    const { isFocusVisible: isTrailingFocusVisible, focusProps: trailingFocusProps } =
+      useFocusRing();
+
+    const handleTrailingPress = useCallback(() => {
       if (menuState.isOpen) {
         menuState.close();
       } else {
@@ -96,15 +149,48 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
       }
     }, [menuState]);
 
-    const { buttonProps: dropdownButtonProps } = useButton(
+    const { buttonProps: trailingButtonProps } = useButton(
       {
         isDisabled,
-        onPress: handleDropdownPress,
+        onPress: handleTrailingPress,
+        onPressStart: handleTrailingPressStart,
+        onPressEnd: handleTrailingPressEnd,
         elementType: "button",
       },
-      dropdownRef
+      trailingRef
     );
 
+    // ── Ripple effects ────────────────────────────────────────────────────────
+    const { onMouseDown: handleLeadingRipple, ripples: leadingRipples } = useRipple({
+      disabled: isDisabled,
+    });
+    const { onMouseDown: handleTrailingRipple, ripples: trailingRipples } = useRipple({
+      disabled: isDisabled,
+    });
+
+    const onLeadingMouseDown = useCallback(
+      (e: MouseEvent<HTMLButtonElement>) => {
+        const ariaHandler = leadingButtonProps.onMouseDown as
+          | ((e: MouseEvent<HTMLElement>) => void)
+          | undefined;
+        ariaHandler?.(e);
+        handleLeadingRipple(e);
+      },
+      [leadingButtonProps, handleLeadingRipple]
+    );
+
+    const onTrailingMouseDown = useCallback(
+      (e: MouseEvent<HTMLButtonElement>) => {
+        const ariaHandler = trailingButtonProps.onMouseDown as
+          | ((e: MouseEvent<HTMLElement>) => void)
+          | undefined;
+        ariaHandler?.(e);
+        handleTrailingRipple(e);
+      },
+      [trailingButtonProps, handleTrailingRipple]
+    );
+
+    // ── Menu item handling ────────────────────────────────────────────────────
     const handleMenuItemSelect = useCallback(
       (item: SplitButtonMenuItem) => {
         if (!item.isDisabled) {
@@ -115,22 +201,22 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
       [menuState]
     );
 
+    // Global Escape closes menu
     useEffect(() => {
       if (!menuState.isOpen) return;
 
       const handleGlobalKeyDown = (e: KeyboardEvent): void => {
         if (e.key === "Escape") {
           menuState.close();
-          dropdownRef.current?.focus();
+          trailingRef.current?.focus();
         }
       };
 
       document.addEventListener("keydown", handleGlobalKeyDown);
-      return () => {
-        document.removeEventListener("keydown", handleGlobalKeyDown);
-      };
+      return () => document.removeEventListener("keydown", handleGlobalKeyDown);
     }, [menuState, menuState.isOpen]);
 
+    // Arrow / Home / End keyboard navigation within the open menu
     const handleMenuKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLUListElement>) => {
         const menuItems = Array.from(
@@ -163,7 +249,7 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
           }
           case "Escape": {
             menuState.close();
-            dropdownRef.current?.focus();
+            trailingRef.current?.focus();
             break;
           }
           default:
@@ -173,8 +259,7 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
       [menuState]
     );
 
-    // Auto-focus the first enabled menu item when the menu opens so keyboard
-    // users can navigate immediately without an extra Tab press.
+    // Auto-focus first enabled item when menu opens
     useEffect(() => {
       if (menuState.isOpen && menuRef.current) {
         const firstItem = menuRef.current.querySelector<HTMLElement>(
@@ -195,109 +280,101 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
       [menuState]
     );
 
-    const { onMouseDown: handlePrimaryRipple, ripples: primaryRipples } = useRipple({
-      disabled: isDisabled,
-    });
-
-    const { onMouseDown: handleDropdownRipple, ripples: dropdownRipples } = useRipple({
-      disabled: isDisabled,
-    });
-
-    const onPrimaryMouseDown = useCallback(
-      (e: MouseEvent<HTMLButtonElement>) => {
-        const ariaHandler = primaryButtonProps.onMouseDown as
-          | ((e: MouseEvent<HTMLElement>) => void)
-          | undefined;
-        ariaHandler?.(e);
-        handlePrimaryRipple(e);
-      },
-      [primaryButtonProps, handlePrimaryRipple]
-    );
-
-    const onDropdownMouseDown = useCallback(
-      (e: MouseEvent<HTMLButtonElement>) => {
-        const ariaHandler = dropdownButtonProps.onMouseDown as
-          | ((e: MouseEvent<HTMLElement>) => void)
-          | undefined;
-        ariaHandler?.(e);
-        handleDropdownRipple(e);
-      },
-      [dropdownButtonProps, handleDropdownRipple]
-    );
-
     return (
       <div className="relative inline-flex">
         <div
           ref={forwardedRef}
           role="group"
           aria-label={ariaLabel ?? `${primaryLabel} split button`}
-          className={cn(splitButtonContainerVariants({ variant, size, isDisabled }), className)}
+          className={cn(splitButtonContainerVariants(), className)}
         >
-          {/* Primary action segment */}
+          {/* ── Leading (primary action) segment ──────────────────────────── */}
           <button
-            {...primaryButtonProps}
-            ref={primaryRef}
+            {...mergeProps(leadingButtonProps, leadingHoverProps, leadingFocusProps)}
+            ref={leadingRef}
             type="button"
             tabIndex={isDisabled ? -1 : 0}
-            onMouseDown={onPrimaryMouseDown}
-            className={splitButtonPrimaryVariants({ variant, size })}
+            onMouseDown={onLeadingMouseDown}
+            // Interaction data attributes drive all state-layer and elevation styling
+            {...getInteractionDataAttributes({
+              isHovered: isLeadingHovered,
+              isFocusVisible: isLeadingFocusVisible,
+              isPressed: isLeadingPressed,
+              isDisabled,
+            })}
+            className={splitButtonLeadingVariants({ variant, size })}
           >
+            {/* State layer — overflow-hidden here, not on the root */}
             <span
               data-testid="primary-state-layer"
               aria-hidden="true"
-              className={cn(
-                "pointer-events-none absolute inset-0 bg-current opacity-0",
-                "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-opacity",
-                "group-hover/primary:opacity-8"
-              )}
+              className={splitButtonStateLayerVariants({ variant, groupScope: "leading" })}
             />
-            {primaryRipples}
-            <span className="relative z-10">{primaryLabel}</span>
+
+            {/* Ripple */}
+            {leadingRipples}
+
+            {/* Focus ring — outside overflow-hidden, extends 3px past boundary */}
+            <span
+              aria-hidden="true"
+              className={splitButtonFocusRingVariants({ groupScope: "leading" })}
+            />
+
+            {/* Label */}
+            <span className={splitButtonLabelVariants()}>{primaryLabel}</span>
           </button>
 
-          {/* Visual divider — rendered via border-l on the dropdown segment */}
-          <span data-testid="split-button-divider" aria-hidden="true" />
-
-          {/* Dropdown trigger segment */}
+          {/* ── Trailing (dropdown trigger) segment ───────────────────────── */}
           <button
-            {...dropdownButtonProps}
-            ref={dropdownRef}
+            {...mergeProps(trailingButtonProps, trailingHoverProps, trailingFocusProps)}
+            ref={trailingRef}
             type="button"
             tabIndex={isDisabled ? -1 : 0}
             aria-haspopup="menu"
             aria-expanded={menuState.isOpen}
             aria-label={`${primaryLabel} options, expand`}
-            onMouseDown={onDropdownMouseDown}
-            className={splitButtonDropdownVariants({ variant, size })}
+            onMouseDown={onTrailingMouseDown}
+            // data-selected when menu is open — MD3 trailing icon centering
+            {...getInteractionDataAttributes({
+              isHovered: isTrailingHovered,
+              isFocusVisible: isTrailingFocusVisible,
+              isPressed: isTrailingPressed,
+              isSelected: menuState.isOpen,
+              isDisabled,
+            })}
+            className={splitButtonTrailingVariants({ variant, size })}
           >
+            {/* State layer */}
             <span
               data-testid="dropdown-state-layer"
               aria-hidden="true"
-              className={cn(
-                "pointer-events-none absolute inset-0 bg-current opacity-0",
-                "duration-spring-standard-fast-effects ease-spring-standard-fast-effects transition-opacity",
-                "group-hover/dropdown:opacity-8"
-              )}
+              className={splitButtonStateLayerVariants({ variant, groupScope: "trailing" })}
             />
-            {dropdownRipples}
-            <span className="relative z-10">
-              <ChevronIcon isOpen={menuState.isOpen} />
+
+            {/* Ripple */}
+            {trailingRipples}
+
+            {/* Focus ring */}
+            <span
+              aria-hidden="true"
+              className={splitButtonFocusRingVariants({ groupScope: "trailing" })}
+            />
+
+            {/* Chevron icon — rotates when menu is open */}
+            <span className={splitButtonIconVariants({ size })}>
+              <ChevronIcon isOpen={menuState.isOpen} reducedMotion={reducedMotion} />
             </span>
           </button>
         </div>
 
-        {/* Dropdown menu — sibling to the group container so it is NOT clipped
-            by `overflow-hidden`; positioned relative to the outer wrapper. */}
+        {/* ── Dropdown menu — sibling to the group so it is NOT clipped ─────── */}
         {menuState.isOpen && (
           <ul
             ref={menuRef}
             role="menu"
             aria-label={`${primaryLabel} options`}
             onKeyDown={handleMenuKeyDown}
-            className={cn(
-              "bg-surface-container absolute top-full right-0 z-50 mt-1 min-w-40 rounded-md py-2",
-              "shadow-elevation-2"
-            )}
+            className={splitButtonMenuVariants()}
           >
             {items.map((item) => (
               <li
@@ -307,11 +384,7 @@ export const SplitButton = forwardRef<HTMLDivElement, SplitButtonProps>(
                 aria-disabled={item.isDisabled ?? undefined}
                 onClick={() => handleMenuItemSelect(item)}
                 onKeyDown={(e) => handleMenuItemKeyDown(e, item)}
-                className={cn(
-                  "text-body-large text-on-surface cursor-pointer px-4 py-2",
-                  "hover:bg-on-surface/8",
-                  item.isDisabled && "text-on-surface/38 pointer-events-none"
-                )}
+                className={splitButtonMenuItemVariants({ isDisabled: item.isDisabled ?? false })}
               >
                 {item.label}
               </li>
