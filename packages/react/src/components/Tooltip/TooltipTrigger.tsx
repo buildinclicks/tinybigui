@@ -11,13 +11,14 @@ import {
   type ReactNode,
 } from "react";
 import { TooltipTriggerHeadless, TooltipOverlayHeadless } from "./TooltipHeadless";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 import type { TooltipPlacement } from "./Tooltip.types";
 
 // ─── Animation Context ────────────────────────────────────────────────────────
 
 /**
  * Shared animation state provided by `TooltipTrigger` to its `Tooltip` /
- * `RichTooltip` children. Drives the CVA `isVisible` variant and the
+ * `RichTooltip` children. Drives the CVA `animation` variant and the
  * `animationend` unmount callback.
  */
 export interface TooltipAnimationContextValue {
@@ -25,15 +26,24 @@ export interface TooltipAnimationContextValue {
    * True while the exit animation is playing.
    * `Tooltip` / `RichTooltip` apply the exit animation class when this is
    * `true` and stay mounted until `onAnimationEnd` fires.
+   * Always `false` when `reducedMotion` is `true` (immediate unmount).
    */
   isExiting: boolean;
   /** Called by the tooltip element's `onAnimationEnd` to unmount after exit. */
   onAnimationEnd: () => void;
+  /**
+   * Whether `prefers-reduced-motion: reduce` is currently active.
+   * When `true`, styled components must skip animation classes and the
+   * `TooltipTrigger` unmounts the overlay immediately on close (no
+   * `animationend` dependency).
+   */
+  reducedMotion: boolean;
 }
 
 export const TooltipAnimationContext = createContext<TooltipAnimationContextValue>({
   isExiting: false,
   onAnimationEnd: () => undefined,
+  reducedMotion: false,
 });
 
 /**
@@ -69,13 +79,19 @@ export interface TooltipTriggerStyledProps {
  * machine so that tooltips fade/scale in on open and fade/scale out before
  * unmounting from the DOM, per MD3 motion specs.
  *
- * Animation state machine:
+ * When `prefers-reduced-motion: reduce` is active the overlay is unmounted
+ * immediately on close — no exit animation, no `animationend` dependency.
+ * This prevents the stuck-mount bug that occurs when the global CSS reset
+ * collapses animations and `animationend` never fires.
+ *
+ * Animation state machine (standard motion):
  * 1. RA fires `onOpenChange(true)`  → mount overlay, play entry animation
  * 2. RA fires `onOpenChange(false)` → keep mounted, play exit animation
  * 3. `animationend` fires          → unmount overlay
  *
- * The controlled `isOpen={isMounted}` prop passed to `TooltipTriggerHeadless`
- * is what keeps the overlay alive during the exit animation phase.
+ * Animation state machine (reduced motion):
+ * 1. RA fires `onOpenChange(true)`  → mount overlay, no animation
+ * 2. RA fires `onOpenChange(false)` → unmount overlay immediately
  *
  * @example
  * ```tsx
@@ -90,6 +106,8 @@ export function TooltipTrigger({
   delay = 300,
   isDisabled,
 }: TooltipTriggerStyledProps): JSX.Element {
+  const reducedMotion = useReducedMotion();
+
   const [isMounted, setIsMounted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -98,41 +116,56 @@ export function TooltipTrigger({
   const pendingCloseRef = useRef(false);
 
   /**
+   * Unmounts the overlay immediately (reduced motion path or forced close).
+   * Resets all animation refs to a clean state.
+   */
+  const unmountImmediately = useCallback(() => {
+    isExitingRef.current = false;
+    pendingCloseRef.current = false;
+    setIsMounted(false);
+    setIsExiting(false);
+  }, []);
+
+  /**
    * Stable callback — React Aria calls this when it wants to open or close.
    *
    * On open  → cancel any pending close, mount overlay, play entry animation.
    * On close → if pointer is over the tooltip surface, defer the close until
    *            the pointer leaves (prevents flicker when hovering the portal).
-   *            Otherwise start exit animation immediately.
+   *            Otherwise:
+   *              - reduced motion: unmount immediately (no animationend needed)
+   *              - standard motion: start exit animation, unmount on animationend
    */
-  const handleOpenChange = useCallback((open: boolean) => {
-    if (open) {
-      pendingCloseRef.current = false;
-      isExitingRef.current = false;
-      setIsMounted(true);
-      setIsExiting(false);
-    } else if (isPointerOverTooltipRef.current) {
-      pendingCloseRef.current = true;
-    } else if (!isExitingRef.current) {
-      isExitingRef.current = true;
-      setIsExiting(true);
-    }
-  }, []);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        pendingCloseRef.current = false;
+        isExitingRef.current = false;
+        setIsMounted(true);
+        setIsExiting(false);
+      } else if (isPointerOverTooltipRef.current) {
+        pendingCloseRef.current = true;
+      } else if (reducedMotion) {
+        unmountImmediately();
+      } else if (!isExitingRef.current) {
+        isExitingRef.current = true;
+        setIsExiting(true);
+      }
+    },
+    [reducedMotion, unmountImmediately]
+  );
 
   /**
    * Stable callback — called by the tooltip element's `onAnimationEnd` event.
-   * Unmounts the overlay after the exit animation completes.
+   * Unmounts the overlay after the exit animation completes (standard motion only).
    *
    * The guard ensures the entry animation's `animationend` event is ignored —
    * only the exit animation should trigger unmounting.
    */
   const handleAnimationEnd = useCallback(() => {
     if (!isExitingRef.current) return;
-    isExitingRef.current = false;
-    pendingCloseRef.current = false;
-    setIsMounted(false);
-    setIsExiting(false);
-  }, []);
+    unmountImmediately();
+  }, [unmountImmediately]);
 
   const handleOverlayPointerEnter = useCallback(() => {
     isPointerOverTooltipRef.current = true;
@@ -141,16 +174,21 @@ export function TooltipTrigger({
 
   const handleOverlayPointerLeave = useCallback(() => {
     isPointerOverTooltipRef.current = false;
-    if (pendingCloseRef.current && !isExitingRef.current) {
+    if (pendingCloseRef.current) {
       pendingCloseRef.current = false;
-      isExitingRef.current = true;
-      setIsExiting(true);
+      if (reducedMotion) {
+        unmountImmediately();
+      } else if (!isExitingRef.current) {
+        isExitingRef.current = true;
+        setIsExiting(true);
+      }
     }
-  }, []);
+  }, [reducedMotion, unmountImmediately]);
 
   const contextValue: TooltipAnimationContextValue = {
     isExiting,
     onAnimationEnd: handleAnimationEnd,
+    reducedMotion,
   };
 
   const [triggerChild, tooltipChild] = children;
