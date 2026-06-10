@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **TextField** — MD3 expressive variants-vs-states architecture refactor; `prefix` and `suffix` props; notched outline (outlined variant), state layer and active indicator (filled variant); spring motion tokens; supporting text + counter on one flex row; `size` prop and `TextFieldSize` type removed (breaking)
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.13.0] - 2026-06-10
 
 ### Changed
