@@ -1,12 +1,18 @@
 /**
  * @tinybigui/react — Progress Component
- * Material Design 3 Progress Indicator with accessibility support.
+ * Material Design 3 Expressive Progress Indicator with accessibility support.
  *
  * Four variants:
- *   - Linear Determinate
+ *   - Linear Determinate    (two-segment gap rendering)
  *   - Linear Indeterminate
- *   - Circular Determinate
+ *   - Circular Determinate  (arc gap)
  *   - Circular Indeterminate
+ *
+ * MD3 Expressive additions:
+ *   - Colorful track: primary-container
+ *   - 4dp indicator-track gap
+ *   - Optional thick (8dp) track via `thickness` prop
+ *   - Optional wavy shape via `shape` prop
  */
 
 // Layer 3: MD3 Styled Component (most consumers use this)
@@ -21,16 +27,24 @@ export type { ProgressProps, ProgressHeadlessProps } from "./Progress.types";
 // Variants (for advanced customization)
 export {
   progressContainerVariants,
+  progressLabelVariants,
   progressTrackVariants,
-  progressIndicatorVariants,
+  progressActiveIndicatorVariants,
+  progressInactiveSegmentVariants,
   progressStopIndicatorVariants,
   progressCircularSizeVariants,
-  progressLabelVariants,
+  // backward-compat alias
+  progressIndicatorVariants,
 } from "./Progress.variants";
+
 export type {
   ProgressContainerVariants,
-  ProgressTrackVariants,
-  ProgressIndicatorVariants,
-  ProgressCircularSizeVariants,
   ProgressLabelVariants,
+  ProgressTrackVariants,
+  ProgressActiveIndicatorVariants,
+  ProgressInactiveSegmentVariants,
+  ProgressStopIndicatorVariants,
+  ProgressCircularSizeVariants,
+  // backward-compat alias
+  ProgressIndicatorVariants,
 } from "./Progress.variants";

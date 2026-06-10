@@ -1,15 +1,18 @@
 /*
  * Progress Indicator Animations
- * Material Design 3 motion tokens for indeterminate progress states.
+ * Material Design 3 motion tokens for indeterminate and wavy progress states.
  *
  * Keyframes are defined here (co-located with the component) per project
  * convention — they are NOT added to the global tokens.css.
  *
+ * All timing values reference MD3 motion token CSS custom properties.
+ * Hardcoded durations are forbidden — use the token vars below.
+ *
  * Motion tokens referenced (from packages/tokens/src/tokens.css):
- *   --md-sys-motion-duration-medium4 : 400ms  (determinate transitions — applied via Tailwind)
- *   --md-sys-motion-duration-long2   : 500ms  (linear indeterminate cycle)
- *   --md-sys-motion-duration-long4   : 600ms  (circular indeterminate rotation)
- *   --md-sys-motion-easing-standard  : cubic-bezier(0.2, 0, 0, 1)
+ *   --md-sys-motion-duration-long2          : 500ms  (linear indeterminate cycle)
+ *   --md-sys-motion-duration-long4          : 600ms  (circular indeterminate rotation)
+ *   --md-sys-motion-duration-extra-long4    : 1000ms (wave horizontal translation)
+ *   --md-sys-motion-easing-standard         : cubic-bezier(0.2, 0, 0, 1)
  */
 
 /* ---------------------------------------------------------------------------
@@ -83,12 +86,27 @@
 }
 
 /* ---------------------------------------------------------------------------
+   WAVY TRANSLATION
+   Horizontal wave motion: the wavy path translates one full wavelength so
+   the wave appears to flow continuously.
+   Duration: extra-long4 = 1000ms per cycle (repeating).
+   --------------------------------------------------------------------------- */
+
+@keyframes progress-wave-translate {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    /* Translate exactly one wavelength. The wavelength is baked into the SVG
+       path so the visual loop is seamless. The actual translate distance is
+       set via --progress-wave-wavelength CSS custom property on the element. */
+    transform: translateX(var(--progress-wave-wavelength, -40px));
+  }
+}
+
+/* ---------------------------------------------------------------------------
    TAILWIND @theme INTEGRATION
-   Register animations so they can be used as Tailwind utilities:
-     animate-progress-linear-indeterminate-1
-     animate-progress-linear-indeterminate-2
-     animate-progress-circular-rotate
-     animate-progress-circular-dash
+   Register animations so they can be used as Tailwind utilities.
    --------------------------------------------------------------------------- */
 
 @theme {
@@ -103,4 +121,7 @@
 
   --animate-progress-circular-dash: progress-circular-dash var(--md-sys-motion-duration-long4)
     var(--md-sys-motion-easing-standard) infinite;
+
+  --animate-progress-wave-translate: progress-wave-translate
+    var(--md-sys-motion-duration-extra-long4) linear infinite;
 }
