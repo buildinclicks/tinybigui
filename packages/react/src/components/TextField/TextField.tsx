@@ -160,6 +160,7 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
           // Placeholder value — we need it to determine float state
           const hasPlaceholder = !!(props as { placeholder?: string }).placeholder;
           const hasPrefix = !!prefix;
+          const hasSuffix = !!suffix;
           // Label floats when: focused, has a value, has a placeholder, or has a prefix
           const shouldFloat = isFocused || hasValue || hasPlaceholder || hasPrefix;
           const characterLength = currentValue.length;
@@ -192,6 +193,8 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
               // ── Content flags (structural composition) ───────────────────
               data-with-leading-icon={hasLeadingIcon ? "" : undefined}
               data-with-trailing-icon={hasTrailingIcon ? "" : undefined}
+              data-with-prefix={hasPrefix ? "" : undefined}
+              data-with-suffix={hasSuffix ? "" : undefined}
               data-no-label={!hasLabel ? "" : undefined}
               data-multiline={multiline ? "" : undefined}
             >
@@ -224,7 +227,9 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
 
                   {/* Prefix affix */}
                   {prefix && (
-                    <span className={cn(textFieldAffixVariants(), "pr-0.5")}>{prefix}</span>
+                    <span className={cn(textFieldAffixVariants({ variant, position: "prefix" }))}>
+                      {prefix}
+                    </span>
                   )}
 
                   {/* Input / Textarea */}
@@ -247,7 +252,9 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
 
                   {/* Suffix affix */}
                   {suffix && (
-                    <span className={cn(textFieldAffixVariants(), "pl-0.5")}>{suffix}</span>
+                    <span className={cn(textFieldAffixVariants({ variant, position: "suffix" }))}>
+                      {suffix}
+                    </span>
                   )}
                 </div>
 

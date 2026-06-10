@@ -301,8 +301,8 @@ export const textFieldInputVariants = cva(
       variant: {
         /**
          * Filled: top padding creates room for floating label (label rests at 8dp).
-         * Horizontal padding: 16dp left (4) / 16dp right (4).
-         * With label: pt-6 pb-2 so label and input text don't overlap.
+         * Horizontal padding: 16dp left / 16dp right — but yielded to prefix/suffix
+         * when they are present so the affix handles the edge spacing instead.
          */
         filled: [
           "pt-6 pb-2 px-4",
@@ -312,10 +312,18 @@ export const textFieldInputVariants = cva(
           "group-data-[with-leading-icon]/text-field:pl-[52px]",
           // Trailing icon horizontal offset
           "group-data-[with-trailing-icon]/text-field:pr-[52px]",
+          // Prefix present: prefix handles left edge — remove input's left padding
+          "group-data-[with-prefix]/text-field:pl-0",
+          // Leading icon + prefix together: compound wins over both singles
+          "group-data-[with-leading-icon]/text-field:group-data-[with-prefix]/text-field:pl-0",
+          // Suffix present: suffix handles right edge — remove input's right padding
+          "group-data-[with-suffix]/text-field:pr-0",
+          // Trailing icon + suffix together: compound wins over both singles
+          "group-data-[with-trailing-icon]/text-field:group-data-[with-suffix]/text-field:pr-0",
         ],
         /**
          * Outlined: label sits on the border, no extra top padding needed.
-         * Horizontal padding: 16dp (px-4).
+         * Horizontal padding: 16dp — yielded to prefix/suffix when present.
          */
         outlined: [
           "py-4 px-4",
@@ -323,6 +331,12 @@ export const textFieldInputVariants = cva(
           "group-data-[with-leading-icon]/text-field:pl-[52px]",
           // Trailing icon horizontal offset
           "group-data-[with-trailing-icon]/text-field:pr-[52px]",
+          // Prefix present: prefix handles left edge
+          "group-data-[with-prefix]/text-field:pl-0",
+          "group-data-[with-leading-icon]/text-field:group-data-[with-prefix]/text-field:pl-0",
+          // Suffix present: suffix handles right edge
+          "group-data-[with-suffix]/text-field:pr-0",
+          "group-data-[with-trailing-icon]/text-field:group-data-[with-suffix]/text-field:pr-0",
         ],
       },
       multiline: {
@@ -376,18 +390,76 @@ export const textFieldIconVariants = cva(
 /**
  * Inline prefix and suffix text — visible only when the field is floated.
  * body-large, on-surface-variant color.
- * Fades in with the floating transition using effects token.
+ *
+ * Vertical alignment:
+ *   Filled  — matches the input's pt-6 pb-2 padding so the text baseline aligns
+ *             with the input text in the lower zone of the 56dp container.
+ *             When no label is present the input uses py-4, so we mirror that.
+ *   Outlined — input uses py-4 which centres text at 28px; naturally-sized affix
+ *             is already centred there by items-center on the content column.
+ *
+ * Horizontal alignment:
+ *   Prefix  — pl-4 aligns its left text edge to the field's 16dp start margin
+ *             (same as label left-4 and the default input pl-4). With a leading
+ *             icon the offset grows to 52dp to clear the icon zone.
+ *             pr-0.5 provides a small gap between the prefix text and the cursor.
+ *   Suffix  — pl-0.5 provides a small gap between the input text and the suffix.
+ *             pr-4 keeps 16dp from the right edge. With a trailing icon the
+ *             offset grows to 52dp to avoid overlapping the icon.
  */
-export const textFieldAffixVariants = cva([
-  "relative z-10 text-body-large text-on-surface-variant select-none",
-  "opacity-0 pointer-events-none",
-  // Visible once label is floated
-  "group-data-[float]/text-field:opacity-100 group-data-[float]/text-field:pointer-events-auto",
-  // Effects transition
-  "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
-  // Disabled
-  "group-data-[disabled]/text-field:text-on-surface/38",
-]);
+export const textFieldAffixVariants = cva(
+  [
+    "relative z-10 text-body-large text-on-surface-variant select-none shrink-0",
+    "opacity-0 pointer-events-none",
+    // Visible once label is floated
+    "group-data-[float]/text-field:opacity-100 group-data-[float]/text-field:pointer-events-auto",
+    // Effects transition
+    "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+    // Disabled
+    "group-data-[disabled]/text-field:text-on-surface/38",
+  ],
+  {
+    variants: {
+      variant: {
+        /**
+         * Filled: mirror the input's pt-6 pb-2 so the text sits in the same
+         * vertical zone. When no label is present, the input uses py-4 — match
+         * that too so the affix stays centred with the input text.
+         */
+        filled: [
+          "pt-6 pb-2",
+          "group-data-[no-label]/text-field:pt-4 group-data-[no-label]/text-field:pb-4",
+        ],
+        /**
+         * Outlined: input uses py-4 and h-full; items-center on the content
+         * column already centres the naturally-sized affix at the same 28px
+         * midpoint as the input text. No extra vertical padding needed.
+         */
+        outlined: [],
+      },
+      position: {
+        /**
+         * Prefix: sits before the input in the flex row.
+         * pl-4 aligns the left text edge to the 16dp field margin.
+         * With a leading icon that shifts to 52dp to clear the icon.
+         * pr-0.5 is a small gap between prefix text and the input cursor.
+         */
+        prefix: ["pl-4", "group-data-[with-leading-icon]/text-field:pl-[52px]", "pr-0.5"],
+        /**
+         * Suffix: sits after the input in the flex row.
+         * pl-0.5 is a small gap between the input text and the suffix.
+         * pr-4 keeps 16dp from the right field edge.
+         * With a trailing icon that shifts to 52dp to avoid overlap.
+         */
+        suffix: ["pl-0.5", "pr-4", "group-data-[with-trailing-icon]/text-field:pr-[52px]"],
+      },
+    },
+    defaultVariants: {
+      variant: "filled",
+      position: "prefix",
+    },
+  }
+);
 
 // ─── SUPPORTING ROW ───────────────────────────────────────────────────────────
 
@@ -455,5 +527,6 @@ export type TextFieldFieldVariants = VariantProps<typeof textFieldFieldVariants>
 export type TextFieldLabelVariants = VariantProps<typeof textFieldLabelVariants>;
 export type TextFieldInputVariants = VariantProps<typeof textFieldInputVariants>;
 export type TextFieldIconVariants = VariantProps<typeof textFieldIconVariants>;
+export type TextFieldAffixVariants = VariantProps<typeof textFieldAffixVariants>;
 export type TextFieldSupportingTextVariants = VariantProps<typeof textFieldSupportingTextVariants>;
 export type TextFieldCounterVariants = VariantProps<typeof textFieldCounterVariants>;
