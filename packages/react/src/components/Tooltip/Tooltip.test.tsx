@@ -641,3 +641,123 @@ describe("TooltipTrigger (styled)", () => {
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
   });
 });
+
+// ─── 37–40. MD3 token correctness ─────────────────────────────────────────────
+
+describe("MD3 token correctness", () => {
+  test("37. rich tooltip title uses text-on-surface-variant (MD3 subhead role)", async () => {
+    const user = userEvent.setup();
+    renderStyledRichTooltip();
+    await user.tab();
+    const title = screen.getByText("Title text");
+    expect(title).toHaveClass("text-on-surface-variant");
+  });
+
+  test("38. rich tooltip supporting text uses text-on-surface-variant", async () => {
+    const user = userEvent.setup();
+    renderStyledRichTooltip();
+    await user.tab();
+    const body = screen.getByText("Supporting text");
+    expect(body).toHaveClass("text-on-surface-variant");
+  });
+
+  test("39. rich tooltip action is wrapped in the actions-row slot div", async () => {
+    const user = userEvent.setup();
+    renderStyledRichTooltip();
+    await user.tab();
+    const actionButton = screen.getByRole("button", { name: "Action" });
+    // The action button's parent must be the actions-row slot div
+    const actionRow = actionButton.closest("div");
+    expect(actionRow).toHaveClass("mt-3");
+    expect(actionRow).toHaveClass("-ml-2");
+  });
+
+  test("40. plain tooltip container has inline-flex to center single-line content", async () => {
+    const user = userEvent.setup();
+    renderStyledTooltip();
+    await user.tab();
+    expect(screen.getByText("Tooltip text")).toHaveClass("inline-flex");
+    expect(screen.getByText("Tooltip text")).toHaveClass("items-center");
+  });
+});
+
+// ─── 41–45. prefers-reduced-motion ───────────────────────────────────────────
+
+/**
+ * Helpers that override matchMedia to simulate `prefers-reduced-motion: reduce`.
+ * We restore the global mock after each test so other tests are unaffected.
+ */
+function mockReducedMotion(matches: boolean): void {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(prefers-reduced-motion: reduce)" ? matches : false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
+describe("prefers-reduced-motion", () => {
+  afterEach(() => {
+    // Restore to the default mock (matches: false) set in test/setup.ts
+    mockReducedMotion(false);
+  });
+
+  test("41. plain tooltip has no animation class when reduced motion is active", async () => {
+    mockReducedMotion(true);
+    const user = userEvent.setup();
+    renderStyledTooltip();
+    await user.tab();
+    const tooltip = screen.getByText("Tooltip text");
+    expect(tooltip).not.toHaveClass("animate-md-scale-in");
+    expect(tooltip).not.toHaveClass("animate-md-scale-out");
+  });
+
+  test("42. rich tooltip has no animation class when reduced motion is active", async () => {
+    mockReducedMotion(true);
+    const user = userEvent.setup();
+    renderStyledRichTooltip();
+    await user.tab();
+    const richWrapper = screen.getByText("Supporting text").closest("div");
+    expect(richWrapper).not.toHaveClass("animate-md-scale-in");
+    expect(richWrapper).not.toHaveClass("animate-md-scale-out");
+  });
+
+  test("43. plain tooltip unmounts immediately on close (no animationend) when reduced motion is active", async () => {
+    mockReducedMotion(true);
+    const user = userEvent.setup();
+    renderStyledTooltip();
+    await user.tab();
+    expect(screen.getByText("Tooltip text")).toBeInTheDocument();
+
+    // Move focus away — under reduced motion the overlay must unmount
+    // immediately without waiting for animationend (which CSS never fires).
+    await user.tab();
+    expect(screen.queryByText("Tooltip text")).not.toBeInTheDocument();
+  });
+
+  test("44. rich tooltip unmounts immediately on close (no animationend) when reduced motion is active", async () => {
+    mockReducedMotion(true);
+    const user = userEvent.setup();
+    renderStyledRichTooltip();
+    await user.tab();
+    expect(screen.getByText("Supporting text")).toBeInTheDocument();
+
+    await user.tab();
+    expect(screen.queryByText("Supporting text")).not.toBeInTheDocument();
+  });
+
+  test("45. standard animation classes still applied when reduced motion is NOT active", async () => {
+    mockReducedMotion(false);
+    const user = userEvent.setup();
+    renderStyledTooltip();
+    await user.tab();
+    expect(screen.getByText("Tooltip text")).toHaveClass("animate-md-scale-in");
+  });
+});
