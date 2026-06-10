@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.14.0** (2026-06-10)
+> **Latest Release: v0.15.0** (2026-06-10)
 >
-> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,065 tests** passing.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,071 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,7 +94,7 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.14.0  | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.15.0  | Released |
 | [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.13.0  | Released |
 
 ---
@@ -152,7 +152,7 @@ This is a monorepo containing multiple packages:
 ### Phase 4: Data Display ✅
 
 - [x] Card — MD3 motion tier, media aspect-ratio fix, title-medium headline, CVA export parity (v0.11.1)
-- [x] List — static and interactive modes (v0.4.0)
+- [x] List — MD3 expressive variants-vs-states architecture, state layer, focus ring, slot CVAs (v0.15.0)
 - [x] Chip — MD3 expressive slot architecture, token corrections, elevated surface (v0.9.0)
 - [x] Badge — MD3 expressive variants/states, icon-corner anchoring (v0.8.0)
 - [x] Divider — MD3 expressive slot-based CVA, CSS-var thickness, logical RTL insets (v0.12.0)

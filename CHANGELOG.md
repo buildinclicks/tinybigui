@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **List** — MD3 expressive variants-vs-states architecture refactor; state layer and focus ring spans; spring motion tokens; slot CVAs for leading, trailing, and text; per-item `onAction` removed from `ListItemProps` (breaking — use List-level `onAction`)
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.14.0] - 2026-06-10
 
 ### Changed
