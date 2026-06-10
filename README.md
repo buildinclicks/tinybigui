@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.20.0** (2026-06-10)
+> **Latest Release: v0.21.0** (2026-06-10)
 >
-> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,121 tests** passing.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,134 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,7 +94,7 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.20.0  | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.21.0  | Released |
 | [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.13.0  | Released |
 
 ---
@@ -122,7 +122,7 @@ This is a monorepo containing multiple packages:
 - [x] FAB — M3 Expressive slot architecture, size scale, solid colors (v0.6.0)
 - [x] FABMenu — M3 Expressive pill menu items with overlay anchoring (v0.7.0)
 - [x] ButtonGroup — connected layout, single/multi-select (v0.4.0)
-- [x] SplitButton — filled, tonal, outlined variants (v0.4.0)
+- [x] SplitButton — MD3 expressive variants-vs-states architecture, 5-size scale, elevated variant, spring motion (v0.21.0)
 
 ### Phase 1b: Form Components ✅
 

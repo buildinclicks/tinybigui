@@ -4,15 +4,25 @@ export { SplitButton } from "./SplitButton";
 // ─── Layer 2: Headless Primitives (for advanced customization) ────────────────
 export { SplitButtonHeadless } from "./SplitButtonHeadless";
 
-// ─── CVA Variants ─────────────────────────────────────────────────────────────
+// ─── CVA Variants (slot-based) ────────────────────────────────────────────────
 export {
   splitButtonVariants,
   splitButtonContainerVariants,
-  splitButtonPrimaryVariants,
-  splitButtonDropdownVariants,
+  splitButtonLeadingVariants,
+  splitButtonTrailingVariants,
+  splitButtonStateLayerVariants,
+  splitButtonFocusRingVariants,
+  splitButtonLabelVariants,
+  splitButtonIconVariants,
+  splitButtonMenuVariants,
+  splitButtonMenuItemVariants,
   type SplitButtonContainerVariants,
-  type SplitButtonPrimaryVariants,
-  type SplitButtonDropdownVariants,
+  type SplitButtonLeadingVariants,
+  type SplitButtonTrailingVariants,
+  type SplitButtonStateLayerVariants,
+  type SplitButtonFocusRingVariants,
+  type SplitButtonIconVariants,
+  type SplitButtonMenuItemVariantProps,
 } from "./SplitButton.variants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
