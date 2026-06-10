@@ -63,7 +63,7 @@ describe("Progress", () => {
       expect(container.querySelector("svg")).toBeInTheDocument();
     });
 
-    test("does not render SVG for linear variant", () => {
+    test("does not render SVG for linear flat variant", () => {
       const { container } = linearDeterminate();
       expect(container.querySelector("svg")).not.toBeInTheDocument();
     });
@@ -189,6 +189,7 @@ describe("Progress", () => {
     test("calculates 0% for value=0", () => {
       const { container } = render(<Progress type="linear" value={0} aria-label="Loading" />);
       const indicator = container.querySelector("[data-progress-indicator]");
+      // At 0% the active indicator has width 0% (still rendered)
       expect(indicator).toHaveStyle({ width: "0%" });
     });
 
@@ -212,26 +213,45 @@ describe("Progress", () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Linear Variant
+  // Linear Determinate — Flat (gap-based two-segment rendering)
   // ---------------------------------------------------------------------------
 
-  describe("Linear Determinate", () => {
+  describe("Linear Determinate (Flat)", () => {
     test("renders track element", () => {
       const { container } = linearDeterminate();
       expect(container.querySelector("[data-progress-track]")).toBeInTheDocument();
     });
 
-    test("renders indicator element inside track", () => {
+    test("renders active indicator element inside track", () => {
       const { container } = linearDeterminate();
       expect(container.querySelector("[data-progress-indicator]")).toBeInTheDocument();
     });
 
-    test("indicator has width matching percentage", () => {
+    test("active indicator has width matching percentage", () => {
       const { container } = render(<Progress type="linear" value={60} aria-label="Loading" />);
       const indicator = container.querySelector("[data-progress-indicator]");
       expect(indicator).toHaveStyle({ width: "60%" });
     });
+
+    test("renders inactive segment with gap-based left offset", () => {
+      const { container } = render(<Progress type="linear" value={40} aria-label="Loading" />);
+      const inactive = container.querySelector("[data-progress-inactive-segment]");
+      expect(inactive).toBeInTheDocument();
+      // left = calc(40% + 4px)
+      const style = (inactive as HTMLElement)?.style.left;
+      expect(style).toContain("40%");
+      expect(style).toContain("4px");
+    });
+
+    test("does not render inactive segment when value=100", () => {
+      const { container } = render(<Progress type="linear" value={100} aria-label="Loading" />);
+      expect(container.querySelector("[data-progress-inactive-segment]")).not.toBeInTheDocument();
+    });
   });
+
+  // ---------------------------------------------------------------------------
+  // Linear Indeterminate
+  // ---------------------------------------------------------------------------
 
   describe("Linear Indeterminate", () => {
     test("renders indeterminate animation wrapper", () => {
@@ -251,7 +271,7 @@ describe("Progress", () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Circular Variant
+  // Circular Determinate (arc gap)
   // ---------------------------------------------------------------------------
 
   describe("Circular Determinate", () => {
@@ -260,24 +280,23 @@ describe("Progress", () => {
       expect(container.querySelector("svg")).toBeInTheDocument();
     });
 
-    test("renders two circles (background + foreground)", () => {
-      const { container } = circularDeterminate();
+    test("foreground circle has stroke-dasharray attribute (gapped arc)", () => {
+      const { container } = render(<Progress type="circular" value={50} aria-label="Half" />);
       const circles = container.querySelectorAll("circle");
-      expect(circles).toHaveLength(2);
+      // At 50% there should be an active circle and an inactive circle
+      const hasActiveGap = Array.from(circles).some(
+        (c) => c.getAttribute("stroke-dasharray") !== null
+      );
+      expect(hasActiveGap).toBe(true);
     });
 
-    test("foreground circle has stroke-dashoffset attribute", () => {
-      const { container } = circularDeterminate();
+    test("renders primary-container inactive track when value > 0 and < 100", () => {
+      const { container } = render(<Progress type="circular" value={50} aria-label="Loading" />);
       const circles = container.querySelectorAll("circle");
-      const foreground = circles[1];
-      expect(foreground).toHaveAttribute("stroke-dashoffset");
-    });
-
-    test("foreground stroke-dashoffset is 0 at 100% value", () => {
-      const { container } = render(<Progress type="circular" value={100} aria-label="Complete" />);
-      const circles = container.querySelectorAll("circle");
-      const foreground = circles[1];
-      expect(Number(foreground?.getAttribute("stroke-dashoffset"))).toBeCloseTo(0, 0);
+      const hasContainer = Array.from(circles).some(
+        (c) => c.getAttribute("class")?.includes("text-primary-container") === true
+      );
+      expect(hasContainer).toBe(true);
     });
   });
 
@@ -295,6 +314,15 @@ describe("Progress", () => {
     test("does not have aria-valuenow when indeterminate", () => {
       circularIndeterminate();
       expect(screen.getByRole("progressbar")).not.toHaveAttribute("aria-valuenow");
+    });
+
+    test("renders primary-container inactive track circle", () => {
+      const { container } = circularIndeterminate();
+      const circles = container.querySelectorAll("circle");
+      const hasContainer = Array.from(circles).some(
+        (c) => c.getAttribute("class")?.includes("text-primary-container") === true
+      );
+      expect(hasContainer).toBe(true);
     });
   });
 
@@ -327,6 +355,208 @@ describe("Progress", () => {
   });
 
   // ---------------------------------------------------------------------------
+  // MD3 Expressive — Thickness prop
+  // ---------------------------------------------------------------------------
+
+  describe("Thickness prop", () => {
+    test("renders default thickness (h-1) by default", () => {
+      const { container } = render(<Progress type="linear" value={50} aria-label="Loading" />);
+      const track = container.querySelector("[data-progress-track]");
+      expect(track).toHaveClass("h-1");
+    });
+
+    test("renders thick variant (h-2) when thickness=thick", () => {
+      const { container } = render(
+        <Progress type="linear" value={50} thickness="thick" aria-label="Loading" />
+      );
+      const track = container.querySelector("[data-progress-track]");
+      expect(track).toHaveClass("h-2");
+    });
+
+    test("thick thickness renders for indeterminate linear", () => {
+      const { container } = render(
+        <Progress type="linear" indeterminate thickness="thick" aria-label="Loading" />
+      );
+      const track = container.querySelector("[data-progress-track]");
+      expect(track).toHaveClass("h-2");
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // MD3 Expressive — Shape prop
+  // ---------------------------------------------------------------------------
+
+  describe("Shape prop", () => {
+    test("renders SVG path for linear wavy indeterminate", () => {
+      const { container } = render(
+        <Progress type="linear" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      // Wavy uses SVG paths, not divs
+      expect(container.querySelector("svg path")).toBeInTheDocument();
+    });
+
+    test("renders SVG path for linear wavy determinate", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("svg")).toBeInTheDocument();
+    });
+
+    test("renders circular wavy indeterminate with path element", () => {
+      const { container } = render(
+        <Progress type="circular" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("svg path")).toBeInTheDocument();
+    });
+
+    test("flat shape does not render SVG for linear", () => {
+      const { container } = render(
+        <Progress type="linear" value={50} shape="flat" aria-label="Loading" />
+      );
+      expect(container.querySelector("svg")).not.toBeInTheDocument();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Wavy rendering specifics — overflow fix assertions
+  // ---------------------------------------------------------------------------
+
+  describe("Wavy rendering (overflow fix)", () => {
+    // ── Linear wavy determinate ──────────────────────────────────────────────
+
+    test("linear wavy determinate renders [data-progress-indicator] SVG path", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      const indicator = container.querySelector("[data-progress-indicator]");
+      expect(indicator).toBeInTheDocument();
+      expect(indicator?.tagName.toLowerCase()).toBe("path");
+    });
+
+    test("linear wavy determinate renders [data-stop-indicator]", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("[data-stop-indicator]")).toBeInTheDocument();
+    });
+
+    test("linear wavy determinate SVG has preserveAspectRatio='none'", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      const svg = container.querySelector("svg");
+      expect(svg?.getAttribute("preserveAspectRatio")).toBe("none");
+    });
+
+    test("linear wavy determinate SVG has clip-path style to bound the active portion", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      const svg = container.querySelector("svg") as HTMLElement | null;
+      // clip-path: inset(0 40% 0 0) — right side = 100-60 = 40%
+      expect(svg?.style.clipPath).toMatch(/inset/);
+    });
+
+    test("linear wavy determinate renders inactive segment after the gap", () => {
+      const { container } = render(
+        <Progress type="linear" value={40} shape="wavy" aria-label="Loading" />
+      );
+      const inactive = container.querySelector("[data-progress-inactive-segment]");
+      expect(inactive).toBeInTheDocument();
+      const style = (inactive as HTMLElement)?.style.left;
+      expect(style).toContain("40%");
+      expect(style).toContain("4px");
+    });
+
+    test("linear wavy determinate does not render inactive segment at 100%", () => {
+      const { container } = render(
+        <Progress type="linear" value={100} shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("[data-progress-inactive-segment]")).not.toBeInTheDocument();
+    });
+
+    // ── Linear wavy indeterminate ────────────────────────────────────────────
+
+    test("linear wavy indeterminate renders [data-progress-indeterminate]", () => {
+      const { container } = render(
+        <Progress type="linear" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("[data-progress-indeterminate]")).toBeInTheDocument();
+    });
+
+    test("linear wavy indeterminate SVG has preserveAspectRatio='none'", () => {
+      const { container } = render(
+        <Progress type="linear" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      const svg = container.querySelector("svg");
+      expect(svg?.getAttribute("preserveAspectRatio")).toBe("none");
+    });
+
+    // ── Circular wavy — pathLength normalization ─────────────────────────────
+
+    test("circular wavy determinate active path has pathLength='100'", () => {
+      const { container } = render(
+        <Progress type="circular" value={50} shape="wavy" aria-label="Loading" />
+      );
+      const indicator = container.querySelector("[data-progress-indicator]");
+      expect(indicator).toBeInTheDocument();
+      expect(indicator?.getAttribute("pathLength")).toBe("100");
+    });
+
+    test("circular wavy indeterminate path has pathLength='100'", () => {
+      const { container } = render(
+        <Progress type="circular" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      const path = container.querySelector("svg path");
+      expect(path?.getAttribute("pathLength")).toBe("100");
+    });
+
+    test("circular wavy determinate does not render wavy overlay on top of plain arc", () => {
+      const { container } = render(
+        <Progress type="circular" value={50} shape="wavy" aria-label="Loading" />
+      );
+      // There should be exactly ONE path element (the active wavy arc) — no stacking
+      const paths = container.querySelectorAll("path");
+      expect(paths.length).toBe(1);
+    });
+
+    // ── Regression guards added by polish pass ───────────────────────────────
+
+    test("linear wavy determinate inactive segment has trackPx height (4px default)", () => {
+      const { container } = render(
+        <Progress type="linear" value={40} shape="wavy" aria-label="Loading" />
+      );
+      const inactive = container.querySelector("[data-progress-inactive-segment]");
+      expect(inactive).toBeInTheDocument();
+      expect((inactive as HTMLElement).style.height).toBe("4px");
+    });
+
+    test("linear wavy determinate inactive segment has trackPx height (8px thick)", () => {
+      const { container } = render(
+        <Progress type="linear" value={40} shape="wavy" thickness="thick" aria-label="Loading" />
+      );
+      const inactive = container.querySelector("[data-progress-inactive-segment]");
+      expect(inactive).toBeInTheDocument();
+      expect((inactive as HTMLElement).style.height).toBe("8px");
+    });
+
+    test("circular wavy determinate active path coordinates are within viewBox bounds", () => {
+      // Medium circle: diameter=48, so all coordinates must be in [0, 48]
+      const { container } = render(
+        <Progress type="circular" value={50} shape="wavy" aria-label="Loading" />
+      );
+      const path = container.querySelector("[data-progress-indicator]");
+      expect(path).toBeInTheDocument();
+      const d = path?.getAttribute("d") ?? "";
+      // Extract all numbers from the path data and verify they are in [0, 48]
+      const nums = d.match(/-?[\d.]+/g)?.map(Number) ?? [];
+      expect(nums.length).toBeGreaterThan(0);
+      const allInBounds = nums.every((n) => n >= 0 && n <= 48);
+      expect(allInBounds).toBe(true);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Accessibility
   // ---------------------------------------------------------------------------
 
@@ -353,6 +583,22 @@ describe("Progress", () => {
 
     test("circular indeterminate has no axe violations", async () => {
       const { container } = render(<Progress type="circular" indeterminate aria-label="Loading" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("wavy linear has no axe violations", async () => {
+      const { container } = render(
+        <Progress type="linear" indeterminate shape="wavy" aria-label="Loading wavy" />
+      );
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("thick linear has no axe violations", async () => {
+      const { container } = render(
+        <Progress type="linear" value={60} thickness="thick" label="Uploading thick" />
+      );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
@@ -422,6 +668,22 @@ describe("Progress", () => {
       );
       expect(renderProgress).toHaveBeenCalledWith(
         expect.objectContaining({ isIndeterminate: true })
+      );
+    });
+
+    test("calls renderProgress with shape and thickness", () => {
+      const renderProgress = vi.fn(() => null);
+      render(
+        <ProgressHeadless
+          value={50}
+          shape="wavy"
+          thickness="thick"
+          aria-label="Loading"
+          renderProgress={renderProgress}
+        />
+      );
+      expect(renderProgress).toHaveBeenCalledWith(
+        expect.objectContaining({ shape: "wavy", thickness: "thick" })
       );
     });
 

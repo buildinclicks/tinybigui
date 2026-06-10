@@ -3,21 +3,28 @@ import { useState } from "react";
 import { Progress } from "./Progress";
 
 /**
- * Material Design 3 Progress Indicator Component
+ * Material Design 3 Progress Indicator — MD3 Expressive
  *
- * Supports four variants driven by `type` and `indeterminate` props:
- * - **Linear Determinate** — shows a known progress value on a horizontal track
+ * Supports four visual combinations driven by `type` × `indeterminate`:
+ * - **Linear Determinate** — two-segment track (active + gap + inactive) on a horizontal rail
  * - **Linear Indeterminate** — animated two-segment bar for unknown duration
- * - **Circular Determinate** — SVG arc showing a known progress value
- * - **Circular Indeterminate** — rotating spinner for unknown duration
+ * - **Circular Determinate** — SVG arc pair with 4dp gap between active and inactive
+ * - **Circular Indeterminate** — rotating spinner with visible inactive track
  *
- * ## MD3 Specifications
- * - Linear track height: 4dp
- * - Circular default size: 48dp (medium)
- * - Active track color: `primary`
- * - Inactive track color: `surface-container-highest`
- * - Determinate transitions: 400ms ease-standard
- * - Indeterminate cycle: 500ms (linear) / 600ms (circular)
+ * ## MD3 Expressive spec (May 2025)
+ * - Active indicator color: `primary`
+ * - Inactive track color: `primary-container` (colorful style)
+ * - Indicator-track gap: 4dp between active and inactive segments
+ * - Stop indicator: 4dp `primary` dot at trailing edge (linear determinate only)
+ * - Track thickness: 4dp default | 8dp thick (via `thickness` prop)
+ * - Shape: flat (default) | wavy (SVG sine-wave, `shape="wavy"`)
+ * - Reduced-motion: wavy automatically degrades to flat
+ *
+ * ## New MD3 Expressive props
+ * | Prop | Values | Default | Description |
+ * |---|---|---|---|
+ * | `shape` | `"flat"` \| `"wavy"` | `"flat"` | Wavy uses a sine-wave active indicator |
+ * | `thickness` | `"default"` \| `"thick"` | `"default"` | 4dp or 8dp track |
  */
 const meta: Meta<typeof Progress> = {
   title: "Components/Progress",
@@ -54,12 +61,22 @@ const meta: Meta<typeof Progress> = {
       options: ["small", "medium", "large"],
       description: "Circular indicator size (ignored for linear)",
     },
+    shape: {
+      control: "radio",
+      options: ["flat", "wavy"],
+      description: "Shape of the active indicator (wavy = MD3 Expressive sine-wave)",
+    },
+    thickness: {
+      control: "radio",
+      options: ["default", "thick"],
+      description: "Track thickness: 4dp (default) or 8dp (thick, MD3 Expressive)",
+    },
   },
   parameters: {
     docs: {
       description: {
         component:
-          "Progress indicators communicate the status of an ongoing process. Built with React Aria for accessibility and styled with MD3 design tokens.",
+          "Progress indicators communicate the status of an ongoing process. Built with React Aria for accessibility and styled with MD3 Expressive design tokens (primary-container track, 4dp gap, optional wavy shape and thick track).",
       },
     },
   },
@@ -69,11 +86,11 @@ export default meta;
 type Story = StoryObj<typeof Progress>;
 
 // ---------------------------------------------------------------------------
-// Individual variant stories
+// Baseline variants
 // ---------------------------------------------------------------------------
 
 /**
- * Linear Determinate — shows exact progress on a horizontal track.
+ * Linear Determinate — two-segment gap rendering with colorful `primary-container` track.
  */
 export const LinearDeterminate: Story = {
   args: {
@@ -95,7 +112,7 @@ export const LinearIndeterminate: Story = {
 };
 
 /**
- * Circular Determinate — SVG arc showing known progress.
+ * Circular Determinate — SVG arc pair showing known progress with 4dp gap.
  */
 export const CircularDeterminate: Story = {
   args: {
@@ -106,7 +123,7 @@ export const CircularDeterminate: Story = {
 };
 
 /**
- * Circular Indeterminate — rotating spinner for unknown duration.
+ * Circular Indeterminate — rotating spinner with visible `primary-container` inactive track.
  */
 export const CircularIndeterminate: Story = {
   args: {
@@ -117,12 +134,251 @@ export const CircularIndeterminate: Story = {
 };
 
 // ---------------------------------------------------------------------------
+// MD3 Expressive — Flat vs Wavy
+// ---------------------------------------------------------------------------
+
+/**
+ * Flat vs Wavy — side-by-side comparison of the two shapes.
+ */
+export const FlatVsWavy: Story = {
+  render: function FlatVsWavyRender() {
+    return (
+      <div className="flex flex-col gap-8">
+        <div>
+          <p className="text-label-large text-on-surface-variant mb-3">Flat (default)</p>
+          <div className="flex flex-col gap-4">
+            <Progress type="linear" value={60} label="Determinate" shape="flat" />
+            <Progress type="linear" indeterminate shape="flat" aria-label="Indeterminate flat" />
+          </div>
+        </div>
+        <div>
+          <p className="text-label-large text-on-surface-variant mb-3">Wavy (MD3 Expressive)</p>
+          <div className="flex flex-col gap-4">
+            <Progress type="linear" value={60} label="Determinate wavy" shape="wavy" />
+            <Progress type="linear" indeterminate shape="wavy" aria-label="Indeterminate wavy" />
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * Circular Flat vs Wavy — side-by-side circular shapes.
+ */
+export const CircularFlatVsWavy: Story = {
+  render: function CircularFlatVsWavyRender() {
+    return (
+      <div className="flex items-end gap-12">
+        <div className="flex flex-col items-center gap-3">
+          <Progress type="circular" indeterminate shape="flat" aria-label="Flat spinner" />
+          <span className="text-body-small text-on-surface-variant">Flat</span>
+        </div>
+        <div className="flex flex-col items-center gap-3">
+          <Progress type="circular" indeterminate shape="wavy" aria-label="Wavy spinner" />
+          <span className="text-body-small text-on-surface-variant">Wavy</span>
+        </div>
+        <div className="flex flex-col items-center gap-3">
+          <Progress type="circular" value={65} shape="flat" aria-label="Flat 65%" />
+          <span className="text-body-small text-on-surface-variant">Flat det.</span>
+        </div>
+        <div className="flex flex-col items-center gap-3">
+          <Progress type="circular" value={65} shape="wavy" aria-label="Wavy 65%" />
+          <span className="text-body-small text-on-surface-variant">Wavy det.</span>
+        </div>
+      </div>
+    );
+  },
+};
+
+// ---------------------------------------------------------------------------
+// MD3 Expressive — Thick track
+// ---------------------------------------------------------------------------
+
+/**
+ * Thick track (8dp) — MD3 Expressive variant with increased visual weight.
+ */
+export const ThickTrack: Story = {
+  render: function ThickTrackRender() {
+    return (
+      <div className="flex flex-col gap-8">
+        <div>
+          <p className="text-label-large text-on-surface-variant mb-3">Default (4dp)</p>
+          <div className="flex flex-col gap-4">
+            <Progress type="linear" value={55} label="Downloading" thickness="default" />
+            <Progress
+              type="linear"
+              indeterminate
+              thickness="default"
+              aria-label="Loading default"
+            />
+          </div>
+        </div>
+        <div>
+          <p className="text-label-large text-on-surface-variant mb-3">Thick (8dp)</p>
+          <div className="flex flex-col gap-4">
+            <Progress type="linear" value={55} label="Downloading thick" thickness="thick" />
+            <Progress type="linear" indeterminate thickness="thick" aria-label="Loading thick" />
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * Thick + Wavy — the full MD3 Expressive visual combination.
+ */
+export const ThickWavy: Story = {
+  render: function ThickWavyRender() {
+    return (
+      <div className="flex flex-col gap-4">
+        <Progress
+          type="linear"
+          value={70}
+          label="Processing (thick wavy)"
+          shape="wavy"
+          thickness="thick"
+        />
+        <Progress
+          type="linear"
+          indeterminate
+          shape="wavy"
+          thickness="thick"
+          aria-label="Loading thick wavy"
+        />
+      </div>
+    );
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Gap demo
+// ---------------------------------------------------------------------------
+
+/**
+ * Gap demo — illustrates the 4dp indicator-track gap at various progress values.
+ */
+export const GapDemo: Story = {
+  render: function GapDemoRender() {
+    const values = [10, 25, 50, 75, 90];
+    return (
+      <div className="flex flex-col gap-4">
+        {values.map((v) => (
+          <div key={v} className="flex items-center gap-4">
+            <span className="text-label-medium text-on-surface-variant w-12 text-right">{v}%</span>
+            <div className="flex-1">
+              <Progress type="linear" value={v} aria-label={`Progress ${v}%`} />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  },
+};
+
+// ---------------------------------------------------------------------------
+// All shapes showcase
+// ---------------------------------------------------------------------------
+
+/**
+ * All shapes — comprehensive view of every shape × thickness × state combination.
+ */
+export const AllShapes: Story = {
+  render: function AllShapesRender() {
+    return (
+      <div className="flex flex-col gap-10">
+        {/* Linear */}
+        <section>
+          <h3 className="text-title-medium text-on-surface mb-4">Linear</h3>
+          <div className="flex flex-col gap-6">
+            <div>
+              <p className="text-label-small text-on-surface-variant mb-2">Flat · Default (4dp)</p>
+              <div className="flex flex-col gap-3">
+                <Progress type="linear" value={50} label="Determinate 50%" />
+                <Progress type="linear" indeterminate aria-label="Linear flat indeterminate" />
+              </div>
+            </div>
+            <div>
+              <p className="text-label-small text-on-surface-variant mb-2">Flat · Thick (8dp)</p>
+              <div className="flex flex-col gap-3">
+                <Progress type="linear" value={50} thickness="thick" label="Thick det. 50%" />
+                <Progress
+                  type="linear"
+                  indeterminate
+                  thickness="thick"
+                  aria-label="Thick flat indet."
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-label-small text-on-surface-variant mb-2">Wavy · Default (4dp)</p>
+              <div className="flex flex-col gap-3">
+                <Progress type="linear" value={50} shape="wavy" label="Wavy det. 50%" />
+                <Progress type="linear" indeterminate shape="wavy" aria-label="Wavy indet." />
+              </div>
+            </div>
+            <div>
+              <p className="text-label-small text-on-surface-variant mb-2">Wavy · Thick (8dp)</p>
+              <div className="flex flex-col gap-3">
+                <Progress
+                  type="linear"
+                  value={50}
+                  shape="wavy"
+                  thickness="thick"
+                  label="Wavy thick det. 50%"
+                />
+                <Progress
+                  type="linear"
+                  indeterminate
+                  shape="wavy"
+                  thickness="thick"
+                  aria-label="Wavy thick indet."
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Circular */}
+        <section>
+          <h3 className="text-title-medium text-on-surface mb-4">Circular</h3>
+          <div className="flex flex-wrap items-end gap-8">
+            {(["flat", "wavy"] as const).map((shape) =>
+              (["default", "thick"] as const).map((thickness) =>
+                (["small", "medium", "large"] as const).map((size) => (
+                  <div
+                    key={`${shape}-${thickness}-${size}`}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <Progress
+                      type="circular"
+                      indeterminate
+                      size={size}
+                      shape={shape}
+                      thickness={thickness}
+                      aria-label={`${shape} ${thickness} ${size}`}
+                    />
+                    <span className="text-label-small text-on-surface-variant capitalize">
+                      {shape} · {thickness} · {size}
+                    </span>
+                  </div>
+                ))
+              )
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Label stories
 // ---------------------------------------------------------------------------
 
 /**
- * With visible label — label is rendered above the indicator and linked via
- * aria-labelledby for screen reader accessibility.
+ * With visible label — rendered above the indicator and linked via aria-labelledby.
  */
 export const WithLabel: Story = {
   render: function WithLabelRender() {
@@ -132,34 +388,6 @@ export const WithLabel: Story = {
         <Progress type="circular" value={70} label="Syncing data" />
       </div>
     );
-  },
-};
-
-/**
- * With aria-label only — no visible label; aria-label satisfies WCAG.
- */
-export const WithAriaLabel: Story = {
-  args: {
-    type: "linear",
-    indeterminate: true,
-    "aria-label": "Loading page content",
-  },
-};
-
-// ---------------------------------------------------------------------------
-// Custom range
-// ---------------------------------------------------------------------------
-
-/**
- * Custom min/max values — value=150 on range 0–200 renders as 75%.
- */
-export const CustomMinMax: Story = {
-  args: {
-    type: "linear",
-    minValue: 0,
-    maxValue: 200,
-    value: 150,
-    label: "Transfer progress",
   },
 };
 
@@ -174,54 +402,12 @@ export const CircularSizes: Story = {
   render: function CircularSizesRender() {
     return (
       <div className="flex items-end gap-8">
-        <div className="flex flex-col items-center gap-2">
-          <Progress type="circular" indeterminate size="small" aria-label="Loading small" />
-          <span className="text-body-small text-on-surface-variant">Small (24dp)</span>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <Progress type="circular" indeterminate size="medium" aria-label="Loading medium" />
-          <span className="text-body-small text-on-surface-variant">Medium (48dp)</span>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <Progress type="circular" indeterminate size="large" aria-label="Loading large" />
-          <span className="text-body-small text-on-surface-variant">Large (64dp)</span>
-        </div>
-      </div>
-    );
-  },
-};
-
-// ---------------------------------------------------------------------------
-// All variants showcase
-// ---------------------------------------------------------------------------
-
-/**
- * All variants — showcase of all four variant combinations.
- */
-export const AllVariants: Story = {
-  render: function AllVariantsRender() {
-    return (
-      <div className="flex flex-col gap-8">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-title-medium text-on-surface">Linear</h3>
-          <div className="flex flex-col gap-4">
-            <Progress type="linear" value={40} label="Determinate (40%)" />
-            <Progress type="linear" indeterminate aria-label="Linear indeterminate" />
+        {(["small", "medium", "large"] as const).map((size) => (
+          <div key={size} className="flex flex-col items-center gap-2">
+            <Progress type="circular" indeterminate size={size} aria-label={`Loading ${size}`} />
+            <span className="text-body-small text-on-surface-variant capitalize">{size}</span>
           </div>
-        </div>
-        <div className="flex flex-col gap-3">
-          <h3 className="text-title-medium text-on-surface">Circular</h3>
-          <div className="flex items-center gap-8">
-            <div className="flex flex-col items-center gap-2">
-              <Progress type="circular" value={65} aria-label="Circular determinate 65%" />
-              <span className="text-body-small text-on-surface-variant">Determinate (65%)</span>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Progress type="circular" indeterminate aria-label="Circular indeterminate" />
-              <span className="text-body-small text-on-surface-variant">Indeterminate</span>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     );
   },
@@ -232,12 +418,14 @@ export const AllVariants: Story = {
 // ---------------------------------------------------------------------------
 
 /**
- * Playground — interactive slider to explore determinate progress values.
+ * Playground — interactive slider to explore progress values, shape and thickness.
  */
 export const Playground: Story = {
   render: function PlaygroundRender() {
     const [value, setValue] = useState(30);
     const [isIndeterminate, setIsIndeterminate] = useState(false);
+    const [shape, setShape] = useState<"flat" | "wavy">("flat");
+    const [thickness, setThickness] = useState<"default" | "thick">("default");
 
     return (
       <div className="flex flex-col gap-8">
@@ -258,7 +446,7 @@ export const Playground: Story = {
               className="flex-1"
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap gap-4">
             <label className="text-body-medium text-on-surface flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
@@ -266,6 +454,22 @@ export const Playground: Story = {
                 onChange={(e) => setIsIndeterminate(e.target.checked)}
               />
               Indeterminate
+            </label>
+            <label className="text-body-medium text-on-surface flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                checked={shape === "wavy"}
+                onChange={(e) => setShape(e.target.checked ? "wavy" : "flat")}
+              />
+              Wavy shape
+            </label>
+            <label className="text-body-medium text-on-surface flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                checked={thickness === "thick"}
+                onChange={(e) => setThickness(e.target.checked ? "thick" : "default")}
+              />
+              Thick (8dp)
             </label>
           </div>
         </div>
@@ -277,6 +481,8 @@ export const Playground: Story = {
             type="linear"
             value={value}
             indeterminate={isIndeterminate}
+            shape={shape}
+            thickness={thickness}
             label={isIndeterminate ? undefined : `Uploading (${value}%)`}
             aria-label={isIndeterminate ? "Loading" : undefined}
           />
@@ -289,6 +495,8 @@ export const Playground: Story = {
             type="circular"
             value={value}
             indeterminate={isIndeterminate}
+            shape={shape}
+            thickness={thickness}
             label={isIndeterminate ? undefined : `${value}%`}
             aria-label={isIndeterminate ? "Loading" : undefined}
           />
@@ -323,8 +531,15 @@ export const SimulatedUpload: Story = {
 
     return (
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           <Progress type="linear" value={progress} label={`Uploading… ${progress}%`} />
+          <Progress
+            type="linear"
+            value={progress}
+            shape="wavy"
+            thickness="thick"
+            label={`Wavy thick… ${progress}%`}
+          />
           <Progress
             type="circular"
             value={progress}

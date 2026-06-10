@@ -7,7 +7,9 @@ import type { AriaProgressBarProps } from "react-aria";
  * Built on React Aria for world-class accessibility.
  * Supports four variants: Linear Determinate, Linear Indeterminate,
  * Circular Determinate, and Circular Indeterminate.
- * Implementation uses CVA + Tailwind CSS classes mapped to MD3 tokens.
+ * Implements MD3 Expressive styling: colorful primary-container track,
+ * 4dp indicator-track gap, fully-rounded segments, thick track option,
+ * and optional wavy shape.
  *
  * @example
  * ```tsx
@@ -25,6 +27,9 @@ import type { AriaProgressBarProps } from "react-aria";
  *
  * // Circular with size
  * <Progress type="circular" indeterminate size="small" aria-label="Loading" />
+ *
+ * // Thick wavy linear (MD3 Expressive)
+ * <Progress type="linear" indeterminate shape="wavy" thickness="thick" aria-label="Loading" />
  *
  * // Custom range
  * <Progress type="linear" minValue={0} maxValue={200} value={150} label="Progress" />
@@ -52,6 +57,24 @@ export interface ProgressProps extends AriaProgressBarProps {
   size?: "small" | "medium" | "large";
 
   /**
+   * Visual shape of the progress indicator.
+   * - `"flat"` — standard rounded rectangular/circular track.
+   * - `"wavy"` — MD3 Expressive sine-wave active indicator.
+   *   Increases linear container height to accommodate wave amplitude.
+   *   Reduced-motion users receive a flat fallback automatically.
+   * @default "flat"
+   */
+  shape?: "flat" | "wavy";
+
+  /**
+   * Track thickness.
+   * - `"default"` — 4dp per MD3 baseline spec.
+   * - `"thick"` — 8dp MD3 Expressive variant (fully rounded, `trackCornerRadius` = 4dp).
+   * @default "default"
+   */
+  thickness?: "default" | "thick";
+
+  /**
    * Additional CSS classes (Tailwind).
    */
   className?: string;
@@ -67,7 +90,7 @@ export interface ProgressProps extends AriaProgressBarProps {
  *   type="linear"
  *   value={50}
  *   label="Upload"
- *   renderProgress={({ percentage }) => (
+ *   renderProgress={({ percentage, shape, thickness }) => (
  *     <div style={{ width: `${percentage}%` }} />
  *   )}
  * />
@@ -93,6 +116,18 @@ export interface ProgressHeadlessProps extends AriaProgressBarProps {
   size?: "small" | "medium" | "large";
 
   /**
+   * Visual shape of the progress indicator.
+   * @default "flat"
+   */
+  shape?: "flat" | "wavy";
+
+  /**
+   * Track thickness.
+   * @default "default"
+   */
+  thickness?: "default" | "thick";
+
+  /**
    * Additional CSS classes.
    */
   className?: string;
@@ -111,5 +146,7 @@ export interface ProgressHeadlessProps extends AriaProgressBarProps {
     isIndeterminate: boolean;
     type: "linear" | "circular";
     size: "small" | "medium" | "large";
+    shape: "flat" | "wavy";
+    thickness: "default" | "thick";
   }) => React.ReactNode;
 }

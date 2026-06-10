@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Progress** — MD3 expressive slot-based CVA refactor; colorful `primary-container` inactive track; 4dp indicator-track gap; new `shape` (`flat` | `wavy`) and `thickness` (`default` | `thick`) props; spring motion tokens; wavy SVG indicator with reduced-motion fallback
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.15.0] - 2026-06-10
 
 ### Changed
