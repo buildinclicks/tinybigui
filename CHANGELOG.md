@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Radio** — MD3 expressive variants-vs-states architecture refactor; slot-based CVA with `group-data-[x]/radio` selectors; div-based state layer, outer ring, inner dot, and MD3 focus ring; spring motion tokens; fixes `isInvalid` forwarding in `RadioGroup`
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.16.0] - 2026-06-10
 
 ### Changed

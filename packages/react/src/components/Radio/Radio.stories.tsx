@@ -87,6 +87,46 @@ export default meta;
 type Story = StoryObj<typeof RadioGroup>;
 
 /**
+ * All visual states of a Radio button at a glance.
+ * Demonstrates unselected, selected, error, and disabled states.
+ */
+export const States: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <RadioGroup label="Unselected">
+        <Radio value="a">Unselected</Radio>
+      </RadioGroup>
+
+      <RadioGroup label="Selected" defaultValue="a">
+        <Radio value="a">Selected</Radio>
+      </RadioGroup>
+
+      <RadioGroup label="Error state (isInvalid)" isInvalid>
+        <Radio value="a">Unselected (error)</Radio>
+        <Radio value="b">Option B</Radio>
+      </RadioGroup>
+
+      <RadioGroup label="Error state selected (isInvalid)" isInvalid defaultValue="a">
+        <Radio value="a">Selected (error)</Radio>
+        <Radio value="b">Option B</Radio>
+      </RadioGroup>
+
+      <RadioGroup label="Disabled group" isDisabled defaultValue="a">
+        <Radio value="a">Disabled selected</Radio>
+        <Radio value="b">Disabled unselected</Radio>
+      </RadioGroup>
+
+      <RadioGroup label="Individual disabled">
+        <Radio value="a">Enabled</Radio>
+        <Radio value="b" isDisabled>
+          Individual disabled
+        </Radio>
+      </RadioGroup>
+    </div>
+  ),
+};
+
+/**
  * Default vertical radio group with three options
  */
 export const Default: Story = {

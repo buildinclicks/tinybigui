@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.16.0** (2026-06-10)
+> **Latest Release: v0.17.0** (2026-06-10)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -138,14 +138,14 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 1b: Form Components ✅
 
-| Component    | Status | Description                                                                 |
-| ------------ | ------ | --------------------------------------------------------------------------- |
-| `TextField`  | ✅     | MD3 expressive variants-vs-states, prefix/suffix, notched outline (v0.14.0) |
-| `Checkbox`   | ✅     | MD3 variants-vs-states, spec-accurate icons (v0.8.1)                        |
-| `Radio`      | ✅     | Radio button input                                                          |
-| `RadioGroup` | ✅     | Vertical and horizontal orientation                                         |
-| `Switch`     | ✅     | Toggle with variants-vs-states arch.                                        |
-| `Slider`     | ✅     | Standard, centered, range; discrete stops                                   |
+| Component    | Status | Description                                                                        |
+| ------------ | ------ | ---------------------------------------------------------------------------------- |
+| `TextField`  | ✅     | MD3 expressive variants-vs-states, prefix/suffix, notched outline (v0.14.0)        |
+| `Checkbox`   | ✅     | MD3 variants-vs-states, spec-accurate icons (v0.8.1)                               |
+| `Radio`      | ✅     | MD3 expressive variants-vs-states architecture, slot CVAs, spring motion (v0.17.0) |
+| `RadioGroup` | ✅     | Vertical and horizontal orientation, `isInvalid` forwarding fix (v0.17.0)          |
+| `Switch`     | ✅     | Toggle with variants-vs-states arch.                                               |
+| `Slider`     | ✅     | Standard, centered, range; discrete stops                                          |
 
 ### Phase 2: Navigation ✅
 

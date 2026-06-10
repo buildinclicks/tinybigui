@@ -2,15 +2,19 @@
 
 import { forwardRef, useRef, useContext } from "react";
 import type React from "react";
-import { useRadio, useFocusRing, mergeProps, VisuallyHidden } from "react-aria";
+import { useRadio, useFocusRing, useHover, mergeProps, VisuallyHidden } from "react-aria";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
 import { RadioGroupContext } from "./RadioGroupHeadless";
 import {
-  radioVariants,
-  radioContainerVariants,
-  radioIconOuterVariants,
-  radioIconInnerVariants,
+  radioRootVariants,
+  radioControlVariants,
+  radioFocusRingVariants,
+  radioTargetVariants,
+  radioStateLayerVariants,
+  radioRingVariants,
+  radioDotVariants,
   radioLabelVariants,
 } from "./Radio.variants";
 import type { RadioProps } from "./Radio.types";
@@ -19,25 +23,25 @@ import type { RadioProps } from "./Radio.types";
  * Material Design 3 Radio Component (Layer 3: Styled)
  *
  * Built on React Aria for world-class accessibility.
- * Uses CVA for type-safe variant management.
- * Styled with Tailwind CSS using MD3 design tokens.
- * Must be used within a RadioGroup for proper functionality.
+ * Implements the Variants-vs-States architecture: all interaction/selection/error
+ * states are expressed as data-* attributes on the root and consumed by each
+ * slot via group-data-[x]/radio Tailwind selectors — no state variants in CVA.
  *
  * Features:
- * - ✅ 2 states: unselected, selected
+ * - ✅ Unselected / selected states
+ * - ✅ Error/invalid state (via RadioGroup isInvalid)
  * - ✅ Ripple effect (Material Design)
  * - ✅ Full keyboard accessibility (via React Aria)
  * - ✅ Screen reader support (via React Aria)
- * - ✅ Focus management (via React Aria)
+ * - ✅ Focus management with MD3 focus ring (no animate-pulse)
  * - ✅ Form integration (name, value props from RadioGroup)
  *
  * MD3 Specifications:
- * - Radio icon: 20x20dp (within 40x40dp touch target)
- * - Outer circle: 20px
- * - Inner dot: 10px (selected state)
- * - Outline width: 2dp
- * - State layers: 8% hover, 12% focus/pressed
- * - Disabled: 38% opacity
+ * - Radio icon: 20×20dp (within 40×40dp touch target)
+ * - Outer circle border: 2dp
+ * - Inner dot: 10dp (selected state, scale 0→1)
+ * - State layers: 8% hover, 10% focus/pressed
+ * - Disabled: 38% opacity (on root)
  * - Label spacing: 16px (ml-4)
  *
  * @example
@@ -58,191 +62,110 @@ import type { RadioProps } from "./Radio.types";
  *   <Radio value="a">Enabled</Radio>
  *   <Radio value="b" isDisabled>Disabled</Radio>
  * </RadioGroup>
- *
- * // Custom styling
- * <Radio value="custom" className="my-custom-class">
- *   Custom
- * </Radio>
  * ```
  */
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(
-  (
-    {
-      // Content props
-      children,
-
-      // State props
-      disableRipple = false,
-      isDisabled = false,
-
-      // Styling
-      className,
-
-      // Other props
-      ...props
-    },
-    forwardedRef
-  ) => {
-    // Get RadioGroup state from context
+  ({ children, disableRipple = false, isDisabled = false, className, ...props }, forwardedRef) => {
     const state = useContext(RadioGroupContext);
 
     if (!state) {
       throw new Error("Radio must be used within a RadioGroup");
     }
 
-    // Internal ref for React Aria
     const internalRef = useRef<HTMLInputElement>(null);
-
-    // Merge internal ref with forwarded ref
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLInputElement>;
 
-    // Extract data-testid and other HTML attributes
+    // Extract passthrough HTML attributes that React Aria doesn't understand
     const htmlAttrs = props as Record<string, unknown>;
     const dataTestId = htmlAttrs["data-testid"] as string | undefined;
     const htmlId = htmlAttrs.id as string | undefined;
     const htmlTitle = htmlAttrs.title as string | undefined;
 
-    // Remove HTML attributes from props for React Aria
     const {
       "data-testid": _dataTestId,
       id: _htmlId,
       title: _htmlTitle,
-      ...restPropsWithoutHtmlAttrs
+      ...ariaProps
     } = props as Record<string, unknown>;
 
-    // React Aria hooks - pass props without HTML attributes
+    // React Aria hooks — behavior + interaction states
     const {
       inputProps,
       isSelected,
       isDisabled: radioIsDisabled,
+      isPressed,
     } = useRadio(
-      {
-        ...restPropsWithoutHtmlAttrs,
-        value: props.value,
-      } as Parameters<typeof useRadio>[0],
+      { ...ariaProps, value: props.value } as Parameters<typeof useRadio>[0],
       state,
       ref
     );
     const { isFocusVisible, focusProps } = useFocusRing();
-
-    // Determine final disabled state (group or individual)
     const finalIsDisabled = isDisabled || radioIsDisabled;
+    const { isHovered, hoverProps } = useHover({ isDisabled: finalIsDisabled });
 
-    // Determine visual state
-    const visualState = isSelected ? "selected" : "unselected";
+    // Error/invalid state from RadioGroup
+    const isInvalid = state.validationState === "invalid";
 
-    // Ripple effect
+    // Ripple on the target (40dp area)
     const { onMouseDown: handleRipple, ripples } = useRipple({
       disabled: finalIsDisabled || disableRipple,
     });
 
-    // Development warnings
     if (process.env.NODE_ENV === "development") {
-      const ariaProps = restPropsWithoutHtmlAttrs as {
-        "aria-label"?: string;
-        "aria-labelledby"?: string;
-      };
-      if (!children && !ariaProps["aria-label"] && !ariaProps["aria-labelledby"]) {
-        console.warn(
-          "[Radio] Radio should have a label (children) or aria-label for accessibility."
-        );
+      const a = ariaProps as { "aria-label"?: string; "aria-labelledby"?: string };
+      if (!children && !a["aria-label"] && !a["aria-labelledby"]) {
+        console.warn("[Radio] Provide a label via children or aria-label for accessibility.");
       }
     }
 
-    // Get isInvalid from RadioGroup state if available
-    const isInvalid = state.validationState === "invalid";
-
     return (
       <label
-        className={cn(
-          radioVariants({
-            disabled: finalIsDisabled,
-          }),
-          className
-        )}
+        {...mergeProps(hoverProps)}
+        className={cn(radioRootVariants(), "group/radio", className)}
         data-testid={dataTestId}
         title={htmlTitle}
+        // ── Interaction + selection + error data attributes ─────────────
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          isSelected,
+          isDisabled: finalIsDisabled,
+          isInvalid,
+        })}
       >
-        {/* Visually hidden native input for accessibility */}
+        {/* Visually hidden native input — handles all accessibility */}
         <VisuallyHidden>
           <input {...mergeProps(inputProps, focusProps)} ref={ref} id={htmlId} />
         </VisuallyHidden>
 
-        {/* Visual radio container */}
-        <div
-          role="presentation"
-          className={cn(
-            radioContainerVariants({
-              state: visualState,
-              isInvalid,
-              disabled: finalIsDisabled,
-            })
-          )}
-          onMouseDown={handleRipple}
-        >
-          {/* Ripple effect */}
-          {ripples}
+        {/*
+         * Control wrapper — relative 40dp container.
+         * Hosts focus ring (sibling of target, not clipped) and the
+         * overflow-hidden target that clips the state layer.
+         */}
+        <div role="presentation" className={cn(radioControlVariants())}>
+          {/* Focus ring — sibling of target, never clipped by overflow-hidden */}
+          <div className={cn(radioFocusRingVariants())} aria-hidden="true" />
 
-          {/* SVG Radio Visual */}
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-            className="relative z-10"
-          >
-            {/* Outer circle (20x20) */}
-            <circle
-              cx="10"
-              cy="10"
-              r="9"
-              className={cn(
-                radioIconOuterVariants({
-                  state: visualState,
-                  disabled: finalIsDisabled,
-                })
-              )}
-            />
+          {/* Target — overflow-hidden clips state layer to the circle */}
+          <div role="presentation" className={cn(radioTargetVariants())} onMouseDown={handleRipple}>
+            {/* Ripple */}
+            {ripples}
 
-            {/* Inner dot (10px diameter = 5px radius, shown when selected) */}
-            <circle
-              cx="10"
-              cy="10"
-              r="5"
-              className={cn(
-                radioIconInnerVariants({
-                  visible: isSelected,
-                })
-              )}
-            />
+            {/* State layer — hover/focus/pressed opacity ring */}
+            <span className={cn(radioStateLayerVariants())} aria-hidden="true" />
 
-            {/* Focus ring (visible on keyboard focus) */}
-            {isFocusVisible && (
-              <circle
-                cx="10"
-                cy="10"
-                r="13"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="animate-pulse"
-              />
-            )}
-          </svg>
+            {/* Outer ring — 20dp circle with 2dp border */}
+            <div className={cn(radioRingVariants())} aria-hidden="true">
+              {/* Inner dot — scales 0→1 when selected */}
+              <div className={cn(radioDotVariants())} aria-hidden="true" />
+            </div>
+          </div>
         </div>
 
-        {/* Label text */}
-        {children && (
-          <span
-            className={cn(
-              radioLabelVariants({
-                disabled: finalIsDisabled,
-              })
-            )}
-          >
-            {children}
-          </span>
-        )}
+        {/* Text label */}
+        {children && <span className={cn(radioLabelVariants())}>{children}</span>}
       </label>
     );
   }
