@@ -56,20 +56,33 @@ const InitialsAvatar = ({
   </span>
 );
 
+// ─── Shared trigger button ────────────────────────────────────────────────────
+
+interface OpenSearchButtonProps {
+  onClick: () => void;
+}
+
+const OpenSearchButton = ({ onClick }: OpenSearchButtonProps): JSX.Element => (
+  <button
+    type="button"
+    className="bg-primary text-on-primary text-label-large rounded-full px-6 py-2.5"
+    onClick={onClick}
+  >
+    Open search
+  </button>
+);
+
 // ─── Named component wrappers for stateful stories ───────────────────────────
+// All SearchView stories default to isOpen={false} so that:
+// 1. Storybook autodocs renders the full story list without a fullscreen overlay locking it.
+// 2. Clicking the back arrow returns to the trigger button, not a blank page.
 
 function ContainedFullScreenExample(): JSX.Element {
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
   const [value, setValue] = React.useState("Ping");
   return (
-    <div className="bg-surface min-h-screen">
-      <button
-        type="button"
-        className="bg-primary text-on-primary text-label-large m-4 rounded-full px-4 py-2"
-        onClick={() => setIsOpen(true)}
-      >
-        Open Search
-      </button>
+    <div className="bg-surface flex min-h-screen flex-col items-center justify-center gap-4 p-4">
+      {!isOpen && <OpenSearchButton onClick={() => setIsOpen(true)} />}
       <SearchView
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -110,10 +123,11 @@ function ContainedFullScreenExample(): JSX.Element {
 }
 
 function ContainedDockedExample(): JSX.Element {
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
   const [value, setValue] = React.useState("Eli");
   return (
-    <div className="bg-surface flex min-h-[400px] items-start justify-center p-8">
+    <div className="bg-surface flex min-h-[480px] flex-col items-center justify-start gap-4 p-8">
+      {!isOpen && <OpenSearchButton onClick={() => setIsOpen(true)} />}
       <SearchView
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -147,37 +161,41 @@ function ContainedDockedExample(): JSX.Element {
 }
 
 function DividedFullScreenExample(): JSX.Element {
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
   const [value, setValue] = React.useState("Eli");
   return (
-    <SearchView
-      isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
-      value={value}
-      onChange={setValue}
-      placeholder="Search"
-      aria-label="Search"
-      searchStyle="divided"
-      layout="fullscreen"
-    >
-      <List aria-label="Search results">
-        <ListItem
-          value="eli"
-          headline="Eli, me"
-          supportingText="Adopt a pup? The pet adoption..."
-        />
-        <ListItem value="zita" headline="Zita, Odette, Dagmar" supportingText="Movie marathon" />
-        <ListItem value="in" headline="In, Aki" supportingText="Museum field trip" />
-      </List>
-    </SearchView>
+    <div className="bg-surface flex min-h-screen flex-col items-center justify-center gap-4 p-4">
+      {!isOpen && <OpenSearchButton onClick={() => setIsOpen(true)} />}
+      <SearchView
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        value={value}
+        onChange={setValue}
+        placeholder="Search"
+        aria-label="Search"
+        searchStyle="divided"
+        layout="fullscreen"
+      >
+        <List aria-label="Search results">
+          <ListItem
+            value="eli"
+            headline="Eli, me"
+            supportingText="Adopt a pup? The pet adoption..."
+          />
+          <ListItem value="zita" headline="Zita, Odette, Dagmar" supportingText="Movie marathon" />
+          <ListItem value="in" headline="In, Aki" supportingText="Museum field trip" />
+        </List>
+      </SearchView>
+    </div>
   );
 }
 
 function DividedDockedExample(): JSX.Element {
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
   const [value, setValue] = React.useState("Eli");
   return (
-    <div className="bg-surface flex min-h-[400px] items-start justify-center p-8">
+    <div className="bg-surface flex min-h-[480px] flex-col items-center justify-start gap-4 p-8">
+      {!isOpen && <OpenSearchButton onClick={() => setIsOpen(true)} />}
       <SearchView
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -244,10 +262,11 @@ function SearchBarToViewExample(): JSX.Element {
 }
 
 function GroupedResultsExample(): JSX.Element {
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
   const [value, setValue] = React.useState("m");
   return (
-    <div className="bg-surface flex min-h-[500px] items-start justify-center p-8">
+    <div className="bg-surface flex min-h-[500px] flex-col items-center justify-start gap-4 p-8">
+      {!isOpen && <OpenSearchButton onClick={() => setIsOpen(true)} />}
       <SearchView
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

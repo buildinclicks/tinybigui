@@ -310,11 +310,12 @@ describe("SearchBar (Styled)", () => {
     expect(container?.className).toContain("gap-4");
   });
 
-  test("state layer has hover:opacity-8 class", () => {
+  test("state layer has group-data-[hovered]/search:opacity-8 class", () => {
     render(<SearchBar placeholder="Search" />);
     const stateLayer = document.querySelector("[data-slot=state-layer]");
     expect(stateLayer).toBeInTheDocument();
-    expect(stateLayer?.className).toContain("group-hover:opacity-8");
+    // Hover state driven by data-* attribute from React Aria useHover, not :hover pseudo-class
+    expect(stateLayer?.className).toContain("group-data-[hovered]/search:opacity-8");
   });
 
   test("state layer uses spring motion tokens for opacity transition", () => {
@@ -336,10 +337,15 @@ describe("SearchBar (Styled)", () => {
     expect(rippleContainer).toBeInTheDocument();
   });
 
-  test("focus indicator ring applied to container via has-[:focus-visible]", () => {
+  test("focus indicator ring span rendered as sibling with outline-secondary class", () => {
     render(<SearchBar placeholder="Search" />);
-    const container = screen.getByRole("search").parentElement;
-    expect(container?.className).toContain("ring-secondary");
+    // Focus ring is an absolutely-positioned sibling span (outside overflow-hidden)
+    // with outline-secondary — not a ring- class on the container.
+    const container = screen.getByRole("search").closest("[class*=group\\/search]");
+    const relativeWrapper = container?.parentElement;
+    const focusRingSpan = relativeWrapper?.querySelector("span[aria-hidden]");
+    expect(focusRingSpan).toBeInTheDocument();
+    expect(focusRingSpan?.className).toContain("outline-secondary");
   });
 
   test("avatar only (Config 1) renders in trailing slot at 30dp size", () => {
@@ -401,6 +407,42 @@ describe("SearchBar (Styled)", () => {
     expect(screen.getByTestId("mic-btn")).toBeInTheDocument();
     expect(screen.getByTestId("avatar-img")).toBeInTheDocument();
   });
+
+  test("bar input carries flex-1, outline-none, and webkit-cancel-hide classes", () => {
+    render(<SearchBar placeholder="Search" />);
+    const input = document.querySelector("[data-slot='input']");
+    expect(input).toBeInTheDocument();
+    expect(input?.className).toContain("flex-1");
+    expect(input?.className).toContain("outline-none");
+    expect(input?.className).toContain("[&::-webkit-search-cancel-button]:appearance-none");
+  });
+
+  test("trailing-actions wrapper has 'flex' class when trailing actions provided", () => {
+    render(
+      <SearchBar
+        placeholder="Search"
+        trailingActions={[
+          <button key="mic" aria-label="mic">
+            mic
+          </button>,
+          <button key="more" aria-label="more">
+            more
+          </button>,
+        ]}
+      />
+    );
+    const trailingGroup = document.querySelector("[data-slot='trailing-actions']");
+    expect(trailingGroup).toBeInTheDocument();
+    expect(trailingGroup?.className).toContain("flex");
+  });
+
+  test("renders a default MD3 search icon when no leadingIcon prop is given", () => {
+    render(<SearchBar placeholder="Search" />);
+    // The default icon is a 24×24 SVG with a search path inside the leading-icon slot
+    const leadingSlot = document.querySelector("[data-slot='leading-icon']");
+    expect(leadingSlot).toBeInTheDocument();
+    expect(leadingSlot?.querySelector("svg")).toBeInTheDocument();
+  });
 });
 
 describe("SearchView (Styled)", () => {
@@ -454,14 +496,18 @@ describe("SearchView (Styled)", () => {
     expect(view.className).toContain("bg-surface-container-high");
   });
 
-  test("divided style renders border-outline divider", () => {
+  test("divided style renders border-outline divider on the hr element", () => {
     render(
       <SearchView isOpen onClose={() => {}} aria-label="Search" searchStyle="divided">
         <p>results</p>
       </SearchView>
     );
     const view = screen.getByRole("search", { name: "Search" });
-    expect(view.className).toContain("border-outline");
+    // Divider is an <hr data-slot="divider"> with the border-outline class,
+    // not on the container itself.
+    const divider = view.querySelector("hr[data-slot='divider']");
+    expect(divider).toBeInTheDocument();
+    expect(divider?.className).toContain("border-outline");
   });
 
   test("docked layout has min-w-[360px] and max-w-[720px] constraint classes", () => {
@@ -475,7 +521,7 @@ describe("SearchView (Styled)", () => {
     expect(view.className).toContain("max-w-[720px]");
   });
 
-  test("divided+fullscreen header has h-[72px] class", () => {
+  test("divided+fullscreen header has h-[72px] class on the header element", () => {
     render(
       <SearchView
         isOpen
@@ -488,7 +534,10 @@ describe("SearchView (Styled)", () => {
       </SearchView>
     );
     const view = screen.getByRole("search", { name: "Search" });
-    expect(view.className).toContain("h-[72px]");
+    // h-[72px] is applied to the header slot element, not the container.
+    const header = view.querySelector("[data-slot='header']");
+    expect(header).toBeInTheDocument();
+    expect(header?.className).toContain("h-[72px]");
   });
 
   test("divided+fullscreen has bg-surface-container-high class", () => {
@@ -540,13 +589,25 @@ describe("SearchView (Styled)", () => {
     expect(view.className).toContain("gap-0.5");
   });
 
-  test("has animate-md-scale-in class on mount", () => {
+  test("fullscreen layout has animate-md-fade-in class on mount", () => {
     render(
-      <SearchView isOpen onClose={() => {}} aria-label="Search">
+      <SearchView isOpen onClose={() => {}} aria-label="Search" layout="fullscreen">
         <p>results</p>
       </SearchView>
     );
     const view = screen.getByRole("search", { name: "Search" });
+    // Fullscreen uses fade-in (no scale distortion on full viewport coverage).
+    expect(view.className).toContain("animate-md-fade-in");
+  });
+
+  test("docked layout has animate-md-scale-in class on mount", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search" layout="docked">
+        <p>results</p>
+      </SearchView>
+    );
+    const view = screen.getByRole("search", { name: "Search" });
+    // Docked uses scale-in (feels like a popover appearing).
     expect(view.className).toContain("animate-md-scale-in");
   });
 
@@ -559,5 +620,50 @@ describe("SearchView (Styled)", () => {
     const content = screen.getByRole("search").querySelector("[data-slot=content]");
     expect(content).toBeInTheDocument();
     expect(screen.getByTestId("search-result")).toBeInTheDocument();
+  });
+
+  test("docked layout renders inline (searchbox is findable via getByRole)", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search" layout="docked">
+        <p>results</p>
+      </SearchView>
+    );
+    // Docked renders in normal document flow, not in a portal — the search view
+    // must still be queryable by role so tests and consumers can interact with it.
+    expect(screen.getByRole("search", { name: "Search" })).toBeInTheDocument();
+  });
+
+  test("view input slot carries outline-none and webkit-cancel-hide classes", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search">
+        <p>results</p>
+      </SearchView>
+    );
+    const input = screen.getByRole("search").querySelector("[data-slot='input']");
+    expect(input).toBeInTheDocument();
+    expect(input?.className).toContain("outline-none");
+    expect(input?.className).toContain("[&::-webkit-search-cancel-button]:appearance-none");
+  });
+
+  test("view trailing-actions wrapper has flex class when trailing actions provided", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        trailingActions={[
+          <button key="mic" aria-label="mic">
+            mic
+          </button>,
+        ]}
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const trailingGroup = screen
+      .getByRole("search")
+      .querySelector("[data-slot='trailing-actions']");
+    expect(trailingGroup).toBeInTheDocument();
+    expect(trailingGroup?.className).toContain("flex");
   });
 });
