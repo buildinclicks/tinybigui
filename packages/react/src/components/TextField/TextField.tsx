@@ -1,33 +1,53 @@
 /**
  * TextField Component (Layer 3)
  *
- * Material Design 3 styled text input component.
+ * Material Design 3 Expressive styled text input component.
  * Composes TextFieldHeadless (Layer 2) via render-prop to obtain all
  * React Aria ARIA props without duplicating accessibility wiring.
+ *
+ * Architecture: Variants vs States
+ * - All interaction/selection states are emitted as data-* attributes on the
+ *   root div (group/text-field) via getInteractionDataAttributes + explicit
+ *   derived content flags. CVA slots read them via group-data-[x]/text-field:.
+ * - CVA variants hold only design-time choices (variant, position).
+ *
+ * MD3 Expressive spec:
+ * - Single 56dp height (no size variants)
+ * - Filled: rounded-top 4dp, surface-container-highest bg, active indicator
+ * - Outlined: rounded 4dp all corners, transparent bg, notched fieldset border
+ * - body-large typography for input, body-small for floating label + supporting text
+ * - Standard fast motion tokens (utility form UI — no Expressive overshoot)
  */
 
 "use client";
 
 import { forwardRef } from "react";
+import { useHover } from "react-aria";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import {
-  textFieldContainerVariants,
-  textFieldWrapperVariants,
-  textFieldInputVariants,
+  textFieldRootVariants,
+  textFieldFieldVariants,
+  textFieldStateLayerVariants,
+  textFieldActiveIndicatorVariants,
+  textFieldOutlineVariants,
+  textFieldNotchVariants,
   textFieldLabelVariants,
+  textFieldInputVariants,
   textFieldIconVariants,
-  textFieldHelperTextVariants,
-  textFieldCharacterCountVariants,
+  textFieldAffixVariants,
+  textFieldSupportingRowVariants,
+  textFieldSupportingTextVariants,
+  textFieldCounterVariants,
 } from "./TextField.variants";
 import { TextFieldHeadless } from "./TextFieldHeadless";
 import type { TextFieldProps } from "./TextField.types";
 
 /**
- * TextField - MD3 Text Input Component
+ * TextField — MD3 Expressive Text Input Component
  *
- * A text input field following Material Design 3 specifications.
- * Supports filled and outlined variants with comprehensive accessibility
- * provided by React Aria via the TextFieldHeadless layer.
+ * A text input field strictly following Material Design 3 Expressive specifications.
+ * Supports filled and outlined variants with full accessibility via React Aria.
  *
  * @example
  * ```tsx
@@ -40,6 +60,14 @@ import type { TextFieldProps } from "./TextField.types";
  *   type="email"
  *   isRequired
  *   errorMessage="Please enter a valid email"
+ * />
+ *
+ * // With icons and affixes
+ * <TextField
+ *   label="Price"
+ *   prefix="$"
+ *   suffix="USD"
+ *   leadingIcon={<IconDollar />}
  * />
  *
  * // Multiline with character counter
@@ -56,12 +84,13 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
   (
     {
       variant = "filled",
-      size = "medium",
       label,
       description,
       errorMessage,
       leadingIcon,
       trailingIcon,
+      prefix,
+      suffix,
       characterCount = false,
       maxLength,
       fullWidth = false,
@@ -89,6 +118,9 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
         : typeof spellCheck === "string"
           ? spellCheck === "true"
           : spellCheck;
+
+    // React Aria hover state for the field box
+    const { isHovered, hoverProps } = useHover({ isDisabled });
 
     // Build headless props, omitting undefined optional values to satisfy exactOptionalPropertyTypes
     const headlessProps = {
@@ -120,149 +152,170 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
           errorMessageProps,
           isInvalid: fieldIsInvalid,
           isFocused,
+          isFocusVisible,
           currentValue,
           inputRef,
         }) => {
           const hasValue = currentValue.length > 0;
-          const shouldFloatLabel = isFocused || hasValue;
+          // Placeholder value — we need it to determine float state
+          const hasPlaceholder = !!(props as { placeholder?: string }).placeholder;
+          const hasPrefix = !!prefix;
+          // Label floats when: focused, has a value, has a placeholder, or has a prefix
+          const shouldFloat = isFocused || hasValue || hasPlaceholder || hasPrefix;
           const characterLength = currentValue.length;
           const isCharacterLimitExceeded = maxLength ? characterLength > maxLength : false;
 
+          const hasLeadingIcon = !!leadingIcon;
+          const hasTrailingIcon = !!trailingIcon;
+          const hasLabel = !!label;
+
+          // Supporting row is shown when description OR counter is present
+          const showDescription = !!description && !fieldIsInvalid;
+          const showError = fieldIsInvalid && !!errorMessage;
+          const showCounter = characterCount && maxLength !== undefined;
+          const showSupportingRow = showDescription || showError || showCounter;
+
           return (
-            <div className={cn(textFieldContainerVariants({ fullWidth }), className)}>
-              {/* Input wrapper with visual styling */}
-              <div
-                className={cn(
-                  textFieldWrapperVariants({
-                    variant,
-                    size,
-                    disabled: isDisabled,
-                    error: fieldIsInvalid,
-                    focused: isFocused,
-                  })
+            <div
+              className={cn(textFieldRootVariants({ fullWidth }), "group/text-field", className)}
+              // ── Interaction data attributes (from React Aria state) ──────
+              {...getInteractionDataAttributes({
+                isHovered,
+                isFocusVisible,
+                isDisabled,
+                isReadOnly,
+                isInvalid: fieldIsInvalid,
+              })}
+              // ── Derived state flags ──────────────────────────────────────
+              data-focused={isFocused ? "" : undefined}
+              data-float={shouldFloat ? "" : undefined}
+              // ── Content flags (structural composition) ───────────────────
+              data-with-leading-icon={hasLeadingIcon ? "" : undefined}
+              data-with-trailing-icon={hasTrailingIcon ? "" : undefined}
+              data-no-label={!hasLabel ? "" : undefined}
+              data-multiline={multiline ? "" : undefined}
+            >
+              {/* Field box — 56dp visual container */}
+              <div {...hoverProps} className={cn(textFieldFieldVariants({ variant }))}>
+                {/* ── State layer (filled variant only) ───────────────────── */}
+                {variant === "filled" && (
+                  <span className={cn(textFieldStateLayerVariants())} aria-hidden="true" />
                 )}
-              >
-                {/* Leading icon */}
+
+                {/* ── Leading icon ────────────────────────────────────────── */}
                 {leadingIcon && (
                   <span
-                    className={textFieldIconVariants({
-                      position: "leading",
-                      size,
-                      disabled: isDisabled,
-                    })}
+                    className={cn(textFieldIconVariants({ position: "leading" }))}
+                    aria-hidden="true"
                   >
                     {leadingIcon}
                   </span>
                 )}
 
-                {/* Floating label — uses labelProps from React Aria for proper htmlFor wiring */}
-                {label && (
-                  <label
-                    {...labelProps}
-                    className={cn(
-                      textFieldLabelVariants({
-                        variant,
-                        size,
-                        floating: shouldFloatLabel,
-                        focused: isFocused,
-                        error: fieldIsInvalid,
-                        disabled: isDisabled,
-                        hasLeadingIcon: !!leadingIcon,
-                      })
-                    )}
-                  >
-                    {label}
-                    {isRequired && " *"}
-                  </label>
-                )}
+                {/* ── Content column (label + prefix + input + suffix) ─────── */}
+                <div className="relative flex h-full min-w-0 flex-1 items-center">
+                  {/* Floating label — uses labelProps from React Aria for htmlFor wiring */}
+                  {label && (
+                    <label {...labelProps} className={cn(textFieldLabelVariants({ variant }))}>
+                      {label}
+                      {isRequired && <span aria-hidden="true">&thinsp;*</span>}
+                    </label>
+                  )}
 
-                {/* Input/Textarea — uses inputProps from React Aria for full ARIA wiring */}
-                {multiline ? (
-                  <textarea
-                    {...inputProps}
-                    ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-                    className={cn(
-                      textFieldInputVariants({
-                        variant,
-                        size,
-                        disabled: isDisabled,
-                        hasLeadingIcon: !!leadingIcon,
-                        hasTrailingIcon: !!trailingIcon,
-                        multiline: true,
-                      }),
-                      label && "placeholder:opacity-0"
-                    )}
-                    rows={rows}
-                    spellCheck={spellCheckProp}
-                  />
-                ) : (
-                  <input
-                    {...inputProps}
-                    ref={inputRef as React.RefObject<HTMLInputElement>}
-                    className={cn(
-                      textFieldInputVariants({
-                        variant,
-                        size,
-                        disabled: isDisabled,
-                        hasLeadingIcon: !!leadingIcon,
-                        hasTrailingIcon: !!trailingIcon,
-                        multiline: false,
-                      }),
-                      label && "placeholder:opacity-0" // Hide placeholder when there's a value to prevent overlap with floating label
-                    )}
-                    spellCheck={spellCheckProp}
-                  />
-                )}
+                  {/* Prefix affix */}
+                  {prefix && (
+                    <span className={cn(textFieldAffixVariants(), "pr-0.5")}>{prefix}</span>
+                  )}
 
-                {/* Trailing icon */}
+                  {/* Input / Textarea */}
+                  {multiline ? (
+                    <textarea
+                      {...inputProps}
+                      ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                      className={cn(textFieldInputVariants({ variant, multiline: true }))}
+                      rows={rows}
+                      spellCheck={spellCheckProp}
+                    />
+                  ) : (
+                    <input
+                      {...inputProps}
+                      ref={inputRef as React.RefObject<HTMLInputElement>}
+                      className={cn(textFieldInputVariants({ variant, multiline: false }))}
+                      spellCheck={spellCheckProp}
+                    />
+                  )}
+
+                  {/* Suffix affix */}
+                  {suffix && (
+                    <span className={cn(textFieldAffixVariants(), "pl-0.5")}>{suffix}</span>
+                  )}
+                </div>
+
+                {/* ── Trailing icon ────────────────────────────────────────── */}
                 {trailingIcon && (
                   <span
-                    className={textFieldIconVariants({
-                      position: "trailing",
-                      size,
-                      disabled: isDisabled,
-                    })}
+                    className={cn(textFieldIconVariants({ position: "trailing" }))}
+                    aria-hidden="true"
                   >
                     {trailingIcon}
                   </span>
                 )}
+
+                {/* ── Active indicator (filled variant only) ───────────────── */}
+                {variant === "filled" && (
+                  <span className={cn(textFieldActiveIndicatorVariants())} aria-hidden="true" />
+                )}
+
+                {/* ── Outlined border with notch ───────────────────────────── */}
+                {variant === "outlined" && (
+                  <fieldset aria-hidden="true" className={cn(textFieldOutlineVariants())}>
+                    <legend className={cn(textFieldNotchVariants())}>
+                      {/* Invisible copy of label drives the notch width */}
+                      {label && (
+                        <span>
+                          {label}
+                          {isRequired && "\u2009*"}
+                        </span>
+                      )}
+                    </legend>
+                  </fieldset>
+                )}
               </div>
 
-              {/* Helper text — only shown when not in error state */}
-              {description && !fieldIsInvalid && (
-                <div
-                  {...descriptionProps}
-                  className={textFieldHelperTextVariants({
-                    type: "description",
-                    disabled: isDisabled,
-                  })}
-                >
-                  {description}
-                </div>
-              )}
+              {/* ── Supporting row (description / error + counter) ──────────── */}
+              {showSupportingRow && (
+                <div className={cn(textFieldSupportingRowVariants())}>
+                  {/* Left: supporting text or error message (flex-1 pushes counter right) */}
+                  <div className="min-w-0 flex-1">
+                    {showDescription && (
+                      <p
+                        {...descriptionProps}
+                        className={cn(textFieldSupportingTextVariants({ type: "description" }))}
+                      >
+                        {description}
+                      </p>
+                    )}
+                    {showError && (
+                      <p
+                        {...errorMessageProps}
+                        className={cn(textFieldSupportingTextVariants({ type: "error" }))}
+                      >
+                        {errorMessage}
+                      </p>
+                    )}
+                  </div>
 
-              {/* Error message */}
-              {fieldIsInvalid && errorMessage && (
-                <div
-                  {...errorMessageProps}
-                  className={textFieldHelperTextVariants({
-                    type: "error",
-                    disabled: isDisabled,
-                  })}
-                >
-                  {errorMessage}
-                </div>
-              )}
-
-              {/* Character counter */}
-              {characterCount && maxLength && (
-                <div
-                  className={textFieldCharacterCountVariants({
-                    exceeded: isCharacterLimitExceeded,
-                    disabled: isDisabled,
-                  })}
-                >
-                  {characterLength} / {maxLength}
+                  {/* Right: character counter */}
+                  {showCounter && (
+                    <span
+                      className={cn(
+                        textFieldCounterVariants({ exceeded: isCharacterLimitExceeded })
+                      )}
+                      aria-live="polite"
+                    >
+                      {characterLength}&thinsp;/&thinsp;{maxLength}
+                    </span>
+                  )}
                 </div>
               )}
             </div>

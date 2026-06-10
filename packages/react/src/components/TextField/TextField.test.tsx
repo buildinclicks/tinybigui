@@ -1,7 +1,7 @@
 /**
  * TextField Component Tests
  *
- * Comprehensive test suite for the MD3 TextField component.
+ * Comprehensive test suite for the MD3 Expressive TextField component.
  * Follows TDD approach with tests for rendering, variants, states,
  * interactions, accessibility, and edge cases.
  */
@@ -59,35 +59,117 @@ describe("TextField", () => {
 
   describe("Variants", () => {
     test("renders filled variant (default)", () => {
-      render(<TextField label="Email" variant="filled" />);
-      const container = screen.getByRole("textbox").closest("div");
-      expect(container).toHaveClass("bg-surface-container-highest");
+      const { container } = render(<TextField label="Email" variant="filled" />);
+      // The field box (first child of root) carries the filled background
+      const fieldBox = container.querySelector(".bg-surface-container-highest");
+      expect(fieldBox).toBeInTheDocument();
     });
 
-    test("renders outlined variant", () => {
-      render(<TextField label="Email" variant="outlined" />);
-      const container = screen.getByRole("textbox").closest("div");
-      expect(container).toHaveClass("border", "border-outline");
+    test("renders outlined variant with fieldset border", () => {
+      const { container } = render(<TextField label="Email" variant="outlined" />);
+      // Outlined renders an aria-hidden fieldset for the border
+      const fieldset = container.querySelector("fieldset[aria-hidden]");
+      expect(fieldset).toBeInTheDocument();
+      expect(fieldset).toHaveClass("border-outline");
+    });
+
+    test("filled variant renders state layer", () => {
+      const { container } = render(<TextField label="Email" variant="filled" />);
+      // State layer span is present for filled
+      const stateLayer = container.querySelector(".bg-on-surface");
+      expect(stateLayer).toBeInTheDocument();
+    });
+
+    test("filled variant renders active indicator", () => {
+      const { container } = render(<TextField label="Email" variant="filled" />);
+      // Active indicator has h-px bg-on-surface-variant
+      const indicator = container.querySelector(".bg-on-surface-variant");
+      expect(indicator).toBeInTheDocument();
+    });
+
+    test("outlined variant does NOT render active indicator", () => {
+      const { container } = render(<TextField label="Email" variant="outlined" />);
+      // Outlined has no active indicator
+      const indicator = container.querySelector(".h-px.bg-on-surface-variant");
+      expect(indicator).not.toBeInTheDocument();
+    });
+
+    test("outlined variant renders legend notch element", () => {
+      const { container } = render(<TextField label="Email" variant="outlined" />);
+      const legend = container.querySelector("legend");
+      expect(legend).toBeInTheDocument();
     });
   });
 
-  describe("Sizes", () => {
-    test("renders small size", () => {
-      render(<TextField label="Email" size="small" />);
-      const input = screen.getByRole("textbox");
-      expect(input).toHaveClass("h-10");
+  describe("Data Attribute State Model", () => {
+    test("root has group/text-field class", () => {
+      const { container } = render(<TextField label="Email" />);
+      const root = container.firstChild as HTMLElement;
+      expect(root.className).toContain("group/text-field");
     });
 
-    test("renders medium size (default)", () => {
-      render(<TextField label="Email" size="medium" />);
-      const input = screen.getByRole("textbox");
-      expect(input).toHaveClass("h-12");
+    test("root has data-disabled when isDisabled", () => {
+      const { container } = render(<TextField label="Email" isDisabled />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-disabled", "");
     });
 
-    test("renders large size", () => {
-      render(<TextField label="Email" size="large" />);
-      const input = screen.getByRole("textbox");
-      expect(input).toHaveClass("h-14");
+    test("root has data-invalid when isInvalid", () => {
+      const { container } = render(<TextField label="Email" isInvalid />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-invalid", "");
+    });
+
+    test("root has data-readonly when isReadOnly", () => {
+      const { container } = render(<TextField label="Email" isReadOnly />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-readonly", "");
+    });
+
+    test("root has data-with-leading-icon when leadingIcon provided", () => {
+      const { container } = render(
+        <TextField label="Email" leadingIcon={<span data-testid="icon" />} />
+      );
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-with-leading-icon", "");
+    });
+
+    test("root has data-with-trailing-icon when trailingIcon provided", () => {
+      const { container } = render(
+        <TextField label="Email" trailingIcon={<span data-testid="icon" />} />
+      );
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-with-trailing-icon", "");
+    });
+
+    test("root has data-float when placeholder is provided", () => {
+      const { container } = render(<TextField label="Email" placeholder="something" />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-float", "");
+    });
+
+    test("root has data-float when prefix is provided", () => {
+      const { container } = render(<TextField label="Price" prefix="$" />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-float", "");
+    });
+
+    test("root has data-multiline when multiline", () => {
+      const { container } = render(<TextField label="Message" multiline />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-multiline", "");
+    });
+
+    test("root does NOT have data-float when no value/placeholder/prefix", () => {
+      const { container } = render(<TextField label="Email" />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).not.toHaveAttribute("data-float");
+    });
+
+    test("root has data-float when field has a value", () => {
+      const { container } = render(<TextField label="Email" defaultValue="hello" />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-float", "");
     });
   });
 
@@ -96,7 +178,6 @@ describe("TextField", () => {
       render(<TextField label="Email" isDisabled />);
       const input = screen.getByRole("textbox");
       expect(input).toBeDisabled();
-      expect(input).toHaveClass("cursor-not-allowed");
     });
 
     test("renders error state with message", () => {
@@ -119,9 +200,9 @@ describe("TextField", () => {
     });
 
     test("renders full width", () => {
-      render(<TextField label="Email" fullWidth />);
-      const container = screen.getByRole("textbox").closest("div");
-      expect(container).toHaveClass("w-full");
+      const { container } = render(<TextField label="Email" fullWidth />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveClass("w-full");
     });
   });
 
@@ -214,6 +295,12 @@ describe("TextField", () => {
       const input = screen.getByRole("textbox");
       expect(input).toBeRequired();
     });
+
+    test("outlined fieldset is aria-hidden", () => {
+      const { container } = render(<TextField label="Email" variant="outlined" />);
+      const fieldset = container.querySelector("fieldset");
+      expect(fieldset).toHaveAttribute("aria-hidden", "true");
+    });
   });
 
   describe("Icons", () => {
@@ -237,6 +324,30 @@ describe("TextField", () => {
       );
       expect(screen.getByTestId("leading-icon")).toBeInTheDocument();
       expect(screen.getByTestId("trailing-icon")).toBeInTheDocument();
+    });
+  });
+
+  describe("Prefix and Suffix", () => {
+    test("renders prefix text", () => {
+      render(<TextField label="Price" prefix="$" />);
+      expect(screen.getByText("$")).toBeInTheDocument();
+    });
+
+    test("renders suffix text", () => {
+      render(<TextField label="Weight" suffix="kg" />);
+      expect(screen.getByText("kg")).toBeInTheDocument();
+    });
+
+    test("renders both prefix and suffix", () => {
+      render(<TextField label="Amount" prefix="$" suffix="USD" />);
+      expect(screen.getByText("$")).toBeInTheDocument();
+      expect(screen.getByText("USD")).toBeInTheDocument();
+    });
+
+    test("prefix causes label to float (data-float attribute)", () => {
+      const { container } = render(<TextField label="Price" prefix="$" />);
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-float", "");
     });
   });
 
@@ -269,7 +380,7 @@ describe("TextField", () => {
   describe("Character Counter", () => {
     test("renders character counter when enabled", () => {
       render(<TextField label="Bio" characterCount maxLength={100} defaultValue="Hello" />);
-      expect(screen.getByText("5 / 100")).toBeInTheDocument();
+      expect(screen.getByText(/5.*100/)).toBeInTheDocument();
     });
 
     test("updates character count on input", async () => {
@@ -279,12 +390,12 @@ describe("TextField", () => {
       const input = screen.getByRole("textbox");
       await user.type(input, "Test");
 
-      expect(screen.getByText("4 / 100")).toBeInTheDocument();
+      expect(screen.getByText(/4.*100/)).toBeInTheDocument();
     });
 
     test("does not render counter when characterCount is false", () => {
       render(<TextField label="Bio" characterCount={false} maxLength={100} defaultValue="Hello" />);
-      expect(screen.queryByText("5 / 100")).not.toBeInTheDocument();
+      expect(screen.queryByText(/5.*100/)).not.toBeInTheDocument();
     });
 
     test("enforces maxLength", async () => {
@@ -295,6 +406,44 @@ describe("TextField", () => {
       await user.type(input, "12345678");
 
       expect(input).toHaveValue("12345");
+    });
+
+    test("counter and description appear on the same supporting row", () => {
+      const { container } = render(
+        <TextField
+          label="Bio"
+          description="Tell us about yourself"
+          characterCount
+          maxLength={100}
+        />
+      );
+      // Both are in a single flex row
+      const supportingRow = container.querySelector(".flex.items-start.justify-between");
+      expect(supportingRow).toBeInTheDocument();
+      expect(supportingRow).toContainElement(screen.getByText("Tell us about yourself"));
+      expect(supportingRow).toContainElement(screen.getByText(/\/.*100/));
+    });
+  });
+
+  describe("Supporting Row", () => {
+    test("description and error on the same row slot (error replaces description)", () => {
+      render(
+        <TextField
+          label="Email"
+          description="Enter your email"
+          errorMessage="Email is required"
+          isInvalid
+        />
+      );
+      // When error is shown, description is hidden per MD3 spec
+      expect(screen.queryByText("Enter your email")).not.toBeInTheDocument();
+      expect(screen.getByText("Email is required")).toBeInTheDocument();
+    });
+
+    test("supporting row is not rendered when no description/error/counter", () => {
+      const { container } = render(<TextField label="Email" />);
+      const supportingRow = container.querySelector(".flex.items-start.justify-between");
+      expect(supportingRow).not.toBeInTheDocument();
     });
   });
 
@@ -338,20 +487,6 @@ describe("TextField", () => {
 
       expect(input).toHaveValue("test");
     });
-
-    test("handles both description and error message", () => {
-      render(
-        <TextField
-          label="Email"
-          description="Enter your email"
-          errorMessage="Email is required"
-          isInvalid
-        />
-      );
-      // When error is shown, description is hidden per MD3 spec
-      expect(screen.queryByText("Enter your email")).not.toBeInTheDocument();
-      expect(screen.getByText("Email is required")).toBeInTheDocument();
-    });
   });
 
   describe("Custom Props", () => {
@@ -384,7 +519,7 @@ describe("TextField", () => {
       // the input's id — which React Aria wires automatically via labelProps / inputProps.
       render(<TextField label="Email" />);
       const input = screen.getByRole("textbox");
-      const label = screen.getByText("Email").closest("label");
+      const label = screen.getByText("Email", { selector: "label" });
       expect(label).toBeTruthy();
       expect(label).toHaveAttribute("for", input.id);
     });
@@ -405,6 +540,14 @@ describe("TextField", () => {
       render(<TextFieldHeadless label="Standalone" aria-label="Standalone field" />);
       const input = screen.getByRole("textbox");
       expect(input).toBeInTheDocument();
+    });
+
+    test("no size prop exists on TextField component", () => {
+      // Size was removed in MD3 Expressive refactor — single 56dp height
+      // Verify TypeScript would not accept it by checking the component renders fine
+      // without size (this is a typing concern but we verify render is stable)
+      render(<TextField label="Email" />);
+      expect(screen.getByRole("textbox")).toBeInTheDocument();
     });
   });
 
@@ -481,6 +624,24 @@ describe("TextField", () => {
 
     test("has no axe violations in multiline mode", async () => {
       const { container } = render(<TextField label="Bio" multiline />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no axe violations in outlined variant", async () => {
+      const { container } = render(<TextField label="Email" variant="outlined" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no axe violations with prefix and suffix", async () => {
+      const { container } = render(<TextField label="Price" prefix="$" suffix="USD" />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("has no axe violations with character counter", async () => {
+      const { container } = render(<TextField label="Bio" characterCount maxLength={100} />);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });

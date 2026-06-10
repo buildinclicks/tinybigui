@@ -2,7 +2,7 @@
  * TextField Type Definitions
  *
  * Type definitions for the Material Design 3 TextField component.
- * Supports both filled and outlined variants with full accessibility.
+ * Supports filled and outlined variants with full accessibility via React Aria.
  */
 
 import type {
@@ -15,21 +15,12 @@ import type {
 import type { AriaTextFieldProps } from "react-aria";
 
 /**
- * TextField visual variants
+ * TextField visual variants.
  *
- * - `filled`: Solid background with bottom border (default)
- * - `outlined`: Border around entire field
+ * - `filled`: Solid background (`surface-container-highest`) with active indicator bottom border.
+ * - `outlined`: Transparent with a full rounded border and notched legend for the floating label.
  */
 export type TextFieldVariant = "filled" | "outlined";
-
-/**
- * TextField size variants
- *
- * - `small`: Compact height
- * - `medium`: Standard height (default)
- * - `large`: Larger height
- */
-export type TextFieldSize = "small" | "medium" | "large";
 
 /**
  * Arguments passed to the TextFieldHeadless render-prop children function.
@@ -48,7 +39,7 @@ export interface TextFieldRenderProps {
   errorMessageProps: HTMLAttributes<HTMLElement>;
   /** Whether the field is currently in an invalid state */
   isInvalid: boolean;
-  /** Whether the input currently has focus (keyboard or pointer) */
+  /** Whether the input currently has any focus (keyboard or pointer) */
   isFocused: boolean;
   /** Whether the input has keyboard-visible focus (for focus ring) */
   isFocusVisible: boolean;
@@ -59,7 +50,7 @@ export interface TextFieldRenderProps {
 }
 
 /**
- * Props for the headless TextField component (Layer 2)
+ * Props for the headless TextField component (Layer 2).
  *
  * Extends React Aria's AriaTextFieldProps for accessibility.
  * Provides behavior without styling.
@@ -69,72 +60,72 @@ export interface TextFieldHeadlessProps extends Omit<
   "children" | "onFocus" | "onBlur"
 > {
   /**
-   * Label text for the input
+   * Label text for the input.
    */
   label?: string;
 
   /**
-   * Helper text displayed below the input
+   * Helper text displayed below the input.
    * @example "Enter your email address"
    */
   description?: string;
 
   /**
-   * Error message to display when input is invalid
+   * Error message to display when input is invalid.
    * @example "Email is required"
    */
   errorMessage?: string;
 
   /**
-   * Whether the input should expand to fill its container
+   * Whether the input should expand to fill its container.
    * @default false
    */
   fullWidth?: boolean;
 
   /**
-   * Enable multiline mode (textarea)
+   * Enable multiline mode (textarea).
    * @default false
    */
   multiline?: boolean;
 
   /**
-   * Number of visible rows for multiline input
+   * Number of visible rows for multiline input.
    * @default 3
    */
   rows?: number;
 
   /**
-   * Custom className for the container
+   * Custom className for the container.
    */
   className?: string;
 
   /**
-   * Custom className for the input element
+   * Custom className for the input element.
    */
   inputClassName?: string;
 
   /**
-   * Custom className for the label element
+   * Custom className for the label element.
    */
   labelClassName?: string;
 
   /**
-   * Custom className for the description element
+   * Custom className for the description element.
    */
   descriptionClassName?: string;
 
   /**
-   * Custom className for the error message element
+   * Custom className for the error message element.
    */
   errorClassName?: string;
 
   /**
-   * Handler called when the input is focused
+   * Handler called when the input is focused.
    */
   onFocus?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 
   /**
-   * Handler called when the input loses focus
+   * Handler called when the input loses focus.
    */
   onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 
@@ -145,14 +136,12 @@ export interface TextFieldHeadlessProps extends Omit<
    * React Aria props and derived state so the styled layer can build its
    * own MD3 DOM without duplicating accessibility wiring.
    *
-   * When omitted, the default accessible DOM (label + input + helper text) renders.
-   *
    * @example
    * ```tsx
    * <TextFieldHeadless label="Email" value={value} onChange={onChange}>
    *   {({ labelProps, inputProps, isFocused }) => (
    *     <div>
-   *       <label {...labelProps} className={floating ? 'floating' : ''}>Email</label>
+   *       <label {...labelProps} className={isFocused ? 'focused' : ''}>Email</label>
    *       <input {...inputProps} className="md3-input" />
    *     </div>
    *   )}
@@ -163,45 +152,59 @@ export interface TextFieldHeadlessProps extends Omit<
 }
 
 /**
- * Props for the styled TextField component (Layer 3)
+ * Props for the styled TextField component (Layer 3).
  *
  * Extends TextFieldHeadlessProps with MD3 visual styling options.
+ * Strictly follows MD3 spec: single fixed height (56dp), two variants,
+ * optional icons, prefix/suffix affixes, and supporting text + counter row.
  */
 export interface TextFieldProps extends TextFieldHeadlessProps {
   /**
-   * Visual variant of the text field
+   * Visual variant of the text field.
    * @default 'filled'
    */
   variant?: TextFieldVariant;
 
   /**
-   * Size variant
-   * @default 'medium'
+   * Leading icon rendered at the start of the field.
+   * MD3 Specification: icons should be 24×24dp.
    */
-  size?: TextFieldSize;
+  leadingIcon?: ReactNode;
 
   /**
-   * Leading icon (before input text)
-   * MD3 Specification: Icons should be 18px × 18px
+   * Trailing icon rendered at the end of the field.
+   * MD3 Specification: icons should be 24×24dp.
+   * Automatically colored `error` when the field is invalid.
    */
-  leadingIcon?: React.ReactNode;
+  trailingIcon?: ReactNode;
 
   /**
-   * Trailing icon (after input text)
-   * MD3 Specification: Icons should be 18px × 18px
+   * Inline prefix text rendered before the input value.
+   * Only visible when the label is in its floating (small) position.
+   * Useful for currency symbols, units, etc.
+   * @example "$"
    */
-  trailingIcon?: React.ReactNode;
+  prefix?: ReactNode;
 
   /**
-   * Show character counter below the input
-   * Requires maxLength to be set
+   * Inline suffix text rendered after the input value.
+   * Only visible when the label is in its floating (small) position.
+   * Useful for units, domain suffixes, etc.
+   * @example "kg"
+   */
+  suffix?: ReactNode;
+
+  /**
+   * Show character counter in the supporting row below the field.
+   * Requires `maxLength` to be set.
    * @default false
    */
   characterCount?: boolean;
 
   /**
-   * Maximum number of characters allowed
-   * Enables character counter if characterCount is true
+   * Maximum number of characters allowed.
+   * Enforced on the native input and displayed in the counter when
+   * `characterCount` is true.
    */
   maxLength?: number;
 }

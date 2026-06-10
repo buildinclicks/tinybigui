@@ -1,7 +1,7 @@
 /**
  * TextField Component Exports
  *
- * Barrel exports for the TextField component and related types.
+ * Barrel exports for the MD3 TextField component and related types.
  */
 
 // Layer 3: MD3 Styled Component (most users use this)
@@ -10,25 +10,31 @@ export { TextField } from "./TextField";
 // Layer 2: Headless Component (for advanced customization)
 export { TextFieldHeadless } from "./TextFieldHeadless";
 
-// CVA Variants
+// CVA Variants (all slots)
 export {
-  textFieldContainerVariants,
-  textFieldWrapperVariants,
-  textFieldInputVariants,
+  textFieldRootVariants,
+  textFieldFieldVariants,
+  textFieldStateLayerVariants,
+  textFieldActiveIndicatorVariants,
+  textFieldOutlineVariants,
+  textFieldNotchVariants,
   textFieldLabelVariants,
+  textFieldInputVariants,
   textFieldIconVariants,
-  textFieldHelperTextVariants,
-  textFieldCharacterCountVariants,
+  textFieldAffixVariants,
+  textFieldSupportingRowVariants,
+  textFieldSupportingTextVariants,
+  textFieldCounterVariants,
 } from "./TextField.variants";
 
 export type {
-  TextFieldContainerVariants,
-  TextFieldWrapperVariants,
-  TextFieldInputVariants,
+  TextFieldRootVariants,
+  TextFieldFieldVariants,
   TextFieldLabelVariants,
+  TextFieldInputVariants,
   TextFieldIconVariants,
-  TextFieldHelperTextVariants,
-  TextFieldCharacterCountVariants,
+  TextFieldSupportingTextVariants,
+  TextFieldCounterVariants,
 } from "./TextField.variants";
 
 // Types
@@ -37,5 +43,4 @@ export type {
   TextFieldHeadlessProps,
   TextFieldRenderProps,
   TextFieldVariant,
-  TextFieldSize,
 } from "./TextField.types";
