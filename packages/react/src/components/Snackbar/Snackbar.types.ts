@@ -36,10 +36,19 @@ export type SnackbarSeverity = "default" | "error";
 /**
  * Internal animation state machine for the Snackbar.
  *
- * - `entering` → zoom-in start: scale-75 + opacity-0 (no duration, paints before transition)
- * - `visible`  → scale-100 + opacity-100 (medium1 / standard-decelerate = 250ms)
- * - `exiting`  → scale-75 + opacity-0 (short4 / standard-accelerate = 200ms)
+ * - `entering` → initial paint: opacity-0 + directional translate offset (no duration)
+ * - `visible`  → slide in + fade in: translate-y-0 + opacity-100
+ *                (spring-standard-default-effects = 200ms, no overshoot)
+ * - `exiting`  → slide out + fade out: offset + opacity-0
+ *                (spring-standard-fast-effects = 150ms)
  * - `exited`   → removed from DOM / stack updated
+ *
+ * The translate direction is position-aware:
+ *   bottom positions → slide up from below (translate-y-3 → translate-y-0)
+ *   top positions    → slide down from above (-translate-y-3 → translate-y-0)
+ *
+ * When `prefers-reduced-motion` is active, the translate offset is suppressed
+ * and only opacity transitions (fade-only).
  */
 export type SnackbarAnimationState = "entering" | "visible" | "exiting" | "exited";
 
