@@ -14,7 +14,7 @@ import type { ProgressHeadlessProps } from "./Progress.types";
  * - Determinate and indeterminate progress support
  * - Internationalized value label formatting via React Aria
  * - Label linkage via aria-labelledby / aria-label
- * - Render prop for custom visual rendering
+ * - Render prop for custom visual rendering (receives shape + thickness)
  *
  * @example
  * ```tsx
@@ -22,7 +22,7 @@ import type { ProgressHeadlessProps } from "./Progress.types";
  * <ProgressHeadless
  *   value={50}
  *   label="Upload"
- *   renderProgress={({ percentage }) => (
+ *   renderProgress={({ percentage, shape, thickness }) => (
  *     <div style={{ width: `${percentage}%` }} />
  *   )}
  * />
@@ -39,6 +39,8 @@ export const ProgressHeadless = forwardRef<HTMLDivElement, ProgressHeadlessProps
       type = "linear",
       indeterminate = false,
       size = "medium",
+      shape = "flat",
+      thickness = "default",
       className,
       children,
       renderProgress,
@@ -53,7 +55,6 @@ export const ProgressHeadless = forwardRef<HTMLDivElement, ProgressHeadlessProps
     const internalRef = useRef<HTMLDivElement>(null);
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLDivElement>;
 
-    // Map our `indeterminate` prop to React Aria's `isIndeterminate`
     const { progressBarProps, labelProps } = useProgressBar({
       label,
       value,
@@ -63,7 +64,6 @@ export const ProgressHeadless = forwardRef<HTMLDivElement, ProgressHeadlessProps
       ...restProps,
     });
 
-    // Compute percentage for consumers
     const percentage = indeterminate ? 0 : ((value - minValue) / (maxValue - minValue)) * 100;
 
     return (
@@ -74,6 +74,8 @@ export const ProgressHeadless = forwardRef<HTMLDivElement, ProgressHeadlessProps
           isIndeterminate: indeterminate,
           type,
           size,
+          shape,
+          thickness,
         })}
         {children}
       </div>
