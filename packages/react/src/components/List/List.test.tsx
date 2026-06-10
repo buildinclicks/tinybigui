@@ -123,7 +123,6 @@ describe("ListHeadless — interactive (single select)", () => {
       </ListHeadless>
     );
     const options = screen.getAllByRole("option");
-    // Focus the last item, then move up
     await user.tab();
     await user.keyboard("{ArrowDown}");
     await user.keyboard("{ArrowDown}");
@@ -401,7 +400,7 @@ describe("List — styled density classes", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Token classes
+// Token classes — Variants-vs-States architecture
 // ---------------------------------------------------------------------------
 
 describe("List — styled token classes", () => {
@@ -415,7 +414,7 @@ describe("List — styled token classes", () => {
     expect(list).toHaveClass("bg-surface");
   });
 
-  test("30. Selected item has bg-secondary-container", async () => {
+  test("30. Selected item carries data-selected attribute", async () => {
     const user = userEvent.setup();
     render(
       <List aria-label="Test" selectionMode="single">
@@ -424,83 +423,157 @@ describe("List — styled token classes", () => {
       </List>
     );
     await user.click(screen.getByRole("option", { name: "Item 1" }));
-    expect(screen.getByRole("option", { name: "Item 1" })).toHaveClass("bg-secondary-container");
+    expect(screen.getByRole("option", { name: "Item 1" })).toHaveAttribute("data-selected", "");
   });
 
-  test("31. Unselected item has no bg-secondary-container", () => {
+  test("31. Unselected item does not carry data-selected attribute", () => {
     render(
       <List aria-label="Test" selectionMode="single">
         <ListItem value="1" headline="Item 1" />
       </List>
     );
     const item = screen.getByRole("option", { name: "Item 1" });
-    expect(item).not.toHaveClass("bg-secondary-container");
+    expect(item).not.toHaveAttribute("data-selected");
   });
 
-  test("32. Disabled item has opacity-38 and pointer-events-none", () => {
+  test("32. Disabled item carries data-disabled attribute", () => {
     render(
       <List aria-label="Test" selectionMode="single">
         <ListItem value="1" headline="Item 1" isDisabled />
       </List>
     );
     const item = screen.getByRole("option", { name: "Item 1" });
-    expect(item).toHaveClass("opacity-38");
-    expect(item).toHaveClass("pointer-events-none");
+    expect(item).toHaveAttribute("data-disabled", "");
   });
 });
 
 // ---------------------------------------------------------------------------
-// State layer
+// Variants-vs-States architecture — group/list-item + data-* attributes
+// ---------------------------------------------------------------------------
+
+describe("List — Variants-vs-States architecture", () => {
+  test("33. Interactive item root has group/list-item class", () => {
+    render(
+      <List aria-label="Test" selectionMode="single">
+        <ListItem value="1" headline="Item 1" />
+      </List>
+    );
+    const item = screen.getByRole("option", { name: "Item 1" });
+    expect(item.className).toContain("group/list-item");
+  });
+
+  test("34. Interactive item root has data-interactive attribute", () => {
+    render(
+      <List aria-label="Test" selectionMode="single">
+        <ListItem value="1" headline="Item 1" />
+      </List>
+    );
+    const item = screen.getByRole("option", { name: "Item 1" });
+    expect(item).toHaveAttribute("data-interactive", "");
+  });
+
+  test("35. Static item root does NOT have data-interactive attribute", () => {
+    render(
+      <List aria-label="Test">
+        <ListItem value="1" headline="Item 1" />
+      </List>
+    );
+    const item = screen.getByRole("listitem");
+    expect(item).not.toHaveAttribute("data-interactive");
+  });
+
+  test("35a. data-with-leading content flag set when leadingSlot provided", () => {
+    render(
+      <List aria-label="Test" selectionMode="single">
+        <ListItem value="1" headline="Item 1" leadingSlot={<span>★</span>} leadingType="icon" />
+      </List>
+    );
+    // Accessible name includes slot text — use positional query since only one option
+    const item = screen.getAllByRole("option")[0];
+    expect(item).toHaveAttribute("data-with-leading", "");
+  });
+
+  test("35b. data-with-trailing content flag set when trailingSlot provided", () => {
+    render(
+      <List aria-label="Test" selectionMode="single">
+        <ListItem value="1" headline="Item 1" trailingSlot={<span>→</span>} trailingType="icon" />
+      </List>
+    );
+    // Accessible name includes slot text — use positional query since only one option
+    const item = screen.getAllByRole("option")[0];
+    expect(item).toHaveAttribute("data-with-trailing", "");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// State layer — MD3 spring motion tokens
 // ---------------------------------------------------------------------------
 
 describe("List — state layer", () => {
-  test("33. State layer div present with opacity-0 and group-hover:opacity-8", () => {
+  test("33b. State layer span present in interactive list item", () => {
     render(
       <List aria-label="Test" selectionMode="single">
         <ListItem value="1" headline="Item 1" />
       </List>
     );
     const item = screen.getByRole("option", { name: "Item 1" });
-    const stateLayer = item.querySelector(".bg-on-surface");
+    const stateLayer = item.querySelector(".bg-on-surface.opacity-0");
     expect(stateLayer).toBeInTheDocument();
-    expect(stateLayer).toHaveClass("opacity-0");
-    expect(stateLayer).toHaveClass("group-hover:opacity-8");
   });
 
-  test("34. transition-[background-color] duration-short4 ease-standard on item root", () => {
+  test("34b. State layer has spring-standard-fast-effects motion tokens", () => {
     render(
       <List aria-label="Test" selectionMode="single">
         <ListItem value="1" headline="Item 1" />
       </List>
     );
     const item = screen.getByRole("option", { name: "Item 1" });
-    expect(item).toHaveClass("transition-[background-color]");
-    expect(item).toHaveClass("duration-short4");
-    expect(item).toHaveClass("ease-standard");
-  });
-
-  test("35a. State layer has transition-opacity duration-short2 ease-standard", () => {
-    render(
-      <List aria-label="Test" selectionMode="single">
-        <ListItem value="1" headline="Item 1" />
-      </List>
-    );
-    const item = screen.getByRole("option", { name: "Item 1" });
-    const stateLayer = item.querySelector(".bg-on-surface");
+    const stateLayer = item.querySelector(".bg-on-surface.opacity-0");
     expect(stateLayer).toHaveClass("transition-opacity");
-    expect(stateLayer).toHaveClass("duration-short2");
-    expect(stateLayer).toHaveClass("ease-standard");
+    expect(stateLayer).toHaveClass("duration-spring-standard-fast-effects");
+    expect(stateLayer).toHaveClass("ease-spring-standard-fast-effects");
   });
 
-  test("35b. State layer has group-active:opacity-12 for press state", () => {
+  test("35c. State layer is NOT present in static list item", () => {
+    render(
+      <List aria-label="Test">
+        <ListItem value="1" headline="Item 1" />
+      </List>
+    );
+    const item = screen.getByRole("listitem");
+    // Static item has no state layer span
+    const stateLayer = item.querySelector(".bg-on-surface.opacity-0");
+    expect(stateLayer).not.toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Focus ring
+// ---------------------------------------------------------------------------
+
+describe("List — focus ring", () => {
+  test("36. Focus ring span present in interactive list item", () => {
     render(
       <List aria-label="Test" selectionMode="single">
         <ListItem value="1" headline="Item 1" />
       </List>
     );
     const item = screen.getByRole("option", { name: "Item 1" });
-    const stateLayer = item.querySelector(".bg-on-surface");
-    expect(stateLayer).toHaveClass("group-active:opacity-12");
+    const focusRing = item.querySelector(".outline-secondary.opacity-0");
+    expect(focusRing).toBeInTheDocument();
+  });
+
+  test("36b. Focus ring has spring-standard-fast-effects motion tokens", () => {
+    render(
+      <List aria-label="Test" selectionMode="single">
+        <ListItem value="1" headline="Item 1" />
+      </List>
+    );
+    const item = screen.getByRole("option", { name: "Item 1" });
+    const focusRing = item.querySelector(".outline-secondary.opacity-0");
+    expect(focusRing).toHaveClass("transition-opacity");
+    expect(focusRing).toHaveClass("duration-spring-standard-fast-effects");
+    expect(focusRing).toHaveClass("ease-spring-standard-fast-effects");
   });
 });
 
@@ -509,7 +582,7 @@ describe("List — state layer", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — leading slot", () => {
-  test("35. type='icon': renders with size-6 text-on-surface-variant", () => {
+  test("37. type='icon': renders with size-6 text-on-surface-variant", () => {
     render(
       <List aria-label="Test">
         <ListItem
@@ -526,7 +599,7 @@ describe("List — leading slot", () => {
     expect(container).toHaveClass("text-on-surface-variant");
   });
 
-  test("36. type='avatar': renders with size-10 rounded-full", () => {
+  test("38. type='avatar': renders with size-10 rounded-full", () => {
     render(
       <List aria-label="Test">
         <ListItem
@@ -543,7 +616,7 @@ describe("List — leading slot", () => {
     expect(container).toHaveClass("rounded-full");
   });
 
-  test("37. type='checkbox': inner control wrapper has aria-hidden='true'", () => {
+  test("39. type='checkbox': inner control wrapper has aria-hidden='true'", () => {
     render(
       <List aria-label="Test" selectionMode="multiple">
         <ListItem
@@ -558,7 +631,7 @@ describe("List — leading slot", () => {
     expect(cb.closest("[aria-hidden='true']")).toBeInTheDocument();
   });
 
-  test("38. type='radio': inner control wrapper has aria-hidden='true' and tabIndex={-1}", () => {
+  test("40. type='radio': inner control wrapper has aria-hidden='true' and tabIndex={-1}", () => {
     render(
       <List aria-label="Test" selectionMode="single">
         <ListItem
@@ -581,7 +654,7 @@ describe("List — leading slot", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — trailing slot", () => {
-  test("39. type='text': renders with text-label-small text-on-surface-variant", () => {
+  test("41. type='text': renders with text-label-small text-on-surface-variant", () => {
     render(
       <List aria-label="Test">
         <ListItem
@@ -598,7 +671,7 @@ describe("List — trailing slot", () => {
     expect(container).toHaveClass("text-on-surface-variant");
   });
 
-  test("40. type='icon': renders with size-6", () => {
+  test("42. type='icon': renders with size-6", () => {
     render(
       <List aria-label="Test">
         <ListItem
@@ -620,7 +693,7 @@ describe("List — trailing slot", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — text sub-component", () => {
-  test("41. Headline has text-body-large text-on-surface", () => {
+  test("43. Headline has text-body-large text-on-surface", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Headline" />
@@ -631,7 +704,7 @@ describe("List — text sub-component", () => {
     expect(headline).toHaveClass("text-on-surface");
   });
 
-  test("42. Supporting text has text-body-medium text-on-surface-variant", () => {
+  test("44. Supporting text has text-body-medium text-on-surface-variant", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Title" supportingText="Sub" />
@@ -642,7 +715,7 @@ describe("List — text sub-component", () => {
     expect(supporting).toHaveClass("text-on-surface-variant");
   });
 
-  test("43. Overline has text-label-small text-on-surface-variant", () => {
+  test("45. Overline has text-label-small text-on-surface-variant", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Title" overline="OVERLINE" supportingText="Sub" />
@@ -659,7 +732,7 @@ describe("List — text sub-component", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — ripple", () => {
-  test("44. Ripple container present in interactive list item", () => {
+  test("46. Ripple container present in interactive list item", () => {
     render(
       <List aria-label="Test" selectionMode="single">
         <ListItem value="1" headline="Item 1" />
@@ -669,7 +742,7 @@ describe("List — ripple", () => {
     expect(item.querySelector("[data-ripple-container]")).toBeInTheDocument();
   });
 
-  test("45. Ripple NOT present in static list item", () => {
+  test("47. Ripple NOT present in static list item", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Item 1" />
@@ -681,7 +754,7 @@ describe("List — ripple", () => {
 });
 
 // ===========================================================================
-// Divider Integration Tests (46–59)
+// Divider Integration Tests (48–59)
 // ===========================================================================
 
 // ---------------------------------------------------------------------------
@@ -689,7 +762,7 @@ describe("List — ripple", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — showDividers", () => {
-  test("46. showDividers={true} renders Divider elements between list items", () => {
+  test("48. showDividers={true} renders Divider elements between list items", () => {
     const { container } = render(
       <List aria-label="Test" showDividers>
         <ListItem value="1" headline="Item 1" />
@@ -701,7 +774,7 @@ describe("List — showDividers", () => {
     expect(dividers.length).toBeGreaterThan(0);
   });
 
-  test("47. With 3 items and showDividers={true}: renders exactly 2 Dividers", () => {
+  test("49. With 3 items and showDividers={true}: renders exactly 2 Dividers", () => {
     const { container } = render(
       <List aria-label="Test" showDividers>
         <ListItem value="1" headline="Item 1" />
@@ -713,7 +786,7 @@ describe("List — showDividers", () => {
     expect(dividers).toHaveLength(2);
   });
 
-  test("48. With 1 item and showDividers={true}: renders NO Dividers", () => {
+  test("50. With 1 item and showDividers={true}: renders NO Dividers", () => {
     const { container } = render(
       <List aria-label="Test" showDividers>
         <ListItem value="1" headline="Item 1" />
@@ -723,7 +796,7 @@ describe("List — showDividers", () => {
     expect(dividers).toHaveLength(0);
   });
 
-  test("49. Divider has border-outline-variant class (token compliance)", () => {
+  test("51. Divider has border-outline-variant class (token compliance)", () => {
     const { container } = render(
       <List aria-label="Test" showDividers>
         <ListItem value="1" headline="Item 1" />
@@ -734,7 +807,7 @@ describe("List — showDividers", () => {
     expect(divider).toHaveClass("border-outline-variant");
   });
 
-  test("50. showDividers={false} (default): renders no Dividers", () => {
+  test("52. showDividers={false} (default): renders no Dividers", () => {
     const { container } = render(
       <List aria-label="Test">
         <ListItem value="1" headline="Item 1" />
@@ -751,7 +824,7 @@ describe("List — showDividers", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — insetDivider", () => {
-  test("51. insetDivider={true} renders a Divider at the bottom of the item", () => {
+  test("53. insetDivider={true} renders a Divider at the bottom of the item", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Item 1" insetDivider />
@@ -762,7 +835,7 @@ describe("List — insetDivider", () => {
     expect(divider).toBeInTheDocument();
   });
 
-  test("52. Inset Divider has ms-4 class (16dp logical inset from start)", () => {
+  test("54. Inset Divider has ms-4 class (16dp logical inset from start)", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Item 1" insetDivider />
@@ -773,7 +846,7 @@ describe("List — insetDivider", () => {
     expect(divider).toHaveClass("ms-4");
   });
 
-  test("53. insetDivider={false} (default): no Divider inside item", () => {
+  test("55. insetDivider={false} (default): no Divider inside item", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Item 1" />
@@ -790,7 +863,7 @@ describe("List — insetDivider", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — divider composition", () => {
-  test("54. showDividers and insetDivider can coexist without duplicate dividers at the same boundary", () => {
+  test("56. showDividers and insetDivider can coexist without duplicate dividers at the same boundary", () => {
     const { container } = render(
       <List aria-label="Test" showDividers>
         <ListItem value="1" headline="Item 1" insetDivider />
@@ -802,7 +875,7 @@ describe("List — divider composition", () => {
     expect(allDividers).toHaveLength(3);
   });
 
-  test("55. Divider in showDividers mode uses inset='none' (full-width)", () => {
+  test("57. Divider in showDividers mode uses inset='none' (full-width)", () => {
     const { container } = render(
       <List aria-label="Test" showDividers>
         <ListItem value="1" headline="Item 1" />
@@ -816,7 +889,7 @@ describe("List — divider composition", () => {
     expect(betweenDivider).toHaveClass("w-full");
   });
 
-  test("56. Divider in insetDivider mode uses inset='start' (leading inset)", () => {
+  test("58. Divider in insetDivider mode uses inset='start' (leading inset)", () => {
     render(
       <List aria-label="Test">
         <ListItem value="1" headline="Item 1" insetDivider />
@@ -833,7 +906,7 @@ describe("List — divider composition", () => {
 // ---------------------------------------------------------------------------
 
 describe("List — divider accessibility", () => {
-  test("57. axe check — list with showDividers={true}, no violations", async () => {
+  test("59. axe check — list with showDividers={true}, no violations", async () => {
     const { container } = render(
       <List aria-label="Settings" showDividers>
         <ListItem value="wifi" headline="Wi-Fi" />
@@ -845,7 +918,7 @@ describe("List — divider accessibility", () => {
     expect(results).toHaveNoViolations();
   });
 
-  test("58. axe check — list with insetDivider={true}, no violations", async () => {
+  test("60. axe check — list with insetDivider={true}, no violations", async () => {
     const { container } = render(
       <List aria-label="Settings">
         <ListItem value="wifi" headline="Wi-Fi" insetDivider />
@@ -856,7 +929,7 @@ describe("List — divider accessibility", () => {
     expect(results).toHaveNoViolations();
   });
 
-  test("59. <hr> elements from Dividers do not break listbox/list accessibility roles", async () => {
+  test("61. <hr> elements from Dividers do not break listbox/list accessibility roles", async () => {
     const { container } = render(
       <List aria-label="Settings" showDividers>
         <ListItem value="wifi" headline="Wi-Fi" insetDivider />

@@ -4,9 +4,9 @@ import type { Key, Selection, SelectionMode } from "react-stately";
 /**
  * Visual density based on content lines (MD3 List)
  *
- * - `one-line`: headline only (48dp)
- * - `two-line`: headline + supporting text (64dp)
- * - `three-line`: overline + headline + supporting text (88dp)
+ * - `one-line`: headline only (56dp min-height)
+ * - `two-line`: headline + supporting text (72dp min-height)
+ * - `three-line`: overline + headline + supporting text (88dp min-height)
  */
 export type ListDensity = "one-line" | "two-line" | "three-line";
 
@@ -135,9 +135,6 @@ export interface ListItemProps {
 
   /** Additional CSS classes */
   className?: string;
-
-  /** Item-specific action callback */
-  onAction?: (value: string | number) => void;
 }
 
 /**

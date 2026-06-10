@@ -12,8 +12,22 @@ export { ListHeadless, ListItemHeadless } from "./ListHeadless";
 export {
   listVariants,
   listItemVariants,
+  listItemStateLayerVariants,
+  listItemFocusRingVariants,
+  listItemLeadingVariants,
+  listItemTrailingVariants,
+  listItemOverlineVariants,
+  listItemHeadlineVariants,
+  listItemSupportingTextVariants,
   type ListVariants,
   type ListItemVariants,
+  type ListItemStateLayerVariants,
+  type ListItemFocusRingVariants,
+  type ListItemLeadingVariants,
+  type ListItemTrailingVariants,
+  type ListItemOverlineVariants,
+  type ListItemHeadlineVariants,
+  type ListItemSupportingTextVariants,
 } from "./List.variants";
 
 // Types

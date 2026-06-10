@@ -904,6 +904,59 @@ export const SettingsList: Story = {
   },
 };
 
+// ─── States story ─────────────────────────────────────────────────────────────
+
+const StatesExample = (): React.ReactElement => {
+  const [selected, setSelected] = useState<Selection>(new Set<string>(["selected"]));
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <p className="text-label-medium text-on-surface-variant mb-2">Interactive states</p>
+        <List
+          aria-label="List states"
+          selectionMode="single"
+          selectedKeys={selected}
+          onSelectionChange={setSelected}
+        >
+          <ListItem value="default" headline="Default (at rest)" />
+          <ListItem
+            value="selected"
+            headline="Selected"
+            supportingText="bg-secondary-container, on-secondary-container text/icons"
+          />
+          <ListItem
+            value="disabled"
+            headline="Disabled"
+            supportingText="38% opacity, pointer-events none"
+            isDisabled
+          />
+          <ListItem
+            value="with-slots"
+            headline="With slots (hover / focus / press to see state layer)"
+            leadingType="icon"
+            leadingSlot={<IconWifi />}
+            trailingType="icon"
+            trailingSlot={<IconChevronRight />}
+          />
+        </List>
+      </div>
+    </div>
+  );
+};
+
+export const States: Story = {
+  render: () => <StatesExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Shows the four key states: at rest, selected (`bg-secondary-container`), disabled (38% opacity), and a slotted item to demonstrate the hover/focus/pressed state layer. State layer uses `bg-on-surface` with 8% (hover) / 10% (focus, pressed) opacity via `group-data-[x]/list-item` selectors — no state stored in CVA variants.",
+      },
+    },
+  },
+};
+
 // ─── Playground ───────────────────────────────────────────────────────────────
 
 export const Playground: Story = {

@@ -1,16 +1,13 @@
 import { forwardRef } from "react";
 import { cn } from "../../utils/cn";
+import { listItemTrailingVariants } from "./List.variants";
 import type { ListItemTrailingProps } from "./List.types";
-
-const typeClasses: Record<string, string> = {
-  icon: "size-6 text-on-surface-variant",
-  text: "text-on-surface-variant text-label-small",
-  checkbox: "",
-  radio: "",
-};
 
 /**
  * MD3 ListItem trailing slot.
+ *
+ * Uses `listItemTrailingVariants` CVA so icon/text colors automatically react to
+ * the parent `group/list-item` data-selected and data-disabled attributes.
  *
  * For `checkbox` and `radio` types the children are wrapped with
  * `aria-hidden="true"` and `tabIndex={-1}` — selection semantics
@@ -21,10 +18,7 @@ export const ListItemTrailing = forwardRef<HTMLDivElement, ListItemTrailingProps
     const isControl = type === "checkbox" || type === "radio";
 
     return (
-      <div
-        ref={ref}
-        className={cn("ml-auto flex shrink-0 items-center", typeClasses[type], className)}
-      >
+      <div ref={ref} className={cn(listItemTrailingVariants({ type }), className)}>
         {isControl ? (
           <span aria-hidden="true" tabIndex={-1}>
             {children}
