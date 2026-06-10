@@ -203,6 +203,12 @@ export interface SearchProps extends Omit<SearchBarProps, "onFocus"> {
 export interface SearchBarHeadlessProps extends SearchBarProps {
   /** Ref forwarded to the form element */
   ref?: React.Ref<HTMLFormElement>;
+  /**
+   * Slot class names applied directly to the bar's inner elements.
+   * Passed from SearchBar so per-slot CVA classes apply without descendant selectors.
+   */
+  inputClassName?: string | undefined;
+  trailingActionsClassName?: string | undefined;
 }
 
 /** Props for SearchViewHeadless — the headless primitive for the view */
@@ -218,6 +224,7 @@ export interface SearchViewHeadlessProps extends SearchViewProps {
   backButtonClassName?: string;
   clearButtonClassName?: string;
   inputClassName?: string;
+  trailingActionsClassName?: string | undefined;
   dividerClassName?: string;
   contentClassName?: string;
 }

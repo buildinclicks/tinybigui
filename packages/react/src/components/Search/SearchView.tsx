@@ -8,6 +8,7 @@ import {
   searchViewBackButtonVariants,
   searchViewClearButtonVariants,
   searchViewTrailingActionVariants,
+  searchViewTrailingActionsVariants,
   searchViewInputVariants,
   searchViewDividerVariants,
   searchViewContentVariants,
@@ -88,6 +89,7 @@ export const SearchView = forwardRef<HTMLDivElement, SearchViewProps>(
     const clearButtonClass = cn(searchViewClearButtonVariants());
 
     const trailingActionClass = cn(searchViewTrailingActionVariants());
+    const trailingActionsGroupClass = cn(searchViewTrailingActionsVariants());
 
     const inputClass = cn(searchViewInputVariants());
 
@@ -114,6 +116,7 @@ export const SearchView = forwardRef<HTMLDivElement, SearchViewProps>(
         ref={ref}
         isOpen={isOpen}
         onClose={onClose}
+        layout={layout}
         {...(value !== undefined ? { value } : {})}
         {...(defaultValue !== undefined ? { defaultValue } : {})}
         {...(onChange !== undefined ? { onChange } : {})}
@@ -129,6 +132,7 @@ export const SearchView = forwardRef<HTMLDivElement, SearchViewProps>(
         backButtonClassName={backButtonClass}
         clearButtonClassName={clearButtonClass}
         inputClassName={inputClass}
+        trailingActionsClassName={trailingActionsGroupClass}
         dividerClassName={dividerClass}
         contentClassName={contentClass}
       >

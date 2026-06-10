@@ -13,6 +13,7 @@ export {
   searchBarFocusRingVariants,
   searchBarLeadingIconVariants,
   searchBarTrailingActionVariants,
+  searchBarTrailingActionsVariants,
   searchBarAvatarVariants,
   searchBarInputVariants,
 } from "./Search.variants";
@@ -24,6 +25,7 @@ export {
   searchViewBackButtonVariants,
   searchViewClearButtonVariants,
   searchViewTrailingActionVariants,
+  searchViewTrailingActionsVariants,
   searchViewInputVariants,
   searchViewDividerVariants,
   searchViewContentVariants,

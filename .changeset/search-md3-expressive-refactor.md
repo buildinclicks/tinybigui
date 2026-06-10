@@ -1,5 +1,5 @@
 ---
-"@tinybigui/react": patch
+"@tinybigui/react": minor
 ---
 
 refactor(search): md3 expressive variants-vs-states architecture

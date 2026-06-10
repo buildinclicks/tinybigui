@@ -407,6 +407,42 @@ describe("SearchBar (Styled)", () => {
     expect(screen.getByTestId("mic-btn")).toBeInTheDocument();
     expect(screen.getByTestId("avatar-img")).toBeInTheDocument();
   });
+
+  test("bar input carries flex-1, outline-none, and webkit-cancel-hide classes", () => {
+    render(<SearchBar placeholder="Search" />);
+    const input = document.querySelector("[data-slot='input']");
+    expect(input).toBeInTheDocument();
+    expect(input?.className).toContain("flex-1");
+    expect(input?.className).toContain("outline-none");
+    expect(input?.className).toContain("[&::-webkit-search-cancel-button]:appearance-none");
+  });
+
+  test("trailing-actions wrapper has 'flex' class when trailing actions provided", () => {
+    render(
+      <SearchBar
+        placeholder="Search"
+        trailingActions={[
+          <button key="mic" aria-label="mic">
+            mic
+          </button>,
+          <button key="more" aria-label="more">
+            more
+          </button>,
+        ]}
+      />
+    );
+    const trailingGroup = document.querySelector("[data-slot='trailing-actions']");
+    expect(trailingGroup).toBeInTheDocument();
+    expect(trailingGroup?.className).toContain("flex");
+  });
+
+  test("renders a default MD3 search icon when no leadingIcon prop is given", () => {
+    render(<SearchBar placeholder="Search" />);
+    // The default icon is a 24×24 SVG with a search path inside the leading-icon slot
+    const leadingSlot = document.querySelector("[data-slot='leading-icon']");
+    expect(leadingSlot).toBeInTheDocument();
+    expect(leadingSlot?.querySelector("svg")).toBeInTheDocument();
+  });
 });
 
 describe("SearchView (Styled)", () => {
@@ -584,5 +620,50 @@ describe("SearchView (Styled)", () => {
     const content = screen.getByRole("search").querySelector("[data-slot=content]");
     expect(content).toBeInTheDocument();
     expect(screen.getByTestId("search-result")).toBeInTheDocument();
+  });
+
+  test("docked layout renders inline (searchbox is findable via getByRole)", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search" layout="docked">
+        <p>results</p>
+      </SearchView>
+    );
+    // Docked renders in normal document flow, not in a portal — the search view
+    // must still be queryable by role so tests and consumers can interact with it.
+    expect(screen.getByRole("search", { name: "Search" })).toBeInTheDocument();
+  });
+
+  test("view input slot carries outline-none and webkit-cancel-hide classes", () => {
+    render(
+      <SearchView isOpen onClose={() => {}} aria-label="Search">
+        <p>results</p>
+      </SearchView>
+    );
+    const input = screen.getByRole("search").querySelector("[data-slot='input']");
+    expect(input).toBeInTheDocument();
+    expect(input?.className).toContain("outline-none");
+    expect(input?.className).toContain("[&::-webkit-search-cancel-button]:appearance-none");
+  });
+
+  test("view trailing-actions wrapper has flex class when trailing actions provided", () => {
+    render(
+      <SearchView
+        isOpen
+        onClose={() => {}}
+        aria-label="Search"
+        trailingActions={[
+          <button key="mic" aria-label="mic">
+            mic
+          </button>,
+        ]}
+      >
+        <p>results</p>
+      </SearchView>
+    );
+    const trailingGroup = screen
+      .getByRole("search")
+      .querySelector("[data-slot='trailing-actions']");
+    expect(trailingGroup).toBeInTheDocument();
+    expect(trailingGroup?.className).toContain("flex");
   });
 });

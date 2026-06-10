@@ -14,17 +14,19 @@ import { cva, type VariantProps } from "class-variance-authority";
  *   searchBarStateLayerVariants  — hover/pressed opacity overlay (inside overflow-hidden)
  *   searchBarFocusRingVariants   — keyboard focus outline (outside overflow-hidden)
  *   searchBarLeadingIconVariants — 48dp tap target wrapping 24dp icon, on-surface
- *   searchBarTrailingActionVariants — 48dp tap target for each trailing icon, on-surface-variant
- *   searchBarAvatarVariants      — 48dp tap target wrapping 30dp rounded-full avatar
- *   searchBarInputVariants       — flex-1 text input inside the bar
+ *   searchBarTrailingActionVariants  — 48dp tap target for each trailing icon, on-surface-variant
+ *   searchBarTrailingActionsVariants — flex row wrapper for all trailing actions
+ *   searchBarAvatarVariants          — 48dp tap target wrapping 30dp rounded-full avatar
+ *   searchBarInputVariants           — flex-1 text input inside the bar
  *
  * Search View slot responsibilities:
  *   searchViewVariants           — container; style × layout compound variants
  *   searchViewHeaderVariants     — header row; style × layout heights/padding
  *   searchViewBackButtonVariants — 48dp back-arrow tap target, on-surface
  *   searchViewClearButtonVariants — 48dp clear tap target, on-surface-variant
- *   searchViewTrailingActionVariants — 48dp trailing action in view header
- *   searchViewInputVariants      — flex-1 text input inside the view header
+ *   searchViewTrailingActionVariants  — 48dp trailing action in view header
+ *   searchViewTrailingActionsVariants — flex row wrapper for all view trailing actions
+ *   searchViewInputVariants           — flex-1 text input inside the view header
  *   searchViewDividerVariants    — horizontal rule (divided style only)
  *   searchViewContentVariants    — scrollable results/suggestions area
  *
@@ -168,18 +170,33 @@ export const searchBarTrailingActionVariants = cva([
  */
 export const searchBarAvatarVariants = cva(["flex size-12 shrink-0 items-center justify-center"]);
 
+// ─── SEARCH BAR TRAILING ACTIONS GROUP ────────────────────────────────────────
+
+/**
+ * Trailing actions group wrapper — lays out multiple trailing icon slots in a row.
+ * gap = 0 per MD3 spec (contained trailing-actions gap token = 0dp).
+ */
+export const searchBarTrailingActionsVariants = cva(["flex items-center"]);
+
 // ─── SEARCH BAR INPUT ─────────────────────────────────────────────────────────
 
 /**
  * Text input inside the search bar.
  * Typography: body-large (MD3 supporting text / input text font).
  * Colors: on-surface for input, on-surface-variant for placeholder.
+ *
+ * `min-w-0` is required so `flex-1` can shrink when trailing actions are present.
+ * The native browser search cancel button and decoration are hidden so only our
+ * MD3 clear button (in SearchView) controls clearing.
  */
 export const searchBarInputVariants = cva([
-  "flex-1 bg-transparent outline-none",
+  "flex-1 min-w-0 bg-transparent outline-none",
   "text-body-large text-on-surface",
   "placeholder:text-on-surface-variant",
   "focus-visible:outline-none",
+  // Hide native browser search affordances — our MD3 clear button handles clearing
+  "[&::-webkit-search-cancel-button]:appearance-none",
+  "[&::-webkit-search-decoration]:appearance-none",
 ]);
 
 // ─── SEARCH VIEW CONTAINER ────────────────────────────────────────────────────
@@ -303,18 +320,32 @@ export const searchViewTrailingActionVariants = cva([
   "flex size-12 shrink-0 items-center justify-center text-on-surface-variant",
 ]);
 
+// ─── SEARCH VIEW TRAILING ACTIONS GROUP ───────────────────────────────────────
+
+/**
+ * Trailing actions group wrapper in the view header — lays out multiple action
+ * slots in a row. gap = 0 per MD3 spec.
+ */
+export const searchViewTrailingActionsVariants = cva(["flex items-center"]);
+
 // ─── SEARCH VIEW INPUT ────────────────────────────────────────────────────────
 
 /**
  * Text input inside the view header.
  * Typography: body-large.
  * Colors: on-surface for input text, on-surface-variant for placeholder.
+ *
+ * `min-w-0` lets `flex-1` shrink when clear/trailing buttons are present.
+ * Native search affordances hidden — MD3 clear button controls clearing.
  */
 export const searchViewInputVariants = cva([
-  "flex-1 bg-transparent outline-none",
+  "flex-1 min-w-0 bg-transparent outline-none",
   "text-body-large text-on-surface",
   "placeholder:text-on-surface-variant",
   "focus-visible:outline-none",
+  // Hide native browser search affordances
+  "[&::-webkit-search-cancel-button]:appearance-none",
+  "[&::-webkit-search-decoration]:appearance-none",
 ]);
 
 // ─── SEARCH VIEW DIVIDER ──────────────────────────────────────────────────────
@@ -341,6 +372,9 @@ export type SearchBarStateLayerVariants = VariantProps<typeof searchBarStateLaye
 export type SearchBarFocusRingVariants = VariantProps<typeof searchBarFocusRingVariants>;
 export type SearchBarLeadingIconVariants = VariantProps<typeof searchBarLeadingIconVariants>;
 export type SearchBarTrailingActionVariants = VariantProps<typeof searchBarTrailingActionVariants>;
+export type SearchBarTrailingActionsVariants = VariantProps<
+  typeof searchBarTrailingActionsVariants
+>;
 export type SearchBarAvatarVariants = VariantProps<typeof searchBarAvatarVariants>;
 export type SearchBarInputVariants = VariantProps<typeof searchBarInputVariants>;
 export type SearchViewVariants = VariantProps<typeof searchViewVariants>;
@@ -349,6 +383,9 @@ export type SearchViewBackButtonVariants = VariantProps<typeof searchViewBackBut
 export type SearchViewClearButtonVariants = VariantProps<typeof searchViewClearButtonVariants>;
 export type SearchViewTrailingActionVariants = VariantProps<
   typeof searchViewTrailingActionVariants
+>;
+export type SearchViewTrailingActionsVariants = VariantProps<
+  typeof searchViewTrailingActionsVariants
 >;
 export type SearchViewInputVariants = VariantProps<typeof searchViewInputVariants>;
 export type SearchViewDividerVariants = VariantProps<typeof searchViewDividerVariants>;

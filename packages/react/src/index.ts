@@ -318,6 +318,7 @@ export {
   searchBarFocusRingVariants,
   searchBarLeadingIconVariants,
   searchBarTrailingActionVariants,
+  searchBarTrailingActionsVariants,
   searchBarAvatarVariants,
   searchBarInputVariants,
   // View slot CVAs
@@ -326,6 +327,7 @@ export {
   searchViewBackButtonVariants,
   searchViewClearButtonVariants,
   searchViewTrailingActionVariants,
+  searchViewTrailingActionsVariants,
   searchViewInputVariants,
   searchViewDividerVariants,
   searchViewContentVariants,

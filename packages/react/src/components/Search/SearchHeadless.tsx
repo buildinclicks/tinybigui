@@ -11,7 +11,7 @@ import type { SearchBarHeadlessProps, SearchViewHeadlessProps } from "./Search.t
 
 /**
  * MD3 Arrow Back icon — 24×24, currentColor, aria-hidden.
- * Used as the leading button in Search View to close/collapse back to bar.
+ * Used as the leading button in Search View to collapse back to the bar.
  */
 const ArrowBackIcon = (): React.ReactElement => (
   <svg
@@ -28,7 +28,7 @@ const ArrowBackIcon = (): React.ReactElement => (
 
 /**
  * MD3 Close icon — 24×24, currentColor, aria-hidden.
- * Used as the clear button in Search View to reset input text.
+ * Used as the clear button in Search View to reset the input text.
  */
 const CloseIcon = (): React.ReactElement => (
   <svg
@@ -57,6 +57,7 @@ const CloseIcon = (): React.ReactElement => (
  * - Keyboard: Enter → onSubmit, Escape (with value) → onClear
  * - Leading icon, trailing actions, and avatar slots
  * - aria-label falls back to placeholder per MD3 labeling spec
+ * - `inputClassName` and `trailingActionsClassName` applied directly to inner elements
  *
  * @example
  * ```tsx
@@ -84,6 +85,8 @@ export const SearchBarHeadless = forwardRef<HTMLFormElement, SearchBarHeadlessPr
       className,
       onFocus,
       onBlur,
+      inputClassName,
+      trailingActionsClassName,
     },
     forwardedRef
   ) => {
@@ -124,14 +127,16 @@ export const SearchBarHeadless = forwardRef<HTMLFormElement, SearchBarHeadlessPr
     return (
       <form ref={formRef} role="search" className={className} onSubmit={handleFormSubmit}>
         {leadingIcon && <span data-slot="leading-icon">{leadingIcon}</span>}
-        <input {...inputProps} ref={inputRef} role="searchbox" />
+        <input
+          {...inputProps}
+          ref={inputRef}
+          role="searchbox"
+          data-slot="input"
+          className={inputClassName}
+        />
         {trailingActions && trailingActions.length > 0 && (
-          <span data-slot="trailing-actions">
-            {trailingActions.map((action, index) => (
-              <span key={index} data-slot="trailing-action">
-                {action}
-              </span>
-            ))}
+          <span data-slot="trailing-actions" className={trailingActionsClassName}>
+            {trailingActions}
           </span>
         )}
         {avatar && <span data-slot="avatar">{avatar}</span>}
@@ -147,21 +152,18 @@ SearchBarHeadless.displayName = "SearchBarHeadless";
 /**
  * SearchViewHeadless — Layer 2 headless primitive for the MD3 Search view.
  *
- * Renders in a portal when `isOpen={true}`. Does not render when closed.
- * Uses `useOverlay` for Escape-key dismissal, `usePreventScroll` to lock
- * body scrolling, and `FocusScope` for focus trapping.
+ * Rendering strategy by layout:
+ * - `fullscreen`: renders in a portal (`createPortal`) with `usePreventScroll` and
+ *   `FocusScope contain` — the view covers the full viewport.
+ * - `docked`: renders inline (no portal) with `FocusScope restoreFocus autoFocus` only —
+ *   the card sits in normal document flow so it can be centered by its wrapper.
+ *
+ * Both layouts use `useOverlay` so Escape key and click-outside dismiss correctly.
  *
  * Features:
- * - Portal rendering via `createPortal`
- * - Escape key → onClose
- * - Body scroll lock when open
- * - Focus trap with auto-focus and restore on close
+ * - Back arrow (MD3 ArrowBack SVG) + input + MD3 Close SVG clear button in header
  * - aria-live region for autosuggest announcements
- * - Back arrow (MD3 SVG icon) + input + clear button (MD3 SVG icon) header
- *
- * Slot class names (`headerClassName`, `backButtonClassName`, etc.) are passed
- * from the styled `SearchView` layer so per-slot CVA classes apply directly to
- * each element — no descendant-selector blobs needed.
+ * - Slot class names from the styled SearchView layer applied directly on elements
  *
  * @example
  * ```tsx
@@ -190,10 +192,12 @@ export const SearchViewHeadless = forwardRef<HTMLDivElement, SearchViewHeadlessP
       leadingIcon,
       trailingActions,
       showDivider,
+      layout = "fullscreen",
       headerClassName,
       backButtonClassName,
       clearButtonClassName,
       inputClassName,
+      trailingActionsClassName,
       dividerClassName,
       contentClassName,
     },
@@ -203,31 +207,38 @@ export const SearchViewHeadless = forwardRef<HTMLDivElement, SearchViewHeadlessP
       return null;
     }
 
-    return createPortal(
-      <SearchViewPanel
-        ref={forwardedRef}
-        onClose={onClose}
-        ariaLabel={ariaLabel}
-        {...(className !== undefined ? { className } : {})}
-        {...(leadingIcon !== undefined ? { leadingIcon } : {})}
-        {...(trailingActions !== undefined ? { trailingActions } : {})}
-        {...(showDivider !== undefined ? { showDivider } : {})}
-        {...(value !== undefined ? { value } : {})}
-        {...(defaultValue !== undefined ? { defaultValue } : {})}
-        {...(onChange !== undefined ? { onChange } : {})}
-        {...(onSubmit !== undefined ? { onSubmit } : {})}
-        {...(placeholder !== undefined ? { placeholder } : {})}
-        headerClassName={headerClassName}
-        backButtonClassName={backButtonClassName}
-        clearButtonClassName={clearButtonClassName}
-        inputClassName={inputClassName}
-        dividerClassName={dividerClassName}
-        contentClassName={contentClassName}
-      >
-        {children}
-      </SearchViewPanel>,
-      document.body
-    );
+    const panelProps = {
+      onClose,
+      ariaLabel,
+      layout,
+      children,
+      ...(className !== undefined ? { className } : {}),
+      ...(leadingIcon !== undefined ? { leadingIcon } : {}),
+      ...(trailingActions !== undefined ? { trailingActions } : {}),
+      ...(showDivider !== undefined ? { showDivider } : {}),
+      ...(value !== undefined ? { value } : {}),
+      ...(defaultValue !== undefined ? { defaultValue } : {}),
+      ...(onChange !== undefined ? { onChange } : {}),
+      ...(onSubmit !== undefined ? { onSubmit } : {}),
+      ...(placeholder !== undefined ? { placeholder } : {}),
+      headerClassName,
+      backButtonClassName,
+      clearButtonClassName,
+      inputClassName,
+      trailingActionsClassName,
+      dividerClassName,
+      contentClassName,
+    };
+
+    // Docked renders inline — no portal, no scroll-lock, no contain trap.
+    // This lets the container sit in normal document flow and be positioned
+    // by its parent wrapper (e.g. centered in the Storybook canvas).
+    if (layout === "docked") {
+      return <SearchViewPanel ref={forwardedRef} {...panelProps} />;
+    }
+
+    // Fullscreen renders in a portal over the page with scroll-lock + focus trap.
+    return createPortal(<SearchViewPanel ref={forwardedRef} {...panelProps} />, document.body);
   }
 );
 
@@ -248,18 +259,21 @@ interface SearchViewPanelProps {
   leadingIcon?: React.ReactNode;
   trailingActions?: React.ReactNode[];
   showDivider?: boolean;
+  /** Controls scroll-lock and focus containment — see SearchViewHeadless. */
+  layout: "fullscreen" | "docked";
   // Slot class names from the styled layer
   headerClassName?: string | undefined;
   backButtonClassName?: string | undefined;
   clearButtonClassName?: string | undefined;
   inputClassName?: string | undefined;
+  trailingActionsClassName?: string | undefined;
   dividerClassName?: string | undefined;
   contentClassName?: string | undefined;
 }
 
 /**
- * Inner panel for the search view. Separated to allow hooks
- * (`usePreventScroll`, `useOverlay`) which must be called unconditionally.
+ * Inner panel for the search view. Separated so that hooks that must be called
+ * unconditionally (`usePreventScroll`, `useOverlay`) always run.
  * @internal
  */
 const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
@@ -277,10 +291,12 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
       leadingIcon,
       trailingActions,
       showDivider,
+      layout,
       headerClassName,
       backButtonClassName,
       clearButtonClassName,
       inputClassName,
+      trailingActionsClassName,
       dividerClassName,
       contentClassName,
     },
@@ -290,7 +306,10 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
     const inputRef = useRef<HTMLInputElement>(null);
     const ref = (forwardedRef ?? panelRef) as React.RefObject<HTMLDivElement>;
 
-    usePreventScroll();
+    const isFullscreen = layout === "fullscreen";
+
+    // Scroll-lock only when the view covers the whole page (fullscreen portal).
+    usePreventScroll({ isDisabled: !isFullscreen });
 
     const { overlayProps } = useOverlay(
       {
@@ -329,7 +348,6 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
       onClose();
     }, [onClose]);
 
-    // MD3 SVG back arrow — replaces the former literal "←" glyph
     const defaultBackButton = (
       <button
         type="button"
@@ -342,8 +360,7 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
       </button>
     );
 
-    // MD3 SVG close icon — replaces the former literal "✕" glyph
-    // Visible only when input has a value (controlled by state.value)
+    // Clear button only rendered when the input has a value
     const clearButton = state.value ? (
       <button
         {...clearBtnDomProps}
@@ -358,13 +375,16 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
     ) : null;
 
     return (
-      <FocusScope contain restoreFocus autoFocus>
+      // Focus containment only for fullscreen — docked uses restoreFocus + autoFocus only
+      // so tabbing can naturally leave the widget.
+      <FocusScope contain={isFullscreen} restoreFocus autoFocus>
         <div {...overlayProps} ref={ref} role="search" aria-label={ariaLabel} className={className}>
           <div data-slot="header" className={headerClassName}>
-            {/* Leading icon: custom override or default MD3 back arrow */}
+            {/* Leading: custom override or default back arrow */}
             {leadingIcon ?? defaultBackButton}
 
-            {/* Search input */}
+            {/* Search input — receives inputClassName with flex-1, outline-none, and
+                the webkit search-cancel hide rule to suppress the native "×" button */}
             <input
               {...inputProps}
               ref={inputRef}
@@ -373,17 +393,13 @@ const SearchViewPanel = forwardRef<HTMLDivElement, SearchViewPanelProps>(
               className={inputClassName}
             />
 
-            {/* Clear button */}
+            {/* MD3 clear button (Close SVG) — only when input has content */}
             {clearButton}
 
-            {/* Trailing actions (view-state only) */}
+            {/* Trailing actions */}
             {trailingActions && trailingActions.length > 0 && (
-              <span data-slot="trailing-actions">
-                {trailingActions.map((action, index) => (
-                  <span key={index} data-slot="trailing-action">
-                    {action}
-                  </span>
-                ))}
+              <span data-slot="trailing-actions" className={trailingActionsClassName}>
+                {trailingActions}
               </span>
             )}
           </div>

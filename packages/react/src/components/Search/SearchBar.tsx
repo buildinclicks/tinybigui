@@ -10,13 +10,33 @@ import {
   searchBarFocusRingVariants,
   searchBarLeadingIconVariants,
   searchBarTrailingActionVariants,
+  searchBarTrailingActionsVariants,
   searchBarAvatarVariants,
+  searchBarInputVariants,
 } from "./Search.variants";
 import { cn } from "../../utils/cn";
 import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import type { SearchBarProps } from "./Search.types";
+
+/**
+ * MD3 default leading search icon — shown when no `leadingIcon` prop is provided.
+ * Matches the MD3 Search Bar spec which states the leading slot defaults to a search icon.
+ * 24×24, currentColor (inherits `text-on-surface` from the leading-icon slot wrapper).
+ */
+const DefaultSearchIcon = (): React.ReactElement => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+  </svg>
+);
 
 /**
  * Material Design 3 Search Bar Component (Layer 3: Styled)
@@ -107,12 +127,16 @@ export const SearchBar = forwardRef<HTMLFormElement, SearchBarProps>(
     const handleMouseUp = useCallback(() => setIsPressed(false), []);
 
     // ── Slot content ───────────────────────────────────────────────────────────
-    const styledLeadingIcon = leadingIcon ? (
+    // Leading icon: use the provided icon or fall back to the MD3 default search icon.
+    // Both are wrapped in the 48dp tap-target + on-surface color slot.
+    const styledLeadingIcon = (
       <span className={cn(searchBarLeadingIconVariants())}>
-        <span className="size-6">{leadingIcon}</span>
+        <span className="size-6">{leadingIcon ?? <DefaultSearchIcon />}</span>
       </span>
-    ) : undefined;
+    );
 
+    // Each action pre-styled with 48dp tap target; the group flex wrapper is applied
+    // via trailingActionsClassName on the <span data-slot="trailing-actions"> in headless.
     const styledTrailingActions = trailingActions?.map((action, index) => (
       <span key={index} className={cn(searchBarTrailingActionVariants())}>
         {action}
@@ -187,7 +211,7 @@ export const SearchBar = forwardRef<HTMLFormElement, SearchBarProps>(
               {...(onSubmit !== undefined ? { onSubmit } : {})}
               {...(onClear !== undefined ? { onClear } : {})}
               {...(placeholder !== undefined ? { placeholder } : {})}
-              {...(styledLeadingIcon !== undefined ? { leadingIcon: styledLeadingIcon } : {})}
+              leadingIcon={styledLeadingIcon}
               {...(styledTrailingActions !== undefined
                 ? { trailingActions: styledTrailingActions }
                 : {})}
@@ -197,6 +221,8 @@ export const SearchBar = forwardRef<HTMLFormElement, SearchBarProps>(
               onFocus={handleFocusInternal}
               onBlur={handleBlurInternal}
               className="relative z-0 flex h-full w-full items-center"
+              inputClassName={cn(searchBarInputVariants())}
+              trailingActionsClassName={cn(searchBarTrailingActionsVariants())}
             />
           </div>
         </div>
