@@ -5,10 +5,9 @@ import { cva, type VariantProps } from "class-variance-authority";
  *
  * Architecture: Variants vs States
  * - CVA holds design-time structure only (menuStyle, colorScheme).
- * - Enter/exit animation uses composite MD3 utilities (animate-md-scale-in/out)
- *   sourced from the token system — no hardcoded durations or beziers.
- * - Placement-aware transform-origin is set via data-placement data attributes
- *   emitted by React Aria's Popover.
+ * - Animation (enter/exit motion) lives on `menuPopoverVariants` which is
+ *   applied to the RAC Popover element — the element where RAC actually emits
+ *   data-entering, data-exiting, and data-placement.
  *
  * Shape per menuStyle:
  *   baseline: `rounded-xs` (4dp extra-small)
@@ -36,31 +35,6 @@ export const menuContainerVariants = cva(
     "z-50",
     // Focus outline delegated to React Aria
     "outline-none",
-    // Promote to compositor layer — scale + opacity animations run without layout reflow
-    "will-change-[transform,opacity]",
-    // Block pointer events during animation to prevent accidental item clicks
-    "data-[entering]:pointer-events-none data-[exiting]:pointer-events-none",
-
-    // ── Enter animation ─────────────────────────────────────────────────────
-    // animate-md-scale-in: scale(0.85)+opacity:0 → scale(1)+opacity:1
-    // Duration: 350ms expressive-fast-spatial spring (intentional overshoot)
-    "data-[entering]:animate-md-scale-in",
-
-    // ── Exit animation ──────────────────────────────────────────────────────
-    // animate-md-scale-out: scale(1)+opacity:1 → scale(0.85)+opacity:0
-    // Duration: 200ms emphasized-accelerate (accelerating exit)
-    "data-[exiting]:animate-md-scale-out",
-
-    // ── Transform origin (placement-aware) ──────────────────────────────────
-    // RAC sets data-placement on the Popover element.
-    // Default (bottom): origin at top edge (menu expands downward)
-    "origin-top",
-    "data-[placement=top]:origin-bottom",
-    "data-[placement=left]:origin-right",
-    "data-[placement=right]:origin-left",
-
-    // ── Reduced motion ───────────────────────────────────────────────────────
-    "motion-reduce:data-[entering]:animate-none motion-reduce:data-[exiting]:animate-none",
   ],
   {
     variants: {
@@ -94,6 +68,44 @@ export const menuContainerVariants = cva(
     },
   }
 );
+
+// ─── MENU POPOVER ────────────────────────────────────────────────────────────
+
+/**
+ * Applied to the React Aria `<Popover>` element — the element where RAC emits
+ * `data-entering`, `data-exiting`, and `data-placement`.
+ *
+ * Why here and not on the inner RACMenu:
+ * RAC's Popover owns the overlay lifecycle and sets these data attributes on
+ * itself, not on the child Menu element. Placing animation classes on RACMenu
+ * means they never match.
+ *
+ * Motion:
+ *   Enter: animate-md-scale-in (350ms expressive-fast-spatial, scale+fade)
+ *   Exit:  animate-md-scale-out (200ms emphasized-accelerate, scale+fade)
+ *
+ * Transform-origin is placement-aware: menus below the trigger expand from the
+ * top edge; menus above expand from the bottom, etc.
+ *
+ * @see https://m3.material.io/components/menus/specs — Motion
+ */
+export const menuPopoverVariants = cva([
+  // Promote to compositor layer so scale + opacity animate without layout reflow
+  "will-change-[transform,opacity]",
+  // Block pointer events while animating to prevent accidental item clicks
+  "data-[entering]:pointer-events-none data-[exiting]:pointer-events-none",
+  // Enter: 350ms expressive-fast-spatial spring (intentional overshoot)
+  "data-[entering]:animate-md-scale-in",
+  // Exit: 200ms emphasized-accelerate (accelerating exit)
+  "data-[exiting]:animate-md-scale-out",
+  // Transform origin — default bottom placement expands downward from top edge
+  "origin-top",
+  "data-[placement=top]:origin-bottom",
+  "data-[placement=left]:origin-right",
+  "data-[placement=right]:origin-left",
+  // Reduced motion: skip both animations entirely
+  "motion-reduce:data-[entering]:animate-none motion-reduce:data-[exiting]:animate-none",
+]);
 
 // ─── MENU ITEM ROOT ───────────────────────────────────────────────────────────
 
@@ -147,36 +159,100 @@ export const menuItemVariants = cva(
         vibrant: ["text-on-tertiary-container"],
       },
       /**
-       * Visual style — drives corner radius on items and selection background.
+       * Visual style — drives corner radius on items.
+       * Selected background is now handled by menuItemHighlightVariants.
        */
       menuStyle: {
-        baseline: [
-          // Selected: surface-container-highest, text stays on-surface
-          "data-[selected]:bg-surface-container-highest",
-        ],
+        baseline: [],
         vertical: [],
       },
     },
     compoundVariants: [
-      // vertical + standard: selected → tertiary-container
+      // vertical + standard: selected text → on-tertiary-container
       {
         menuStyle: "vertical",
         colorScheme: "standard",
-        class: [
-          "data-[selected]:bg-tertiary-container",
-          "data-[selected]:text-on-tertiary-container",
-        ],
+        class: ["data-[selected]:text-on-tertiary-container"],
       },
-      // vertical + vibrant: selected → tertiary
+      // vertical + vibrant: selected text → on-tertiary
       {
         menuStyle: "vertical",
         colorScheme: "vibrant",
-        class: ["data-[selected]:bg-tertiary", "data-[selected]:text-on-tertiary"],
+        class: ["data-[selected]:text-on-tertiary"],
       },
     ],
     defaultVariants: {
       colorScheme: "standard",
       menuStyle: "baseline",
+    },
+  }
+);
+
+// ─── MENU ITEM HIGHLIGHT ─────────────────────────────────────────────────────
+
+/**
+ * Selected-background highlight layer for menu items.
+ *
+ * Geometry is menuStyle-aware:
+ *   baseline — `inset-0` (full-bleed, square background; unchanged MD3 look)
+ *   vertical — `inset-1 rounded-lg` (inset ~4dp, 16dp corners per MD3 Expressive
+ *               spec; creates the pill-shaped highlight visible in the reference)
+ *
+ * The layer is always present in the DOM (opacity-0 / transparent at rest) and
+ * transitions its background-color to the selection color on `data-selected`.
+ * This keeps the item hit-target and density height unchanged (they remain on
+ * the root `<li>`) while the visual background is confined to the inset shape.
+ *
+ * Selection colors per menuStyle × colorScheme:
+ *   baseline (any):         group-data-[selected]/menuitem:bg-surface-container-highest
+ *   vertical + standard:    group-data-[selected]/menuitem:bg-tertiary-container
+ *   vertical + vibrant:     group-data-[selected]/menuitem:bg-tertiary
+ *
+ * @see https://m3.material.io/components/menus/specs — Selected state
+ */
+export const menuItemHighlightVariants = cva(
+  [
+    "absolute pointer-events-none",
+    // Effects transition for background-color — no overshoot
+    "transition-colors duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+    // z-0: below state layer (z-[1]) and content (z-10)
+    "z-0",
+  ],
+  {
+    variants: {
+      menuStyle: {
+        baseline: ["inset-0"],
+        vertical: ["inset-1 rounded-lg"],
+      },
+      colorScheme: {
+        standard: [
+          // baseline selected bg (vertical standard compound below overrides)
+          "group-data-[selected]/menuitem:bg-surface-container-highest",
+        ],
+        vibrant: [
+          // baseline + vibrant: use surface-container-highest as fallback
+          // (vertical vibrant compound below overrides)
+          "group-data-[selected]/menuitem:bg-surface-container-highest",
+        ],
+      },
+    },
+    compoundVariants: [
+      // vertical + standard selected: tertiary-container
+      {
+        menuStyle: "vertical",
+        colorScheme: "standard",
+        class: ["group-data-[selected]/menuitem:bg-tertiary-container"],
+      },
+      // vertical + vibrant selected: tertiary
+      {
+        menuStyle: "vertical",
+        colorScheme: "vibrant",
+        class: ["group-data-[selected]/menuitem:bg-tertiary"],
+      },
+    ],
+    defaultVariants: {
+      menuStyle: "baseline",
+      colorScheme: "standard",
     },
   }
 );
@@ -203,7 +279,7 @@ export const menuItemVariants = cva(
  */
 export const menuItemStateLayerVariants = cva(
   [
-    "absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none opacity-0",
+    "absolute overflow-hidden pointer-events-none opacity-0",
     // Effects transition — opacity must NOT overshoot
     "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
     // Hover: 8%
@@ -214,6 +290,8 @@ export const menuItemStateLayerVariants = cva(
     "group-data-[pressed]/menuitem:group-data-[pressed]/menuitem:opacity-10",
     // No state layer when disabled
     "group-data-[disabled]/menuitem:hidden",
+    // z-[1]: above highlight layer (z-0), below content (z-10)
+    "z-[1]",
   ],
   {
     variants: {
@@ -222,8 +300,10 @@ export const menuItemStateLayerVariants = cva(
         vibrant: ["bg-on-tertiary-container"],
       },
       menuStyle: {
-        baseline: [],
-        vertical: [],
+        // baseline: full-bleed, inherits container corner radius
+        baseline: ["inset-0 rounded-[inherit]"],
+        // vertical: inset to match the highlight layer shape
+        vertical: ["inset-1 rounded-lg"],
       },
     },
     compoundVariants: [
@@ -380,7 +460,9 @@ export const menuItemDescriptionVariants = cva([
 // ─── TYPE EXPORTS ─────────────────────────────────────────────────────────────
 
 export type MenuContainerVariants = VariantProps<typeof menuContainerVariants>;
+export type MenuPopoverVariants = VariantProps<typeof menuPopoverVariants>;
 export type MenuItemVariants = VariantProps<typeof menuItemVariants>;
+export type MenuItemHighlightVariants = VariantProps<typeof menuItemHighlightVariants>;
 export type MenuItemStateLayerVariants = VariantProps<typeof menuItemStateLayerVariants>;
 export type MenuItemIconVariants = VariantProps<typeof menuItemIconVariants>;
 export type MenuSectionVariants = VariantProps<typeof menuSectionVariants>;

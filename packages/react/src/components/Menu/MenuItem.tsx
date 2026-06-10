@@ -7,6 +7,7 @@ import { HeadlessMenuItem } from "./MenuHeadless";
 import {
   menuItemVariants,
   menuItemStateLayerVariants,
+  menuItemHighlightVariants,
   menuItemIconVariants,
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
@@ -134,9 +135,18 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
     >
       {({ isSelected }: MenuItemRenderProps) => (
         <>
+          {/* ── Highlight layer (selected background) ─────────────────── */}
+          {/* Sits at z-0, below state layer and content. Geometry is
+              menuStyle-aware: baseline=full-bleed, vertical=inset-1 rounded-lg */}
+          <span
+            aria-hidden="true"
+            data-testid="menuitem-highlight"
+            className={menuItemHighlightVariants({ colorScheme, menuStyle })}
+          />
+
           {/* ── State layer slot ──────────────────────────────────────── */}
-          {/* Renders below all content, above the base background.
-              Opacity is driven by group-data-[hovered/pressed/focus-visible]/menuitem. */}
+          {/* z-[1]: above highlight, below content. Opacity driven by
+              group-data-[hovered/pressed/focus-visible]/menuitem. */}
           <span
             aria-hidden="true"
             className={menuItemStateLayerVariants({ colorScheme, menuStyle })}
@@ -144,7 +154,12 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
 
           {/* ── Ripple container ──────────────────────────────────────── */}
           {!disableRipple && (
-            <span className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit]">
+            <span
+              className={cn(
+                "pointer-events-none absolute z-[2] overflow-hidden",
+                menuStyle === "vertical" ? "inset-1 rounded-lg" : "inset-0 rounded-[inherit]"
+              )}
+            >
               {ripples}
             </span>
           )}

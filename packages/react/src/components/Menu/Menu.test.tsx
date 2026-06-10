@@ -14,6 +14,8 @@ import {
   menuContainerVariants,
   menuItemVariants,
   menuItemStateLayerVariants,
+  menuItemHighlightVariants,
+  menuPopoverVariants,
 } from "./Menu.variants";
 
 // ─── Test Icon Mocks ───────────────────────────────────────────────────────────
@@ -463,8 +465,9 @@ describe("MenuItem", () => {
       renderBasicMenu();
       await openMenu();
       const item = screen.getByRole("menuitem", { name: "Cut" });
-      const stateLayer = item.querySelector("span[aria-hidden='true']");
-      expect(stateLayer).toBeInTheDocument();
+      // The highlight layer is the first aria-hidden span; state layer is the second
+      const overlaySpans = item.querySelectorAll("span[aria-hidden='true']");
+      expect(overlaySpans.length).toBeGreaterThanOrEqual(2);
     });
   });
 
@@ -872,9 +875,11 @@ describe("Selection mode", () => {
     );
     await openMenu();
     const selectedItem = screen.getByRole("menuitemradio", { name: "Grid view" });
-    // RAC emits data-selected on the element; CVA applies data-[selected]:bg-surface-container-highest
+    // RAC emits data-selected on the element; selected bg lives on the highlight layer
     expect(selectedItem).toHaveAttribute("data-selected");
-    expect(selectedItem).toHaveClass("data-[selected]:bg-surface-container-highest");
+    const highlight = selectedItem.querySelector("[data-testid='menuitem-highlight']");
+    expect(highlight).toBeInTheDocument();
+    expect(highlight).toHaveClass("group-data-[selected]/menuitem:bg-surface-container-highest");
   });
 
   test("selected item in vertical standard has tertiary container background", async () => {
@@ -896,7 +901,9 @@ describe("Selection mode", () => {
     await openMenu();
     const selectedItem = screen.getByRole("menuitemradio", { name: "Grid view" });
     expect(selectedItem).toHaveAttribute("data-selected");
-    expect(selectedItem).toHaveClass("data-[selected]:bg-tertiary-container");
+    const highlight = selectedItem.querySelector("[data-testid='menuitem-highlight']");
+    expect(highlight).toBeInTheDocument();
+    expect(highlight).toHaveClass("group-data-[selected]/menuitem:bg-tertiary-container");
   });
 
   test("selected item in vertical vibrant has tertiary background", async () => {
@@ -918,7 +925,9 @@ describe("Selection mode", () => {
     await openMenu();
     const selectedItem = screen.getByRole("menuitemradio", { name: "Grid view" });
     expect(selectedItem).toHaveAttribute("data-selected");
-    expect(selectedItem).toHaveClass("data-[selected]:bg-tertiary");
+    const highlight = selectedItem.querySelector("[data-testid='menuitem-highlight']");
+    expect(highlight).toBeInTheDocument();
+    expect(highlight).toHaveClass("group-data-[selected]/menuitem:bg-tertiary");
   });
 
   test("checkmark appears on selected item when selectionMode is set and no leadingIcon", async () => {
@@ -1291,29 +1300,35 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("text-label-large");
   });
 
-  test("menuItemVariants: baseline includes data-[selected] bg class for surface-container-highest", () => {
-    const cls = menuItemVariants({
-      colorScheme: "standard",
-      menuStyle: "baseline",
-    });
-    expect(cls).toContain("data-[selected]:bg-surface-container-highest");
+  // ── menuItemHighlightVariants ──────────────────────────────────────────────
+
+  test("menuItemHighlightVariants: baseline standard has bg-surface-container-highest selector", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("group-data-[selected]/menuitem:bg-surface-container-highest");
   });
 
-  test("menuItemVariants: vertical standard includes data-[selected] bg class for tertiary-container", () => {
-    const cls = menuItemVariants({
-      colorScheme: "standard",
-      menuStyle: "vertical",
-    });
-    expect(cls).toContain("data-[selected]:bg-tertiary-container");
+  test("menuItemHighlightVariants: baseline uses inset-0 (full-bleed)", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("inset-0");
   });
 
-  test("menuItemVariants: vertical vibrant includes data-[selected] bg class for tertiary", () => {
-    const cls = menuItemVariants({
-      colorScheme: "vibrant",
-      menuStyle: "vertical",
-    });
-    expect(cls).toContain("data-[selected]:bg-tertiary");
+  test("menuItemHighlightVariants: vertical standard has tertiary-container selector", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("group-data-[selected]/menuitem:bg-tertiary-container");
   });
+
+  test("menuItemHighlightVariants: vertical vibrant has tertiary selector", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
+    expect(cls).toContain("group-data-[selected]/menuitem:bg-tertiary");
+  });
+
+  test("menuItemHighlightVariants: vertical uses inset-1 rounded-lg", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("inset-1");
+    expect(cls).toContain("rounded-lg");
+  });
+
+  // ── menuItemStateLayerVariants ────────────────────────────────────────────
 
   test("menuItemStateLayerVariants: standard uses bg-on-surface", () => {
     const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
@@ -1325,6 +1340,17 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("bg-on-tertiary-container");
   });
 
+  test("menuItemStateLayerVariants: baseline uses inset-0", () => {
+    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("inset-0");
+  });
+
+  test("menuItemStateLayerVariants: vertical uses inset-1 rounded-lg", () => {
+    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("inset-1");
+    expect(cls).toContain("rounded-lg");
+  });
+
   test("menuItemStateLayerVariants: includes hover opacity-8 selector", () => {
     const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
     expect(cls).toContain("group-data-[hovered]/menuitem:opacity-8");
@@ -1333,5 +1359,23 @@ describe("CVA variants (unit)", () => {
   test("menuItemStateLayerVariants: includes focus-visible opacity-10 selector", () => {
     const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
     expect(cls).toContain("group-data-[focus-visible]/menuitem:opacity-10");
+  });
+
+  // ── menuPopoverVariants ───────────────────────────────────────────────────
+
+  test("menuPopoverVariants: includes animate-md-scale-in on entering", () => {
+    const cls = menuPopoverVariants();
+    expect(cls).toContain("data-[entering]:animate-md-scale-in");
+  });
+
+  test("menuPopoverVariants: includes animate-md-scale-out on exiting", () => {
+    const cls = menuPopoverVariants();
+    expect(cls).toContain("data-[exiting]:animate-md-scale-out");
+  });
+
+  test("menuPopoverVariants: includes placement-aware origin classes", () => {
+    const cls = menuPopoverVariants();
+    expect(cls).toContain("origin-top");
+    expect(cls).toContain("data-[placement=top]:origin-bottom");
   });
 });
