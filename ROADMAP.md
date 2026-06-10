@@ -4,9 +4,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.15.0 (released 2026-06-10)  
-**Next Release:** v0.16.0  
-**Status:** 29 components published to NPM; 2,071 tests passing
+**Current Version:** v0.16.0 (released 2026-06-10)  
+**Next Release:** v0.17.0  
+**Status:** 29 components published to NPM; 2,097 tests passing
 
 ## Release Timeline
 
@@ -32,6 +32,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.13.0 | —       | DatePicker MD3 expressive refactor — two-axis slot architecture, styled slot injection API, popover anchoring fix, modal/scrim positioning fix            | Released 2026-06-10 |
 | v0.14.0 | —       | TextField MD3 expressive refactor — variants-vs-states architecture, prefix/suffix props, notched outline, state layer; `size` prop removed (breaking)    | Released 2026-06-10 |
 | v0.15.0 | —       | List MD3 expressive refactor — variants-vs-states architecture, state layer, focus ring, spring motion, slot CVAs; per-item `onAction` removed (breaking) | Released 2026-06-10 |
+| v0.16.0 | —       | Progress MD3 expressive refactor — colorful tokens, 4dp gap, wavy shape, thick track, slot-based CVA, spring motion                                       | Released 2026-06-10 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                          | Planned             |
 
 ## Completed Work
@@ -97,7 +98,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
 - [x] CVA variant management with variants-vs-states architecture
-- [x] Vitest + React Testing Library (2,071 tests)
+- [x] Vitest + React Testing Library (2,097 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards
