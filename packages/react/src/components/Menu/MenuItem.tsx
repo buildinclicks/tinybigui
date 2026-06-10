@@ -52,13 +52,21 @@ export function ChevronRightIcon(): JSX.Element {
   );
 }
 
-// ─── Density height map ────────────────────────────────────────────────────────
+// ─── Density height maps ───────────────────────────────────────────────────────
 
-const DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
+const BASELINE_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
   0: "h-12",
   [-1]: "h-11",
   [-2]: "h-10",
   [-3]: "h-9",
+};
+
+// MD3 Expressive vertical: Item = 44dp at density 0
+const VERTICAL_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
+  0: "h-11",
+  [-1]: "h-10",
+  [-2]: "h-9",
+  [-3]: "h-8",
 };
 
 // ─── MenuItem ─────────────────────────────────────────────────────────────────
@@ -103,7 +111,8 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
   const density = ctx?.density ?? 0;
   const selectionMode = ctx?.selectionMode;
 
-  const heightClass = DENSITY_HEIGHT[density];
+  const heightClass =
+    menuStyle === "vertical" ? VERTICAL_DENSITY_HEIGHT[density] : BASELINE_DENSITY_HEIGHT[density];
   const isSelectionMenu = selectionMode != null;
 
   const { ripples, onMouseDown } = useRipple({ disabled: disableRipple });
@@ -157,7 +166,9 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
             <span
               className={cn(
                 "pointer-events-none absolute z-[2] overflow-hidden",
-                menuStyle === "vertical" ? "inset-1 rounded-lg" : "inset-0 rounded-[inherit]"
+                menuStyle === "vertical"
+                  ? "inset-x-1 inset-y-0 rounded-md"
+                  : "inset-0 rounded-[inherit]"
               )}
             >
               {ripples}

@@ -26,8 +26,6 @@ export const menuContainerVariants = cva(
     "shadow-elevation-2",
     // Width constraints: 112dp min / 280dp max per MD3 spec
     "min-w-28 max-w-70",
-    // Layout
-    "py-2",
     // Scroll behaviour
     "overflow-y-auto",
     "max-h-[calc(var(--visual-viewport-height,100vh)-2rem)]",
@@ -39,8 +37,9 @@ export const menuContainerVariants = cva(
   {
     variants: {
       /**
-       * Color scheme — drives the container background (vertical style only).
-       * baseline always uses surface-container regardless of colorScheme.
+       * Color scheme — drives the container background (baseline only).
+       * vertical menus paint each item with the group surface; the container
+       * itself is transparent so the 2dp gap between groups reveals nothing.
        */
       colorScheme: {
         standard: [],
@@ -48,20 +47,16 @@ export const menuContainerVariants = cva(
       },
       /**
        * Visual style — drives corner radius and container background.
+       *
+       * baseline: solid surface-container, 4dp corners, 8dp vertical padding.
+       * vertical: transparent container, 16dp corners, no vertical padding —
+       *   each item owns its group background so gaps appear between them.
        */
       menuStyle: {
-        baseline: ["rounded-xs", "bg-surface-container"],
-        vertical: ["rounded-lg", "bg-surface-container-low"],
+        baseline: ["rounded-xs", "bg-surface-container", "py-2"],
+        vertical: ["rounded-lg", "bg-transparent"],
       },
     },
-    compoundVariants: [
-      // vertical + vibrant → tertiary container background
-      {
-        menuStyle: "vertical",
-        colorScheme: "vibrant",
-        class: ["bg-tertiary-container"],
-      },
-    ],
     defaultVariants: {
       colorScheme: "standard",
       menuStyle: "baseline",
@@ -120,17 +115,20 @@ export const menuPopoverVariants = cva([
  * - The root element sets group/menuitem so all slot children can read state.
  *
  * Typography: Label Large per MD3 menu spec (14sp / 500 weight).
- * Height: 48/44/40/36dp controlled by density via context (not CVA).
- * Padding: 12dp left/right, 12dp gap between elements.
+ * Height: 48/44/40/36dp (baseline/vertical) controlled by density via context.
+ * Padding: baseline 12dp left/right; vertical 16dp left/right (ItemLeadingSpace).
+ * Gap between icon and label: 12dp (ItemBetweenSpace, unchanged).
  *
- * Selected backgrounds per menuStyle × colorScheme:
- *   baseline (any):          data-[selected]:bg-surface-container-highest
- *   vertical + standard:     data-[selected]:bg-tertiary-container
- *   vertical + vibrant:      data-[selected]:bg-tertiary
- *
- * Disabled:
- *   The root itself gets data-[disabled]:pointer-events-none/cursor-not-allowed.
- *   Content (label, icons) are coloured at 38% via per-slot selectors.
+ * Vertical segmented group background strategy:
+ *   The container is transparent for vertical menus. Each item paints its own
+ *   group surface (bg-surface-container-low / bg-tertiary-container), and CSS
+ *   sibling selectors on [data-menu-gap] adjacent items produce the correct
+ *   corner-radius composition:
+ *     leading item (first or after-gap): rounded-t-lg (16dp top) + rounded-b-xs (4dp bottom)
+ *     trailing item (last or before-gap): rounded-t-xs (4dp top) + rounded-b-lg (16dp bottom)
+ *     standalone (first AND last): rounded-lg (all 16dp)
+ *     middle item: rounded-xs (4dp all)
+ *   [data-menu-gap] is set on the MenuGap component so the CSS selectors resolve.
  *
  * @see https://m3.material.io/components/menus/specs
  */
@@ -138,7 +136,7 @@ export const menuItemVariants = cva(
   [
     // Layout — height set by density context in MenuItem component
     "relative flex w-full items-center",
-    "px-3 gap-3",
+    "gap-3",
     // Typography: Label Large per MD3 menu spec
     "text-label-large",
     // Interaction
@@ -159,15 +157,39 @@ export const menuItemVariants = cva(
         vibrant: ["text-on-tertiary-container"],
       },
       /**
-       * Visual style — drives corner radius on items.
-       * Selected background is now handled by menuItemHighlightVariants.
+       * Visual style — drives padding, group background, and corner rounding.
+       *
+       * baseline: 12dp h-padding, no item background (container provides it).
+       * vertical: 16dp h-padding, item owns group surface background, CSS
+       *   sibling selectors on [data-menu-gap] form the rounded group cards.
        */
       menuStyle: {
-        baseline: [],
-        vertical: [],
+        baseline: ["px-3"],
+        vertical: [
+          "px-4",
+          // Group surface — the container is transparent for vertical
+          "bg-surface-container-low",
+          // Segmented corner rounding
+          // Default: inner item (4dp all corners)
+          "rounded-xs",
+          // First item in menu: 16dp top corners
+          "first:rounded-t-lg",
+          // Last item in menu: 16dp bottom corners
+          "last:rounded-b-lg",
+          // Item immediately before a gap: 16dp bottom corners
+          "has-[[data-menu-gap]~&]:rounded-b-lg",
+          // Item immediately after a gap: 16dp top corners
+          "[[data-menu-gap]~&]:rounded-t-lg",
+        ],
       },
     },
     compoundVariants: [
+      // vertical + vibrant: item bg → tertiary-container
+      {
+        menuStyle: "vertical",
+        colorScheme: "vibrant",
+        class: ["bg-tertiary-container"],
+      },
       // vertical + standard: selected text → on-tertiary-container
       {
         menuStyle: "vertical",
@@ -195,13 +217,12 @@ export const menuItemVariants = cva(
  *
  * Geometry is menuStyle-aware:
  *   baseline — `inset-0` (full-bleed, square background; unchanged MD3 look)
- *   vertical — `inset-1 rounded-lg` (inset ~4dp, 16dp corners per MD3 Expressive
- *               spec; creates the pill-shaped highlight visible in the reference)
+ *   vertical — `inset-x-1 inset-y-0 rounded-md` (horizontal-only 4dp inset,
+ *               12dp CornerMedium per MD3 Expressive; selection no longer spans
+ *               full width but does fill item height to avoid vertical gaps)
  *
- * The layer is always present in the DOM (opacity-0 / transparent at rest) and
- * transitions its background-color to the selection color on `data-selected`.
- * This keeps the item hit-target and density height unchanged (they remain on
- * the root `<li>`) while the visual background is confined to the inset shape.
+ * The layer is always present in the DOM and transitions its background-color
+ * to the selection color on `data-selected`.
  *
  * Selection colors per menuStyle × colorScheme:
  *   baseline (any):         group-data-[selected]/menuitem:bg-surface-container-highest
@@ -222,7 +243,8 @@ export const menuItemHighlightVariants = cva(
     variants: {
       menuStyle: {
         baseline: ["inset-0"],
-        vertical: ["inset-1 rounded-lg"],
+        // horizontal-only inset + 12dp corners (CornerMedium = ItemSelectedShape)
+        vertical: ["inset-x-1 inset-y-0 rounded-md"],
       },
       colorScheme: {
         standard: [
@@ -302,8 +324,8 @@ export const menuItemStateLayerVariants = cva(
       menuStyle: {
         // baseline: full-bleed, inherits container corner radius
         baseline: ["inset-0 rounded-[inherit]"],
-        // vertical: inset to match the highlight layer shape
-        vertical: ["inset-1 rounded-lg"],
+        // vertical: horizontal-only inset to match the highlight layer shape
+        vertical: ["inset-x-1 inset-y-0 rounded-md"],
       },
     },
     compoundVariants: [
@@ -341,7 +363,7 @@ export const menuItemStateLayerVariants = cva(
  */
 export const menuItemIconVariants = cva(
   [
-    "relative z-10 flex h-6 w-6 shrink-0 items-center justify-center",
+    "relative z-10 shrink-0 flex items-center justify-center",
     "text-on-surface-variant",
     "transition-colors duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
     // Disabled: 38% opacity on icon color
@@ -356,9 +378,14 @@ export const menuItemIconVariants = cva(
           "text-on-tertiary-container",
         ],
       },
+      /**
+       * Size per menuStyle:
+       *   baseline — 24dp (MD3 baseline spec)
+       *   vertical — 20dp (SegmentedMenuTokens.ItemLeadingIconSize = 20dp)
+       */
       menuStyle: {
-        baseline: [],
-        vertical: [],
+        baseline: ["h-6 w-6"],
+        vertical: ["h-5 w-5"],
       },
     },
     compoundVariants: [
@@ -412,7 +439,7 @@ export const menuSectionHeaderVariants = cva([
  *
  * @see https://m3.material.io/components/menus/specs — Measurements
  */
-export const menuDividerVariants = cva(["border-t border-outline-variant", "my-2 mx-0"]);
+export const menuDividerVariants = cva(["border-t border-outline-variant", "my-0.5 mx-3"]);
 
 // ─── MENU GAP ────────────────────────────────────────────────────────────────
 
@@ -425,7 +452,7 @@ export const menuDividerVariants = cva(["border-t border-outline-variant", "my-2
  *
  * @see https://m3.material.io/components/menus/guidelines#gaps-and-dividers
  */
-export const menuGapVariants = cva(["h-2 w-full"]);
+export const menuGapVariants = cva(["h-0.5 w-full"]);
 
 // ─── MENU ITEM TRAILING TEXT ──────────────────────────────────────────────────
 

@@ -15,6 +15,8 @@ import {
   menuItemVariants,
   menuItemStateLayerVariants,
   menuItemHighlightVariants,
+  menuItemIconVariants,
+  menuGapVariants,
   menuPopoverVariants,
 } from "./Menu.variants";
 
@@ -243,11 +245,12 @@ describe("Menu", () => {
       expect(menu).toHaveClass("bg-surface-container");
     });
 
-    test("vibrant colorScheme applies tertiary container background", async () => {
+    test("vibrant colorScheme on vertical menu: items carry tertiary container background", async () => {
       renderBasicMenu({ colorScheme: "vibrant", menuStyle: "vertical" });
       await openMenu();
-      const menu = screen.getByRole("menu");
-      expect(menu).toHaveClass("bg-tertiary-container");
+      // vertical container is transparent; the item carries bg-tertiary-container
+      const items = screen.getAllByRole("menuitem");
+      expect(items[0]).toHaveClass("bg-tertiary-container");
     });
 
     test("baseline menuStyle uses extra-small corner radius", async () => {
@@ -311,7 +314,7 @@ describe("MenuItem", () => {
       expect(screen.getByTestId("copy-icon")).toBeInTheDocument();
     });
 
-    test("leading icon wrapper has 24dp size constraint", async () => {
+    test("leading icon wrapper has 24dp size constraint (baseline)", async () => {
       render(
         <MenuTrigger>
           <button type="button">Open Menu</button>
@@ -329,6 +332,24 @@ describe("MenuItem", () => {
       expect(wrapper).toHaveClass("h-6");
     });
 
+    test("leading icon wrapper has 20dp size constraint in vertical menu", async () => {
+      render(
+        <MenuTrigger>
+          <button type="button">Open Menu</button>
+          <MenuTrigger.Menu aria-label="Actions" menuStyle="vertical">
+            <MenuItem id="copy" leadingIcon={<CopyIcon />}>
+              Copy
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      );
+      await openMenu();
+      const icon = screen.getByTestId("copy-icon");
+      const wrapper = icon.closest("span");
+      expect(wrapper).toHaveClass("w-5");
+      expect(wrapper).toHaveClass("h-5");
+    });
+
     test("renders trailing icon when provided", async () => {
       render(
         <MenuTrigger>
@@ -344,7 +365,7 @@ describe("MenuItem", () => {
       expect(screen.getByTestId("cut-icon")).toBeInTheDocument();
     });
 
-    test("trailing icon wrapper has 24dp size constraint", async () => {
+    test("trailing icon wrapper has 24dp size constraint (baseline)", async () => {
       render(
         <MenuTrigger>
           <button type="button">Open Menu</button>
@@ -472,28 +493,40 @@ describe("MenuItem", () => {
   });
 
   describe("Density", () => {
-    test("density 0 (default) renders items with h-12 class", async () => {
+    test("density 0 (default) renders baseline items with h-12 class", async () => {
       renderBasicMenu({ density: 0 });
       await openMenu();
       expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-12");
     });
 
-    test("density -1 renders items with h-11 class", async () => {
+    test("density -1 renders baseline items with h-11 class", async () => {
       renderBasicMenu({ density: -1 });
       await openMenu();
       expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-11");
     });
 
-    test("density -2 renders items with h-10 class", async () => {
+    test("density -2 renders baseline items with h-10 class", async () => {
       renderBasicMenu({ density: -2 });
       await openMenu();
       expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-10");
     });
 
-    test("density -3 renders items with h-9 class", async () => {
+    test("density -3 renders baseline items with h-9 class", async () => {
       renderBasicMenu({ density: -3 });
       await openMenu();
       expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-9");
+    });
+
+    test("vertical density 0 renders items with h-11 class (44dp)", async () => {
+      renderBasicMenu({ density: 0, menuStyle: "vertical" });
+      await openMenu();
+      expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-11");
+    });
+
+    test("vertical density -1 renders items with h-10 class", async () => {
+      renderBasicMenu({ density: -1, menuStyle: "vertical" });
+      await openMenu();
+      expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-10");
     });
   });
 
@@ -743,7 +776,7 @@ describe("MenuDivider", () => {
     expect(screen.getByRole("separator", { hidden: true })).toBeInTheDocument();
   });
 
-  test("divider has correct 8dp top/bottom padding (my-2)", async () => {
+  test("divider has correct 2dp top/bottom spacing (my-0.5) and horizontal inset (mx-3)", async () => {
     render(
       <MenuTrigger>
         <button type="button">Open Menu</button>
@@ -756,7 +789,8 @@ describe("MenuDivider", () => {
     );
     await openMenu();
     const divider = screen.getByRole("separator", { hidden: true });
-    expect(divider).toHaveClass("my-2");
+    expect(divider).toHaveClass("my-0.5");
+    expect(divider).toHaveClass("mx-3");
   });
 
   test("accepts custom className", async () => {
@@ -1284,15 +1318,16 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("rounded-xs");
   });
 
-  test("menuContainerVariants: vertical standard has bg-surface-container-low and rounded-lg", () => {
+  test("menuContainerVariants: vertical standard is transparent (bg-transparent) and has rounded-lg", () => {
     const cls = menuContainerVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("bg-surface-container-low");
+    expect(cls).toContain("bg-transparent");
     expect(cls).toContain("rounded-lg");
   });
 
-  test("menuContainerVariants: vertical vibrant has bg-tertiary-container", () => {
+  test("menuContainerVariants: vertical vibrant is transparent (container itself has no bg)", () => {
     const cls = menuContainerVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
-    expect(cls).toContain("bg-tertiary-container");
+    expect(cls).toContain("bg-transparent");
+    expect(cls).not.toContain("bg-tertiary-container");
   });
 
   test("menuItemVariants: uses text-label-large", () => {
@@ -1322,10 +1357,11 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("group-data-[selected]/menuitem:bg-tertiary");
   });
 
-  test("menuItemHighlightVariants: vertical uses inset-1 rounded-lg", () => {
+  test("menuItemHighlightVariants: vertical uses inset-x-1 inset-y-0 rounded-md (horizontal inset, CornerMedium)", () => {
     const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("inset-1");
-    expect(cls).toContain("rounded-lg");
+    expect(cls).toContain("inset-x-1");
+    expect(cls).toContain("inset-y-0");
+    expect(cls).toContain("rounded-md");
   });
 
   // ── menuItemStateLayerVariants ────────────────────────────────────────────
@@ -1345,10 +1381,11 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("inset-0");
   });
 
-  test("menuItemStateLayerVariants: vertical uses inset-1 rounded-lg", () => {
+  test("menuItemStateLayerVariants: vertical uses inset-x-1 inset-y-0 rounded-md (horizontal inset, CornerMedium)", () => {
     const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("inset-1");
-    expect(cls).toContain("rounded-lg");
+    expect(cls).toContain("inset-x-1");
+    expect(cls).toContain("inset-y-0");
+    expect(cls).toContain("rounded-md");
   });
 
   test("menuItemStateLayerVariants: includes hover opacity-8 selector", () => {
@@ -1377,5 +1414,50 @@ describe("CVA variants (unit)", () => {
     const cls = menuPopoverVariants();
     expect(cls).toContain("origin-top");
     expect(cls).toContain("data-[placement=top]:origin-bottom");
+  });
+
+  // ── menuItemVariants — vertical segmented bg + rounding ───────────────────
+
+  test("menuItemVariants: vertical standard has bg-surface-container-low", () => {
+    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("bg-surface-container-low");
+  });
+
+  test("menuItemVariants: vertical vibrant has bg-tertiary-container", () => {
+    const cls = menuItemVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
+    expect(cls).toContain("bg-tertiary-container");
+  });
+
+  test("menuItemVariants: vertical has segmented rounding classes", () => {
+    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("first:rounded-t-lg");
+    expect(cls).toContain("last:rounded-b-lg");
+    expect(cls).toContain("rounded-xs");
+  });
+
+  test("menuItemVariants: vertical uses px-4 (ItemLeadingSpace = 16dp)", () => {
+    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("px-4");
+  });
+
+  // ── menuItemIconVariants — size per menuStyle ─────────────────────────────
+
+  test("menuItemIconVariants: baseline uses h-6 w-6 (24dp)", () => {
+    const cls = menuItemIconVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("h-6");
+    expect(cls).toContain("w-6");
+  });
+
+  test("menuItemIconVariants: vertical uses h-5 w-5 (20dp, ItemLeadingIconSize)", () => {
+    const cls = menuItemIconVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("h-5");
+    expect(cls).toContain("w-5");
+  });
+
+  // ── menuGapVariants ───────────────────────────────────────────────────────
+
+  test("menuGapVariants: height is h-0.5 (2dp, SegmentedMenuTokens.SegmentedGap)", () => {
+    const cls = menuGapVariants();
+    expect(cls).toContain("h-0.5");
   });
 });
