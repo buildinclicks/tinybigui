@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.20.0** (2026-06-10)
+> **Latest Release: v0.21.0** (2026-06-10)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -127,14 +127,14 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 1a: Core Buttons ✅
 
-| Component     | Status | Description                                      |
-| ------------- | ------ | ------------------------------------------------ |
-| `Button`      | ✅     | Filled, outlined, tonal, elevated, text variants |
-| `IconButton`  | ✅     | M3 Expressive 5-tier sizing, toggle mode         |
-| `FAB`         | ✅     | M3 Expressive slot architecture, size scale      |
-| `FABMenu`     | ✅     | Speed-dial with MD3 Expressive pill menu items   |
-| `ButtonGroup` | ✅     | Connected layout, single/multi-select            |
-| `SplitButton` | ✅     | Primary action + dropdown menu                   |
+| Component     | Status | Description                                                                                |
+| ------------- | ------ | ------------------------------------------------------------------------------------------ |
+| `Button`      | ✅     | Filled, outlined, tonal, elevated, text variants                                           |
+| `IconButton`  | ✅     | M3 Expressive 5-tier sizing, toggle mode                                                   |
+| `FAB`         | ✅     | M3 Expressive slot architecture, size scale                                                |
+| `FABMenu`     | ✅     | Speed-dial with MD3 Expressive pill menu items                                             |
+| `ButtonGroup` | ✅     | Connected layout, single/multi-select                                                      |
+| `SplitButton` | ✅     | MD3 expressive variants-vs-states, 5-size scale, elevated variant, spring motion (v0.21.0) |
 
 ### Phase 1b: Form Components ✅
 

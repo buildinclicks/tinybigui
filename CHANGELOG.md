@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **SplitButton** — MD3 expressive variants-vs-states architecture refactor; 5-size scale (`xs`–`xl`); new `elevated` variant; inner-corner shape morphing; per-segment state layers and focus rings; spring motion tokens; CVA export renames (`splitButtonLeadingVariants`, `splitButtonTrailingVariants`)
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.20.0] - 2026-06-10
 
 ### Changed
