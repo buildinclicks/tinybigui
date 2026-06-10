@@ -1,12 +1,20 @@
 "use client";
 
-import { forwardRef, useMemo, useRef } from "react";
+import { forwardRef, useEffect, useMemo, useRef } from "react";
 import type React from "react";
-import { mergeProps, useFocusRing, useSlider, useSliderThumb, VisuallyHidden } from "react-aria";
+import {
+  mergeProps,
+  useFocusRing,
+  useHover,
+  useSlider,
+  useSliderThumb,
+  VisuallyHidden,
+} from "react-aria";
 import { useSliderState } from "react-stately";
 import type { SliderState } from "react-stately";
 import { cn } from "../../utils/cn";
-import type { SliderHeadlessProps } from "./Slider.types";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
+import type { SliderHeadlessProps, SliderThumbRenderState } from "./Slider.types";
 
 // ─── Centered Variant Utilities ───────────────────────────────────────────────
 
@@ -38,10 +46,13 @@ interface SliderThumbInternalProps {
   state: SliderState;
   trackRef: React.RefObject<HTMLDivElement>;
   isDisabled: boolean;
+  orientation: "horizontal" | "vertical";
   formatValue?: (value: number) => string;
   "aria-label"?: string;
   className?: string;
   "data-direction"?: "negative" | "positive" | "zero";
+  renderContent?: (state: SliderThumbRenderState) => React.ReactNode;
+  onDraggingChange?: (isDragging: boolean) => void;
 }
 
 function SliderThumbInternal({
@@ -49,9 +60,12 @@ function SliderThumbInternal({
   state,
   trackRef,
   isDisabled,
+  orientation,
   formatValue,
   className,
   "data-direction": dataDirection,
+  renderContent,
+  onDraggingChange,
   ...ariaProps
 }: SliderThumbInternalProps): React.JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,23 +82,69 @@ function SliderThumbInternal({
   );
 
   const { isFocusVisible, focusProps } = useFocusRing();
+  const { isHovered, hoverProps } = useHover({ isDisabled });
+
+  // Notify parent when dragging state changes so Slider.tsx can suppress
+  // the track flex-basis transition during active drag (matches Switch/Button pattern).
+  useEffect(() => {
+    onDraggingChange?.(isDragging);
+  }, [isDragging, onDraggingChange]);
 
   // Override aria-valuetext with the custom formatter when provided.
   // React Stately v3.7 does not support getValueLabel; we patch the attribute directly.
   const currentValue = state.getThumbValue(index);
   const ariaValueText = formatValue ? formatValue(currentValue) : undefined;
 
+  // Absolute positioning: place the thumb (and its visual content) exactly
+  // at the value's percentage position on the track.
+  // Horizontal: left edge at `pct%`, centered via translate(-50%, -50%)
+  // Vertical:   bottom edge at `pct%`, centered via translate(-50%, 50%)
+  const thumbPercent = state.getThumbPercent(index);
+  const positionStyle: React.CSSProperties =
+    orientation === "horizontal"
+      ? {
+          position: "absolute",
+          left: `${thumbPercent * 100}%`,
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 10,
+        }
+      : {
+          position: "absolute",
+          bottom: `${thumbPercent * 100}%`,
+          left: "50%",
+          transform: "translate(-50%, 50%)",
+          zIndex: 10,
+        };
+
+  const renderState: SliderThumbRenderState = {
+    index,
+    value: currentValue,
+    isDragging,
+    isFocusVisible,
+    isHovered,
+    isDisabled,
+  };
+
   return (
     <div
-      {...thumbProps}
+      {...mergeProps(thumbProps, hoverProps, { style: positionStyle })}
+      data-slot="slider-thumb"
       data-dragging={isDragging || undefined}
       data-focused={isFocused || undefined}
-      data-focus-visible={isFocusVisible || undefined}
-      data-disabled={isDisabled || undefined}
       {...(dataDirection !== undefined ? { "data-direction": dataDirection } : {})}
+      {...getInteractionDataAttributes({
+        isHovered,
+        isFocusVisible,
+        isPressed: isDragging,
+        isDisabled,
+      })}
       className={cn(
+        // Group scope: interaction selectors on children target this element
+        "group/slider-thumb",
+        // Accessibility: remove default outline (custom focus ring via data-[focus-visible])
         "outline-none",
-        // Focus ring visible only on keyboard focus — matches project pattern (md3-design.mdc §Accessibility)
+        // Focus ring visible only on keyboard focus — matches project pattern
         "data-[focus-visible]:ring-3",
         "data-[focus-visible]:ring-secondary",
         "data-[focus-visible]:ring-offset-2",
@@ -98,6 +158,7 @@ function SliderThumbInternal({
           {...(ariaValueText !== undefined ? { "aria-valuetext": ariaValueText } : {})}
         />
       </VisuallyHidden>
+      {renderContent?.(renderState)}
     </div>
   );
 }
@@ -120,6 +181,8 @@ function SliderThumbInternal({
  * - Discrete stepping support
  * - Live value announcements via <output>
  * - data-* attributes for styled layer targeting
+ * - `group/slider-thumb` scope on each thumb for group-data CSS selectors
+ * - `renderThumbContent` render prop for injecting visual content inside RA thumb
  *
  * @example
  * ```tsx
@@ -154,6 +217,8 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
       className,
       style,
       children,
+      renderThumbContent,
+      onThumbDraggingChange,
       ...ariaProps
     } = props;
 
@@ -236,6 +301,10 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
           data-orientation={orientation}
           data-track
           {...(zeroPercent !== undefined ? { "data-zero-percent": zeroPercent } : {})}
+          // `relative` is required so the absolutely-positioned RA thumbs
+          // (which carry all visual content in the new arch) are positioned
+          // relative to this element.
+          className={cn("relative", orientation === "vertical" && "h-full w-full")}
         >
           {children}
           <SliderThumbInternal
@@ -243,9 +312,14 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
             state={state}
             trackRef={trackRef}
             isDisabled={isDisabled}
+            orientation={orientation}
             {...(formatValue !== undefined ? { formatValue } : {})}
             {...(thumb0Label !== undefined ? { "aria-label": thumb0Label } : {})}
             {...(direction !== undefined ? { "data-direction": direction } : {})}
+            {...(renderThumbContent !== undefined ? { renderContent: renderThumbContent } : {})}
+            {...(onThumbDraggingChange !== undefined
+              ? { onDraggingChange: (d) => onThumbDraggingChange(0, d) }
+              : {})}
           />
           {isRange && (
             <SliderThumbInternal
@@ -253,8 +327,13 @@ export const SliderHeadless = forwardRef<HTMLDivElement, SliderHeadlessProps>(
               state={state}
               trackRef={trackRef}
               isDisabled={isDisabled}
+              orientation={orientation}
               {...(formatValue !== undefined ? { formatValue } : {})}
               aria-label={thumbLabels?.[1] ?? "Maximum"}
+              {...(renderThumbContent !== undefined ? { renderContent: renderThumbContent } : {})}
+              {...(onThumbDraggingChange !== undefined
+                ? { onDraggingChange: (d) => onThumbDraggingChange(1, d) }
+                : {})}
             />
           )}
         </div>

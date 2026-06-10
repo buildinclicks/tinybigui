@@ -13,12 +13,6 @@ interface SliderValueIndicatorProps {
    */
   value: number;
   /**
-   * Whether the indicator is currently visible (thumb in Pressed state).
-   * When false the pill is rendered but hidden via `opacity-0 scale-0`.
-   * @default false
-   */
-  isVisible: boolean;
-  /**
    * Optional formatter for the displayed value string.
    * @default (v) => `${Math.round(v)}`
    * @example (v) => `$${v}`
@@ -41,56 +35,46 @@ interface SliderValueIndicatorProps {
  * - Text: `inverse-on-surface`, Label Large typography
  * - Min-width: 48dp, padding 16dp horizontal / 12dp vertical
  * - Positioned absolutely above the thumb; centered horizontally
- * - Visible only during Pressed state; hidden otherwise (`opacity-0 scale-0`)
- * - Transition: spring standard fast effects (MD3 motion §9.3)
+ * - Visible only during Pressed state; CSS-driven via
+ *   `group-data-[pressed]/slider-thumb:opacity-100 scale-100`
  *
- * Rendered as a child of the handle element (which is `position: relative`).
- * The `role="tooltip"` marks it as decorative — accessible value is in the
- * underlying `<input type="range">` managed by React Aria.
+ * Rendered as a child of the RA thumb element (`group/slider-thumb`).
+ * The element is always present in the DOM when `showValueIndicator=true`.
+ * Visibility is driven by `group-data-[pressed]/slider-thumb` CSS selectors
+ * (no JS state required). `aria-hidden="true"` permanently since the accessible
+ * value is in the `<output>` element managed by React Aria.
+ *
+ * **Motion**: MD3 spring standard fast spatial tokens for transform/opacity.
+ *   Suppressed via `useReducedMotion()` for prefers-reduced-motion.
  *
  * @example
  * ```tsx
- * <SliderValueIndicator
- *   value={50}
- *   isVisible={isPressed}
- *   formatValue={(v) => `$${v}`}
- * />
+ * // Inside renderThumbContent — always rendered when showValueIndicator=true
+ * <SliderValueIndicator value={50} formatValue={(v) => `$${v}`} />
  * ```
  */
 export function SliderValueIndicator({
   value,
-  isVisible,
   formatValue,
   className,
 }: SliderValueIndicatorProps): React.JSX.Element {
   const displayValue = formatValue ? formatValue(value) : `${Math.round(value)}`;
   const reducedMotion = useReducedMotion();
 
-  // MD3 Appendix E: Value indicator uses directional legacy easing for enter/exit —
-  // enter (scale in): ease-standard-decelerate + duration-short3 (150ms)
-  // exit  (scale out): ease-standard-accelerate + duration-short2 (100ms)
-  // The -translate-x-1/2 from CVA is inherited as part of the transform; scale is
-  // added via the visible/false variant (scale-100 / scale-0).
-  // When reduced motion is preferred, all transitions are suppressed for instant state change.
+  // MD3 spring system: transform/opacity transition for entry/exit.
+  // Scale (transform) uses spatial spring; opacity is coupled to the same
+  // spring for a single unified animation.
+  // Suppressed entirely when prefers-reduced-motion is active.
   const transitionClasses = reducedMotion
     ? ""
-    : cn(
-        "transition-[transform,opacity]",
-        isVisible
-          ? "duration-short3 ease-standard-decelerate"
-          : "duration-short2 ease-standard-accelerate"
-      );
+    : "transition-[transform,opacity] duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial";
 
   return (
     <div
       data-slot="value-indicator"
-      className={cn(
-        sliderValueIndicatorVariants({ visible: isVisible }),
-        transitionClasses,
-        className
-      )}
+      className={cn(sliderValueIndicatorVariants(), transitionClasses, className)}
       role="tooltip"
-      aria-hidden={!isVisible}
+      aria-hidden="true"
     >
       <span className={sliderValueIndicatorTextVariants()}>{displayValue}</span>
     </div>

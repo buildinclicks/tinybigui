@@ -32,6 +32,7 @@ export type {
   SliderHeadlessProps,
   SliderThumbProps,
   SliderProps,
+  SliderThumbRenderState,
   SliderThumbState,
   SliderRenderState,
   SliderRangeThumbLabels,
