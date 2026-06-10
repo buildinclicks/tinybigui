@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Slider** — MD3 expressive variants-vs-states architecture refactor; spring motion tokens; absolute track positioning for range/vertical alignment; vertical handle per-size widths; `renderThumbContent` and `onThumbDraggingChange` on `SliderHeadless`; value indicator CSS-driven visibility with Tailwind v4 `scale` transitions
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.18.0] - 2026-06-10
 
 ### Changed

@@ -56,6 +56,29 @@ export type SliderOrientation = "horizontal" | "vertical";
  */
 export type SliderRangeThumbLabels = [string, string];
 
+// ─── SliderThumbRenderState ───────────────────────────────────────────────────
+
+/**
+ * Render state provided to `renderThumbContent` for each thumb slot.
+ *
+ * The styled layer (`Slider`) uses this to render the visual handle,
+ * state layer, and value indicator inside the React Aria thumb element.
+ */
+export interface SliderThumbRenderState {
+  /** Zero-based index of this thumb (0 for single-thumb, 0 or 1 for range). */
+  index: number;
+  /** Current numeric value of this thumb (from React Stately state). */
+  value: number;
+  /** Whether this thumb is currently being dragged (pointer down). */
+  isDragging: boolean;
+  /** Whether keyboard focus ring is visible on this thumb. */
+  isFocusVisible: boolean;
+  /** Whether pointer is hovering over this thumb. */
+  isHovered: boolean;
+  /** Whether the slider is disabled. */
+  isDisabled: boolean;
+}
+
 // ─── SliderHeadlessProps ──────────────────────────────────────────────────────
 
 /**
@@ -176,10 +199,36 @@ export interface SliderHeadlessProps {
   isDisabled?: boolean;
 
   /**
-   * Content (children) rendered inside the slider container.
-   * Used by the styled layer to inject track, handle, stops, etc.
+   * Content (children) rendered inside the slider track element.
+   * Used by the styled layer to inject track layout.
    */
   children?: React.ReactNode;
+
+  /**
+   * CSS classes applied to the `data-track` region element.
+   * The styled layer uses this to carry the size-based height/width and
+   * `touch-none` on the element React Aria measures for pointer math.
+   * When omitted, the track region defaults to `relative w-full`.
+   */
+  trackClassName?: string;
+
+  /**
+   * Render prop called for each thumb to produce visual thumb content
+   * (handle, state layer, value indicator). Receives the thumb's current
+   * render state. When provided, visual content is rendered inside the
+   * React Aria thumb element (which is absolutely positioned at the value %).
+   *
+   * Used by the styled `Slider` layer; advanced users of `SliderHeadless`
+   * may supply custom thumb visuals.
+   */
+  renderThumbContent?: (state: SliderThumbRenderState) => React.ReactNode;
+
+  /**
+   * Called when any thumb's dragging state changes.
+   * Receives the thumb index and a boolean indicating whether it is dragging.
+   * Used by the styled layer to suppress track animation during pointer drag.
+   */
+  onThumbDraggingChange?: (index: number, isDragging: boolean) => void;
 
   /**
    * Additional CSS classes applied to the slider root element.
@@ -286,7 +335,10 @@ export interface SliderThumbProps {
  * />
  * ```
  */
-export interface SliderProps extends Omit<SliderHeadlessProps, "children"> {
+export interface SliderProps extends Omit<
+  SliderHeadlessProps,
+  "children" | "renderThumbContent" | "onThumbDraggingChange"
+> {
   /**
    * MD3 Expressive size preset.
    * Controls track height, handle height, corner radius, and icon size.
@@ -320,11 +372,15 @@ export interface SliderProps extends Omit<SliderHeadlessProps, "children"> {
   className?: string;
 }
 
-// ─── Internal State Types ─────────────────────────────────────────────────────
+// ─── Internal State Types (kept for public API compatibility) ─────────────────
 
 /**
  * Interactive state of a slider thumb.
- * Used internally by the styled layer for state-dependent styling.
+ *
+ * @deprecated The styled Slider now drives interaction states via React Aria
+ *   hooks + `data-*` attributes (group-data-[x]/slider-thumb selectors) instead
+ *   of a manual state machine. This type is retained only for backwards
+ *   compatibility with existing usages of `SliderHeadlessProps`.
  *
  * @internal
  */
@@ -332,6 +388,10 @@ export type SliderThumbState = "enabled" | "hovered" | "pressed" | "disabled";
 
 /**
  * Render state passed to internal sub-components for conditional styling.
+ *
+ * @deprecated The styled Slider now uses `SliderThumbRenderState` (per-thumb
+ *   render state) provided by the `renderThumbContent` render prop. This type
+ *   is retained only for backwards compatibility.
  *
  * @internal
  */

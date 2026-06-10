@@ -368,7 +368,80 @@ export const VerticalOrientation: Story = {
   },
 };
 
-// ─── 10. Disabled State ───────────────────────────────────────────────────────
+// ─── 10. Vertical Centered ────────────────────────────────────────────────────
+
+/**
+ * Centered variant in vertical orientation.
+ * Fill grows from the zero-point outward — up for positive values, down for negative.
+ * Demonstrates standard and centered side-by-side for visual comparison.
+ */
+export const VerticalCentered: Story = {
+  render: function VerticalCenteredRender() {
+    return (
+      <div className="flex h-[300px] items-end gap-8">
+        <div className="flex h-full flex-col items-center gap-2">
+          <span className="text-label-small text-on-surface-variant">Std</span>
+          <Slider
+            label="Volume"
+            defaultValue={[65]}
+            orientation="vertical"
+            size="small"
+            showValueIndicator
+          />
+        </div>
+        <div className="flex h-full flex-col items-center gap-2">
+          <span className="text-label-small text-on-surface-variant">+</span>
+          <Slider
+            variant="centered"
+            label="Treble"
+            defaultValue={[30]}
+            minValue={-50}
+            maxValue={50}
+            orientation="vertical"
+            size="small"
+            showValueIndicator
+          />
+        </div>
+        <div className="flex h-full flex-col items-center gap-2">
+          <span className="text-label-small text-on-surface-variant">−</span>
+          <Slider
+            variant="centered"
+            label="Bass"
+            defaultValue={[-20]}
+            minValue={-50}
+            maxValue={50}
+            orientation="vertical"
+            size="small"
+            showValueIndicator
+          />
+        </div>
+        <div className="flex h-full flex-col items-center gap-2">
+          <span className="text-label-small text-on-surface-variant">0</span>
+          <Slider
+            variant="centered"
+            label="Balance"
+            defaultValue={[0]}
+            minValue={-50}
+            maxValue={50}
+            orientation="vertical"
+            size="small"
+            showValueIndicator
+          />
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Centered variant in vertical orientation — fill extends from the zero midpoint toward the handle. Positive values fill upward, negative values fill downward. At value 0 the active track collapses to nothing.",
+      },
+    },
+  },
+};
+
+// ─── 11. Disabled State ───────────────────────────────────────────────────────
 
 /**
  * All three variants in disabled state. Disabled color treatment: active track
@@ -410,7 +483,7 @@ export const DisabledState: Story = {
   },
 };
 
-// ─── 11. Controlled ───────────────────────────────────────────────────────────
+// ─── 12. Controlled ───────────────────────────────────────────────────────────
 
 /**
  * Controlled slider with external state management. The current value is
@@ -461,7 +534,7 @@ export const Controlled: Story = {
   },
 };
 
-// ─── 12. Range With Custom Labels ─────────────────────────────────────────────
+// ─── 13. Range With Custom Labels ─────────────────────────────────────────────
 
 /**
  * Range slider with custom `thumbLabels` for accessible screen-reader
@@ -490,7 +563,7 @@ export const RangeWithCustomLabels: Story = {
   },
 };
 
-// ─── 13. All Variants Comparison ──────────────────────────────────────────────
+// ─── 14. All Variants Comparison ──────────────────────────────────────────────
 
 /**
  * Side-by-side comparison of all three variants at the same Small size,
@@ -544,7 +617,7 @@ export const AllVariantsComparison: Story = {
   },
 };
 
-// ─── 14. Sizes With Icon ──────────────────────────────────────────────────────
+// ─── 15. Sizes With Icon ──────────────────────────────────────────────────────
 
 /**
  * Medium, Large, and XLarge sizes with an inset brightness icon. The icon
@@ -585,7 +658,7 @@ export const SizesWithIcon: Story = {
   },
 };
 
-// ─── 15. Vertical Sizes ───────────────────────────────────────────────────────
+// ─── 16. Vertical Sizes ───────────────────────────────────────────────────────
 
 /**
  * All five sizes in vertical orientation for visual comparison.
