@@ -14,14 +14,48 @@ function isWeekend(date: DateValue): boolean {
   return day === 0 || day === 6;
 }
 
+/**
+ * Prevents overlay/popover stories from rendering inline on the autodocs page.
+ * Without this, stories that open modals or popovers stack fixed-position layers
+ * and break the docs layout.
+ */
+const docsCanvasOnly = {
+  story: {
+    inline: false,
+    iframeHeight: 720,
+  },
+} as const;
+
+/**
+ * Docs iframe sizing for docked stories that open the calendar by default.
+ * Needs extra height so the portaled popover is not clipped by the iframe viewport.
+ */
+const docsDockedOpen = {
+  story: {
+    inline: false,
+    iframeHeight: 720,
+  },
+} as const;
+
+/**
+ * Top-aligns docked pickers and reserves vertical space for the portaled calendar
+ * popover (opens below the field by default).
+ */
+const dockedStoryLayout = (Story: () => JSX.Element): JSX.Element => (
+  <div className="flex min-h-[600px] w-full items-start justify-center pt-8">
+    <Story />
+  </div>
+);
+
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta: Meta<typeof DatePicker> = {
   title: "Components/DatePicker",
   component: DatePicker,
   tags: ["autodocs"],
+  decorators: [dockedStoryLayout],
   parameters: {
-    layout: "centered",
+    layout: "padded",
     docs: {
       description: {
         component:
@@ -82,6 +116,7 @@ export const DockedOpen: Story = {
   },
   parameters: {
     docs: {
+      ...docsDockedOpen,
       description: {
         story:
           "Docked variant with the popover calendar open by default. Shows the August 2025 calendar grid with the 17th pre-selected.",
@@ -111,7 +146,7 @@ export const DockedWithSelectedDate: Story = {
 // ─── 4. Modal Single Date ─────────────────────────────────────────────────────
 
 const ModalSingleDateDemo = (): JSX.Element => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [date, setDate] = useState<DateValue | null>(null);
 
   return (
@@ -143,6 +178,7 @@ export const ModalSingleDate: Story = {
   render: () => <ModalSingleDateDemo />,
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           "Modal variant for single date selection. Opens as a full overlay dialog with calendar grid, navigation, and Cancel/OK action buttons.",
@@ -154,7 +190,7 @@ export const ModalSingleDate: Story = {
 // ─── 5. Modal Date Range ──────────────────────────────────────────────────────
 
 const ModalDateRangeDemo = (): JSX.Element => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [range, setRange] = useState<{
     start: DateValue;
     end: DateValue;
@@ -198,6 +234,7 @@ export const ModalDateRange: Story = {
   },
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           "Modal date picker in range selection mode. Select a start and end date — the in-between dates are highlighted with bg-secondary-container. Default range: Sep 10–17, 2025.",
@@ -209,7 +246,7 @@ export const ModalDateRange: Story = {
 // ─── 6. Modal Input Single ────────────────────────────────────────────────────
 
 const ModalInputSingleDemo = (): JSX.Element => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [date, setDate] = useState<DateValue | null>(null);
 
   return (
@@ -241,6 +278,7 @@ export const ModalInputSingle: Story = {
   render: () => <ModalInputSingleDemo />,
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           "Modal input variant for single date entry via keyboard. Shows outlined text field with mm/dd/yyyy segments and inline validation.",
@@ -252,7 +290,7 @@ export const ModalInputSingle: Story = {
 // ─── 7. Modal Input Range ─────────────────────────────────────────────────────
 
 const ModalInputRangeDemo = (): JSX.Element => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex flex-col items-center gap-4 p-8">
@@ -282,6 +320,7 @@ export const ModalInputRange: Story = {
   render: () => <ModalInputRangeDemo />,
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           'Modal input variant for date range entry. Renders two outlined text fields — "Start date" and "End date" — with cross-field validation ensuring end date is after start date.',
@@ -303,6 +342,7 @@ export const WithMinMaxConstraints: Story = {
   },
   parameters: {
     docs: {
+      ...docsDockedOpen,
       description: {
         story:
           'Docked date picker constrained to October 2025 only. Dates outside the 1st–31st range are disabled with aria-disabled="true" and reduced opacity (38%).',
@@ -323,6 +363,7 @@ export const WithUnavailableDates: Story = {
   },
   parameters: {
     docs: {
+      ...docsDockedOpen,
       description: {
         story:
           "Docked date picker with weekends disabled via the isDateUnavailable callback. Saturday and Sunday cells are aria-disabled and cannot be selected.",
@@ -388,15 +429,34 @@ export const Controlled: Story = {
 
 // ─── 11. Year Selection View ──────────────────────────────────────────────────
 
+const YearSelectionViewDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="flex flex-col items-center gap-4 p-8">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-3"
+      >
+        Open year selection
+      </button>
+      <DatePicker
+        variant="modal"
+        isOpen={open}
+        onOpenChange={setOpen}
+        aria-label="Select year"
+        defaultValue={new CalendarDate(2025, 8, 17)}
+      />
+    </div>
+  );
+};
+
 export const YearSelectionView: Story = {
-  args: {
-    variant: "modal",
-    isOpen: true,
-    "aria-label": "Select year",
-    defaultValue: new CalendarDate(2025, 8, 17),
-  },
+  render: () => <YearSelectionViewDemo />,
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           "Modal date picker — click the month/year label in the header to switch to the year selection grid. Each year item is 88×52dp with bg-primary when selected.",
@@ -407,15 +467,34 @@ export const YearSelectionView: Story = {
 
 // ─── 12. Month Selection View ─────────────────────────────────────────────────
 
+const MonthSelectionViewDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="flex flex-col items-center gap-4 p-8">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-3"
+      >
+        Open month selection
+      </button>
+      <DatePicker
+        variant="modal"
+        isOpen={open}
+        onOpenChange={setOpen}
+        aria-label="Select month"
+        defaultValue={new CalendarDate(2025, 8, 17)}
+      />
+    </div>
+  );
+};
+
 export const MonthSelectionView: Story = {
-  args: {
-    variant: "modal",
-    isOpen: true,
-    "aria-label": "Select month",
-    defaultValue: new CalendarDate(2025, 8, 17),
-  },
+  render: () => <MonthSelectionViewDemo />,
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           "Modal date picker — click the dropdown arrow next to the month/year label to access month navigation. Use Previous/Next month buttons for sequential navigation.",
@@ -538,19 +617,38 @@ export const AllVariantsComparison: Story = {
 
 // ─── 15. Custom Labels ────────────────────────────────────────────────────────
 
+const CustomLabelsDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="flex flex-col items-center gap-4 p-8">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="bg-primary text-on-primary text-label-large rounded-full px-6 py-3"
+      >
+        Open custom labels modal
+      </button>
+      <DatePicker
+        variant="modal"
+        isOpen={open}
+        onOpenChange={setOpen}
+        headline="Pick a departure date"
+        supportingText="Choose a date for your flight"
+        cancelLabel="Go back"
+        confirmLabel="Confirm departure"
+        aria-label="Departure date"
+        defaultValue={new CalendarDate(2025, 11, 28)}
+      />
+    </div>
+  );
+};
+
 export const CustomLabels: Story = {
-  args: {
-    variant: "modal",
-    isOpen: true,
-    headline: "Pick a departure date",
-    supportingText: "Choose a date for your flight",
-    cancelLabel: "Go back",
-    confirmLabel: "Confirm departure",
-    "aria-label": "Departure date",
-    defaultValue: new CalendarDate(2025, 11, 28),
-  },
+  render: () => <CustomLabelsDemo />,
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           "Modal date picker with custom headline, supporting text, and action button labels. Demonstrates l10n-ready label customization for airline booking flows.",
@@ -611,7 +709,7 @@ export const FormIntegration: Story = {
 // ─── 17. With Clear Button ────────────────────────────────────────────────────
 
 const WithClearButtonDemo = (): JSX.Element => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [date, setDate] = useState<DateValue | null>(new CalendarDate(2025, 8, 17));
 
   return (
@@ -646,6 +744,7 @@ export const WithClearButton: Story = {
   render: () => <WithClearButtonDemo />,
   parameters: {
     docs: {
+      ...docsCanvasOnly,
       description: {
         story:
           "Modal date picker with the Clear button enabled via showClear. Pressing Clear resets the selection to null without closing the dialog.",

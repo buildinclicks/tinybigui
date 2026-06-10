@@ -1,3 +1,4 @@
+import type React from "react";
 import type { CalendarDate, DateValue } from "@internationalized/date";
 
 // ─── Date Picker Variant ─────────────────────────────────────────────────────
@@ -42,9 +43,10 @@ export type CalendarView = "day" | "month" | "year";
 // ─── Calendar Cell State ─────────────────────────────────────────────────────
 
 /**
- * Visual state of a calendar date cell.
- *
- * @internal
+ * Semantic state of a calendar date cell.
+ * Used to describe which visual treatment applies; the actual styling is driven
+ * by presence-based `data-*` attributes on the cell element, not by this type
+ * as a CVA variant key.
  */
 export type CalendarCellType =
   | "default"
@@ -330,11 +332,6 @@ export interface CalendarCellProps {
   date: DateValue;
 
   /**
-   * Visual type of the cell.
-   */
-  cellType?: CalendarCellType;
-
-  /**
    * Whether this cell is outside the currently displayed month.
    */
   isOutsideMonth?: boolean;
@@ -391,6 +388,25 @@ export interface DateFieldProps {
   granularity?: "day" | "month" | "year";
   /** Additional CSS classes */
   className?: string;
+}
+
+// ─── Slot imports (forward-declared to avoid circular deps) ─────────────────
+
+// These are imported by value in the actual slot files; here we only need the type.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type AnyComponent = React.ComponentType<any>;
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+/**
+ * Slots for injecting styled sub-components into CalendarCore.
+ * Mirrors CalendarSlots from CalendarCore — duplicated here to avoid circular imports.
+ */
+export interface DatePickerCalendarSlots {
+  CellComponent?: AnyComponent;
+  NavButtonComponent?: AnyComponent;
+  TitleComponent?: AnyComponent;
+  YearItemComponent?: AnyComponent;
+  WeekdayComponent?: AnyComponent;
 }
 
 // ─── Date Picker Docked Props ────────────────────────────────────────────────
@@ -452,8 +468,23 @@ export interface DatePickerDockedProps {
   onCancel?: () => void;
   /** Called when the confirm button is pressed */
   onConfirm?: (value: DateValue | null) => void;
-  /** Additional CSS classes */
+  /** Additional CSS classes on the root wrapper */
   className?: string;
+  /**
+   * CSS classes applied to the portaled calendar popover panel.
+   * Used by the styled layer to inject popover surface + calendar layout styles.
+   */
+  popoverClassName?: string;
+  /**
+   * Calendar slot component overrides (cells, nav buttons, year items, etc.).
+   * Used by the styled layer to inject CVA + state-layer components.
+   */
+  slots?: DatePickerCalendarSlots;
+  /**
+   * Slot component for action buttons (Cancel / OK).
+   * Used by the styled layer to inject CVA + state-layer styled buttons.
+   */
+  ActionButtonComponent?: AnyComponent;
 }
 
 // ─── Date Picker Modal Props ─────────────────────────────────────────────────
@@ -529,6 +560,15 @@ export interface DatePickerModalProps {
   onClear?: () => void;
   /** Additional CSS classes */
   className?: string;
+  /**
+   * CSS classes applied directly to the `[data-scrim]` overlay element.
+   * Used by the styled layer to inject scrim surface styles.
+   */
+  scrimClassName?: string;
+  /** Calendar slot component overrides. */
+  slots?: DatePickerCalendarSlots;
+  /** Slot component for action buttons. */
+  ActionButtonComponent?: AnyComponent;
 }
 
 // ─── Date Picker Modal Header Props ──────────────────────────────────────────
@@ -764,4 +804,11 @@ export interface DatePickerModalInputProps {
   onModeToggle?: () => void;
   /** Additional CSS classes */
   className?: string;
+  /**
+   * CSS classes applied directly to the `[data-scrim]` overlay element.
+   * Used by the styled layer to inject scrim surface styles.
+   */
+  scrimClassName?: string;
+  /** Slot component for action buttons. */
+  ActionButtonComponent?: AnyComponent;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { mergeProps, useCalendarCell, useFocusRing } from "react-aria";
+import { mergeProps, useCalendarCell, useFocusRing, useHover, usePress } from "react-aria";
 import { isSameDay, today, getLocalTimeZone } from "@internationalized/date";
 
 import type { CalendarDate } from "@internationalized/date";
@@ -16,6 +16,10 @@ interface CalendarCellInternalProps {
   date: CalendarDate;
   /** Calendar state from React Aria / React Stately */
   state: CalendarState | RangeCalendarState;
+  /** Optional CSS class applied to the inner button div */
+  className?: string;
+  /** Optional children rendered inside the cell (e.g. state layer, focus ring) */
+  children?: React.ReactNode;
 }
 
 /**
@@ -24,27 +28,38 @@ interface CalendarCellInternalProps {
  * Renders a single date cell within the calendar grid using React Aria's
  * `useCalendarCell` for accessibility and keyboard interaction.
  *
- * Exposes data attributes for the styled layer:
- * - `data-selected` — date is selected
- * - `data-today` — date is today
+ * Emits presence-based data attributes consumed by the styled layer:
+ * - `data-selected`     — date is selected
+ * - `data-today`        — date is today
  * - `data-outside-month` — date is from an adjacent month
- * - `data-range-start` — date is the start of a selected range
- * - `data-range-end` — date is the end of a selected range
+ * - `data-range-start`  — date is the start of a selected range
+ * - `data-range-end`    — date is the end of a selected range
  * - `data-range-middle` — date is between range start and end
- * - `data-disabled` — date is disabled
- * - `data-unavailable` — date is unavailable
- * - `data-focused` — date is focused
- * - `data-focus-visible` — date has visible focus ring
+ * - `data-disabled`     — date is disabled
+ * - `data-unavailable`  — date is unavailable
+ * - `data-focus-visible` — keyboard focus ring should be shown
+ * - `data-hovered`      — pointer is over the cell
+ * - `data-pressed`      — cell is being pressed
+ *
+ * Accepts `className` and `children` for the styled layer to inject
+ * CVA classes and state-layer / focus-ring overlay elements.
  *
  * @internal
  */
-export function CalendarCell({ date, state }: CalendarCellInternalProps): JSX.Element {
+export function CalendarCell({
+  date,
+  state,
+  className,
+  children,
+}: CalendarCellInternalProps): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
 
   const { cellProps, buttonProps, isSelected, isDisabled, isUnavailable, formattedDate } =
     useCalendarCell({ date }, state, ref);
 
-  const { focusProps, isFocusVisible, isFocused } = useFocusRing();
+  const { focusProps, isFocusVisible } = useFocusRing();
+  const { hoverProps, isHovered } = useHover({ isDisabled: isDisabled || isUnavailable });
+  const { pressProps, isPressed } = usePress({ isDisabled: isDisabled || isUnavailable });
 
   const isCurrentDay = isSameDay(date, today(getLocalTimeZone()));
   const isOutsideMonth =
@@ -64,21 +79,26 @@ export function CalendarCell({ date, state }: CalendarCellInternalProps): JSX.El
   return (
     <td {...cellProps}>
       <div
-        {...mergeProps(buttonProps, focusProps)}
+        {...mergeProps(buttonProps, focusProps, hoverProps, pressProps)}
         ref={ref}
+        className={className}
         aria-current={isCurrentDay ? ("date" as const) : undefined}
-        data-selected={isSelected || undefined}
-        data-today={isCurrentDay || undefined}
-        data-outside-month={isOutsideMonth || undefined}
-        data-range-start={isRangeStart || undefined}
-        data-range-end={isRangeEnd || undefined}
-        data-range-middle={isRangeMiddle || undefined}
-        data-disabled={isDisabled || undefined}
-        data-unavailable={isUnavailable || undefined}
-        data-focused={isFocused || undefined}
-        data-focus-visible={isFocusVisible || undefined}
+        data-selected={isSelected ? "" : undefined}
+        data-today={isCurrentDay ? "" : undefined}
+        data-outside-month={isOutsideMonth ? "" : undefined}
+        data-range-start={isRangeStart ? "" : undefined}
+        data-range-end={isRangeEnd ? "" : undefined}
+        data-range-middle={isRangeMiddle ? "" : undefined}
+        data-disabled={isDisabled ? "" : undefined}
+        data-unavailable={isUnavailable ? "" : undefined}
+        data-focus-visible={isFocusVisible ? "" : undefined}
+        data-hovered={isHovered ? "" : undefined}
+        data-pressed={isPressed ? "" : undefined}
       >
-        {formattedDate}
+        {/* Always render the date text so it's visible in both headless and styled usage */}
+        <span className="pointer-events-none relative z-10">{formattedDate}</span>
+        {/* Overlay slots (state layer, focus ring) — only rendered when children provided */}
+        {children}
       </div>
     </td>
   );

@@ -8,29 +8,76 @@ export { DatePickerModalInput } from "./DatePickerModalInput";
 export { CalendarCore } from "./CalendarCore";
 export { DateField } from "./DateField";
 
-// CVA Variants
+// Layer 3 — Styled Slot Components (injectable into headless layer)
+export { StyledCalendarCell } from "./StyledCalendarCell";
+export { StyledNavButton, StyledCalendarTitle } from "./StyledCalendarHeader";
+export { StyledYearItem } from "./StyledYearItem";
+export { StyledWeekday } from "./StyledWeekday";
+export { StyledActionButton } from "./StyledActionButton";
+
+// CVA Variants — two-axis slot model (structure only; no interaction state variants)
 export {
+  // Container
   datePickerContainerVariants,
+  // Calendar cell slots
   calendarCellVariants,
-  datePickerHeaderVariants,
-  datePickerNavVariants,
+  calendarCellStateLayerVariants,
+  calendarCellFocusRingVariants,
+  // Calendar header
+  calendarHeaderVariants,
+  // Nav button slots
+  navButtonVariants,
+  navButtonStateLayerVariants,
+  navButtonFocusRingVariants,
+  // Calendar title slots
+  calendarTitleVariants,
+  calendarTitleTextVariants,
+  calendarTitleIconVariants,
+  calendarTitleStateLayerVariants,
+  // Year grid
+  yearGridVariants,
+  // Year item slots
   yearItemVariants,
-  datePickerDividerVariants,
-  datePickerActionVariants,
-  datePickerActionButtonVariants,
-  datePickerWeekdayVariants,
-  datePickerRangeIndicatorVariants,
-  datePickerHeadlineVariants,
-  datePickerSupportingTextVariants,
-  datePickerScrimVariants,
+  yearItemStateLayerVariants,
+  yearItemFocusRingVariants,
+  // Weekday labels
+  weekdayVariants,
+  // Calendar divider (named calendarDividerVariants to avoid conflict with Divider component)
+  calendarDividerVariants,
+  // Action row + button slots
+  actionRowVariants,
+  actionButtonVariants,
+  actionButtonStateLayerVariants,
+  actionButtonFocusRingVariants,
+  // Modal structure
+  modalDialogVariants,
+  modalHeaderVariants,
+  headlineVariants,
+  supportingTextVariants,
+  modeToggleVariants,
+  modeToggleStateLayerVariants,
+  scrimVariants,
+  // Date input field (modal-input)
+  dateInputFieldVariants,
+  dateInputFieldGroupVariants,
+  dateInputLabelVariants,
+  dateInputErrorVariants,
+  // Docked primitives
+  dockedFieldGroupVariants,
+  dockedTriggerVariants,
+  dockedTriggerStateLayerVariants,
+  dockedLabelVariants,
+  dateFieldVariants,
+  dateSegmentPlaceholderVariants,
+  popoverVariants,
 } from "./DatePicker.variants";
 
 // Types
 export type {
+  CalendarCellType,
   DatePickerVariant,
   DateSelectionMode,
   CalendarView,
-  CalendarCellType,
   DatePickerHeadlessProps,
   DatePickerProps,
   CalendarGridProps,
@@ -44,21 +91,55 @@ export type {
   RangeCalendarProps,
   DateInputFieldProps,
   DatePickerModalHeaderProps,
+  DatePickerCalendarSlots,
 } from "./DatePicker.types";
 
 // CVA Variant Types
 export type {
   DatePickerContainerVariants,
   CalendarCellVariants,
-  DatePickerHeaderVariants,
-  DatePickerNavVariants,
+  CalendarCellStateLayerVariants,
+  CalendarCellFocusRingVariants,
+  CalendarHeaderVariants,
+  NavButtonVariants,
+  NavButtonStateLayerVariants,
+  NavButtonFocusRingVariants,
+  CalendarTitleVariants,
+  CalendarTitleTextVariants,
+  CalendarTitleIconVariants,
+  CalendarTitleStateLayerVariants,
+  YearGridVariants,
   YearItemVariants,
-  DatePickerDividerVariants,
-  DatePickerActionVariants,
-  DatePickerActionButtonVariants,
-  DatePickerWeekdayVariants,
-  DatePickerRangeIndicatorVariants,
-  DatePickerHeadlineVariants,
-  DatePickerSupportingTextVariants,
-  DatePickerScrimVariants,
+  YearItemStateLayerVariants,
+  YearItemFocusRingVariants,
+  WeekdayVariants,
+  CalendarDividerVariants,
+  ActionRowVariants,
+  ActionButtonVariants,
+  ActionButtonStateLayerVariants,
+  ActionButtonFocusRingVariants,
+  ModalDialogVariants,
+  ModalHeaderVariants,
+  HeadlineVariants,
+  SupportingTextVariants,
+  ModeToggleVariants,
+  ModeToggleStateLayerVariants,
+  ScrimVariants,
+  DateInputFieldVariants,
+  DateInputFieldGroupVariants,
+  DateInputLabelVariants,
+  DateInputErrorVariants,
+  DockedFieldGroupVariants,
+  DockedTriggerVariants,
+  DockedTriggerStateLayerVariants,
+  DockedLabelVariants,
+  DateFieldVariants,
+  DateSegmentPlaceholderVariants,
+  PopoverVariants,
 } from "./DatePicker.variants";
+
+// CalendarCore slot types
+export type { CalendarSlots, CalendarCoreProps, YearItemComponentProps } from "./CalendarCore";
+export type { CalendarCellComponentProps } from "./CalendarGrid";
+export type { NavButtonComponentProps, TitleComponentProps } from "./CalendarHeader";
+export type { ActionButtonSlotProps } from "./DatePickerActions";
