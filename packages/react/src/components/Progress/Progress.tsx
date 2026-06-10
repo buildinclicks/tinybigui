@@ -26,6 +26,7 @@ function useReducedMotion(): boolean {
 
   return reduced;
 }
+
 import {
   progressContainerVariants,
   progressTrackVariants,
@@ -57,10 +58,29 @@ const CIRCULAR_SIZE_PX: Record<"small" | "medium" | "large", number> = {
 };
 
 /** MD3 Expressive wavy defaults */
-const WAVE_AMPLITUDE_DEFAULT = 3; // px — visible wave height
-const WAVE_AMPLITUDE_THICK = 5; // px — scaled for thick track
-const WAVE_WAVELENGTH_LINEAR = 40; // px — one full wave
-const WAVE_WAVELENGTH_CIRCULAR = 30; // px — tighter curve for circular
+const WAVE_AMPLITUDE_DEFAULT = 3; // px amplitude (half-height of wave)
+const WAVE_AMPLITUDE_THICK = 5; // px amplitude for thick track
+
+/**
+ * Number of complete wave cycles drawn across the full bar width.
+ * Uses a fixed count (not a fixed wavelength) so the wave never extends
+ * beyond the viewBox — the wave density adapts to the rendered bar width.
+ * 14 cycles ≈ 40px wavelength at a typical 600px bar.
+ */
+const LINEAR_WAVE_COUNT = 14;
+
+/**
+ * SVG viewBox width for linear wavy renderers.
+ * x=0..VB_W maps 1-to-1 with 0..100% of the rendered bar width.
+ * Using 100 makes clipPath percentage calculations exact.
+ */
+const VB_W = 100;
+
+/**
+ * Target arc-length per wave cycle for circular wavy (px).
+ * Used to derive an integer waveCount per circle size.
+ */
+const WAVE_WAVELENGTH_CIRCULAR = 30;
 
 // ---------------------------------------------------------------------------
 // Geometry helpers
@@ -93,80 +113,88 @@ function getCircularGeometry(
 }
 
 // ---------------------------------------------------------------------------
-// Wavy path builders
+// Wave path builders (fixed)
 // ---------------------------------------------------------------------------
 
 /**
- * Build an SVG `d` string for a horizontal sine wave.
- * The path starts at x=0 and repeats for (extraCycles + 1) wavelengths so
- * the wave-translate animation loops seamlessly.
+ * Build an SVG `d` string for a horizontal sine wave in a VB_W×H viewBox.
  *
- * @param totalWidth   — container px width (used for repeats)
- * @param amplitude    — half-height of the wave in px
- * @param wavelength   — horizontal distance for one full cycle in px
- * @param extraCycles  — extra wavelength repetitions added to the right to
- *                       allow the translate animation to loop cleanly
+ * Key design:
+ * - `vbWidth` = viewBox width (100 user units = 100% of rendered width).
+ * - Path covers 0..vbWidth so it never exceeds the container.
+ * - `vectorEffect="non-scaling-stroke"` on the rendered path keeps the
+ *   stroke at screen-pixel size even though x-scale ≠ y-scale.
+ * - `midY` is in px (works because viewBox height = rendered height, y-scale=1).
+ * - `padCycles` extends the path rightward for seamless-loop animations.
+ *
+ * @param vbWidth    SVG viewBox width (= VB_W = 100)
+ * @param waveCount  Number of complete sine cycles across vbWidth
+ * @param amplitude  Half-height of the wave in px
+ * @param midY       y-coordinate of the midline in user-units (≈ px since y-scale=1)
+ * @param padCycles  Extra cycles appended to the right (for loop animations)
  */
 function buildLinearWavePath(
-  totalWidth: number,
+  vbWidth: number,
+  waveCount: number,
   amplitude: number,
-  wavelength: number,
-  extraCycles = 2
+  midY: number,
+  padCycles = 0
 ): string {
-  const totalPathWidth = totalWidth + extraCycles * wavelength;
-  const segments: string[] = [];
-  let x = 0;
-
-  // Start at the midline
-  segments.push(`M 0 ${amplitude}`);
-
-  // Each wavelength is two half-cycles (cubic bezier approximation of sine)
+  const wavelength = vbWidth / waveCount; // user units per cycle
+  const totalCycles = waveCount + padCycles;
+  // Bezier control point distance: wavelength/4 gives a good sine approximation
   const cp = wavelength / 4;
-  while (x < totalPathWidth) {
-    // First half: up peak
+  const segments: string[] = [`M 0 ${midY}`];
+
+  for (let i = 0; i < totalCycles; i++) {
+    const x = i * wavelength;
+    // Crest (above midline)
     segments.push(
-      `C ${x + cp} ${0} ${x + wavelength / 2 - cp} ${0} ${x + wavelength / 2} ${amplitude}`
+      `C ${x + cp} ${midY - amplitude} ${x + wavelength / 2 - cp} ${midY - amplitude} ${x + wavelength / 2} ${midY}`
     );
-    // Second half: down trough
-    const mid = x + wavelength / 2;
+    // Trough (below midline)
     segments.push(
-      `C ${mid + cp} ${2 * amplitude} ${mid + wavelength / 2 - cp} ${2 * amplitude} ${mid + wavelength / 2} ${amplitude}`
+      `C ${x + wavelength / 2 + cp} ${midY + amplitude} ${x + wavelength - cp} ${midY + amplitude} ${x + wavelength} ${midY}`
     );
-    x += wavelength;
   }
 
   return segments.join(" ");
 }
 
 /**
- * Build a wavy SVG `d` string that follows the circular arc.
- * Uses radial offset (outward/inward perturbation) along the circle.
+ * Build an SVG `d` string for a wavy ring (circle with radial sine perturbation).
  *
- * @param cx         — circle centre x
- * @param cy         — circle centre y
- * @param radius     — arc radius
- * @param strokeWidth — stroke width (determines visual band)
- * @param amplitude  — radial perturbation amplitude in px
- * @param wavelength — arc-length per wave cycle in px
- * @param steps      — number of arc segments for approximation
+ * Key design: `waveCount` MUST be an integer so `sin(2π·waveCount·1) = sin(2π·waveCount·0)`,
+ * guaranteeing the ring closes seamlessly. Compute it with
+ * `Math.max(4, Math.round(circumference / WAVE_WAVELENGTH_CIRCULAR))`.
+ *
+ * The path starts at the 3 o'clock position (angle = 0) so it aligns with
+ * SVG `<circle>` dash behavior when the parent SVG is rotated -90deg.
+ *
+ * @param cx        Circle centre x (px)
+ * @param cy        Circle centre y (px)
+ * @param radius    Arc radius (px)
+ * @param amplitude Radial perturbation amplitude (px)
+ * @param waveCount Integer number of wave cycles — must be integer for seamless close
+ * @param steps     Polygon approximation steps (default: waveCount × 12)
  */
 function buildCircularWavePath(
   cx: number,
   cy: number,
   radius: number,
   amplitude: number,
-  wavelength: number,
-  steps = 120
+  waveCount: number,
+  steps?: number
 ): string {
-  const circumference = 2 * Math.PI * radius;
+  const actualSteps = steps ?? waveCount * 12;
   const points: string[] = [];
 
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const angle = t * 2 * Math.PI - Math.PI / 2; // start at top (−90°)
-    // Radial perturbation: sine wave scaled to arc length
-    const wavePhase = (circumference * t) / wavelength;
-    const radialOffset = amplitude * Math.sin(2 * Math.PI * wavePhase);
+  for (let i = 0; i <= actualSteps; i++) {
+    const t = i / actualSteps;
+    // Start at 3 o'clock (angle=0) to align with <circle> strokeDashoffset behaviour
+    const angle = t * 2 * Math.PI;
+    // Integer waveCount guarantees sin(2π·waveCount·1) = 0 = sin(2π·waveCount·0) → no seam
+    const radialOffset = amplitude * Math.sin(2 * Math.PI * waveCount * t);
     const r = radius + radialOffset;
     const x = cx + r * Math.cos(angle);
     const y = cy + r * Math.sin(angle);
@@ -239,7 +267,6 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     const ref = (forwardedRef ?? internalRef) as React.RefObject<HTMLDivElement>;
     const reducedMotion: boolean = useReducedMotion();
 
-    // React Aria: provides progressBarProps (role, aria-value*) and labelProps
     const { progressBarProps, labelProps } = useProgressBar({
       label,
       value,
@@ -249,7 +276,6 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       ...restProps,
     });
 
-    // Percentage for determinate rendering
     const percentage = indeterminate
       ? 0
       : Math.min(100, Math.max(0, ((value - minValue) / (maxValue - minValue)) * 100));
@@ -410,6 +436,23 @@ function LinearFlatIndeterminate({
 
 // ── Wavy Determinate ───────────────────────────────────────────────────────
 
+/**
+ * Linear wavy determinate — fixed approach.
+ *
+ * The wave is drawn in a `viewBox="0 0 VB_W H"` SVG with
+ * `preserveAspectRatio="none"` so x maps 0..VB_W → 0..renderedWidth
+ * and the wave can never overflow the container.
+ *
+ * The active portion is clipped by a CSS `clip-path: inset(0 X% 0 0)` on
+ * the SVG element itself (applied in the rendered-element coordinate space),
+ * which means `(100 - percentage)%` from the right keeps exactly `percentage`
+ * of the wave visible — the percentage bug is fixed.
+ *
+ * `vectorEffect="non-scaling-stroke"` keeps the stroke at screen-pixel width
+ * even though the x-scale (renderedWidth / VB_W) is much larger than 1.
+ *
+ * The inactive segment and stop dot are crisp DOM elements (px-exact).
+ */
 function LinearWavyDeterminate({
   percentage,
   thickness,
@@ -420,147 +463,159 @@ function LinearWavyDeterminate({
   reducedMotion: boolean;
 }): React.JSX.Element {
   const amplitude = thickness === "thick" ? WAVE_AMPLITUDE_THICK : WAVE_AMPLITUDE_DEFAULT;
-  const wavelength = WAVE_WAVELENGTH_LINEAR;
+  const containerHeight = (thickness === "thick" ? 8 : 4) + 2 * amplitude + 4;
+  // midY: 2px top padding + amplitude = midline position in px (= VB y-units, since y-scale=1)
+  const midY = amplitude + 2;
+  const trackHeightClass = thickness === "thick" ? "h-2" : "h-1";
 
-  // Amplitude ramp: 0 → full at 10%, then full → 0 at 90%
+  // Amplitude ramp: 0 at 0% and 100%, full amplitude between 20% and 80%
   const rampedAmplitude =
     reducedMotion || percentage <= 0 || percentage >= 100
       ? 0
       : amplitude *
         Math.min(
-          (percentage - 10) / 10, // ramp up  0.1→0.2
-          (90 - percentage) / 10, // ramp down 0.8→0.9
+          (percentage - 10) / 10, // ramp up  10%→20%
+          (90 - percentage) / 10, // ramp down 80%→90%
           1
         );
 
-  // Container height accommodates the wave amplitude above/below midline
-  const containerHeight = (thickness === "thick" ? 8 : 4) + 2 * amplitude + 4;
-  const trackY = amplitude + 2; // midline Y within SVG viewBox
-
-  const trackHeightClass = thickness === "thick" ? "h-2" : "h-1";
+  const wavePath = buildLinearWavePath(VB_W, LINEAR_WAVE_COUNT, rampedAmplitude, midY);
 
   return (
     <div
       data-progress-track=""
-      className={cn("relative w-full overflow-visible", trackHeightClass)}
-      style={{ height: `${containerHeight}px` }}
+      className={cn("relative w-full overflow-hidden", trackHeightClass)}
+      style={{ height: containerHeight }}
     >
+      {/*
+       * Active wavy SVG.
+       * - viewBox 0..VB_W × 0..H ensures the path fits within the SVG bounds.
+       * - preserveAspectRatio="none" stretches the path to fill the rendered width.
+       * - CSS clip-path inset clips the right (100-percentage)% in rendered space,
+       *   so exactly `percentage`% of the wave is visible regardless of rendered width.
+       * - The clip-path CSS transition provides the smooth progress animation.
+       */}
       <svg
-        className="absolute inset-0 w-full overflow-visible"
-        style={{ height: containerHeight }}
+        viewBox={`0 0 ${VB_W} ${containerHeight}`}
+        preserveAspectRatio="none"
+        className={cn(
+          "absolute inset-0 w-full",
+          "transition-[clip-path]",
+          "duration-spring-standard-default-spatial",
+          "ease-spring-standard-default-spatial"
+        )}
+        style={{
+          height: containerHeight,
+          // clip-path applied in rendered-element space: keeps left `percentage`%
+          clipPath: `inset(0 ${100 - percentage}% 0 0)`,
+        }}
         aria-hidden="true"
       >
-        {/* Inactive track (full-width, primary-container) */}
-        <line
-          x1="0"
-          y1={trackY}
-          x2="100%"
-          y2={trackY}
+        <path
+          data-progress-indicator=""
+          d={wavePath}
+          fill="none"
           stroke="currentColor"
           strokeWidth={getStrokeWidth(thickness)}
           strokeLinecap="round"
-          className="text-primary-container"
-        />
-        {/* Active wavy indicator clipped to percentage */}
-        {percentage > 0 && (
-          <path
-            data-progress-indicator=""
-            d={buildLinearWavePath(
-              // We use a large notional width; clipPath handles the cut
-              1000,
-              rampedAmplitude,
-              wavelength
-            )}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={getStrokeWidth(thickness)}
-            strokeLinecap="round"
-            className="text-primary duration-spring-standard-default-spatial ease-spring-standard-default-spatial transition-[clip-path]"
-            clipPath={`inset(0 ${100 - percentage}% 0 0)`}
-          />
-        )}
-        {/* Stop indicator dot */}
-        <circle
-          data-stop-indicator=""
-          cx="100%"
-          cy={trackY}
-          r={INDICATOR_TRACK_GAP / 2}
-          fill="currentColor"
+          vectorEffect="non-scaling-stroke"
           className="text-primary"
-          aria-hidden="true"
         />
       </svg>
+
+      {/* Inactive segment after 4dp gap — DOM element, px-exact */}
+      {percentage < 100 && (
+        <div
+          data-progress-inactive-segment=""
+          className={cn(progressInactiveSegmentVariants())}
+          style={{ left: `calc(${percentage}% + ${INDICATOR_TRACK_GAP}px)` }}
+        />
+      )}
+
+      {/* Stop indicator dot at trailing edge */}
+      <div
+        data-stop-indicator=""
+        className={cn(progressStopIndicatorVariants())}
+        aria-hidden="true"
+      />
     </div>
   );
 }
 
 // ── Wavy Indeterminate ──────────────────────────────────────────────────────
 
+/**
+ * Linear wavy indeterminate — fixed approach.
+ *
+ * Two SVG elements (mirroring the two divs in the flat variant) are
+ * animated with the existing `progress-linear-indeterminate-1/2` CSS keyframes
+ * which animate the `left`/`right` CSS properties of the element.
+ * The keyframes are designed for positioned elements — SVG elements inside an
+ * HTML container also respect CSS `left`/`right` when `position: absolute`.
+ *
+ * As the CSS box grows/shrinks the SVG viewport stretches/compresses the wave
+ * horizontally (via `preserveAspectRatio="none"`), giving a convincing sweep.
+ * The outer `overflow-hidden` container clips both SVGs to the bar bounds.
+ */
 function LinearWavyIndeterminate({
   thickness,
 }: {
   thickness: "default" | "thick";
 }): React.JSX.Element {
   const amplitude = thickness === "thick" ? WAVE_AMPLITUDE_THICK : WAVE_AMPLITUDE_DEFAULT;
-  const wavelength = WAVE_WAVELENGTH_LINEAR;
   const containerHeight = (thickness === "thick" ? 8 : 4) + 2 * amplitude + 4;
-  const trackY = amplitude + 2;
+  const midY = amplitude + 2;
   const trackHeightClass = thickness === "thick" ? "h-2" : "h-1";
+
+  const wavePath = buildLinearWavePath(VB_W, LINEAR_WAVE_COUNT, amplitude, midY);
 
   return (
     <div
       data-progress-track=""
-      className={cn("relative w-full overflow-visible", trackHeightClass)}
-      style={{ height: `${containerHeight}px` }}
+      className={cn("relative w-full overflow-hidden", trackHeightClass)}
+      style={{ height: containerHeight }}
     >
-      <div
-        data-progress-indeterminate=""
-        className="absolute inset-0 overflow-hidden"
-        style={{ height: containerHeight }}
-      >
+      {/* Full-width inactive track behind the animated segments */}
+      <div className="bg-primary-container absolute inset-0 rounded-full" />
+
+      {/* Animated segments — same approach as flat but with SVG wave paths */}
+      <div data-progress-indeterminate="" className="absolute inset-0">
+        {/* Segment 1 */}
         <svg
-          className="absolute h-full"
-          style={{ width: "200%", top: 0, left: 0, height: containerHeight }}
+          viewBox={`0 0 ${VB_W} ${containerHeight}`}
+          preserveAspectRatio="none"
+          className="animate-progress-linear-indeterminate-1 absolute top-0 h-full"
           aria-hidden="true"
         >
-          {/* Segment 1 — primary wavy */}
           <path
-            d={buildLinearWavePath(2000, amplitude, wavelength)}
+            d={wavePath}
             fill="none"
             stroke="currentColor"
             strokeWidth={getStrokeWidth(thickness)}
             strokeLinecap="round"
-            className={cn("text-primary", "animate-progress-linear-indeterminate-1")}
+            vectorEffect="non-scaling-stroke"
+            className="text-primary"
           />
-          {/* Segment 2 — primary wavy, offset */}
+        </svg>
+
+        {/* Segment 2 */}
+        <svg
+          viewBox={`0 0 ${VB_W} ${containerHeight}`}
+          preserveAspectRatio="none"
+          className="animate-progress-linear-indeterminate-2 absolute top-0 h-full"
+          aria-hidden="true"
+        >
           <path
-            d={buildLinearWavePath(2000, amplitude, wavelength)}
+            d={wavePath}
             fill="none"
             stroke="currentColor"
             strokeWidth={getStrokeWidth(thickness)}
             strokeLinecap="round"
-            className={cn("text-primary", "animate-progress-linear-indeterminate-2")}
+            vectorEffect="non-scaling-stroke"
+            className="text-primary"
           />
         </svg>
       </div>
-
-      {/* Inactive track visible behind segments */}
-      <svg
-        className="pointer-events-none absolute inset-0 w-full overflow-visible"
-        style={{ height: containerHeight }}
-        aria-hidden="true"
-      >
-        <line
-          x1="0"
-          y1={trackY}
-          x2="100%"
-          y2={trackY}
-          stroke="currentColor"
-          strokeWidth={getStrokeWidth(thickness)}
-          strokeLinecap="round"
-          className="text-primary-container"
-        />
-      </svg>
     </div>
   );
 }
@@ -592,6 +647,21 @@ function CircularProgress({
   );
 
   if (indeterminate) {
+    if (shape === "wavy") {
+      return (
+        <CircularWavyIndeterminate
+          size={size}
+          cx={cx}
+          cy={cy}
+          radius={radius}
+          circumference={circumference}
+          viewBox={viewBox}
+          strokeWidth={strokeWidth}
+          diameter={diameter}
+        />
+      );
+    }
+
     return (
       <div
         data-progress-size={size}
@@ -603,7 +673,7 @@ function CircularProgress({
           className="animate-progress-circular-rotate h-full w-full"
           aria-hidden="true"
         >
-          {/* Inactive track — primary-container per Expressive (always visible) */}
+          {/* Inactive track — primary-container (always visible per Expressive spec) */}
           <circle
             cx={cx}
             cy={cy}
@@ -613,56 +683,50 @@ function CircularProgress({
             strokeWidth={strokeWidth}
             className="text-primary-container"
           />
-          {shape === "wavy" ? (
-            <path
-              d={buildCircularWavePath(
-                cx,
-                cy,
-                radius,
-                WAVE_AMPLITUDE_DEFAULT,
-                WAVE_WAVELENGTH_CIRCULAR
-              )}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={strokeWidth}
-              className="animate-progress-circular-dash text-primary"
-              strokeLinecap="round"
-            />
-          ) : (
-            <circle
-              cx={cx}
-              cy={cy}
-              r={radius}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={strokeWidth}
-              className="animate-progress-circular-dash text-primary"
-              strokeLinecap="round"
-            />
-          )}
+          <circle
+            cx={cx}
+            cy={cy}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            className="animate-progress-circular-dash text-primary"
+            strokeLinecap="round"
+          />
         </svg>
       </div>
     );
   }
 
-  // Determinate: introduce 4dp arc gap
-  // Arc gap in radians = gap / radius; subtract from both active and inactive ends
-  const gapRadians = INDICATOR_TRACK_GAP / radius;
+  // Determinate
+  if (shape === "wavy") {
+    return (
+      <CircularWavyDeterminate
+        size={size}
+        percentage={percentage}
+        cx={cx}
+        cy={cy}
+        radius={radius}
+        circumference={circumference}
+        viewBox={viewBox}
+        strokeWidth={strokeWidth}
+        diameter={diameter}
+        reducedMotion={reducedMotion}
+      />
+    );
+  }
+
+  // Flat determinate — introduce 4dp arc gap via stroke-dasharray
   const activeArc = (percentage / 100) * circumference;
-  // Subtract half-gap from each end of the active arc for the visual gap
   const activeArcGapped = Math.max(0, activeArc - INDICATOR_TRACK_GAP);
   const inactiveArcGapped = Math.max(0, circumference - activeArc - INDICATOR_TRACK_GAP);
-
-  const activeOffset = 0; // active starts at 12 o'clock (SVG starts at 3; -90deg rotate)
-  const inactiveOffset = -(activeArcGapped + INDICATOR_TRACK_GAP); // inactive starts after gap
-
-  // Suppress unused variable warning — gapRadians was computed for reference; use the direct pixel approach above
-  void gapRadians;
+  const activeOffset = 0;
+  const inactiveOffset = -(activeArcGapped + INDICATOR_TRACK_GAP);
 
   return (
     <div data-progress-size={size} className={cn(progressCircularSizeVariants({ size }))}>
       <svg viewBox={viewBox} className="h-full w-full -rotate-90" aria-hidden="true">
-        {/* Inactive track — primary-container; rendered first (below active) */}
+        {/* Inactive track */}
         {percentage < 100 && (
           <circle
             cx={cx}
@@ -677,7 +741,7 @@ function CircularProgress({
             className="text-primary-container duration-spring-standard-default-spatial ease-spring-standard-default-spatial transition-[stroke-dasharray,stroke-dashoffset]"
           />
         )}
-        {/* Active indicator — primary; rendered on top */}
+        {/* Active indicator */}
         {percentage > 0 && (
           <circle
             cx={cx}
@@ -692,7 +756,7 @@ function CircularProgress({
             className="text-primary duration-spring-standard-default-spatial ease-spring-standard-default-spatial transition-[stroke-dasharray,stroke-dashoffset]"
           />
         )}
-        {/* Show full circle in primary-container when value is 0 */}
+        {/* Full inactive circle at 0% */}
         {percentage === 0 && (
           <circle
             cx={cx}
@@ -704,28 +768,192 @@ function CircularProgress({
             className="text-primary-container"
           />
         )}
-        {/* Wavy overlay for determinate circular */}
-        {shape === "wavy" && !reducedMotion && percentage > 0 && percentage < 100 && (
-          <path
-            d={buildCircularWavePath(
-              cx,
-              cy,
-              radius,
-              WAVE_AMPLITUDE_DEFAULT,
-              WAVE_WAVELENGTH_CIRCULAR
-            )}
+      </svg>
+
+      <span className="sr-only" data-progress-diameter={diameter} />
+    </div>
+  );
+}
+
+// ── Circular wavy geometry helpers ──────────────────────────────────────────
+
+interface CircularWavyGeometry {
+  size: "small" | "medium" | "large";
+  cx: number;
+  cy: number;
+  radius: number;
+  circumference: number;
+  viewBox: string;
+  strokeWidth: number;
+  diameter: number;
+}
+
+// ── Circular Wavy Indeterminate ─────────────────────────────────────────────
+
+/**
+ * Circular wavy indeterminate — fixed approach.
+ *
+ * Uses an integer `waveCount` derived from `Math.round(circumference / WAVE_WAVELENGTH_CIRCULAR)`
+ * so the ring closes seamlessly (no seam/notch from non-integer cycles).
+ *
+ * The wavy `<path>` uses `pathLength={100}` so `strokeDasharray` is expressed
+ * in 0..100 regardless of the path's intrinsic (longer) length.
+ * A static dash `"28 72"` (≈28% visible arc) + the whole-SVG rotation from
+ * `animate-progress-circular-rotate` produces a clean rotating wavy spinner.
+ * `animate-progress-circular-dash` is intentionally NOT used: its pixel values
+ * are tuned to the plain circle circumference, not the longer wavy path.
+ */
+function CircularWavyIndeterminate({
+  size,
+  cx,
+  cy,
+  radius,
+  circumference,
+  viewBox,
+  strokeWidth,
+}: CircularWavyGeometry): React.JSX.Element {
+  // Integer waveCount → seamless close (sin(2π·N·1) = sin(2π·N·0) = 0)
+  const waveCount = Math.max(4, Math.round(circumference / WAVE_WAVELENGTH_CIRCULAR));
+  const wavePath = buildCircularWavePath(cx, cy, radius, WAVE_AMPLITUDE_DEFAULT, waveCount);
+
+  return (
+    <div
+      data-progress-size={size}
+      data-progress-indeterminate=""
+      className={cn(progressCircularSizeVariants({ size }))}
+    >
+      {/*
+       * The entire SVG rotates via animate-progress-circular-rotate.
+       * The wavy path has a static dash showing ~28% of the ring,
+       * so the arc sweeps around as a rotating wavy segment.
+       */}
+      <svg
+        viewBox={viewBox}
+        className="animate-progress-circular-rotate h-full w-full"
+        aria-hidden="true"
+      >
+        {/* Inactive full ring (primary-container) */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-primary-container"
+        />
+        {/* Active wavy arc — pathLength=100 normalises the dash to a percentage */}
+        <path
+          d={wavePath}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          pathLength={100}
+          strokeDasharray="28 72"
+          className="text-primary"
+        />
+      </svg>
+    </div>
+  );
+}
+
+// ── Circular Wavy Determinate ───────────────────────────────────────────────
+
+/**
+ * Circular wavy determinate — fixed approach.
+ *
+ * Uses `pathLength={100}` on the wavy `<path>` so `strokeDasharray` can be
+ * expressed in percentage terms (0..100) rather than the path's intrinsic
+ * (and longer) arc length. This resolves the mis-match between the wave path
+ * length and the pixel-based dash values used previously.
+ *
+ * Gap: `gapPct = (INDICATOR_TRACK_GAP / circumference) * 100` (in pathLength units).
+ * Active arc:   `activeLen   = max(0, percentage - gapPct)`
+ * Inactive arc: `inactiveLen = max(0, 100 - percentage - gapPct)`
+ * Inactive offset = `-(activeLen + gapPct)` → starts after active + gap.
+ *
+ * Single active wavy path replaces the previous plain-active + wavy-overlay
+ * stacking that produced a distorted double-drawn arc.
+ */
+function CircularWavyDeterminate({
+  size,
+  percentage,
+  cx,
+  cy,
+  radius,
+  circumference,
+  viewBox,
+  strokeWidth,
+  diameter,
+  reducedMotion,
+}: CircularWavyGeometry & { percentage: number; reducedMotion: boolean }): React.JSX.Element {
+  const waveCount = Math.max(4, Math.round(circumference / WAVE_WAVELENGTH_CIRCULAR));
+  const amp = reducedMotion ? 0 : WAVE_AMPLITUDE_DEFAULT;
+  const wavePath = buildCircularWavePath(cx, cy, radius, amp, waveCount);
+
+  // Gap expressed in pathLength=100 space
+  const gapPct = (INDICATOR_TRACK_GAP / circumference) * 100;
+  const activeLen = Math.max(0, percentage - gapPct);
+  const inactiveLen = Math.max(0, 100 - percentage - gapPct);
+  // Inactive arc starts after active + gap
+  const inactiveOffset = -(activeLen + gapPct);
+
+  return (
+    <div data-progress-size={size} className={cn(progressCircularSizeVariants({ size }))}>
+      {/*
+       * -rotate-90 on the SVG makes both the circle and the wavy path start
+       * at the visual 12 o'clock position (path starts at 3 o'clock
+       * mathematically, rotated -90° to top visually).
+       */}
+      <svg viewBox={viewBox} className="h-full w-full -rotate-90" aria-hidden="true">
+        {/* Full inactive track at 0% */}
+        {percentage === 0 && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            className="text-primary-container"
+          />
+        )}
+
+        {/* Inactive arc (primary-container) — for 0 < percentage < 100 */}
+        {percentage > 0 && percentage < 100 && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={radius}
             fill="none"
             stroke="currentColor"
             strokeWidth={strokeWidth}
             strokeLinecap="round"
-            strokeDasharray={`${activeArcGapped} ${circumference - activeArcGapped}`}
-            strokeDashoffset={activeOffset}
+            pathLength={100}
+            strokeDasharray={`${inactiveLen} ${100 - inactiveLen}`}
+            strokeDashoffset={inactiveOffset}
+            className="text-primary-container duration-spring-standard-default-spatial ease-spring-standard-default-spatial transition-[stroke-dasharray,stroke-dashoffset]"
+          />
+        )}
+
+        {/* Active wavy arc (primary) — single element, no stacking */}
+        {percentage > 0 && (
+          <path
+            data-progress-indicator=""
+            d={wavePath}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            pathLength={100}
+            strokeDasharray={percentage < 100 ? `${activeLen} ${100 - activeLen}` : undefined}
+            strokeDashoffset={0}
             className="text-primary duration-spring-standard-default-spatial ease-spring-standard-default-spatial transition-[stroke-dasharray]"
           />
         )}
       </svg>
 
-      {/* Circular size thumbnail for diameter reference — keep for geometry stability */}
       <span className="sr-only" data-progress-diameter={diameter} />
     </div>
   );

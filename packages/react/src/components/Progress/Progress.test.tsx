@@ -418,6 +418,110 @@ describe("Progress", () => {
   });
 
   // ---------------------------------------------------------------------------
+  // Wavy rendering specifics — overflow fix assertions
+  // ---------------------------------------------------------------------------
+
+  describe("Wavy rendering (overflow fix)", () => {
+    // ── Linear wavy determinate ──────────────────────────────────────────────
+
+    test("linear wavy determinate renders [data-progress-indicator] SVG path", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      const indicator = container.querySelector("[data-progress-indicator]");
+      expect(indicator).toBeInTheDocument();
+      expect(indicator?.tagName.toLowerCase()).toBe("path");
+    });
+
+    test("linear wavy determinate renders [data-stop-indicator]", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("[data-stop-indicator]")).toBeInTheDocument();
+    });
+
+    test("linear wavy determinate SVG has preserveAspectRatio='none'", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      const svg = container.querySelector("svg");
+      expect(svg?.getAttribute("preserveAspectRatio")).toBe("none");
+    });
+
+    test("linear wavy determinate SVG has clip-path style to bound the active portion", () => {
+      const { container } = render(
+        <Progress type="linear" value={60} shape="wavy" aria-label="Loading" />
+      );
+      const svg = container.querySelector("svg") as HTMLElement | null;
+      // clip-path: inset(0 40% 0 0) — right side = 100-60 = 40%
+      expect(svg?.style.clipPath).toMatch(/inset/);
+    });
+
+    test("linear wavy determinate renders inactive segment after the gap", () => {
+      const { container } = render(
+        <Progress type="linear" value={40} shape="wavy" aria-label="Loading" />
+      );
+      const inactive = container.querySelector("[data-progress-inactive-segment]");
+      expect(inactive).toBeInTheDocument();
+      const style = (inactive as HTMLElement)?.style.left;
+      expect(style).toContain("40%");
+      expect(style).toContain("4px");
+    });
+
+    test("linear wavy determinate does not render inactive segment at 100%", () => {
+      const { container } = render(
+        <Progress type="linear" value={100} shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("[data-progress-inactive-segment]")).not.toBeInTheDocument();
+    });
+
+    // ── Linear wavy indeterminate ────────────────────────────────────────────
+
+    test("linear wavy indeterminate renders [data-progress-indeterminate]", () => {
+      const { container } = render(
+        <Progress type="linear" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      expect(container.querySelector("[data-progress-indeterminate]")).toBeInTheDocument();
+    });
+
+    test("linear wavy indeterminate SVG has preserveAspectRatio='none'", () => {
+      const { container } = render(
+        <Progress type="linear" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      const svg = container.querySelector("svg");
+      expect(svg?.getAttribute("preserveAspectRatio")).toBe("none");
+    });
+
+    // ── Circular wavy — pathLength normalization ─────────────────────────────
+
+    test("circular wavy determinate active path has pathLength='100'", () => {
+      const { container } = render(
+        <Progress type="circular" value={50} shape="wavy" aria-label="Loading" />
+      );
+      const indicator = container.querySelector("[data-progress-indicator]");
+      expect(indicator).toBeInTheDocument();
+      expect(indicator?.getAttribute("pathLength")).toBe("100");
+    });
+
+    test("circular wavy indeterminate path has pathLength='100'", () => {
+      const { container } = render(
+        <Progress type="circular" indeterminate shape="wavy" aria-label="Loading" />
+      );
+      const path = container.querySelector("svg path");
+      expect(path?.getAttribute("pathLength")).toBe("100");
+    });
+
+    test("circular wavy determinate does not render wavy overlay on top of plain arc", () => {
+      const { container } = render(
+        <Progress type="circular" value={50} shape="wavy" aria-label="Loading" />
+      );
+      // There should be exactly ONE path element (the active wavy arc) — no stacking
+      const paths = container.querySelectorAll("path");
+      expect(paths.length).toBe(1);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Accessibility
   // ---------------------------------------------------------------------------
 
