@@ -1,5 +1,5 @@
 ---
-"@tinybigui/react": patch
+"@tinybigui/react": minor
 ---
 
 **Snackbar**: MD3 slot-based architecture refactor — visual and motion corrections
