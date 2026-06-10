@@ -7,6 +7,7 @@ import { DialogActions } from "./DialogActions";
 import { DialogHeadless } from "./DialogHeadless";
 import { Button } from "../Button";
 import { IconButton } from "../IconButton";
+import type { DialogAnimationState } from "./Dialog.types";
 
 // ─── Inline SVG Icons ─────────────────────────────────────────────────────────
 
@@ -23,6 +24,45 @@ const CloseIcon = (): JSX.Element => (
   </svg>
 );
 
+const BookmarkIcon = (): JSX.Element => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+  </svg>
+);
+
+const DeleteIcon = (): JSX.Element => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+  </svg>
+);
+
+const InfoIcon = (): JSX.Element => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+  </svg>
+);
+
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 /**
@@ -34,12 +74,30 @@ const CloseIcon = (): JSX.Element => (
  * ## Variants
  *
  * - **Basic** (default): A floating card dialog with headline, body text, and
- *   action buttons. Supports scale + fade entry animation. Closes on scrim
- *   click or Escape key. Min 280dp, max 560dp width.
+ *   action buttons. Entry via `animate-md-scale-in` (MD3 Expressive, 350ms).
+ *   Closes on scrim click or Escape key. Min 280dp, max 560dp width.
  *
  * - **Full-screen**: Full viewport overlay suited for mobile and complex forms.
  *   Replaces the headline with a top app bar row (close icon button + confirm
- *   action). Slide-up entry animation. Does NOT close on scrim click.
+ *   action). Entry via `animate-md-slide-in-bottom` (500ms). Does NOT close on
+ *   scrim click.
+ *
+ * ## Hero Icon
+ *
+ * An optional `icon` prop renders a centered 24dp icon above the headline.
+ * When present, headline and supporting text automatically center-align
+ * via `group-data-[with-icon]/dialog:text-center`.
+ *
+ * ## Scroll Dividers
+ *
+ * `DialogContent` automatically shows `border-outline-variant` dividers at the
+ * top and/or bottom when content overflows its container and the user has not
+ * scrolled to the respective edge.
+ *
+ * ## Reduced Motion
+ *
+ * When `prefers-reduced-motion: reduce` is active, all keyframe animations are
+ * suppressed and the dialog appears/disappears instantly.
  *
  * ## Accessibility
  *
@@ -52,6 +110,7 @@ const CloseIcon = (): JSX.Element => (
  * - Escape key always closes
  *
  * @see https://m3.material.io/components/dialogs/overview
+ * @see https://m3.material.io/components/dialogs/specs
  */
 const meta: Meta<typeof Dialog> = {
   title: "Feedback/Dialog",
@@ -61,7 +120,7 @@ const meta: Meta<typeof Dialog> = {
     docs: {
       description: {
         component:
-          "Material Design 3 Dialog — provides important prompts requiring user action. Supports Basic and Full-screen variants with composable slot-based API.",
+          "Material Design 3 Dialog — provides important prompts requiring user action. Supports Basic and Full-screen variants with composable slot-based API, hero icon, scroll dividers, and MD3 Expressive motion.",
       },
     },
   },
@@ -115,14 +174,115 @@ const BasicDemo = (): JSX.Element => {
 
 /**
  * The Basic dialog presents a simple prompt with a headline, body text, and
- * two action buttons. The primary action uses `variant="filled"` and the
- * secondary uses `variant="text"` per MD3 spec.
+ * two action buttons. Entry uses `animate-md-scale-in` (MD3 Expressive 350ms);
+ * exit uses `animate-md-scale-out` (200ms). The scrim fades in/out independently.
  */
 export const Basic: Story = {
   render: () => <BasicDemo />,
 };
 
-// ─── Scrollable content ───────────────────────────────────────────────────────
+// ─── With hero icon ──────────────────────────────────────────────────────────
+
+const WithIconDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex items-center justify-center gap-4 p-8">
+      <Button variant="filled" onPress={() => setOpen(true)}>
+        Open dialog with icon
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen} icon={<BookmarkIcon />}>
+        <DialogHeadline>Save bookmark?</DialogHeadline>
+        <DialogContent>
+          The page will be saved to your bookmarks and synced across all your devices.
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onPress={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="filled" onPress={() => setOpen(false)}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+/**
+ * The optional `icon` prop renders a centered 24dp hero icon above the headline.
+ * When present, both the headline and supporting text center-align automatically
+ * via `group-data-[with-icon]/dialog:text-center` — no extra props needed.
+ *
+ * MD3 icon color: `text-secondary`.
+ */
+export const WithIcon: Story = {
+  render: () => <WithIconDemo />,
+};
+
+// ─── Scroll dividers ──────────────────────────────────────────────────────────
+
+const ScrollDividersDemo = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex items-center justify-center p-8">
+      <Button variant="filled" onPress={() => setOpen(true)}>
+        Open scrollable dialog
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogHeadline>Terms of service</DialogHeadline>
+        {/*
+         * The DialogContent scroll handler automatically sets data-scroll-divider-top
+         * and data-scroll-divider-bottom as the user scrolls. The CVA base classes
+         * apply border-outline-variant dividers when those attributes are present.
+         */}
+        <DialogContent className="max-h-48">
+          <p>
+            By using this service, you agree to these terms. Read them carefully before accepting.
+          </p>
+          <p className="mt-4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+          </p>
+          <p className="mt-4">
+            Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
+            aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+            pariatur.
+          </p>
+          <p className="mt-4">
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+            mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit
+            voluptatem accusantium doloremque laudantium.
+          </p>
+          <p className="mt-4">
+            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
+            consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+          </p>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onPress={() => setOpen(false)}>
+            Decline
+          </Button>
+          <Button variant="filled" onPress={() => setOpen(false)}>
+            Accept
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+/**
+ * Demonstrates `DialogContent` scroll dividers. When the content overflows and
+ * the user has not scrolled to an edge, `border-outline-variant` dividers appear
+ * above and/or below the scrollable area per MD3 spec.
+ *
+ * Scroll the content to see the top divider appear and the bottom divider disappear.
+ */
+export const ScrollDividers: Story = {
+  render: () => <ScrollDividersDemo />,
+};
+
+// ─── Scrollable content (legacy) ─────────────────────────────────────────────
 
 const ScrollableContentDemo = (): JSX.Element => {
   const [open, setOpen] = useState(false);
@@ -192,7 +352,7 @@ const ConfirmationDemo = (): JSX.Element => {
         Delete account
       </Button>
       {confirmed && <p className="text-body-medium text-on-surface-variant">Account deleted.</p>}
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={setOpen} icon={<DeleteIcon />}>
         <DialogHeadline>Delete account?</DialogHeadline>
         <DialogContent>
           Your account and all associated data will be permanently deleted. This action cannot be
@@ -212,11 +372,106 @@ const ConfirmationDemo = (): JSX.Element => {
 };
 
 /**
- * A destructive action confirmation dialog. The primary action uses a
- * standard filled button (MD3 does not use an error-colored button in dialogs).
+ * A destructive action confirmation dialog with a hero icon. The primary action
+ * uses a standard filled button (MD3 does not use an error-colored button in dialogs).
  */
 export const Confirmation: Story = {
   render: () => <ConfirmationDemo />,
+};
+
+// ─── States (motion showcase) ─────────────────────────────────────────────────
+
+const StatesDemo = (): JSX.Element => {
+  const [basicOpen, setBasicOpen] = useState(false);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const [iconOpen, setIconOpen] = useState(false);
+
+  return (
+    <div className="flex flex-wrap items-start gap-4 p-8">
+      <div className="flex flex-col gap-2">
+        <p className="text-label-medium text-on-surface-variant">Basic (scale in/out)</p>
+        <Button variant="filled" onPress={() => setBasicOpen(true)}>
+          Basic dialog
+        </Button>
+        <Dialog open={basicOpen} onOpenChange={setBasicOpen}>
+          <DialogHeadline>Scale animation</DialogHeadline>
+          <DialogContent>
+            Enters with `animate-md-scale-in` (expressive-fast-spatial, 350ms). Exits with
+            `animate-md-scale-out` (200ms). The scrim fades in/out independently.
+          </DialogContent>
+          <DialogActions>
+            <Button variant="filled" onPress={() => setBasicOpen(false)}>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <p className="text-label-medium text-on-surface-variant">With icon (centered)</p>
+        <Button variant="tonal" onPress={() => setIconOpen(true)}>
+          Icon dialog
+        </Button>
+        <Dialog open={iconOpen} onOpenChange={setIconOpen} icon={<InfoIcon />}>
+          <DialogHeadline>Hero icon</DialogHeadline>
+          <DialogContent>
+            When `icon` is provided, `data-with-icon` is set on the panel root. Headline and content
+            center-align via `group-data-[with-icon]/dialog:text-center`.
+          </DialogContent>
+          <DialogActions>
+            <Button variant="filled" onPress={() => setIconOpen(false)}>
+              Got it
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <p className="text-label-medium text-on-surface-variant">Fullscreen (slide in/out)</p>
+        <Button variant="outlined" onPress={() => setFullscreenOpen(true)}>
+          Full-screen dialog
+        </Button>
+        <Dialog variant="fullscreen" open={fullscreenOpen} onOpenChange={setFullscreenOpen}>
+          <DialogHeadline
+            closeButton={
+              <IconButton
+                variant="standard"
+                aria-label="Close"
+                onPress={() => setFullscreenOpen(false)}
+              >
+                <CloseIcon />
+              </IconButton>
+            }
+            confirmButton={
+              <Button variant="text" onPress={() => setFullscreenOpen(false)}>
+                Save
+              </Button>
+            }
+          >
+            Slide animation
+          </DialogHeadline>
+          <DialogContent>
+            <p className="text-body-medium text-on-surface-variant">
+              Enters with `animate-md-slide-in-bottom` (standard-default-spatial, 500ms). Exits with
+              `animate-md-slide-out-bottom` (200ms).
+            </p>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Showcases all three primary dialog states in one view:
+ * - Basic: scale-in / scale-out (MD3 Expressive)
+ * - With icon: centered hero icon + centered text
+ * - Full-screen: slide-in-bottom / slide-out-bottom
+ *
+ * All animations are suppressed when `prefers-reduced-motion: reduce` is active.
+ */
+export const States: Story = {
+  render: () => <StatesDemo />,
 };
 
 // ─── Full-screen ───────────────────────────────────────────────────────────────
@@ -325,7 +580,11 @@ const HeadlessDemo = (): JSX.Element => {
         onOpenChange={setOpen}
         aria-label="Custom headless dialog"
         className="bg-surface-container-high shadow-elevation-3 w-full max-w-md rounded-2xl p-8"
-        scrimClassName="fixed inset-0 z-40 bg-scrim opacity-32"
+        // Static scrim (no animation) — the headless layer accepts getScrimClassName for
+        // animation; omitting it falls back to a static bg-scrim/32 overlay.
+        getScrimClassName={(_state: DialogAnimationState): string =>
+          "fixed inset-0 z-40 bg-scrim/32"
+        }
       >
         <DialogHeadline>Custom styled dialog</DialogHeadline>
         <DialogContent>

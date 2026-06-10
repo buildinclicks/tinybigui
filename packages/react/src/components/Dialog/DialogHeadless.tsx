@@ -64,6 +64,7 @@ export function useDialogContext(): DialogContextValue {
  * ```
  *   <div> (centering / positioning wrapper, z-50)
  *     <div role="dialog" aria-modal> (panel — className, animation, data attrs)
+ *       [icon element — only when icon prop is set]
  *       {children}
  *     </div>
  *   </div>
@@ -79,13 +80,14 @@ interface DialogPanelProps {
   headlineId: string;
   contentId: string;
   onClose: () => void;
-  onTransitionEnd: () => void;
+  onAnimationEnd: (e: React.AnimationEvent<HTMLDivElement>) => void;
   variant: DialogVariant;
   isDismissable: boolean;
   wrapperClassName: string;
   className: string | undefined;
   animationState: DialogAnimationState;
   getAnimationClassName: ((state: DialogAnimationState) => string) | undefined;
+  icon: React.ReactNode | undefined;
   children: React.ReactNode;
 }
 
@@ -94,13 +96,14 @@ const DialogPanel = ({
   headlineId,
   contentId,
   onClose,
-  onTransitionEnd,
+  onAnimationEnd,
   variant,
   isDismissable,
   wrapperClassName,
   className,
   animationState,
   getAnimationClassName,
+  icon,
   children,
 }: DialogPanelProps): React.ReactElement => {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -132,6 +135,10 @@ const DialogPanel = ({
   // Merge animation classes onto the panel element
   const panelClassName = cn(className, getAnimationClassName?.(animationState));
 
+  // `data-with-icon` is a content flag (presence-based): attribute present = icon is rendered.
+  // This lets `group-data-[with-icon]/dialog:` selectors in headline/content center their text.
+  const hasIcon = icon !== undefined && icon !== null && variant === "basic";
+
   return (
     // Centering/positioning wrapper — structural only, no ARIA role
     <div className={wrapperClassName}>
@@ -143,8 +150,17 @@ const DialogPanel = ({
         className={panelClassName}
         data-animation-state={animationState}
         data-variant={variant}
-        onTransitionEnd={onTransitionEnd}
+        // Presence-based content flag — drives centering via group-data-[with-icon]/dialog:
+        data-with-icon={hasIcon ? "" : undefined}
+        // onAnimationEnd advances "exiting" → "exited" after the exit keyframe completes.
+        // We guard e.target === e.currentTarget so that animationend events bubbling up
+        // from child elements (e.g. ripple animations on action buttons) do not
+        // accidentally advance the state machine.
+        onAnimationEnd={onAnimationEnd}
       >
+        {/* Optional hero icon — rendered above headline, centered per MD3 spec */}
+        {hasIcon && icon}
+
         {children}
       </div>
     </div>
@@ -170,7 +186,12 @@ DialogPanel.displayName = "DialogPanel";
  *   Basic variant is dismissable (Escape + outside click);
  *   Full-screen variant is Escape-dismissable only (no scrim click) per MD3 spec.
  * - **Animation state machine**: `entering → visible → exiting → exited`
- *   mirrors the Snackbar animation pattern.
+ *   Exit advances on `onAnimationEnd` with `e.target === e.currentTarget` guard
+ *   (prevents child animation events from advancing the state machine), plus a
+ *   250ms fallback timer in case the animation event doesn't fire.
+ * - **Scrim animation**: state-driven via `getScrimClassName(animationState)`.
+ * - **Hero icon**: optional `icon` prop renders centered above headline;
+ *   sets `data-with-icon` on panel root for group-data centering of headline/content.
  * - **ARIA wiring**: `DialogContext` provides stable IDs for `aria-labelledby`
  *   and `aria-describedby`, consumed by slot sub-components.
  *
@@ -188,8 +209,9 @@ DialogPanel.displayName = "DialogPanel";
  *   variant="basic"
  *   open={open}
  *   onOpenChange={setOpen}
- *   className={cn(dialogWrapperVariants({ variant: 'basic' }), dialogPanelVariants({ variant: 'basic' }))}
- *   scrimClassName={dialogScrimVariants()}
+ *   className={cn(dialogPanelVariants({ variant: 'basic' }))}
+ *   wrapperClassName={dialogWrapperVariants({ variant: 'basic' })}
+ *   getScrimClassName={(state) => dialogScrimVariants({ animationState: state })}
  *   getAnimationClassName={(state) =>
  *     dialogAnimationVariants({ animationState: state, variant: 'basic' })
  *   }
@@ -211,9 +233,11 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
       defaultOpen = false,
       onOpenChange,
       "aria-label": ariaLabel,
+      icon,
       children,
       className,
-      scrimClassName,
+      wrapperClassName,
+      getScrimClassName,
       getAnimationClassName,
     },
     _ref
@@ -237,7 +261,8 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
     const [animationState, setAnimationState] = useState<DialogAnimationState>("exited");
     // Guard against calling state updates after unmount / multiple times
     const closedRef = useRef<boolean>(false);
-    // Fallback timer for exit animation in case onTransitionEnd doesn't fire
+    // Fallback timer for exit animation in case onAnimationEnd doesn't fire
+    // (e.g. browser reduced-motion CSS override, animation cancelled)
     const exitFallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // When isOpen becomes true → start entry animation cycle
@@ -248,7 +273,7 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
       setAnimationState("entering");
 
       // Zero-delay timer ensures "entering" state is rendered (allowing CSS
-      // transition initial values) before transitioning to "visible".
+      // animation initial keyframe to paint) before transitioning to "visible".
       const id = setTimeout(() => {
         setAnimationState("visible");
       }, 0);
@@ -264,13 +289,15 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
       if (animationState === "visible") {
         setAnimationState("exiting");
 
-        // Fallback: advance to exited if CSS transition doesn't fire
+        // 250ms fallback — longer than the 200ms exit keyframe so it only fires
+        // if onAnimationEnd doesn't (e.g. user's CSS `animation: none` override
+        // at the app level rather than via prefers-reduced-motion).
         exitFallbackRef.current = setTimeout(() => {
           if (!closedRef.current) {
             closedRef.current = true;
             setAnimationState("exited");
           }
-        }, 150);
+        }, 250);
       }
     }, [isOpen, animationState]);
 
@@ -284,16 +311,24 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
       []
     );
 
-    const handleTransitionEnd = useCallback(() => {
-      if (animationState === "exiting" && !closedRef.current) {
-        if (exitFallbackRef.current !== null) {
-          clearTimeout(exitFallbackRef.current);
-          exitFallbackRef.current = null;
+    // Advances exiting → exited after the CSS keyframe animation ends.
+    // e.target === e.currentTarget guard: ensures only the panel's own
+    // animationend event triggers the advance — not events bubbling up
+    // from child elements (e.g. ripple animations inside DialogActions).
+    const handleAnimationEnd = useCallback(
+      (e: React.AnimationEvent<HTMLDivElement>) => {
+        if (e.target !== e.currentTarget) return;
+        if (animationState === "exiting" && !closedRef.current) {
+          if (exitFallbackRef.current !== null) {
+            clearTimeout(exitFallbackRef.current);
+            exitFallbackRef.current = null;
+          }
+          closedRef.current = true;
+          setAnimationState("exited");
         }
-        closedRef.current = true;
-        setAnimationState("exited");
-      }
-    }, [animationState]);
+      },
+      [animationState]
+    );
 
     // ── ARIA ID coordination ──────────────────────────────────────────────────
 
@@ -317,6 +352,23 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
       }
     }, [variant, close]);
 
+    // ── Derived wrapper class ─────────────────────────────────────────────────
+
+    // Use the caller-supplied wrapperClassName when provided; fall back to the
+    // hardcoded centering strings so DialogHeadless still works standalone.
+    const resolvedWrapperClass =
+      wrapperClassName ??
+      (variant === "basic"
+        ? "fixed inset-0 z-50 flex items-center justify-center px-4"
+        : "fixed inset-0 z-50");
+
+    // ── Derived scrim class ───────────────────────────────────────────────────
+
+    // Use the caller-supplied getScrimClassName when provided; fall back to a
+    // static scrim without animation so DialogHeadless works as a standalone primitive.
+    const resolvedScrimClass =
+      getScrimClassName?.(animationState) ?? "fixed inset-0 z-40 bg-scrim/32";
+
     // ── Portal gate ───────────────────────────────────────────────────────────
 
     // Do not render portal until open, and remove once animation is fully exited
@@ -331,7 +383,7 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
         {/* Scrim overlay — click closes for basic, inert for fullscreen */}
         <div
           data-testid="dialog-scrim"
-          className={scrimClassName}
+          className={resolvedScrimClass}
           onClick={handleScrimClick}
           aria-hidden="true"
         />
@@ -343,17 +395,14 @@ export const DialogHeadless = forwardRef<HTMLDivElement, DialogHeadlessProps>(
             headlineId={headlineId}
             contentId={contentId}
             onClose={close}
-            onTransitionEnd={handleTransitionEnd}
+            onAnimationEnd={handleAnimationEnd}
             variant={variant}
             isDismissable={variant === "basic"}
-            wrapperClassName={
-              variant === "basic"
-                ? "fixed inset-0 z-50 flex items-center justify-center px-4"
-                : "fixed inset-0 z-50"
-            }
+            wrapperClassName={resolvedWrapperClass}
             className={className}
             animationState={animationState}
             getAnimationClassName={getAnimationClassName}
+            icon={icon}
           >
             {children}
           </DialogPanel>
