@@ -117,9 +117,75 @@ describe("RadioGroup", () => {
       const radioA = screen.getByRole("radio", { name: "A" });
       const _radioB = screen.getByRole("radio", { name: "B (Disabled)" });
       expect(radioA).not.toBeDisabled();
-      // Individual radio disabled state - check via visual styling since React Aria handles it differently
+      // Individual radio disabled state — root label receives data-disabled attribute
       const labelB = screen.getByText("B (Disabled)").closest("label");
-      expect(labelB).toHaveClass("opacity-38");
+      expect(labelB).toHaveAttribute("data-disabled", "");
+    });
+  });
+
+  describe("Data Attributes", () => {
+    test("sets data-selected on the label when radio is selected", async () => {
+      const user = userEvent.setup();
+      render(
+        <RadioGroup label="Options">
+          <Radio value="a">A</Radio>
+          <Radio value="b">B</Radio>
+        </RadioGroup>
+      );
+
+      const radioA = screen.getByRole("radio", { name: "A" });
+      await user.click(radioA);
+
+      const labelA = screen.getByText("A").closest("label");
+      expect(labelA).toHaveAttribute("data-selected", "");
+
+      const labelB = screen.getByText("B").closest("label");
+      expect(labelB).not.toHaveAttribute("data-selected");
+    });
+
+    test("sets data-disabled on label for individually disabled radio", () => {
+      render(
+        <RadioGroup label="Options">
+          <Radio value="a">A</Radio>
+          <Radio value="b" isDisabled>
+            B Disabled
+          </Radio>
+        </RadioGroup>
+      );
+
+      const labelA = screen.getByText("A").closest("label");
+      expect(labelA).not.toHaveAttribute("data-disabled");
+
+      const labelB = screen.getByText("B Disabled").closest("label");
+      expect(labelB).toHaveAttribute("data-disabled", "");
+    });
+
+    test("sets data-disabled on all labels when group is disabled", () => {
+      render(
+        <RadioGroup label="Options" isDisabled>
+          <Radio value="a">A</Radio>
+          <Radio value="b">B</Radio>
+        </RadioGroup>
+      );
+
+      const labelA = screen.getByText("A").closest("label");
+      const labelB = screen.getByText("B").closest("label");
+      expect(labelA).toHaveAttribute("data-disabled", "");
+      expect(labelB).toHaveAttribute("data-disabled", "");
+    });
+
+    test("sets data-invalid on radio labels when group isInvalid", () => {
+      render(
+        <RadioGroup label="Options" isInvalid>
+          <Radio value="a">A</Radio>
+          <Radio value="b">B</Radio>
+        </RadioGroup>
+      );
+
+      const labelA = screen.getByText("A").closest("label");
+      const labelB = screen.getByText("B").closest("label");
+      expect(labelA).toHaveAttribute("data-invalid", "");
+      expect(labelB).toHaveAttribute("data-invalid", "");
     });
   });
 
