@@ -29,9 +29,9 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.12.0** (2026-06-09)
+> **Latest Release: v0.13.0** (2026-06-10)
 >
-> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,029 tests** passing.
+> **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,042 tests** passing.
 >
 > Watch this repository to follow our progress!
 
@@ -94,8 +94,8 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.12.0  | Released |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.12.0  | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.13.0  | Released |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.13.0  | Released |
 
 ---
 
@@ -156,7 +156,8 @@ This is a monorepo containing multiple packages:
 - [x] Chip — MD3 expressive slot architecture, token corrections, elevated surface (v0.9.0)
 - [x] Badge — MD3 expressive variants/states, icon-corner anchoring (v0.8.0)
 - [x] Divider — MD3 expressive slot-based CVA, CSS-var thickness, logical RTL insets (v0.12.0)
-- [x] DatePicker + TimePicker — docked, modal, input variants (v0.4.0)
+- [x] DatePicker — MD3 expressive two-axis slot architecture, styled slot injection, popover anchoring and modal positioning fixes (v0.13.0)
+- [x] TimePicker — 12h/24h clock dial, range selection (v0.4.0)
 
 ### Phase 5: Stable Release
 

@@ -11,6 +11,8 @@ import { CalendarHeader } from "./CalendarHeader";
 
 import type { DateValue } from "@internationalized/date";
 import type { CalendarView, DateSelectionMode } from "./DatePicker.types";
+import type { CalendarCellComponentProps } from "./CalendarGrid";
+import type { NavButtonComponentProps, TitleComponentProps } from "./CalendarHeader";
 
 const FIRST_DAY_MAP: Record<number, "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat"> = {
   0: "sun",
@@ -23,6 +25,46 @@ const FIRST_DAY_MAP: Record<number, "sun" | "mon" | "tue" | "wed" | "thu" | "fri
 };
 
 const YEAR_RANGE_OFFSET = 50;
+
+/**
+ * Slot component overrides for the calendar.
+ * Pass styled components from Layer 3 to inject CVA + state layers without
+ * modifying the headless behavior.
+ */
+export interface CalendarSlots {
+  /**
+   * Component for rendering each date cell.
+   * Defaults to the headless `CalendarCell`.
+   */
+  CellComponent?: React.ComponentType<CalendarCellComponentProps>;
+  /**
+   * Component for rendering navigation buttons (prev/next month).
+   * Defaults to the built-in unstyled button.
+   */
+  NavButtonComponent?: React.ComponentType<NavButtonComponentProps>;
+  /**
+   * Component for rendering the month/year title pill.
+   * Defaults to the built-in unstyled div/button.
+   */
+  TitleComponent?: React.ComponentType<TitleComponentProps>;
+  /**
+   * Component for rendering each year item in the year-selection grid.
+   */
+  YearItemComponent?: React.ComponentType<YearItemComponentProps>;
+  /**
+   * Component for rendering weekday column headers.
+   */
+  WeekdayComponent?: React.ComponentType<{ label: string }>;
+}
+
+/**
+ * Props for a year item slot component.
+ */
+export interface YearItemComponentProps {
+  year: number;
+  isSelected: boolean;
+  onSelect: (year: number) => void;
+}
 
 /**
  * Props for the CalendarCore headless component (Layer 2).
@@ -80,6 +122,11 @@ export interface CalendarCoreProps {
   "aria-label"?: string;
   /** ID of labelling element */
   "aria-labelledby"?: string;
+  /**
+   * Slot component overrides — pass styled components from Layer 3 to inject
+   * CVA classes and state layers into the calendar internals.
+   */
+  slots?: CalendarSlots;
 }
 
 type CalendarInternalProps = Omit<CalendarCoreProps, "selectionMode"> & {
@@ -96,11 +143,13 @@ function YearGrid({
   onYearSelect,
   minYear,
   maxYear,
+  YearItemComponent,
 }: {
   selectedYear: number;
   onYearSelect: (year: number) => void;
   minYear?: number;
   maxYear?: number;
+  YearItemComponent?: React.ComponentType<YearItemComponentProps>;
 }): JSX.Element {
   const currentYear = new Date().getFullYear();
   const startYear = minYear ?? currentYear - YEAR_RANGE_OFFSET;
@@ -129,6 +178,16 @@ function YearGrid({
     >
       {years.map((year) => {
         const isSelected = year === selectedYear;
+        if (YearItemComponent) {
+          return (
+            <YearItemComponent
+              key={year}
+              year={year}
+              isSelected={isSelected}
+              onSelect={onYearSelect}
+            />
+          );
+        }
         return (
           <button
             key={year}
@@ -136,7 +195,7 @@ function YearGrid({
             role="gridcell"
             aria-selected={isSelected}
             data-year-item
-            data-selected={isSelected || undefined}
+            data-selected={isSelected ? "" : undefined}
             ref={isSelected ? selectedRef : undefined}
             onClick={() => onYearSelect(year)}
           >
@@ -206,6 +265,8 @@ function SingleCalendarInner({ calendarRef, ...props }: CalendarInternalProps): 
     props.onViewChange?.("day");
   };
 
+  const slots = props.slots ?? {};
+
   return (
     <div {...calendarProps} ref={calendarRef} className={props.className} data-view={currentView}>
       <CalendarHeader
@@ -214,13 +275,21 @@ function SingleCalendarInner({ calendarRef, ...props }: CalendarInternalProps): 
         nextButtonProps={currentView === "day" ? nextButtonProps : { isDisabled: true }}
         onTitleClick={handleTitleClick}
         showDropdownIndicator
+        {...(slots.NavButtonComponent ? { NavButtonComponent: slots.NavButtonComponent } : {})}
+        {...(slots.TitleComponent ? { TitleComponent: slots.TitleComponent } : {})}
       />
       {currentView === "day" ? (
-        <CalendarGrid state={state} firstDayOfWeek={firstDay} />
+        <CalendarGrid
+          state={state}
+          firstDayOfWeek={firstDay}
+          {...(slots.CellComponent ? { CellComponent: slots.CellComponent } : {})}
+          {...(slots.WeekdayComponent ? { WeekdayComponent: slots.WeekdayComponent } : {})}
+        />
       ) : (
         <YearGrid
           selectedYear={state.focusedDate.year}
           onYearSelect={handleYearSelect}
+          {...(slots.YearItemComponent ? { YearItemComponent: slots.YearItemComponent } : {})}
           {...(props.minValue ? { minYear: props.minValue.year } : {})}
           {...(props.maxValue ? { maxYear: props.maxValue.year } : {})}
         />
@@ -300,6 +369,8 @@ function RangeCalendarInner({ calendarRef, ...props }: CalendarInternalProps): J
     props.onViewChange?.("day");
   };
 
+  const slots = props.slots ?? {};
+
   return (
     <div {...calendarProps} ref={calendarRef} className={props.className} data-view={currentView}>
       <CalendarHeader
@@ -308,13 +379,21 @@ function RangeCalendarInner({ calendarRef, ...props }: CalendarInternalProps): J
         nextButtonProps={currentView === "day" ? nextButtonProps : { isDisabled: true }}
         onTitleClick={handleTitleClick}
         showDropdownIndicator
+        {...(slots.NavButtonComponent ? { NavButtonComponent: slots.NavButtonComponent } : {})}
+        {...(slots.TitleComponent ? { TitleComponent: slots.TitleComponent } : {})}
       />
       {currentView === "day" ? (
-        <CalendarGrid state={state} firstDayOfWeek={firstDay} />
+        <CalendarGrid
+          state={state}
+          firstDayOfWeek={firstDay}
+          {...(slots.CellComponent ? { CellComponent: slots.CellComponent } : {})}
+          {...(slots.WeekdayComponent ? { WeekdayComponent: slots.WeekdayComponent } : {})}
+        />
       ) : (
         <YearGrid
           selectedYear={state.focusedDate.year}
           onYearSelect={handleYearSelect}
+          {...(slots.YearItemComponent ? { YearItemComponent: slots.YearItemComponent } : {})}
           {...(props.minValue ? { minYear: props.minValue.year } : {})}
           {...(props.maxValue ? { maxYear: props.maxValue.year } : {})}
         />
@@ -334,8 +413,9 @@ function RangeCalendarInner({ calendarRef, ...props }: CalendarInternalProps): J
  * Supports day view (calendar grid) and year view (3-column year selection grid)
  * toggled by clicking the month/year title in the header.
  *
- * This is a headless component — it provides behavior, ARIA semantics, and
- * data attributes only. No styling classes are applied.
+ * The `slots` prop allows Layer-3 styled components to inject styled sub-components
+ * (cells, nav buttons, title, year items, weekday labels) without modifying this
+ * headless layer.
  *
  * @example
  * ```tsx
