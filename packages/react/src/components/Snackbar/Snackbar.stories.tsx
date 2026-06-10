@@ -41,7 +41,10 @@ import type { SnackbarPosition } from "./Snackbar.types";
  * - Elevation: level 3 → `shadow-elevation-3`
  * - Width: 288dp min, 568dp max, centered `bottom-4` by default
  * - Auto-dismiss: 4000ms default, pauses on hover and focus
- * - Motion: entry slide 250ms standard-decelerate / exit fade 200ms standard-accelerate
+ * - Motion: position-aware slide + fade, spring-standard effects tokens
+ *   (enter 200ms / exit 150ms, no overshoot — `prefers-reduced-motion` respected)
+ * - Action state layer: `inverse-primary` (MD3-correct on inverse surface)
+ * - Close state layer: `inverse-on-surface` (MD3-correct on inverse surface)
  */
 const meta: Meta<typeof Snackbar> = {
   title: "Components/Snackbar",
@@ -452,6 +455,62 @@ export const StackedSnackbars: Story = {
       description: {
         story:
           "Multiple Snackbars stack vertically with 8dp spacing between them. Each item enters and exits independently. Bottom positions stack upward; top positions stack downward. Click all three buttons quickly to see the full stack.",
+      },
+    },
+  },
+};
+
+// ─── States (action + close slot interaction on inverse surface) ──────────────
+
+/**
+ * Demonstrates the MD3-correct interactive states for the action button and
+ * close icon button on the inverse-surface container.
+ *
+ * **Action button** (`inverse-primary` state layer):
+ * - Hover: `opacity-8` on `bg-inverse-primary`
+ * - Focus-visible: `opacity-10` on `bg-inverse-primary`
+ * - Pressed: `opacity-10` on `bg-inverse-primary`
+ *
+ * **Close icon button** (`inverse-on-surface` state layer):
+ * - Container: 32dp (size-8) — fits within the 48dp snackbar
+ * - Hover: `opacity-8` on `bg-inverse-on-surface`
+ * - Focus-visible: `opacity-10` on `bg-inverse-on-surface`
+ * - Pressed: `opacity-10` on `bg-inverse-on-surface`
+ *
+ * Both use spring-standard-fast-effects (150ms, no overshoot) for state transitions.
+ * Focus rings use the inverse-color tokens for visibility on dark/inverse surfaces.
+ *
+ * Click "Show States Snackbar" to open a persistent Snackbar with both
+ * interactive elements — hover, focus, and press each to observe the state layer.
+ */
+const StatesDemo = (): JSX.Element => {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <div className="flex items-center justify-center p-8">
+      <Button
+        variant="filled"
+        onPress={() =>
+          showSnackbar({
+            message: "Photo deleted",
+            action: { label: "Undo", onAction: () => undefined },
+            showClose: true,
+            duration: 0,
+          })
+        }
+      >
+        Show States Snackbar
+      </Button>
+    </div>
+  );
+};
+
+export const States: Story = {
+  render: () => <StatesDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Opens a persistent Snackbar (duration: 0) with both the action button and close icon visible. Hover, Tab-focus, and press each interactive element to verify MD3-correct state-layer colors on the inverse surface: `inverse-primary` for the action, `inverse-on-surface` for the close icon. The close button is 32dp (size-8), fitting within the 48dp container.",
       },
     },
   },

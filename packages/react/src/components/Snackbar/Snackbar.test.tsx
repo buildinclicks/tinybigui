@@ -126,6 +126,41 @@ describe("Snackbar", () => {
       expect(container).toHaveClass("my-custom-class");
     });
 
+    test("action button state layer uses bg-inverse-primary (MD3 correct on inverse surface)", () => {
+      renderSnackbar({
+        message: "File deleted",
+        action: { label: "Undo", onAction: vi.fn() },
+      });
+      const actionBtn = screen.getByRole("button", { name: "Undo" });
+      // The state layer span is the first aria-hidden span inside the button
+      const stateLayer = actionBtn.querySelector("[aria-hidden='true']");
+      expect(stateLayer?.className).toContain("bg-inverse-primary");
+    });
+
+    test("close button state layer uses bg-inverse-on-surface (MD3 correct on inverse surface)", () => {
+      renderSnackbar({ message: "File deleted", showClose: true });
+      const closeBtn = screen.getByRole("button", { name: /close/i });
+      const stateLayer = closeBtn.querySelector("[aria-hidden='true']");
+      expect(stateLayer?.className).toContain("bg-inverse-on-surface");
+    });
+
+    test("close button is 32dp (size-8) — fits within 48dp snackbar", () => {
+      renderSnackbar({ message: "File deleted", showClose: true });
+      const closeBtn = screen.getByRole("button", { name: /close/i });
+      // Verify the close button is size-8 (32dp), not size-14 (56dp which overflows)
+      expect(closeBtn).toHaveClass("size-8");
+    });
+
+    test("supporting text renders without opacity reduction (full inverse-on-surface)", () => {
+      const { container } = renderSnackbar({
+        message: "Connection lost",
+        supportingText: "Please check your network",
+      });
+      const supportingText = container.querySelector(".mt-1");
+      // Supporting text slot must NOT have opacity-80 (non-spec opacity reduction)
+      expect(supportingText?.className).not.toContain("opacity-80");
+    });
+
     test("forwards ref to container element", () => {
       const ref = { current: null };
       render(
@@ -466,16 +501,19 @@ describe("Snackbar", () => {
   // ---------------------------------------------------------------------------
 
   describe("Animation states", () => {
-    test("container starts with entering animation class", () => {
+    test("container has slide+fade transition classes", () => {
       renderSnackbar({ message: "Hello" });
       const el = screen.getByRole("status");
+      // Base container carries the combined transition property
       expect(el.className).toMatch(/transition/);
     });
 
-    test("container applies opacity class for visibility", () => {
+    test("container starts in entering state (opacity-0 + translate offset)", () => {
       renderSnackbar({ message: "Hello" });
       const el = screen.getByRole("status");
-      expect(el.className).toMatch(/opacity/);
+      // Entering state: opacity-0 and translate-y-3 (bottom positions slide from below)
+      expect(el.className).toMatch(/opacity-0/);
+      expect(el.className).toMatch(/translate-y-3/);
     });
   });
 
@@ -556,21 +594,24 @@ describe("Snackbar", () => {
       expect(container.className).toMatch(/right-4/);
     });
 
-    test("bottom positions enter with scale-75 and origin-bottom (zoom-in from bottom)", () => {
+    test("bottom positions enter with translate-y-3 and opacity-0 (slide from below)", () => {
       renderSnackbar({ message: "Hello", position: "bottom-center" });
       const el = screen.getByRole("status");
-      // In entering state (before the zero-delay setTimeout fires), the snackbar
-      // starts at scale-75 + opacity-0, anchored at origin-bottom for the zoom.
-      expect(el.className).toMatch(/scale-75/);
-      expect(el.className).toMatch(/origin-bottom/);
+      // In entering state (before the double rAF fires), the snackbar starts
+      // offset downward (translate-y-3) and transparent — the slide-up entry
+      // begins from this position.
+      expect(el.className).toMatch(/translate-y-3/);
+      expect(el.className).toMatch(/opacity-0/);
     });
 
-    test("top positions enter with scale-75 and origin-top (zoom-in from top)", () => {
+    test("top positions enter with -translate-y-3 and opacity-0 (slide from above)", () => {
       renderSnackbar({ message: "Hello", position: "top-center" });
       const el = screen.getByRole("status");
-      // In entering state with "down" direction, scale anchors at origin-top.
-      expect(el.className).toMatch(/scale-75/);
-      expect(el.className).toMatch(/origin-top/);
+      // In entering state with "down" direction, the snackbar starts offset
+      // upward (-translate-y-3) and transparent — the slide-down entry begins
+      // from this position.
+      expect(el.className).toMatch(/-translate-y-3/);
+      expect(el.className).toMatch(/opacity-0/);
     });
   });
 

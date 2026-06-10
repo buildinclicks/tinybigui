@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Snackbar** — MD3 slot-based architecture refactor; inverse-surface state layers on action and close buttons; spring-standard enter/exit motion with position-aware slide; dedicated action/close slot CVAs; two-line density and close button sizing fixes
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.19.0] - 2026-06-10
 
 ### Changed
