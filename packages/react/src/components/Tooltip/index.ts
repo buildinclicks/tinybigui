@@ -7,12 +7,23 @@ export { RichTooltip } from "./RichTooltip";
 // Layer 2: Headless Primitives (for advanced customization)
 export { TooltipTriggerHeadless, TooltipOverlayHeadless } from "./TooltipHeadless";
 
-// CVA Variants
+// CVA Variants — containers
 export {
   tooltipVariants,
   richTooltipVariants,
   type TooltipVariants,
   type RichTooltipVariants,
+} from "./Tooltip.variants";
+
+// CVA Variants — rich tooltip slots
+export {
+  richTooltipTitleVariants,
+  richTooltipSupportingTextVariants,
+  richTooltipActionsVariants,
+  type RichTooltipTitleVariants,
+  type RichTooltipSupportingTextVariants,
+  type RichTooltipActionsVariants,
+  type TooltipAnimationState,
 } from "./Tooltip.variants";
 
 // Types

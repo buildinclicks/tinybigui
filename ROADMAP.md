@@ -4,9 +4,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.21.0 (released 2026-06-10)  
+**Current Version:** v0.21.1 (released 2026-06-10)  
 **Next Release:** v0.22.0  
-**Status:** 29 components published to NPM; 2,134 tests passing
+**Status:** 29 components published to NPM; 2,143 tests passing
 
 ## Release Timeline
 
@@ -38,6 +38,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.19.0 | —       | Slider MD3 expressive refactor — variants-vs-states architecture, spring motion, absolute track positioning, range/vertical layout fixes, vertical handle sizing | Released 2026-06-10 |
 | v0.20.0 | —       | Snackbar MD3 expressive refactor — slot-based architecture, inverse-surface state layers, spring motion, dedicated action/close slots, two-line density fix      | Released 2026-06-10 |
 | v0.21.0 | —       | SplitButton MD3 expressive refactor — variants-vs-states architecture, 5-size scale, elevated variant, inner-corner shape morphing, spring motion                | Released 2026-06-10 |
+| v0.21.1 | —       | Tooltip MD3 slot-based styling refactor — 3-state animation variant, rich tooltip token fixes, reduced-motion unmount guard, 9 new tests                         | Released 2026-06-10 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                                 | Planned             |
 
 ## Completed Work
@@ -103,7 +104,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
 - [x] CVA variant management with variants-vs-states architecture
-- [x] Vitest + React Testing Library (2,134 tests)
+- [x] Vitest + React Testing Library (2,143 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards

@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.21.0** (2026-06-10)
+> **Latest Release: v0.21.1** (2026-06-10)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -166,7 +166,7 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 | `Menu`        | ✅     | Dropdown, context menu, submenus                                                   |
 | `Progress`    | ✅     | MD3 expressive slot CVA, colorful tokens, wavy shape, thick track (v0.16.0)        |
 | `BottomSheet` | ✅     | MD3 expressive handle, variants-vs-states architecture (v0.11.0)                   |
-| `Tooltip`     | ✅     | Plain and rich tooltip with positioning                                            |
+| `Tooltip`     | ✅     | Slot-based MD3 styling, reduced-motion guard, rich tooltip token fixes (v0.21.1)   |
 
 ### Phase 4: Data Display ✅
 
