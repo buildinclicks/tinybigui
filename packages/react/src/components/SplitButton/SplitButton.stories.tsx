@@ -381,6 +381,43 @@ export const Accessibility: Story = {
   },
 };
 
+// ─── Selected state (trailing = full circle) ─────────────────────────────────
+
+const SelectedStateExample = (): React.ReactElement => {
+  return (
+    <div className="flex flex-col items-start gap-8">
+      <p className="text-body-medium text-on-surface-variant max-w-sm">
+        When the dropdown is open the trailing segment morphs into a full circle. Click the chevron
+        to toggle the selected state.
+      </p>
+      {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
+        <div key={size} className="flex flex-col gap-1">
+          <span className="text-label-medium text-on-surface-variant uppercase">{size}</span>
+          <SplitButton
+            variant="filled"
+            size={size}
+            primaryLabel="Save"
+            onPrimaryAction={noop}
+            items={saveItems}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const SelectedState: Story = {
+  render: () => <SelectedStateExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Click the chevron on each size to open the menu and observe the trailing segment animate into a full circle with the chevron centered. The inner-corner radius morphs through the specificity ladder: rest → hover/focus (moderate) → pressed (stronger) → selected (full circle).",
+      },
+    },
+  },
+};
+
 // ─── Playground ──────────────────────────────────────────────────────────────
 
 export const Playground: Story = {

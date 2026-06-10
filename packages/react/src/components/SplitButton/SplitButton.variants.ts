@@ -18,31 +18,41 @@ import { cva, type VariantProps } from "class-variance-authority";
  *   splitButtonStateLayerVariants — per-segment hover/focus/press opacity overlay
  *   splitButtonFocusRingVariants  — per-segment keyboard focus outline (extends outside overflow-hidden)
  *   splitButtonLabelVariants      — leading label text slot
- *   splitButtonIconVariants       — leading/trailing icon wrapper
+ *   splitButtonIconVariants       — icon wrapper; carries per-size optical offset + selected reset
  *   splitButtonMenuVariants       — dropdown menu surface
  *   splitButtonMenuItemVariants   — individual menu item row
  *
  * MD3 Expressive Specs:
  *   Shape: outer corners rounded-full; inner corners morph on interaction
  *   Height: 32dp xs | 40dp sm | 56dp md | 96dp lg | 136dp xl
+ *   Trailing segment is always square (width = height); selected state = perfect circle
  *   Gap between segments: 2dp (gap-0.5)
  *   Icon size: 20px xs/sm | 24px md | 32px lg | 40px xl
  *   State-layer opacities: hover 8% | focus 10% | pressed 10%
  *   Disabled: container on-surface/12 | content on-surface/38
  *   Elevation: elevated base=1 hover=2; filled/tonal base=0 hover=1; outlined none
  *
- * Inner-corner radius per size (MD3 spec — 2dp space rule):
- *   xs/sm/md → --radius-xs  (4dp)
- *   lg       → --radius-sm  (8dp)
- *   xl       → --radius-md  (12dp)
+ * Inner-corner radius morph table (--sb-inner-radius CSS variable):
  *
- * When the segment is hovered, focused, or pressed the inner corner morphs to
- * the next step up: xs/sm/md → --radius-sm (8dp), lg/xl → --radius-lg (16dp).
+ *   Size     Rest         Hover / Focus        Pressed (stronger)   Selected (trailing)
+ *   xs/sm/md --radius-xs  --radius-sm          --radius-lg          --radius-full
+ *   lg       --radius-sm  --radius-lg          --radius-xl          --radius-full
+ *   xl       --radius-md  --radius-lg          --radius-xl          --radius-full
+ *
+ * Specificity ladder (CSS attribute selector weight, all at same cascade layer):
+ *   rest           → [--sb-inner-radius:...] (0,0,0 base class)
+ *   hovered        → data-[hovered]:         (0,1,0)
+ *   focus-visible  → data-[fv]:data-[fv]:    (0,2,0)
+ *   pressed        → data-[pressed]:data-[pressed]:data-[pressed]:  (0,3,0)
+ *   selected       → data-[sel]:data-[sel]:data-[sel]:data-[sel]:   (0,4,0) — always wins
  *
  * Motion token pairing:
- *   Border-radius (spatial)   → duration-expressive-fast-spatial  ease-expressive-fast-spatial
- *   Opacity / color (effects) → duration-spring-standard-fast-effects ease-spring-standard-fast-effects
- *   Elevation shadow (effects)→ duration-spring-standard-fast-effects ease-spring-standard-fast-effects
+ *   Border-radius / transform (spatial) → duration-expressive-fast-spatial ease-expressive-fast-spatial
+ *   Opacity / color / shadow (effects)  → duration-spring-standard-fast-effects ease-spring-standard-fast-effects
+ *
+ * Chevron optical offset (MD3 spec — trailing icon shifts toward center gap when unselected):
+ *   xs/sm: -1dp  md: -2dp  lg: -3dp  xl: -6dp
+ *   Resets to translate-x-0 when group-data-[selected]/sb-trailing is present.
  */
 
 // ─── OUTER CONTAINER ─────────────────────────────────────────────────────────
@@ -78,11 +88,13 @@ export const splitButtonLeadingVariants = cva(
     "rounded-tl-full rounded-bl-full",
     "rounded-tr-[var(--sb-inner-radius,var(--radius-xs))]",
     "rounded-br-[var(--sb-inner-radius,var(--radius-xs))]",
-    // Inner-corner size defaults per state (self-targeting — segment owns the variable)
+    // Inner-corner morph — xs/sm/md defaults; lg/xl override in size variants below.
+    // Specificity ladder: rest (0,0,0) < hover (0,1,0) < focus (0,2,0) < pressed (0,3,0)
     "[--sb-inner-radius:var(--radius-xs)]",
     "data-[hovered]:[--sb-inner-radius:var(--radius-sm)]",
     "data-[focus-visible]:data-[focus-visible]:[--sb-inner-radius:var(--radius-sm)]",
-    "data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-sm)]",
+    // Pressed morphs stronger than hover/focus — tripled selector → (0,3,0)
+    "data-[pressed]:data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-lg)]",
     // Spatial transition for border-radius morphing
     "transition-[border-radius]",
     "duration-expressive-fast-spatial ease-expressive-fast-spatial",
@@ -151,8 +163,8 @@ export const splitButtonLeadingVariants = cva(
       },
 
       /**
-       * Size — governs height, horizontal padding, typography, and inner-corner default.
-       * lg/xl override the --sb-inner-radius default to larger steps.
+       * Size — governs height, horizontal padding, typography, and inner-corner rest/morph values.
+       * lg/xl need larger rest radii so their morph steps differ from xs/sm/md.
        */
       size: {
         xs: "h-8 pl-4 pr-3 text-label-large",
@@ -160,17 +172,19 @@ export const splitButtonLeadingVariants = cva(
         md: "h-14 pl-8 pr-6 text-title-medium",
         lg: [
           "h-24 pl-10 pr-8 text-headline-small",
+          // lg rest=sm, hover/focus→lg, pressed→xl
           "[--sb-inner-radius:var(--radius-sm)]",
           "data-[hovered]:[--sb-inner-radius:var(--radius-lg)]",
           "data-[focus-visible]:data-[focus-visible]:[--sb-inner-radius:var(--radius-lg)]",
-          "data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-lg)]",
+          "data-[pressed]:data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-xl)]",
         ],
         xl: [
           "h-[8.5rem] pl-12 pr-10 text-headline-large",
+          // xl rest=md, hover/focus→lg, pressed→xl
           "[--sb-inner-radius:var(--radius-md)]",
           "data-[hovered]:[--sb-inner-radius:var(--radius-lg)]",
           "data-[focus-visible]:data-[focus-visible]:[--sb-inner-radius:var(--radius-lg)]",
-          "data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-lg)]",
+          "data-[pressed]:data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-xl)]",
         ],
       },
     },
@@ -193,18 +207,22 @@ export const splitButtonLeadingVariants = cva(
  */
 export const splitButtonTrailingVariants = cva(
   [
-    // Layout
-    "group/sb-trailing relative inline-flex items-center justify-center",
+    // Layout — square so that selected (rounded-full on all corners) = perfect circle
+    "group/sb-trailing relative inline-flex items-center justify-center shrink-0",
     "cursor-pointer select-none",
     // Shape — asymmetric corners, inner on the left side
     "rounded-tr-full rounded-br-full",
     "rounded-tl-[var(--sb-inner-radius,var(--radius-xs))]",
     "rounded-bl-[var(--sb-inner-radius,var(--radius-xs))]",
-    // Inner-corner size defaults per state
+    // Inner-corner morph — xs/sm/md defaults; lg/xl override in size variants below.
+    // Specificity ladder: rest (0,0,0) < hover (0,1,0) < focus (0,2,0) < pressed (0,3,0) < selected (0,4,0)
     "[--sb-inner-radius:var(--radius-xs)]",
     "data-[hovered]:[--sb-inner-radius:var(--radius-sm)]",
     "data-[focus-visible]:data-[focus-visible]:[--sb-inner-radius:var(--radius-sm)]",
-    "data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-sm)]",
+    // Pressed morphs stronger than hover/focus — tripled → (0,3,0)
+    "data-[pressed]:data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-lg)]",
+    // Selected (menu open) → full circle; quadrupled → (0,4,0) always wins
+    "data-[selected]:data-[selected]:data-[selected]:data-[selected]:[--sb-inner-radius:var(--radius-full)]",
     // Spatial transition for border-radius morphing
     "transition-[border-radius]",
     "duration-expressive-fast-spatial ease-expressive-fast-spatial",
@@ -242,23 +260,26 @@ export const splitButtonTrailingVariants = cva(
       },
 
       size: {
-        // MD3 menu-icon optical offset when unselected; centered when selected (data-selected:px-*)
-        xs: "h-8 px-3",
-        sm: "h-10 px-4",
-        md: "h-14 px-5",
+        // Square dimensions (width = height) so selected state = perfect circle.
+        // Per-size inner-radius rest/morph values mirror the leading segment.
+        xs: "h-8 w-8",
+        sm: "h-10 w-10",
+        md: "h-14 w-14",
         lg: [
-          "h-24 px-7",
+          "h-24 w-24",
+          // lg rest=sm, hover/focus→lg, pressed→xl; selected→full handled in base classes
           "[--sb-inner-radius:var(--radius-sm)]",
           "data-[hovered]:[--sb-inner-radius:var(--radius-lg)]",
           "data-[focus-visible]:data-[focus-visible]:[--sb-inner-radius:var(--radius-lg)]",
-          "data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-lg)]",
+          "data-[pressed]:data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-xl)]",
         ],
         xl: [
-          "h-[8.5rem] px-10",
+          "h-[8.5rem] w-[8.5rem]",
+          // xl rest=md, hover/focus→lg, pressed→xl; selected→full handled in base classes
           "[--sb-inner-radius:var(--radius-md)]",
           "data-[hovered]:[--sb-inner-radius:var(--radius-lg)]",
           "data-[focus-visible]:data-[focus-visible]:[--sb-inner-radius:var(--radius-lg)]",
-          "data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-lg)]",
+          "data-[pressed]:data-[pressed]:data-[pressed]:[--sb-inner-radius:var(--radius-xl)]",
         ],
       },
     },
@@ -390,17 +411,32 @@ export const splitButtonLabelVariants = cva(["relative z-10 inline-flex items-ce
  *
  * Size scales with the button size per MD3 spec:
  *   xs/sm → 20px | md → 24px | lg → 32px | xl → 40px
+ *
+ * For the trailing chevron the MD3 spec calls for an optical offset toward the
+ * gap between segments when the button is unselected, and resets to centered
+ * when selected (menu open). The offset is applied as a negative translate-x
+ * and reverted via group-data-[selected]/sb-trailing:translate-x-0.
+ *
+ * Chevron optical offsets (trailing only):
+ *   xs/sm: -1dp  md: -2dp  lg: -3dp  xl: -6dp
  */
 export const splitButtonIconVariants = cva(
-  ["relative z-10 inline-flex shrink-0 items-center justify-center"],
+  [
+    "relative z-10 inline-flex shrink-0 items-center justify-center",
+    // Spatial spring motion for the optical-offset translate
+    "transition-transform duration-spring-standard-fast-spatial ease-spring-standard-fast-spatial",
+    // Reset offset when the trailing segment is in selected state (menu open)
+    "group-data-[selected]/sb-trailing:translate-x-0",
+  ],
   {
     variants: {
       size: {
-        xs: "size-5",
-        sm: "size-5",
-        md: "size-6",
-        lg: "size-8",
-        xl: "size-10",
+        // Include per-size icon dimension + unselected optical offset
+        xs: ["size-5", "-translate-x-px"],
+        sm: ["size-5", "-translate-x-px"],
+        md: ["size-6", "-translate-x-0.5"],
+        lg: ["size-8", "-translate-x-[3px]"],
+        xl: ["size-10", "-translate-x-[6px]"],
       },
     },
     defaultVariants: { size: "sm" },

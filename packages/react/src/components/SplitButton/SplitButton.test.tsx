@@ -353,6 +353,30 @@ describe("SplitButton (Styled)", () => {
         expect(btn).toHaveClass("h-14");
       }
     });
+
+    // Test 38: Trailing segment is square at size="sm" (w-10 = h-10 → circle when selected)
+    test('trailing segment is square (w-10) at size="sm"', () => {
+      renderStyledSplitButton({ size: "sm" });
+      const buttons = screen.getAllByRole("button");
+      const trailing = buttons.find((b) => b.getAttribute("aria-haspopup") === "menu");
+      expect(trailing).toHaveClass("w-10");
+    });
+
+    // Test 39: Trailing segment is square at size="xs" (w-8)
+    test('trailing segment is square (w-8) at size="xs"', () => {
+      renderStyledSplitButton({ size: "xs" });
+      const buttons = screen.getAllByRole("button");
+      const trailing = buttons.find((b) => b.getAttribute("aria-haspopup") === "menu");
+      expect(trailing).toHaveClass("w-8");
+    });
+
+    // Test 40: Trailing segment is square at size="md" (w-14)
+    test('trailing segment is square (w-14) at size="md"', () => {
+      renderStyledSplitButton({ size: "md" });
+      const buttons = screen.getAllByRole("button");
+      const trailing = buttons.find((b) => b.getAttribute("aria-haspopup") === "menu");
+      expect(trailing).toHaveClass("w-14");
+    });
   });
 
   describe("Chevron Icon", () => {
@@ -429,6 +453,19 @@ describe("SplitButton (Styled)", () => {
       expect(trailing).not.toHaveAttribute("data-selected");
       await user.click(trailing);
       expect(trailing).toHaveAttribute("data-selected");
+    });
+
+    // Test 41: Trailing segment carries the selected→full-circle radius utility
+    // The CSS variable override class for --sb-inner-radius:var(--radius-full) must be
+    // present on the trailing button so the full-circle shape renders in the browser.
+    test("trailing segment has full-circle radius utility class", () => {
+      renderStyledSplitButton({ size: "sm" });
+      const buttons = screen.getAllByRole("button");
+      const trailing = buttons.find((b) => b.getAttribute("aria-haspopup") === "menu")!;
+      // The quadrupled data-[selected] selector class is present regardless of open state;
+      // it is the CSS specificity mechanism, not a runtime class toggle.
+      const classList = Array.from(trailing.classList).join(" ");
+      expect(classList).toContain("data-[selected]");
     });
   });
 
