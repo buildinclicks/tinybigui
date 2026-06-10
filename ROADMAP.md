@@ -4,9 +4,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.17.0 (released 2026-06-10)  
-**Next Release:** v0.18.0  
-**Status:** 29 components published to NPM; 2,101 tests passing
+**Current Version:** v0.18.0 (released 2026-06-10)  
+**Next Release:** v0.19.0  
+**Status:** 29 components published to NPM; 2,108 tests passing
 
 ## Release Timeline
 
@@ -34,6 +34,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.15.0 | —       | List MD3 expressive refactor — variants-vs-states architecture, state layer, focus ring, spring motion, slot CVAs; per-item `onAction` removed (breaking) | Released 2026-06-10 |
 | v0.16.0 | —       | Progress MD3 expressive refactor — colorful tokens, 4dp gap, wavy shape, thick track, slot-based CVA, spring motion                                       | Released 2026-06-10 |
 | v0.17.0 | —       | Radio MD3 expressive refactor — variants-vs-states architecture, slot CVAs, spring motion, `isInvalid` forwarding fix in RadioGroup                       | Released 2026-06-10 |
+| v0.18.0 | —       | Search MD3 expressive refactor — variants-vs-states architecture, per-slot CVAs, React Aria hover/focus, layout-aware enter motion, MD3 SVG icons         | Released 2026-06-10 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                          | Planned             |
 
 ## Completed Work
@@ -99,7 +100,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
 - [x] CVA variant management with variants-vs-states architecture
-- [x] Vitest + React Testing Library (2,101 tests)
+- [x] Vitest + React Testing Library (2,108 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards

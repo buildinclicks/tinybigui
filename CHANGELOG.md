@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-06-10
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Search** — MD3 expressive variants-vs-states architecture refactor; per-slot CVAs for SearchBar and SearchView; React Aria hover/focus with sibling focus ring; layout-aware enter motion (docked scale-in, fullscreen fade-in); MD3 SVG icons replace literal glyphs; search variant CVA exports added
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.17.0] - 2026-06-10
 
 ### Changed

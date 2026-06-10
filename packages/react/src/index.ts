@@ -312,9 +312,25 @@ export {
   SearchView,
   SearchBarHeadless,
   SearchViewHeadless,
-  searchBarVariants,
+  // Bar slot CVAs
+  searchBarRootVariants,
+  searchBarStateLayerVariants,
+  searchBarFocusRingVariants,
+  searchBarLeadingIconVariants,
+  searchBarTrailingActionVariants,
+  searchBarTrailingActionsVariants,
+  searchBarAvatarVariants,
+  searchBarInputVariants,
+  // View slot CVAs
   searchViewVariants,
   searchViewHeaderVariants,
+  searchViewBackButtonVariants,
+  searchViewClearButtonVariants,
+  searchViewTrailingActionVariants,
+  searchViewTrailingActionsVariants,
+  searchViewInputVariants,
+  searchViewDividerVariants,
+  searchViewContentVariants,
 } from "./components/Search";
 export type {
   SearchStyle,
