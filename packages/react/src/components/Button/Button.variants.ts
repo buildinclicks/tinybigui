@@ -10,11 +10,20 @@ import { cva, type VariantProps } from "class-variance-authority";
  * - Content flags (data-with-icon, data-loading) are set explicitly by the component.
  *
  * Slot responsibilities:
- *   buttonVariants           — root <button>; shape, color, elevation
+ *   buttonVariants           — root <button>; shape, text color, elevation (shadow)
+ *   buttonContainerVariants  — absolute inset child; background color + disabled bg override
  *   buttonStateLayerVariants — hover/focus/press opacity ring (absolute inset overlay)
  *   buttonFocusRingVariants  — keyboard focus outline, MUST NOT be inside overflow-hidden
  *   buttonIconVariants       — leading/trailing icon wrapper
  *   buttonLabelVariants      — label text slot
+ *
+ * Why background lives on a child slot (buttonContainerVariants) rather than the root:
+ *   Tailwind `group-data-[x]/button:` generates a descendant combinator selector —
+ *   `.group\/button[data-x] .target`. The root <button> IS the group host and cannot
+ *   be its own descendant, so group selectors cannot target it directly. Moving the
+ *   background to an absolutely-positioned child span lets us use the proven
+ *   `group-data-[disabled]/button:bg-on-surface/12` pattern (same as Switch track)
+ *   to override the container background on disabled, guaranteeing correct specificity.
  *
  * MD3 Spec:
  *   Shape: rounded-full (corner-full)
@@ -37,12 +46,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 /**
  * Root <button> element.
  *
+ * Owns: shape, text color, elevation (box-shadow), cursor, layout.
+ * Does NOT own background-color — that lives on buttonContainerVariants so
+ * the group-data disabled override can reach it via descendant selector.
+ *
  * IMPORTANT — overflow is intentionally NOT on the root.
  * Overflow clipping is delegated to the ripple container and state layer
  * via `overflow-hidden rounded-[inherit]` on those children. This lets the
  * focus ring span (`inset-[-3px]`) extend outside the button boundary and
  * remain fully visible — if overflow-hidden were on the root it would be
  * clipped to zero width.
+ *
+ * Elevation state classes use self-targeting `data-[x]:` (not group-data)
+ * because the root is the group host and cannot be its own descendant.
  */
 export const buttonVariants = cva(
   [
@@ -64,6 +80,10 @@ export const buttonVariants = cva(
        *   Filled/Tonal  hover→level-1, focus/pressed→level-0
        *   Elevated      base→level-1, hover→level-2, focus/pressed→level-1
        *   Outlined/Text no elevation
+       *
+       * Self-targeting `data-[x]:` is used for elevation because these classes
+       * sit on the root element (the group host) — group-data descendant
+       * selectors cannot match an element against itself.
        */
       variant: {
         /**
@@ -72,17 +92,17 @@ export const buttonVariants = cva(
          * Elevation: 0 base → 1 hover → 0 focus → 0 pressed
          */
         filled: [
-          "bg-primary text-on-primary shadow-none",
+          "text-on-primary shadow-none",
           // Hover: gains level-1 elevation
-          "group-data-[hovered]/button:shadow-elevation-1",
+          "data-[hovered]:shadow-elevation-1",
           // Focus/pressed: shadow must explicitly return to level-0
           // (doubled attribute selector → higher specificity than hover)
-          "group-data-[focus-visible]/button:shadow-none",
-          "group-data-[pressed]/button:group-data-[pressed]/button:shadow-none",
-          // Disabled overrides
-          "group-data-[disabled]/button:bg-on-surface/12",
-          "group-data-[disabled]/button:text-on-surface/38",
-          "group-data-[disabled]/button:shadow-none",
+          "data-[focus-visible]:data-[focus-visible]:shadow-none",
+          "data-[pressed]:data-[pressed]:data-[pressed]:shadow-none",
+          // Disabled overrides — root owns text color + shadow only;
+          // disabled bg override lives on buttonContainerVariants (filled variant)
+          "data-[disabled]:text-on-surface/38",
+          "data-[disabled]:shadow-none",
         ],
 
         /**
@@ -91,10 +111,10 @@ export const buttonVariants = cva(
          * Elevation: always 0
          */
         outlined: [
-          "bg-transparent border border-outline text-primary",
+          "border border-outline text-primary",
           // Disabled overrides
-          "group-data-[disabled]/button:border-on-surface/12",
-          "group-data-[disabled]/button:text-on-surface/38",
+          "data-[disabled]:border-on-surface/12",
+          "data-[disabled]:text-on-surface/38",
         ],
 
         /**
@@ -103,16 +123,15 @@ export const buttonVariants = cva(
          * Elevation: 0 base → 1 hover → 0 focus → 0 pressed
          */
         tonal: [
-          "bg-secondary-container text-on-secondary-container shadow-none",
+          "text-on-secondary-container shadow-none",
           // Hover: gains level-1 elevation (same as filled)
-          "group-data-[hovered]/button:shadow-elevation-1",
+          "data-[hovered]:shadow-elevation-1",
           // Focus/pressed: return to level-0
-          "group-data-[focus-visible]/button:shadow-none",
-          "group-data-[pressed]/button:group-data-[pressed]/button:shadow-none",
+          "data-[focus-visible]:data-[focus-visible]:shadow-none",
+          "data-[pressed]:data-[pressed]:data-[pressed]:shadow-none",
           // Disabled overrides
-          "group-data-[disabled]/button:bg-on-surface/12",
-          "group-data-[disabled]/button:text-on-surface/38",
-          "group-data-[disabled]/button:shadow-none",
+          "data-[disabled]:text-on-surface/38",
+          "data-[disabled]:shadow-none",
         ],
 
         /**
@@ -121,17 +140,16 @@ export const buttonVariants = cva(
          * Elevation: 1 base → 2 hover → 1 focus → 1 pressed
          */
         elevated: [
-          "bg-surface-container-low text-primary shadow-elevation-1",
+          "text-primary shadow-elevation-1",
           // Hover: gains extra elevation
-          "group-data-[hovered]/button:shadow-elevation-2",
+          "data-[hovered]:shadow-elevation-2",
           // Focus/pressed: return to base level-1
           // (doubled selector wins over single hover selector at same cascade position)
-          "group-data-[focus-visible]/button:shadow-elevation-1",
-          "group-data-[pressed]/button:group-data-[pressed]/button:shadow-elevation-1",
+          "data-[focus-visible]:data-[focus-visible]:shadow-elevation-1",
+          "data-[pressed]:data-[pressed]:data-[pressed]:shadow-elevation-1",
           // Disabled overrides
-          "group-data-[disabled]/button:bg-on-surface/12",
-          "group-data-[disabled]/button:text-on-surface/38",
-          "group-data-[disabled]/button:shadow-none",
+          "data-[disabled]:text-on-surface/38",
+          "data-[disabled]:shadow-none",
         ],
 
         /**
@@ -140,9 +158,9 @@ export const buttonVariants = cva(
          * Elevation: always 0
          */
         text: [
-          "bg-transparent text-primary",
+          "text-primary",
           // Disabled overrides
-          "group-data-[disabled]/button:text-on-surface/38",
+          "data-[disabled]:text-on-surface/38",
         ],
       },
 
@@ -182,6 +200,44 @@ export const buttonVariants = cva(
       size: "medium",
       fullWidth: false,
     },
+  }
+);
+
+// ─── BACKGROUND CONTAINER ─────────────────────────────────────────────────────
+
+/**
+ * Background container — absolute inset child span that owns the container
+ * background color for each variant and applies the MD3 disabled bg override.
+ *
+ * Separated from the root because the root is the `group/button` host and
+ * cannot be targeted by its own `group-data-[x]/button:` selectors (those
+ * generate descendant combinators). As a real child, this slot DOES match
+ * `group-data-[disabled]/button:` with full specificity, exactly like the
+ * Switch track slot.
+ *
+ * MD3 disabled: container uses on-surface at 12% opacity.
+ */
+export const buttonContainerVariants = cva(
+  [
+    "absolute inset-0 rounded-[inherit] pointer-events-none",
+    // Effects transition for background-color — no overshoot
+    "transition-[background-color] duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+  ],
+  {
+    variants: {
+      variant: {
+        // MD3 disabled: filled containers replace bg with on-surface/12.
+        // group-data descendant selector targets this child span (not the root host).
+        filled: "bg-primary group-data-[disabled]/button:bg-on-surface/12",
+        // outlined/text: container stays transparent when disabled — only border + label fade.
+        outlined: "bg-transparent",
+        // MD3 disabled: tonal and elevated containers also replace bg with on-surface/12.
+        tonal: "bg-secondary-container group-data-[disabled]/button:bg-on-surface/12",
+        elevated: "bg-surface-container-low group-data-[disabled]/button:bg-on-surface/12",
+        text: "bg-transparent",
+      },
+    },
+    defaultVariants: { variant: "filled" },
   }
 );
 
@@ -303,6 +359,7 @@ export const buttonLabelVariants = cva(["relative z-10 inline-flex items-center"
 // ─── EXPORTED TYPES ───────────────────────────────────────────────────────────
 
 export type ButtonVariants = VariantProps<typeof buttonVariants>;
+export type ButtonContainerVariants = VariantProps<typeof buttonContainerVariants>;
 export type ButtonStateLayerVariants = VariantProps<typeof buttonStateLayerVariants>;
 export type ButtonIconVariants = VariantProps<typeof buttonIconVariants>;
 export type ButtonLabelVariants = VariantProps<typeof buttonLabelVariants>;

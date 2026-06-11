@@ -2,7 +2,7 @@
 
 import { type JSX } from "react";
 import { Header as RACHeader } from "react-aria-components";
-import { HeadlessMenuSection, HeadlessMenuDivider } from "./MenuHeadless";
+import { HeadlessMenuSection, HeadlessMenuDivider, useMenuContext } from "./MenuHeadless";
 import {
   menuSectionVariants,
   menuSectionHeaderVariants,
@@ -16,6 +16,10 @@ import type { MenuSectionProps } from "./Menu.types";
  *
  * Groups related `MenuItem` elements with an optional section header and an
  * optional top divider.
+ *
+ * The section header color adapts to the `colorScheme` from `MenuContext`:
+ *   standard → text-on-surface-variant
+ *   vibrant  → text-on-tertiary-container
  *
  * **Implementation note**: The divider is rendered as a SIBLING BEFORE the
  * `RACMenuSection`, NOT inside it. RAC's `Section`/`MenuSection` only accepts
@@ -38,6 +42,9 @@ export function MenuSection({
   className,
   "aria-label": ariaLabel,
 }: MenuSectionProps): JSX.Element {
+  const ctx = useMenuContext();
+  const colorScheme = ctx?.colorScheme ?? "standard";
+
   // The union type guarantees at least one of these is a string.
   const sectionAriaLabel = (ariaLabel ?? header)!;
 
@@ -51,7 +58,7 @@ export function MenuSection({
       >
         {/* RAC Header component renders a semantic section header inside the group */}
         {header && (
-          <RACHeader className={menuSectionHeaderVariants()} aria-hidden="true">
+          <RACHeader className={menuSectionHeaderVariants({ colorScheme })} aria-hidden="true">
             {header}
           </RACHeader>
         )}

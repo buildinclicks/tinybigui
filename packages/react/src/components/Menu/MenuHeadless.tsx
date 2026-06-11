@@ -30,6 +30,7 @@ import {
 } from "react-aria-components";
 import { useButton } from "react-aria";
 import { useOverlayTriggerState } from "react-stately";
+import { menuPopoverVariants } from "./Menu.variants";
 import type {
   HeadlessMenuTriggerProps,
   HeadlessMenuProps,
@@ -132,7 +133,12 @@ export function HeadlessMenuTrigger({
        * Without isNonModal the Popover uses the standard modal overlay underlay,
        * which correctly dismisses the menu on any outside pointer interaction.
        */}
-      <Popover placement={placement} shouldFlip={shouldFlip} offset={4}>
+      <Popover
+        placement={placement}
+        shouldFlip={shouldFlip}
+        offset={4}
+        className={menuPopoverVariants()}
+      >
         {menuChild}
       </Popover>
     </RACMenuTrigger>
@@ -266,7 +272,9 @@ export function HeadlessSubmenuTrigger({
   // trigger MenuItem, second is a Popover wrapping the submenu.
   const racChildren: ReactElement[] = [
     triggerItem as ReactElement,
-    <Popover key="submenu-popover">{menuChild}</Popover>,
+    <Popover key="submenu-popover" className={menuPopoverVariants()}>
+      {menuChild}
+    </Popover>,
   ];
 
   return (
@@ -339,7 +347,13 @@ export function HeadlessContextMenuTrigger({
        * directly, which correctly dismisses the context menu.
        */}
       <OverlayTriggerStateContext.Provider value={internalState}>
-        <Popover triggerRef={virtualTriggerRef} placement="bottom start" shouldFlip offset={0}>
+        <Popover
+          triggerRef={virtualTriggerRef}
+          placement="bottom start"
+          shouldFlip
+          offset={0}
+          className={menuPopoverVariants()}
+        >
           {menuChild}
         </Popover>
       </OverlayTriggerStateContext.Provider>

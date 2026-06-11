@@ -2,6 +2,7 @@
 export { MenuTrigger, Menu } from "./Menu";
 export { MenuItem } from "./MenuItem";
 export { MenuSection } from "./MenuSection";
+export { MenuItemGroup } from "./MenuItemGroup";
 export { MenuDivider } from "./MenuDivider";
 export { MenuGap } from "./MenuGap";
 export { SubmenuTrigger } from "./SubmenuTrigger";
@@ -23,16 +24,31 @@ export {
 // ─── CVA Variants ─────────────────────────────────────────────────────────────
 export {
   menuContainerVariants,
+  menuPopoverVariants,
   menuItemVariants,
+  menuItemHighlightVariants,
+  menuItemStateLayerVariants,
+  menuItemFocusRingVariants,
+  menuItemIconVariants,
   menuSectionVariants,
   menuSectionHeaderVariants,
   menuDividerVariants,
   menuGapVariants,
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
+  menuItemGroupVariants,
   type MenuContainerVariants,
+  type MenuPopoverVariants,
   type MenuItemVariants,
+  type MenuItemHighlightVariants,
+  type MenuItemStateLayerVariants,
+  type MenuItemFocusRingVariants,
+  type MenuItemIconVariants,
   type MenuSectionVariants,
+  type MenuSectionHeaderVariants,
+  type MenuItemTrailingTextVariants,
+  type MenuItemDescriptionVariants,
+  type MenuItemGroupVariants,
 } from "./Menu.variants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -46,6 +62,7 @@ export type {
   MenuSectionProps,
   MenuDividerProps,
   MenuGapProps,
+  MenuItemGroupProps,
   SubmenuTriggerProps,
   ContextMenuTriggerProps,
   HeadlessMenuProps,
