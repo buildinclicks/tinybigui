@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-06-11
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Menu** — MD3 expressive vertical segmented menu rendering; new `MenuItemGroup` grouping primitive with automatic 2dp gaps; slot architecture refactor (`menuPopoverVariants`, `menuItemHighlightVariants`, `menuItemFocusRingVariants`); Storybook states and reference examples
+- **Button** — disabled container background fix via `buttonContainerVariants` child slot
+
+#### `@tinybigui/tokens`
+
+- **`--opacity-*` tokens** — percentage values for Tailwind v4 `color-mix()` compatibility (fixes opacity modifier classes like `text-on-surface/38`)
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) and [packages/tokens/CHANGELOG.md](./packages/tokens/CHANGELOG.md) for full release notes.
+
 ## [0.22.0] - 2026-06-10
 
 ### Changed
