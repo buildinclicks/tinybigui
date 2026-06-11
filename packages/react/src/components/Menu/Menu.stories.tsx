@@ -6,7 +6,7 @@ import { MenuSection } from "./MenuSection";
 import { MenuDivider } from "./MenuDivider";
 import { MenuGap } from "./MenuGap";
 import { SubmenuTrigger } from "./SubmenuTrigger";
-import { ContextMenuTrigger } from "./ContextMenuTrigger";
+import { MenuItemGroup } from "./MenuItemGroup";
 import { HeadlessMenuTrigger, HeadlessMenuItem } from "./MenuHeadless";
 import { menuContainerVariants, menuItemVariants } from "./Menu.variants";
 import { cn } from "../../utils/cn";
@@ -490,16 +490,19 @@ export const VibrantColorScheme: Story = {
             Standard
           </button>
           <MenuTrigger.Menu aria-label="Standard" colorScheme="standard" menuStyle="vertical">
-            <MenuItem id="star" leadingIcon={<StarIcon />}>
-              Add to favourites
-            </MenuItem>
-            <MenuItem id="share" leadingIcon={<ShareIcon />}>
-              Share
-            </MenuItem>
-            <MenuGap />
-            <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
-              Delete
-            </MenuItem>
+            <MenuItemGroup aria-label="Clipboard">
+              <MenuItem id="star" leadingIcon={<StarIcon />}>
+                Add to favourites
+              </MenuItem>
+              <MenuItem id="share" leadingIcon={<ShareIcon />}>
+                Share
+              </MenuItem>
+            </MenuItemGroup>
+            <MenuItemGroup aria-label="Danger">
+              <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+                Delete
+              </MenuItem>
+            </MenuItemGroup>
           </MenuTrigger.Menu>
         </MenuTrigger>
       </div>
@@ -1169,6 +1172,104 @@ export const DarkModeVibrant: Story = {
           </MenuItem>
         </MenuTrigger.Menu>
       </MenuTrigger>
+    </div>
+  ),
+};
+
+// ─── MenuItemGroup ────────────────────────────────────────────────────────────
+
+export const MenuItemGroupAutoGap: Story = {
+  name: "MenuItemGroup — Auto-gap grouping (Expressive Vertical)",
+  parameters: {
+    layout: "centered",
+    docs: {
+      description: {
+        story: [
+          "`MenuItemGroup` is the sibling-aware grouping primitive for MD3 Expressive vertical menus.",
+          "",
+          'It wraps related `MenuItem` elements in a semantic `role="group"` block and **automatically inserts',
+          "a 2dp gap** between consecutive sibling groups — no manual `<MenuGap />` placement required.",
+          "With N groups you get exactly N−1 visible gaps: the leading gap before the first group is hidden",
+          "via the `first:hidden` Tailwind class.",
+          "",
+          "Each group also becomes its own rounded segment card: the existing adjacent-sibling `[data-menu-gap]`",
+          "corner-rounding selectors in `menuItemVariants` handle the 16dp outer / 4dp inner rounding",
+          "automatically.",
+          "",
+          "`aria-label` is required on every group so the ARIA `group` role has an accessible name (WCAG 2.1).",
+        ].join("\n"),
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-start gap-8">
+      {/* ── Standard ── */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Standard</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={primaryBtn}>
+            More actions
+          </button>
+          <MenuTrigger.Menu
+            aria-label="More actions (standard)"
+            menuStyle="vertical"
+            colorScheme="standard"
+          >
+            <MenuItemGroup aria-label="Clipboard">
+              <MenuItem id="cut" leadingIcon={<CutIcon />}>
+                Cut
+              </MenuItem>
+              <MenuItem id="copy" leadingIcon={<CopyIcon />}>
+                Copy
+              </MenuItem>
+              <MenuItem id="paste" leadingIcon={<PasteIcon />}>
+                Paste
+              </MenuItem>
+            </MenuItemGroup>
+            <MenuItemGroup aria-label="History">
+              <MenuItem id="undo">Undo</MenuItem>
+              <MenuItem id="redo">Redo</MenuItem>
+            </MenuItemGroup>
+            <MenuItemGroup aria-label="Danger">
+              <MenuItem id="delete">Delete</MenuItem>
+            </MenuItemGroup>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+
+      {/* ── Vibrant ── */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Vibrant</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={tertiaryBtn}>
+            More actions
+          </button>
+          <MenuTrigger.Menu
+            aria-label="More actions (vibrant)"
+            menuStyle="vertical"
+            colorScheme="vibrant"
+          >
+            <MenuItemGroup aria-label="Clipboard">
+              <MenuItem id="vib-cut" leadingIcon={<CutIcon />}>
+                Cut
+              </MenuItem>
+              <MenuItem id="vib-copy" leadingIcon={<CopyIcon />}>
+                Copy
+              </MenuItem>
+              <MenuItem id="vib-paste" leadingIcon={<PasteIcon />}>
+                Paste
+              </MenuItem>
+            </MenuItemGroup>
+            <MenuItemGroup aria-label="History">
+              <MenuItem id="vib-undo">Undo</MenuItem>
+              <MenuItem id="vib-redo">Redo</MenuItem>
+            </MenuItemGroup>
+            <MenuItemGroup aria-label="Danger">
+              <MenuItem id="vib-delete">Delete</MenuItem>
+            </MenuItemGroup>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
     </div>
   ),
 };

@@ -2,6 +2,7 @@
 export { MenuTrigger, Menu } from "./Menu";
 export { MenuItem } from "./MenuItem";
 export { MenuSection } from "./MenuSection";
+export { MenuItemGroup } from "./MenuItemGroup";
 export { MenuDivider } from "./MenuDivider";
 export { MenuGap } from "./MenuGap";
 export { SubmenuTrigger } from "./SubmenuTrigger";
@@ -35,6 +36,7 @@ export {
   menuGapVariants,
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
+  menuItemGroupVariants,
   type MenuContainerVariants,
   type MenuPopoverVariants,
   type MenuItemVariants,
@@ -46,6 +48,7 @@ export {
   type MenuSectionHeaderVariants,
   type MenuItemTrailingTextVariants,
   type MenuItemDescriptionVariants,
+  type MenuItemGroupVariants,
 } from "./Menu.variants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -59,6 +62,7 @@ export type {
   MenuSectionProps,
   MenuDividerProps,
   MenuGapProps,
+  MenuItemGroupProps,
   SubmenuTriggerProps,
   ContextMenuTriggerProps,
   HeadlessMenuProps,

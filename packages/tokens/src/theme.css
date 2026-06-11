@@ -330,12 +330,12 @@
      Usage: opacity-8, opacity-10, opacity-12, opacity-16, opacity-32, opacity-38
      ──────────────────────────────────────────────────────────────────────── */
 
-  --opacity-8: 0.08;
-  --opacity-10: 0.1;
-  --opacity-12: 0.12;
-  --opacity-16: 0.16;
-  --opacity-32: 0.32;
-  --opacity-38: 0.38;
+  --opacity-8: 8%;
+  --opacity-10: 10%;
+  --opacity-12: 12%;
+  --opacity-16: 16%;
+  --opacity-32: 32%;
+  --opacity-38: 38%;
 
   /* ── LEGACY DURATION UTILITIES ────────────────────────────────────────────
      Usage: duration-short1, duration-medium2, duration-long4, duration-extra-long2

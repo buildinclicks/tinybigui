@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { MenuTrigger } from "./Menu";
 import { MenuItem } from "./MenuItem";
+import { MenuItemGroup } from "./MenuItemGroup";
 import { MenuSection } from "./MenuSection";
 import { MenuDivider } from "./MenuDivider";
 import { MenuGap } from "./MenuGap";
@@ -22,6 +23,7 @@ import {
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
   menuSectionHeaderVariants,
+  menuItemGroupVariants,
 } from "./Menu.variants";
 
 // ─── Test Icon Mocks ───────────────────────────────────────────────────────────
@@ -244,12 +246,20 @@ describe("Menu", () => {
       expect(menu).toHaveClass("bg-surface-container");
     });
 
-    test("vibrant colorScheme on vertical menu: items carry tertiary container background", async () => {
-      renderBasicMenu({ colorScheme: "vibrant", menuStyle: "vertical" });
+    test("vibrant colorScheme on vertical menu: MenuItemGroup carries tertiary container surface", async () => {
+      render(
+        <MenuTrigger>
+          <button type="button">Open Menu</button>
+          <MenuTrigger.Menu aria-label="Actions" colorScheme="vibrant" menuStyle="vertical">
+            <MenuItemGroup aria-label="Clipboard">
+              <MenuItem id="cut">Cut</MenuItem>
+              <MenuItem id="copy">Copy</MenuItem>
+            </MenuItemGroup>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      );
       await openMenu();
-      // vertical items paint their own segment card background
-      const items = screen.getAllByRole("menuitem");
-      expect(items[0]).toHaveClass("bg-tertiary-container");
+      expect(screen.getByRole("group", { name: "Clipboard" })).toHaveClass("bg-tertiary-container");
     });
 
     test("baseline menuStyle uses extra-small corner radius", async () => {
@@ -258,16 +268,12 @@ describe("Menu", () => {
       expect(screen.getByRole("menu")).toHaveClass("rounded-xs");
     });
 
-    test("vertical menuStyle uses large corner radius on container", async () => {
+    test("vertical menuStyle container is transparent without outer corner radius", async () => {
       renderBasicMenu({ menuStyle: "vertical" });
       await openMenu();
-      expect(screen.getByRole("menu")).toHaveClass("rounded-lg");
-    });
-
-    test("vertical menuStyle container is transparent (segments provide bg)", async () => {
-      renderBasicMenu({ menuStyle: "vertical" });
-      await openMenu();
-      expect(screen.getByRole("menu")).toHaveClass("bg-transparent");
+      const menu = screen.getByRole("menu");
+      expect(menu).toHaveClass("bg-transparent");
+      expect(menu).not.toHaveClass("rounded-lg");
     });
   });
 
@@ -1353,10 +1359,10 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("rounded-xs");
   });
 
-  test("menuContainerVariants: vertical is transparent (segments provide bg) and has rounded-lg", () => {
+  test("menuContainerVariants: vertical is transparent (groups provide segment surfaces)", () => {
     const cls = menuContainerVariants({ colorScheme: "standard", menuStyle: "vertical" });
     expect(cls).toContain("bg-transparent");
-    expect(cls).toContain("rounded-lg");
+    expect(cls).not.toContain("rounded-lg");
   });
 
   test("menuItemVariants: uses text-label-large", () => {
@@ -1364,30 +1370,42 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("text-label-large");
   });
 
-  test("menuItemVariants: vertical standard has bg-surface-container-low", () => {
+  test("menuItemVariants: vertical standard does not carry segment surface (group owns bg)", () => {
     const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("bg-surface-container-low");
+    expect(cls).not.toContain("bg-surface-container-low");
+    expect(cls).toContain("rounded-md");
   });
 
-  test("menuItemVariants: vertical vibrant has bg-tertiary-container", () => {
+  test("menuItemVariants: vertical vibrant does not carry segment surface (group owns bg)", () => {
     const cls = menuItemVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
+    expect(cls).not.toContain("bg-tertiary-container");
+    expect(cls).toContain("rounded-md");
+  });
+
+  test("menuItemGroupVariants: vertical standard has segment surface and card rounding", () => {
+    const cls = menuItemGroupVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("bg-surface-container-low");
+    expect(cls).toContain("rounded-lg");
+    expect(cls).toContain("shadow-elevation-1");
+    expect(cls).toContain("first:rounded-b-sm");
+    expect(cls).toContain("last:rounded-t-sm");
+  });
+
+  test("menuItemGroupVariants: vertical vibrant has tertiary-container surface", () => {
+    const cls = menuItemGroupVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
     expect(cls).toContain("bg-tertiary-container");
   });
 
-  test("menuItemVariants: vertical has segmented rounding classes (first/last + adjacent-sibling gap)", () => {
+  test("menuItemVariants: vertical uses px-3 (ItemLeadingSpace = 12dp) and gap-2 (icon-to-label = 8dp)", () => {
     const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("first:rounded-t-lg");
-    expect(cls).toContain("last:rounded-b-lg");
-    expect(cls).toContain("rounded-xs");
-    // after gap
-    expect(cls).toContain("[[data-menu-gap]+&]:rounded-t-lg");
-    // before gap (has selector)
-    expect(cls).toContain("[&:has(+[data-menu-gap])]:rounded-b-lg");
+    expect(cls).toContain("px-3");
+    expect(cls).toContain("gap-2");
   });
 
-  test("menuItemVariants: vertical uses px-4 (ItemLeadingSpace = 16dp)", () => {
-    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("px-4");
+  test("menuItemVariants: baseline uses px-3 and gap-3 (icon-to-label = 12dp)", () => {
+    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("px-3");
+    expect(cls).toContain("gap-3");
   });
 
   // ── menuItemHighlightVariants ──────────────────────────────────────────────

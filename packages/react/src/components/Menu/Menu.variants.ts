@@ -22,15 +22,15 @@ import { cva, type VariantProps } from "class-variance-authority";
  */
 export const menuContainerVariants = cva(
   [
-    // Elevation: level 2
-    "shadow-elevation-2",
     // Width constraints: 112dp min / 280dp max per MD3 spec
     "min-w-28 max-w-70",
+    "flex flex-col",
     // Scroll behaviour
-    "overflow-y-auto",
+
     "max-h-[calc(var(--visual-viewport-height,100vh)-2rem)]",
     // Stacking
     "z-50",
+    "gap-0.5",
     // Focus outline delegated to React Aria
     "outline-none",
   ],
@@ -54,7 +54,7 @@ export const menuContainerVariants = cva(
        */
       menuStyle: {
         baseline: ["rounded-xs", "bg-surface-container", "py-2"],
-        vertical: ["rounded-lg", "bg-transparent"],
+        vertical: ["bg-transparent"],
       },
     },
     defaultVariants: {
@@ -128,8 +128,8 @@ export const menuPopoverVariants = cva([
 export const menuItemVariants = cva(
   [
     // Layout — height set by density context in MenuItem component
+    // gap is style-specific: baseline = 12dp (gap-3), vertical = 8dp (gap-2)
     "relative flex w-full items-center",
-    "gap-3",
     // Typography: Label Large per MD3 menu spec
     "text-label-large",
     // Interaction
@@ -154,43 +154,24 @@ export const menuItemVariants = cva(
         vibrant: ["text-on-tertiary-container"],
       },
       /**
-       * Visual style — drives padding, segment surface, and corner rounding.
+       * Visual style — drives padding, gap, segment surface, and corner rounding.
        *
-       * baseline: 12dp h-padding, no item background (container provides it).
-       * vertical: 16dp h-padding, item owns segment surface, segmented rounding
+       * baseline: 12dp h-padding, 12dp icon-to-label gap, no item background (container provides it).
+       * vertical: 12dp h-padding, 8dp icon-to-label gap, item owns segment surface, segmented rounding
        *   via first/last + adjacent-sibling gap selectors.
        */
       menuStyle: {
-        baseline: ["px-3"],
+        baseline: ["px-3", "gap-3"],
         vertical: [
-          "px-4",
+          "px-3",
+          "gap-2",
           // Default: inner item (4dp all corners)
-          "rounded-xs",
-          // First item in the whole menu → 16dp top corners
-          "first:rounded-t-lg",
+          "rounded-md",
           // Last item in the whole menu → 16dp bottom corners
-          "last:rounded-b-lg",
-          // Immediately AFTER a MenuGap → 16dp top corners (new segment starts)
-          "[[data-menu-gap]+&]:rounded-t-lg",
-          // Immediately BEFORE a MenuGap → 16dp bottom corners (segment ends)
-          // has() targets the element that has an immediately adjacent sibling gap
-          "[&:has(+[data-menu-gap])]:rounded-b-lg",
         ],
       },
     },
     compoundVariants: [
-      // vertical + standard: item background = surface-container-low
-      {
-        menuStyle: "vertical",
-        colorScheme: "standard",
-        class: ["bg-surface-container-low"],
-      },
-      // vertical + vibrant: item background = tertiary-container
-      {
-        menuStyle: "vertical",
-        colorScheme: "vibrant",
-        class: ["bg-tertiary-container"],
-      },
       // vertical + standard: selected/open text → on-tertiary-container
       {
         menuStyle: "vertical",
@@ -476,7 +457,12 @@ export const menuSectionVariants = cva(["flex flex-col w-full"]);
  * @see https://m3.material.io/components/menus/specs — Callout 10
  */
 export const menuSectionHeaderVariants = cva(
-  ["px-3 pt-2 pb-1", "text-title-small", "select-none"],
+  [
+    // 32dp tall region, content vertically centred, 12dp leading padding aligned with items
+    "px-3 h-8 flex items-center",
+    "text-title-small",
+    "select-none",
+  ],
   {
     variants: {
       colorScheme: {
@@ -613,6 +599,61 @@ export const menuItemDescriptionVariants = cva(
   }
 );
 
+// ─── MENU ITEM GROUP ──────────────────────────────────────────────────────────
+
+/**
+ * Menu item group container variants (CVA).
+ *
+ * `MenuItemGroup` is the MD3 Expressive sibling-aware grouping primitive.
+ * It wraps related `MenuItem` elements in a semantic `role="group"` and, when
+ * `menuStyle="vertical"`, automatically inserts a 2dp leading gap that is
+ * hidden when the group is the first sibling — yielding a gap *between*
+ * consecutive groups without a gap before the very first one.
+ *
+ * The base classes mirror `menuSectionVariants` (`flex flex-col w-full`)
+ * so both grouping components share the same layout baseline.
+ *
+ * @see https://m3.material.io/components/menus/guidelines#gaps-and-dividers
+ */
+export const menuItemGroupVariants = cva(
+  [
+    "flex flex-col w-full",
+    "px-1 py-0.5 gap-0.5",
+    "rounded-lg first:rounded-b-sm last:rounded-t-sm",
+    "shadow-elevation-1",
+  ],
+  {
+    variants: {
+      menuStyle: {
+        vertical: ["bg-surface-container-low"],
+        baseline: [],
+      },
+      colorScheme: {
+        standard: ["bg-surface-container-low"],
+        vibrant: ["bg-tertiary-container"],
+      },
+    },
+    compoundVariants: [
+      // vertical + standard: item background = surface-container-low
+      {
+        menuStyle: "vertical",
+        colorScheme: "standard",
+        class: ["bg-surface-container-low"],
+      },
+      // vertical + vibrant: item background = tertiary-container
+      {
+        menuStyle: "vertical",
+        colorScheme: "vibrant",
+        class: ["bg-tertiary-container"],
+      },
+    ],
+    defaultVariants: {
+      menuStyle: "vertical",
+      colorScheme: "standard",
+    },
+  }
+);
+
 // ─── TYPE EXPORTS ─────────────────────────────────────────────────────────────
 
 export type MenuContainerVariants = VariantProps<typeof menuContainerVariants>;
@@ -626,3 +667,4 @@ export type MenuSectionVariants = VariantProps<typeof menuSectionVariants>;
 export type MenuSectionHeaderVariants = VariantProps<typeof menuSectionHeaderVariants>;
 export type MenuItemTrailingTextVariants = VariantProps<typeof menuItemTrailingTextVariants>;
 export type MenuItemDescriptionVariants = VariantProps<typeof menuItemDescriptionVariants>;
+export type MenuItemGroupVariants = VariantProps<typeof menuItemGroupVariants>;
