@@ -23,7 +23,12 @@ export {
 // ─── CVA Variants ─────────────────────────────────────────────────────────────
 export {
   menuContainerVariants,
+  menuPopoverVariants,
   menuItemVariants,
+  menuItemHighlightVariants,
+  menuItemStateLayerVariants,
+  menuItemFocusRingVariants,
+  menuItemIconVariants,
   menuSectionVariants,
   menuSectionHeaderVariants,
   menuDividerVariants,
@@ -31,8 +36,16 @@ export {
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
   type MenuContainerVariants,
+  type MenuPopoverVariants,
   type MenuItemVariants,
+  type MenuItemHighlightVariants,
+  type MenuItemStateLayerVariants,
+  type MenuItemFocusRingVariants,
+  type MenuItemIconVariants,
   type MenuSectionVariants,
+  type MenuSectionHeaderVariants,
+  type MenuItemTrailingTextVariants,
+  type MenuItemDescriptionVariants,
 } from "./Menu.variants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

@@ -15,9 +15,13 @@ import {
   menuItemVariants,
   menuItemStateLayerVariants,
   menuItemHighlightVariants,
+  menuItemFocusRingVariants,
   menuItemIconVariants,
   menuGapVariants,
   menuPopoverVariants,
+  menuItemTrailingTextVariants,
+  menuItemDescriptionVariants,
+  menuSectionHeaderVariants,
 } from "./Menu.variants";
 
 // ─── Test Icon Mocks ───────────────────────────────────────────────────────────
@@ -79,10 +83,6 @@ describe("MenuTrigger", () => {
     test("trigger has aria-expanded='true' when open", async () => {
       renderBasicMenu();
       await openMenu();
-      // When the menu is open the Popover uses modal overlay behavior — RAC's
-      // ariaHideOutside hides everything outside the popover from the a11y tree,
-      // including the trigger. We use { hidden: true } to assert the attribute
-      // on the DOM node directly while it is aria-hidden.
       expect(screen.getByRole("button", { name: "Open Menu", hidden: true })).toHaveAttribute(
         "aria-expanded",
         "true"
@@ -194,7 +194,6 @@ describe("MenuTrigger", () => {
     });
 
     test("shouldFlip prop passes through to trigger", () => {
-      // shouldFlip defaults to true; test it can be set
       render(
         <MenuTrigger shouldFlip={false}>
           <button type="button">Open Menu</button>
@@ -248,7 +247,7 @@ describe("Menu", () => {
     test("vibrant colorScheme on vertical menu: items carry tertiary container background", async () => {
       renderBasicMenu({ colorScheme: "vibrant", menuStyle: "vertical" });
       await openMenu();
-      // vertical container is transparent; the item carries bg-tertiary-container
+      // vertical items paint their own segment card background
       const items = screen.getAllByRole("menuitem");
       expect(items[0]).toHaveClass("bg-tertiary-container");
     });
@@ -259,10 +258,16 @@ describe("Menu", () => {
       expect(screen.getByRole("menu")).toHaveClass("rounded-xs");
     });
 
-    test("vertical menuStyle uses large corner radius", async () => {
+    test("vertical menuStyle uses large corner radius on container", async () => {
       renderBasicMenu({ menuStyle: "vertical" });
       await openMenu();
       expect(screen.getByRole("menu")).toHaveClass("rounded-lg");
+    });
+
+    test("vertical menuStyle container is transparent (segments provide bg)", async () => {
+      renderBasicMenu({ menuStyle: "vertical" });
+      await openMenu();
+      expect(screen.getByRole("menu")).toHaveClass("bg-transparent");
     });
   });
 
@@ -443,7 +448,38 @@ describe("MenuItem", () => {
       await openMenu();
       const desc = screen.getByText("Copy description");
       expect(desc).toHaveClass("text-body-medium");
+    });
+
+    test("description in standard scheme uses on-surface-variant", async () => {
+      render(
+        <MenuTrigger>
+          <button type="button">Open Menu</button>
+          <MenuTrigger.Menu aria-label="Actions" colorScheme="standard">
+            <MenuItem id="copy" description="Copy description">
+              Copy
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      );
+      await openMenu();
+      const desc = screen.getByText("Copy description");
       expect(desc).toHaveClass("text-on-surface-variant");
+    });
+
+    test("description in vibrant scheme uses on-tertiary-container", async () => {
+      render(
+        <MenuTrigger>
+          <button type="button">Open Menu</button>
+          <MenuTrigger.Menu aria-label="Actions" menuStyle="vertical" colorScheme="vibrant">
+            <MenuItem id="copy" description="Copy description">
+              Copy
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      );
+      await openMenu();
+      const desc = screen.getByText("Copy description");
+      expect(desc).toHaveClass("text-on-tertiary-container");
     });
 
     test("renders badge when provided", async () => {
@@ -486,9 +522,15 @@ describe("MenuItem", () => {
       renderBasicMenu();
       await openMenu();
       const item = screen.getByRole("menuitem", { name: "Cut" });
-      // The highlight layer is the first aria-hidden span; state layer is the second
       const overlaySpans = item.querySelectorAll("span[aria-hidden='true']");
       expect(overlaySpans.length).toBeGreaterThanOrEqual(2);
+    });
+
+    test("item contains a focus-ring span slot", async () => {
+      renderBasicMenu();
+      await openMenu();
+      const item = screen.getByRole("menuitem", { name: "Cut" });
+      expect(item.querySelector("[data-testid='menuitem-focus-ring']")).toBeInTheDocument();
     });
   });
 
@@ -517,16 +559,16 @@ describe("MenuItem", () => {
       expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-9");
     });
 
-    test("vertical density 0 renders items with h-11 class (44dp)", async () => {
+    test("vertical density 0 renders items with h-12 class (48dp)", async () => {
       renderBasicMenu({ density: 0, menuStyle: "vertical" });
       await openMenu();
-      expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-11");
+      expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-12");
     });
 
-    test("vertical density -1 renders items with h-10 class", async () => {
+    test("vertical density -1 renders items with h-11 class", async () => {
       renderBasicMenu({ density: -1, menuStyle: "vertical" });
       await openMenu();
-      expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-10");
+      expect(screen.getByRole("menuitem", { name: "Cut" })).toHaveClass("h-11");
     });
   });
 
@@ -683,7 +725,6 @@ describe("Keyboard navigation", () => {
     await user.keyboard("{ArrowDown}");
     await user.keyboard("{ArrowDown}");
     await user.keyboard("{ArrowDown}");
-    // With wrap, should cycle back to "Cut"
     expect(document.activeElement).toHaveTextContent("Cut");
   });
 });
@@ -824,9 +865,7 @@ describe("MenuGap", () => {
       </MenuTrigger>
     );
     await openMenu();
-    // MenuGap uses role="none" / aria-hidden - should NOT appear as a separator
     expect(screen.queryByRole("separator")).not.toBeInTheDocument();
-    // but the menu items still render
     expect(screen.getByRole("menuitem", { name: "Cut" })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "Paste" })).toBeInTheDocument();
   });
@@ -909,7 +948,6 @@ describe("Selection mode", () => {
     );
     await openMenu();
     const selectedItem = screen.getByRole("menuitemradio", { name: "Grid view" });
-    // RAC emits data-selected on the element; selected bg lives on the highlight layer
     expect(selectedItem).toHaveAttribute("data-selected");
     const highlight = selectedItem.querySelector("[data-testid='menuitem-highlight']");
     expect(highlight).toBeInTheDocument();
@@ -1007,7 +1045,6 @@ describe("Selection mode", () => {
     );
     const { user } = await openMenu();
     await user.click(screen.getByRole("menuitemcheckbox", { name: "Bold" }));
-    // Multi-select menus stay open
     expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 });
@@ -1039,7 +1076,6 @@ describe("SubmenuTrigger", () => {
     await openMenu();
     const shareItem = screen.getByRole("menuitem", { name: /Share/i });
     expect(shareItem).toBeInTheDocument();
-    // Chevron icon should be present in the item
     expect(shareItem.querySelector("[data-testid='chevron-icon']")).toBeInTheDocument();
   });
 
@@ -1054,8 +1090,8 @@ describe("SubmenuTrigger", () => {
     renderMenuWithSubmenu();
     const { user } = await openMenu();
     await user.keyboard("{ArrowDown}");
-    await user.keyboard("{ArrowDown}"); // focus Share
-    await user.keyboard("{ArrowRight}"); // open submenu
+    await user.keyboard("{ArrowDown}");
+    await user.keyboard("{ArrowRight}");
     await waitFor(() => {
       expect(screen.getByRole("menu", { name: "Share via" })).toBeInTheDocument();
     });
@@ -1065,8 +1101,8 @@ describe("SubmenuTrigger", () => {
     renderMenuWithSubmenu();
     const { user } = await openMenu();
     await user.keyboard("{ArrowDown}");
-    await user.keyboard("{ArrowDown}"); // focus Share
-    await user.keyboard("{ArrowRight}"); // open submenu
+    await user.keyboard("{ArrowDown}");
+    await user.keyboard("{ArrowRight}");
     await waitFor(() => {
       expect(screen.getByRole("menuitem", { name: "Email" })).toBeInTheDocument();
       expect(screen.getByRole("menuitem", { name: "SMS" })).toBeInTheDocument();
@@ -1086,7 +1122,6 @@ describe("SubmenuTrigger", () => {
     await waitFor(() => {
       expect(screen.queryByRole("menu", { name: "Share via" })).not.toBeInTheDocument();
     });
-    // Parent menu should still be open
     expect(screen.getByRole("menu", { name: "Actions" })).toBeInTheDocument();
   });
 });
@@ -1318,16 +1353,10 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("rounded-xs");
   });
 
-  test("menuContainerVariants: vertical standard is transparent (bg-transparent) and has rounded-lg", () => {
+  test("menuContainerVariants: vertical is transparent (segments provide bg) and has rounded-lg", () => {
     const cls = menuContainerVariants({ colorScheme: "standard", menuStyle: "vertical" });
     expect(cls).toContain("bg-transparent");
     expect(cls).toContain("rounded-lg");
-  });
-
-  test("menuContainerVariants: vertical vibrant is transparent (container itself has no bg)", () => {
-    const cls = menuContainerVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
-    expect(cls).toContain("bg-transparent");
-    expect(cls).not.toContain("bg-tertiary-container");
   });
 
   test("menuItemVariants: uses text-label-large", () => {
@@ -1335,16 +1364,43 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("text-label-large");
   });
 
+  test("menuItemVariants: vertical standard has bg-surface-container-low", () => {
+    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("bg-surface-container-low");
+  });
+
+  test("menuItemVariants: vertical vibrant has bg-tertiary-container", () => {
+    const cls = menuItemVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
+    expect(cls).toContain("bg-tertiary-container");
+  });
+
+  test("menuItemVariants: vertical has segmented rounding classes (first/last + adjacent-sibling gap)", () => {
+    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("first:rounded-t-lg");
+    expect(cls).toContain("last:rounded-b-lg");
+    expect(cls).toContain("rounded-xs");
+    // after gap
+    expect(cls).toContain("[[data-menu-gap]+&]:rounded-t-lg");
+    // before gap (has selector)
+    expect(cls).toContain("[&:has(+[data-menu-gap])]:rounded-b-lg");
+  });
+
+  test("menuItemVariants: vertical uses px-4 (ItemLeadingSpace = 16dp)", () => {
+    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("px-4");
+  });
+
   // ── menuItemHighlightVariants ──────────────────────────────────────────────
+
+  test("menuItemHighlightVariants: uses inset-0 rounded-[inherit] (full-bleed)", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("inset-0");
+    expect(cls).toContain("rounded-[inherit]");
+  });
 
   test("menuItemHighlightVariants: baseline standard has bg-surface-container-highest selector", () => {
     const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "baseline" });
     expect(cls).toContain("group-data-[selected]/menuitem:bg-surface-container-highest");
-  });
-
-  test("menuItemHighlightVariants: baseline uses inset-0 (full-bleed)", () => {
-    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "baseline" });
-    expect(cls).toContain("inset-0");
   });
 
   test("menuItemHighlightVariants: vertical standard has tertiary-container selector", () => {
@@ -1352,19 +1408,28 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("group-data-[selected]/menuitem:bg-tertiary-container");
   });
 
+  test("menuItemHighlightVariants: vertical standard has open (active) tertiary-container selector", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "vertical" });
+    expect(cls).toContain("group-data-[open]/menuitem:bg-tertiary-container");
+  });
+
   test("menuItemHighlightVariants: vertical vibrant has tertiary selector", () => {
     const cls = menuItemHighlightVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
     expect(cls).toContain("group-data-[selected]/menuitem:bg-tertiary");
   });
 
-  test("menuItemHighlightVariants: vertical uses inset-x-1 inset-y-0 rounded-md (horizontal inset, CornerMedium)", () => {
-    const cls = menuItemHighlightVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("inset-x-1");
-    expect(cls).toContain("inset-y-0");
-    expect(cls).toContain("rounded-md");
+  test("menuItemHighlightVariants: vertical vibrant has open (active) tertiary selector", () => {
+    const cls = menuItemHighlightVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
+    expect(cls).toContain("group-data-[open]/menuitem:bg-tertiary");
   });
 
   // ── menuItemStateLayerVariants ────────────────────────────────────────────
+
+  test("menuItemStateLayerVariants: uses inset-0 rounded-[inherit] (full-bleed)", () => {
+    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("inset-0");
+    expect(cls).toContain("rounded-[inherit]");
+  });
 
   test("menuItemStateLayerVariants: standard uses bg-on-surface", () => {
     const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
@@ -1376,26 +1441,32 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("bg-on-tertiary-container");
   });
 
-  test("menuItemStateLayerVariants: baseline uses inset-0", () => {
-    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
-    expect(cls).toContain("inset-0");
-  });
-
-  test("menuItemStateLayerVariants: vertical uses inset-x-1 inset-y-0 rounded-md (horizontal inset, CornerMedium)", () => {
-    const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("inset-x-1");
-    expect(cls).toContain("inset-y-0");
-    expect(cls).toContain("rounded-md");
-  });
-
   test("menuItemStateLayerVariants: includes hover opacity-8 selector", () => {
     const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
     expect(cls).toContain("group-data-[hovered]/menuitem:opacity-8");
   });
 
-  test("menuItemStateLayerVariants: includes focus-visible opacity-10 selector", () => {
+  test("menuItemStateLayerVariants: does NOT include focus-visible opacity (focus shown via ring)", () => {
     const cls = menuItemStateLayerVariants({ colorScheme: "standard", menuStyle: "baseline" });
-    expect(cls).toContain("group-data-[focus-visible]/menuitem:opacity-10");
+    expect(cls).not.toContain("group-data-[focus-visible]/menuitem:opacity-10");
+  });
+
+  // ── menuItemFocusRingVariants ──────────────────────────────────────────────
+
+  test("menuItemFocusRingVariants: has inset-0 rounded-[inherit]", () => {
+    const cls = menuItemFocusRingVariants();
+    expect(cls).toContain("inset-0");
+    expect(cls).toContain("rounded-[inherit]");
+  });
+
+  test("menuItemFocusRingVariants: uses outline-secondary", () => {
+    const cls = menuItemFocusRingVariants();
+    expect(cls).toContain("outline-secondary");
+  });
+
+  test("menuItemFocusRingVariants: shows on focus-visible (opacity-100)", () => {
+    const cls = menuItemFocusRingVariants();
+    expect(cls).toContain("group-data-[focus-visible]/menuitem:opacity-100");
   });
 
   // ── menuPopoverVariants ───────────────────────────────────────────────────
@@ -1416,30 +1487,6 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("data-[placement=top]:origin-bottom");
   });
 
-  // ── menuItemVariants — vertical segmented bg + rounding ───────────────────
-
-  test("menuItemVariants: vertical standard has bg-surface-container-low", () => {
-    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("bg-surface-container-low");
-  });
-
-  test("menuItemVariants: vertical vibrant has bg-tertiary-container", () => {
-    const cls = menuItemVariants({ colorScheme: "vibrant", menuStyle: "vertical" });
-    expect(cls).toContain("bg-tertiary-container");
-  });
-
-  test("menuItemVariants: vertical has segmented rounding classes", () => {
-    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("first:rounded-t-lg");
-    expect(cls).toContain("last:rounded-b-lg");
-    expect(cls).toContain("rounded-xs");
-  });
-
-  test("menuItemVariants: vertical uses px-4 (ItemLeadingSpace = 16dp)", () => {
-    const cls = menuItemVariants({ colorScheme: "standard", menuStyle: "vertical" });
-    expect(cls).toContain("px-4");
-  });
-
   // ── menuItemIconVariants — size per menuStyle ─────────────────────────────
 
   test("menuItemIconVariants: baseline uses h-6 w-6 (24dp)", () => {
@@ -1454,9 +1501,55 @@ describe("CVA variants (unit)", () => {
     expect(cls).toContain("w-5");
   });
 
+  test("menuItemIconVariants: standard uses on-surface-variant", () => {
+    const cls = menuItemIconVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("text-on-surface-variant");
+  });
+
+  test("menuItemIconVariants: vibrant uses on-tertiary-container", () => {
+    const cls = menuItemIconVariants({ colorScheme: "vibrant", menuStyle: "baseline" });
+    expect(cls).toContain("text-on-tertiary-container");
+  });
+
+  // ── menuItemTrailingTextVariants ──────────────────────────────────────────
+
+  test("menuItemTrailingTextVariants: standard uses on-surface-variant", () => {
+    const cls = menuItemTrailingTextVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("text-on-surface-variant");
+  });
+
+  test("menuItemTrailingTextVariants: vibrant uses on-tertiary-container", () => {
+    const cls = menuItemTrailingTextVariants({ colorScheme: "vibrant", menuStyle: "baseline" });
+    expect(cls).toContain("text-on-tertiary-container");
+  });
+
+  // ── menuItemDescriptionVariants ───────────────────────────────────────────
+
+  test("menuItemDescriptionVariants: standard uses on-surface-variant", () => {
+    const cls = menuItemDescriptionVariants({ colorScheme: "standard", menuStyle: "baseline" });
+    expect(cls).toContain("text-on-surface-variant");
+  });
+
+  test("menuItemDescriptionVariants: vibrant uses on-tertiary-container", () => {
+    const cls = menuItemDescriptionVariants({ colorScheme: "vibrant", menuStyle: "baseline" });
+    expect(cls).toContain("text-on-tertiary-container");
+  });
+
+  // ── menuSectionHeaderVariants ─────────────────────────────────────────────
+
+  test("menuSectionHeaderVariants: standard uses on-surface-variant", () => {
+    const cls = menuSectionHeaderVariants({ colorScheme: "standard" });
+    expect(cls).toContain("text-on-surface-variant");
+  });
+
+  test("menuSectionHeaderVariants: vibrant uses on-tertiary-container", () => {
+    const cls = menuSectionHeaderVariants({ colorScheme: "vibrant" });
+    expect(cls).toContain("text-on-tertiary-container");
+  });
+
   // ── menuGapVariants ───────────────────────────────────────────────────────
 
-  test("menuGapVariants: height is h-0.5 (2dp, SegmentedMenuTokens.SegmentedGap)", () => {
+  test("menuGapVariants: height is h-0.5 (2dp — gap acts as visual divider)", () => {
     const cls = menuGapVariants();
     expect(cls).toContain("h-0.5");
   });

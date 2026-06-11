@@ -13,10 +13,10 @@ import { cva, type VariantProps } from "class-variance-authority";
  *   baseline: `rounded-xs` (4dp extra-small)
  *   vertical: `rounded-lg` (16dp large, MD3 Expressive)
  *
- * Background per menuStyle × colorScheme:
- *   baseline + standard:  bg-surface-container
- *   vertical + standard:  bg-surface-container-low
- *   vertical + vibrant:   bg-tertiary-container
+ * Background per menuStyle:
+ *   baseline: bg-surface-container (solid, houses all items)
+ *   vertical: bg-transparent (items paint their own segment cards; gap reveals
+ *             the page background between segments — acting as the divider)
  *
  * @see https://m3.material.io/components/menus/specs
  */
@@ -37,9 +37,9 @@ export const menuContainerVariants = cva(
   {
     variants: {
       /**
-       * Color scheme — drives the container background (baseline only).
-       * vertical menus paint each item with the group surface; the container
-       * itself is transparent so the 2dp gap between groups reveals nothing.
+       * Color scheme — drives item/segment background and content colors.
+       * standard: surface-container-low item background.
+       * vibrant:  tertiary-container item background.
        */
       colorScheme: {
         standard: [],
@@ -49,8 +49,8 @@ export const menuContainerVariants = cva(
        * Visual style — drives corner radius and container background.
        *
        * baseline: solid surface-container, 4dp corners, 8dp vertical padding.
-       * vertical: transparent container, 16dp corners, no vertical padding —
-       *   each item owns its group background so gaps appear between them.
+       * vertical: transparent container, 16dp corners, no container padding —
+       *   items own their segment surface, gaps reveal the page background.
        */
       menuStyle: {
         baseline: ["rounded-xs", "bg-surface-container", "py-2"],
@@ -70,35 +70,21 @@ export const menuContainerVariants = cva(
  * Applied to the React Aria `<Popover>` element — the element where RAC emits
  * `data-entering`, `data-exiting`, and `data-placement`.
  *
- * Why here and not on the inner RACMenu:
- * RAC's Popover owns the overlay lifecycle and sets these data attributes on
- * itself, not on the child Menu element. Placing animation classes on RACMenu
- * means they never match.
- *
  * Motion:
  *   Enter: animate-md-scale-in (350ms expressive-fast-spatial, scale+fade)
  *   Exit:  animate-md-scale-out (200ms emphasized-accelerate, scale+fade)
  *
- * Transform-origin is placement-aware: menus below the trigger expand from the
- * top edge; menus above expand from the bottom, etc.
- *
  * @see https://m3.material.io/components/menus/specs — Motion
  */
 export const menuPopoverVariants = cva([
-  // Promote to compositor layer so scale + opacity animate without layout reflow
   "will-change-[transform,opacity]",
-  // Block pointer events while animating to prevent accidental item clicks
   "data-[entering]:pointer-events-none data-[exiting]:pointer-events-none",
-  // Enter: 350ms expressive-fast-spatial spring (intentional overshoot)
   "data-[entering]:animate-md-scale-in",
-  // Exit: 200ms emphasized-accelerate (accelerating exit)
   "data-[exiting]:animate-md-scale-out",
-  // Transform origin — default bottom placement expands downward from top edge
   "origin-top",
   "data-[placement=top]:origin-bottom",
   "data-[placement=left]:origin-right",
   "data-[placement=right]:origin-left",
-  // Reduced motion: skip both animations entirely
   "motion-reduce:data-[entering]:animate-none motion-reduce:data-[exiting]:animate-none",
 ]);
 
@@ -107,28 +93,35 @@ export const menuPopoverVariants = cva([
 /**
  * Material Design 3 Menu item root variants (CVA).
  *
- * Architecture: Variants vs States
- * - CVA holds only design-time decisions: colorScheme, menuStyle.
- * - All interaction/selection states are driven by data-* attributes that RAC
- *   MenuItem emits natively (data-hovered, data-pressed, data-focus-visible,
- *   data-selected, data-disabled) — read via group-data-[x]/menuitem selectors.
- * - The root element sets group/menuitem so all slot children can read state.
+ * Segmented vertical model (MD3 Expressive):
+ *   The container is transparent. Each item paints its own segment surface
+ *   (bg-surface-container-low / bg-tertiary-container). Groups of items are
+ *   visually separated by a MenuGap spacer whose 2dp height reveals the page
+ *   background between segments — creating the "divider" effect without a line.
  *
- * Typography: Label Large per MD3 menu spec (14sp / 500 weight).
- * Height: 48/44/40/36dp (baseline/vertical) controlled by density via context.
- * Padding: baseline 12dp left/right; vertical 16dp left/right (ItemLeadingSpace).
- * Gap between icon and label: 12dp (ItemBetweenSpace, unchanged).
+ * Segmented corner-rounding strategy (vertical):
+ *   Each item defaults to rounded-xs (4dp, inner corners).
+ *   The first item in a segment gets rounded-t-lg (16dp top corners).
+ *   The last item in a segment gets rounded-b-lg (16dp bottom corners).
+ *   Segment boundaries are determined by:
+ *     - first/last pseudo-classes (start/end of entire menu)
+ *     - CSS adjacent-sibling selectors relative to [data-menu-gap] elements
  *
- * Vertical segmented group background strategy:
- *   The container is transparent for vertical menus. Each item paints its own
- *   group surface (bg-surface-container-low / bg-tertiary-container), and CSS
- *   sibling selectors on [data-menu-gap] adjacent items produce the correct
- *   corner-radius composition:
- *     leading item (first or after-gap): rounded-t-lg (16dp top) + rounded-b-xs (4dp bottom)
- *     trailing item (last or before-gap): rounded-t-xs (4dp top) + rounded-b-lg (16dp bottom)
- *     standalone (first AND last): rounded-lg (all 16dp)
- *     middle item: rounded-xs (4dp all)
- *   [data-menu-gap] is set on the MenuGap component so the CSS selectors resolve.
+ *   Adjacent-sibling selectors:
+ *     Immediately after a gap  → [[data-menu-gap]+&]:rounded-t-lg
+ *     Immediately before a gap → the item uses has-[+[data-menu-gap]] which
+ *                                only works if the gap is a true sibling.
+ *                                RAC wraps items in <li> so we use
+ *                                [:has(+[data-menu-gap])]:rounded-b-lg on the
+ *                                item element itself when supported; where not,
+ *                                the MenuItem component also computes and
+ *                                injects explicit override classes.
+ *
+ * Color mapping (MD3 Expressive spec):
+ *   Standard — item bg: surface-container-low; label: on-surface; icons/trailing: on-surface-variant
+ *              selected/open bg: tertiary-container; content: on-tertiary-container
+ *   Vibrant  — item bg: tertiary-container; label: on-tertiary-container; icons/trailing: on-tertiary-container
+ *              selected/open bg: tertiary; content: on-tertiary
  *
  * @see https://m3.material.io/components/menus/specs
  */
@@ -149,58 +142,69 @@ export const menuItemVariants = cva(
   {
     variants: {
       /**
-       * Color scheme — drives default text color, state-layer color, and
-       * selection text colors.
+       * Color scheme — drives item bg, default text/icon color, and selection colors.
+       *
+       * standard: surface-container-low bg, on-surface text, on-surface-variant icons.
+       *           Selected/open: tertiary-container bg highlight, on-tertiary-container content.
+       * vibrant:  tertiary-container bg, on-tertiary-container text AND icons.
+       *           Selected/open: tertiary bg highlight, on-tertiary content.
        */
       colorScheme: {
         standard: ["text-on-surface"],
         vibrant: ["text-on-tertiary-container"],
       },
       /**
-       * Visual style — drives padding, group background, and corner rounding.
+       * Visual style — drives padding, segment surface, and corner rounding.
        *
        * baseline: 12dp h-padding, no item background (container provides it).
-       * vertical: 16dp h-padding, item owns group surface background, CSS
-       *   sibling selectors on [data-menu-gap] form the rounded group cards.
+       * vertical: 16dp h-padding, item owns segment surface, segmented rounding
+       *   via first/last + adjacent-sibling gap selectors.
        */
       menuStyle: {
         baseline: ["px-3"],
         vertical: [
           "px-4",
-          // Group surface — the container is transparent for vertical
-          "bg-surface-container-low",
-          // Segmented corner rounding
           // Default: inner item (4dp all corners)
           "rounded-xs",
-          // First item in menu: 16dp top corners
+          // First item in the whole menu → 16dp top corners
           "first:rounded-t-lg",
-          // Last item in menu: 16dp bottom corners
+          // Last item in the whole menu → 16dp bottom corners
           "last:rounded-b-lg",
-          // Item immediately before a gap: 16dp bottom corners
-          "has-[[data-menu-gap]~&]:rounded-b-lg",
-          // Item immediately after a gap: 16dp top corners
-          "[[data-menu-gap]~&]:rounded-t-lg",
+          // Immediately AFTER a MenuGap → 16dp top corners (new segment starts)
+          "[[data-menu-gap]+&]:rounded-t-lg",
+          // Immediately BEFORE a MenuGap → 16dp bottom corners (segment ends)
+          // has() targets the element that has an immediately adjacent sibling gap
+          "[&:has(+[data-menu-gap])]:rounded-b-lg",
         ],
       },
     },
     compoundVariants: [
-      // vertical + vibrant: item bg → tertiary-container
+      // vertical + standard: item background = surface-container-low
+      {
+        menuStyle: "vertical",
+        colorScheme: "standard",
+        class: ["bg-surface-container-low"],
+      },
+      // vertical + vibrant: item background = tertiary-container
       {
         menuStyle: "vertical",
         colorScheme: "vibrant",
         class: ["bg-tertiary-container"],
       },
-      // vertical + standard: selected text → on-tertiary-container
+      // vertical + standard: selected/open text → on-tertiary-container
       {
         menuStyle: "vertical",
         colorScheme: "standard",
-        class: ["data-[selected]:text-on-tertiary-container"],
+        class: [
+          "data-[selected]:text-on-tertiary-container",
+          "data-[open]:text-on-tertiary-container",
+        ],
       },
-      // vertical + vibrant: selected text → on-tertiary
+      // vertical + vibrant: selected/open text → on-tertiary
       {
         menuStyle: "vertical",
         colorScheme: "vibrant",
-        class: ["data-[selected]:text-on-tertiary"],
+        class: ["data-[selected]:text-on-tertiary", "data-[open]:text-on-tertiary"],
       },
     ],
     defaultVariants: {
@@ -213,27 +217,30 @@ export const menuItemVariants = cva(
 // ─── MENU ITEM HIGHLIGHT ─────────────────────────────────────────────────────
 
 /**
- * Selected-background highlight layer for menu items.
+ * Selected/active-background highlight layer for menu items.
  *
- * Geometry is menuStyle-aware:
- *   baseline — `inset-0` (full-bleed, square background; unchanged MD3 look)
- *   vertical — `inset-x-1 inset-y-0 rounded-md` (horizontal-only 4dp inset,
- *               12dp CornerMedium per MD3 Expressive; selection no longer spans
- *               full width but does fill item height to avoid vertical gaps)
+ * Geometry:
+ *   baseline — `inset-0 rounded-[inherit]` (full-bleed, inherits item corner radius)
+ *   vertical — `inset-0 rounded-[inherit]` (full-bleed, inherits segment card corners)
  *
- * The layer is always present in the DOM and transitions its background-color
- * to the selection color on `data-selected`.
+ * Both styles use `inset-0 rounded-[inherit]` so the highlight always fills the
+ * item exactly, respecting whichever corner radii the item has (inner 4dp for
+ * middle items, outer 16dp for top/bottom items in a segment).
  *
- * Selection colors per menuStyle × colorScheme:
+ * Selection/active colors per menuStyle × colorScheme:
  *   baseline (any):         group-data-[selected]/menuitem:bg-surface-container-highest
  *   vertical + standard:    group-data-[selected]/menuitem:bg-tertiary-container
+ *                           group-data-[open]/menuitem:bg-tertiary-container
  *   vertical + vibrant:     group-data-[selected]/menuitem:bg-tertiary
+ *                           group-data-[open]/menuitem:bg-tertiary
  *
  * @see https://m3.material.io/components/menus/specs — Selected state
  */
 export const menuItemHighlightVariants = cva(
   [
-    "absolute pointer-events-none",
+    "absolute inset-0 pointer-events-none",
+    // Inherit the item's own corner radius (inner 4dp or outer 16dp)
+    "rounded-[inherit]",
     // Effects transition for background-color — no overshoot
     "transition-colors duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
     // z-0: below state layer (z-[1]) and content (z-10)
@@ -242,34 +249,38 @@ export const menuItemHighlightVariants = cva(
   {
     variants: {
       menuStyle: {
-        baseline: ["inset-0"],
-        // horizontal-only inset + 12dp corners (CornerMedium = ItemSelectedShape)
-        vertical: ["inset-x-1 inset-y-0 rounded-md"],
+        baseline: [],
+        vertical: [],
       },
       colorScheme: {
         standard: [
-          // baseline selected bg (vertical standard compound below overrides)
+          // baseline selected bg
           "group-data-[selected]/menuitem:bg-surface-container-highest",
         ],
         vibrant: [
           // baseline + vibrant: use surface-container-highest as fallback
-          // (vertical vibrant compound below overrides)
           "group-data-[selected]/menuitem:bg-surface-container-highest",
         ],
       },
     },
     compoundVariants: [
-      // vertical + standard selected: tertiary-container
+      // vertical + standard: selected/open highlight → tertiary-container
       {
         menuStyle: "vertical",
         colorScheme: "standard",
-        class: ["group-data-[selected]/menuitem:bg-tertiary-container"],
+        class: [
+          "group-data-[selected]/menuitem:bg-tertiary-container",
+          "group-data-[open]/menuitem:bg-tertiary-container",
+        ],
       },
-      // vertical + vibrant selected: tertiary
+      // vertical + vibrant: selected/open highlight → tertiary
       {
         menuStyle: "vertical",
         colorScheme: "vibrant",
-        class: ["group-data-[selected]/menuitem:bg-tertiary"],
+        class: [
+          "group-data-[selected]/menuitem:bg-tertiary",
+          "group-data-[open]/menuitem:bg-tertiary",
+        ],
       },
     ],
     defaultVariants: {
@@ -283,31 +294,35 @@ export const menuItemHighlightVariants = cva(
 
 /**
  * State layer slot — absolute inset overlay that transitions opacity on
- * hover / focus / press interaction states.
+ * hover / press interaction states.
  *
- * Architecture mirrors buttonStateLayerVariants:
- * - Opacity driven by group-data-[x]/menuitem selectors (no CSS pseudo-classes)
- * - Pressed (opacity-10) uses doubled attribute selector to beat hover (opacity-8)
- * - Hidden entirely when disabled — no state layer on disabled items
- * - Color is variant-driven (on-surface for standard, on-tertiary-container for
- *   vibrant), with selected override per menuStyle × colorScheme
+ * Geometry: `inset-0 rounded-[inherit]` for both baseline and vertical —
+ * full-bleed, inherits item corner radius so the state layer respects
+ * the segment card shape.
+ *
+ * Color mapping (MD3 Expressive):
+ *   standard: bg-on-surface (unselected/unopen)
+ *             group-data-[selected] / group-data-[open]: bg-on-tertiary-container
+ *   vibrant:  bg-on-tertiary-container (unselected/unopen)
+ *             group-data-[selected] / group-data-[open]: bg-on-tertiary
+ *
+ * Focus-visible state is NOT expressed as a state-layer opacity here —
+ * it is expressed via the dedicated focus-ring slot (menuItemFocusRingVariants)
+ * per the MD3 Expressive reference state grid.
  *
  * State-layer opacities per MD3 spec:
- *   Hover:         8%   (opacity-8)
- *   Focus visible: 10%  (opacity-10)
- *   Pressed:       10%  (opacity-10, doubled selector wins over hover)
+ *   Hover:   8%   (opacity-8)
+ *   Pressed: 10%  (opacity-10, doubled selector wins over hover)
  *
  * @see https://m3.material.io/components/menus/specs#state-layers
  */
 export const menuItemStateLayerVariants = cva(
   [
-    "absolute overflow-hidden pointer-events-none opacity-0",
+    "absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none opacity-0",
     // Effects transition — opacity must NOT overshoot
     "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
     // Hover: 8%
     "group-data-[hovered]/menuitem:opacity-8",
-    // Focus visible: 10%
-    "group-data-[focus-visible]/menuitem:opacity-10",
     // Pressed: 10%, doubled selector wins over hover at same cascade position
     "group-data-[pressed]/menuitem:group-data-[pressed]/menuitem:opacity-10",
     // No state layer when disabled
@@ -322,24 +337,28 @@ export const menuItemStateLayerVariants = cva(
         vibrant: ["bg-on-tertiary-container"],
       },
       menuStyle: {
-        // baseline: full-bleed, inherits container corner radius
-        baseline: ["inset-0 rounded-[inherit]"],
-        // vertical: horizontal-only inset to match the highlight layer shape
-        vertical: ["inset-x-1 inset-y-0 rounded-md"],
+        baseline: [],
+        vertical: [],
       },
     },
     compoundVariants: [
-      // vertical + standard selected: state layer switches to on-tertiary-container
+      // vertical + standard: selected/open state layer → on-tertiary-container
       {
         menuStyle: "vertical",
         colorScheme: "standard",
-        class: ["group-data-[selected]/menuitem:bg-on-tertiary-container"],
+        class: [
+          "group-data-[selected]/menuitem:bg-on-tertiary-container",
+          "group-data-[open]/menuitem:bg-on-tertiary-container",
+        ],
       },
-      // vertical + vibrant selected: state layer switches to on-tertiary
+      // vertical + vibrant: selected/open state layer → on-tertiary
       {
         menuStyle: "vertical",
         colorScheme: "vibrant",
-        class: ["group-data-[selected]/menuitem:bg-on-tertiary"],
+        class: [
+          "group-data-[selected]/menuitem:bg-on-tertiary",
+          "group-data-[open]/menuitem:bg-on-tertiary",
+        ],
       },
     ],
     defaultVariants: {
@@ -349,22 +368,53 @@ export const menuItemStateLayerVariants = cva(
   }
 );
 
+// ─── MENU ITEM FOCUS RING ─────────────────────────────────────────────────────
+
+/**
+ * Focus ring slot — keyboard-focus indicator rendered as an absolute overlay
+ * with an outline that extends inside the item boundary.
+ *
+ * Unlike the Button focus ring (which uses `inset-[-3px]` to extend outward),
+ * the menu item focus ring uses `-outline-offset-2` (inset 2dp) so it stays
+ * within the segment card without clipping adjacent items.
+ *
+ * Geometry: `inset-0 rounded-[inherit]` — full-bleed, inherits item corners.
+ * Color: `outline-secondary` per MD3 focus indicator token.
+ * Opacity: 0 at rest → 100% on focus-visible.
+ *
+ * @see https://m3.material.io/components/menus/specs — States
+ */
+export const menuItemFocusRingVariants = cva([
+  "pointer-events-none absolute inset-0 rounded-[inherit]",
+  "outline outline-2 -outline-offset-2 outline-secondary",
+  // Effects transition — opacity must not overshoot
+  "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
+  "opacity-0",
+  "group-data-[focus-visible]/menuitem:opacity-100",
+  // z-[2]: above state layer (z-[1]) and highlight (z-0), below content (z-10)
+  "z-[2]",
+]);
+
 // ─── MENU ITEM ICON ───────────────────────────────────────────────────────────
 
 /**
  * Icon slot (leading and trailing icons) for menu items.
  *
- * Base: 24×24dp, on-surface-variant color.
- * Selected: color follows the menuStyle × colorScheme selection color.
+ * Color mapping (MD3 Expressive):
+ *   standard:  on-surface-variant (unselected); on-tertiary-container (selected/open)
+ *   vibrant:   on-tertiary-container (unselected); on-tertiary (selected/open)
+ *
+ * Size per menuStyle:
+ *   baseline — 24dp (MD3 baseline spec)
+ *   vertical — 20dp (SegmentedMenuTokens.ItemLeadingIconSize = 20dp)
+ *
  * Disabled: on-surface/38 per MD3 spec.
- * Transition: effects spring (no overshoot on color).
  *
  * @see https://m3.material.io/components/menus/specs#anatomy
  */
 export const menuItemIconVariants = cva(
   [
     "relative z-10 shrink-0 flex items-center justify-center",
-    "text-on-surface-variant",
     "transition-colors duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
     // Disabled: 38% opacity on icon color
     "group-data-[disabled]/menuitem:text-on-surface/38",
@@ -372,34 +422,32 @@ export const menuItemIconVariants = cva(
   {
     variants: {
       colorScheme: {
-        standard: [],
-        vibrant: [
-          // Vibrant unselected icon: on-tertiary-container
-          "text-on-tertiary-container",
-        ],
+        standard: ["text-on-surface-variant"],
+        vibrant: ["text-on-tertiary-container"],
       },
-      /**
-       * Size per menuStyle:
-       *   baseline — 24dp (MD3 baseline spec)
-       *   vertical — 20dp (SegmentedMenuTokens.ItemLeadingIconSize = 20dp)
-       */
       menuStyle: {
         baseline: ["h-6 w-6"],
         vertical: ["h-5 w-5"],
       },
     },
     compoundVariants: [
-      // vertical + standard selected: icon → on-tertiary-container
+      // vertical + standard: selected/open icon → on-tertiary-container
       {
         menuStyle: "vertical",
         colorScheme: "standard",
-        class: ["group-data-[selected]/menuitem:text-on-tertiary-container"],
+        class: [
+          "group-data-[selected]/menuitem:text-on-tertiary-container",
+          "group-data-[open]/menuitem:text-on-tertiary-container",
+        ],
       },
-      // vertical + vibrant selected: icon → on-tertiary
+      // vertical + vibrant: selected/open icon → on-tertiary
       {
         menuStyle: "vertical",
         colorScheme: "vibrant",
-        class: ["group-data-[selected]/menuitem:text-on-tertiary"],
+        class: [
+          "group-data-[selected]/menuitem:text-on-tertiary",
+          "group-data-[open]/menuitem:text-on-tertiary",
+        ],
       },
     ],
     defaultVariants: {
@@ -421,13 +469,26 @@ export const menuSectionVariants = cva(["flex flex-col w-full"]);
 /**
  * Menu section header variants (CVA).
  *
- * Typography: `text-title-small text-on-surface-variant` per MD3 spec.
+ * Color mapping (MD3 Expressive):
+ *   standard: text-on-surface-variant
+ *   vibrant:  text-on-tertiary-container
+ *
+ * @see https://m3.material.io/components/menus/specs — Callout 10
  */
-export const menuSectionHeaderVariants = cva([
-  "px-3 pt-2 pb-1",
-  "text-title-small text-on-surface-variant",
-  "select-none",
-]);
+export const menuSectionHeaderVariants = cva(
+  ["px-3 pt-2 pb-1", "text-title-small", "select-none"],
+  {
+    variants: {
+      colorScheme: {
+        standard: ["text-on-surface-variant"],
+        vibrant: ["text-on-tertiary-container"],
+      },
+    },
+    defaultVariants: {
+      colorScheme: "standard",
+    },
+  }
+);
 
 // ─── MENU DIVIDER ─────────────────────────────────────────────────────────────
 
@@ -435,7 +496,7 @@ export const menuSectionHeaderVariants = cva([
  * Menu item divider variants (CVA).
  *
  * Horizontal separator with `border-outline-variant`.
- * Padding: 8dp top/bottom (`my-2`) per MD3 spec.
+ * Spacing: 2dp top/bottom (`my-0.5`) per MD3 spec.
  *
  * @see https://m3.material.io/components/menus/specs — Measurements
  */
@@ -446,9 +507,11 @@ export const menuDividerVariants = cva(["border-t border-outline-variant", "my-0
 /**
  * Menu gap variants (CVA).
  *
- * A visual spacer for MD3 Expressive vertical menus. Uses spacing instead of
- * a border line to separate item groups. Set aria-hidden and role="none" in
- * the component.
+ * A 2dp visual spacer for MD3 Expressive vertical menus. The gap reveals the
+ * page background between item segments, acting as a visual divider without
+ * a line. Set aria-hidden and role="none" in the component.
+ *
+ * Height: 2dp (h-0.5) — keeps the segment separation tight but visible.
  *
  * @see https://m3.material.io/components/menus/guidelines#gaps-and-dividers
  */
@@ -459,15 +522,49 @@ export const menuGapVariants = cva(["h-0.5 w-full"]);
 /**
  * Trailing text (keyboard shortcut) variants (CVA).
  *
- * Color: `text-on-surface-variant`, size: `text-label-large` (14sp).
- * The element also carries `aria-keyshortcuts` for screen reader support.
- * Disabled: on-surface/38 to match the rest of the item content.
+ * Color mapping (MD3 Expressive):
+ *   standard: on-surface-variant (unselected); on-tertiary-container (selected/open)
+ *   vibrant:  on-tertiary-container (unselected); on-tertiary (selected/open)
+ *
+ * Disabled: on-surface/38.
  */
-export const menuItemTrailingTextVariants = cva([
-  "ml-auto shrink-0 text-label-large text-on-surface-variant",
-  "select-none",
-  "group-data-[disabled]/menuitem:text-on-surface/38",
-]);
+export const menuItemTrailingTextVariants = cva(
+  [
+    "ml-auto shrink-0 text-label-large",
+    "select-none",
+    "group-data-[disabled]/menuitem:text-on-surface/38",
+  ],
+  {
+    variants: {
+      colorScheme: {
+        standard: ["text-on-surface-variant"],
+        vibrant: ["text-on-tertiary-container"],
+      },
+      menuStyle: {
+        baseline: [],
+        vertical: [
+          "group-data-[selected]/menuitem:text-on-tertiary-container",
+          "group-data-[open]/menuitem:text-on-tertiary-container",
+        ],
+      },
+    },
+    compoundVariants: [
+      // vertical + vibrant: selected/open trailing text → on-tertiary
+      {
+        menuStyle: "vertical",
+        colorScheme: "vibrant",
+        class: [
+          "group-data-[selected]/menuitem:text-on-tertiary",
+          "group-data-[open]/menuitem:text-on-tertiary",
+        ],
+      },
+    ],
+    defaultVariants: {
+      colorScheme: "standard",
+      menuStyle: "baseline",
+    },
+  }
+);
 
 // ─── MENU ITEM DESCRIPTION ────────────────────────────────────────────────────
 
@@ -475,14 +572,46 @@ export const menuItemTrailingTextVariants = cva([
  * Menu item description (supporting text) variants (CVA).
  *
  * Rendered below the label text.
- * Typography: `text-body-medium text-on-surface-variant`.
+ *
+ * Color mapping (MD3 Expressive):
+ *   standard: on-surface-variant (unselected); on-tertiary-container (selected/open)
+ *   vibrant:  on-tertiary-container (unselected); on-tertiary (selected/open)
+ *
  * Disabled: on-surface/38.
  */
-export const menuItemDescriptionVariants = cva([
-  "text-body-medium text-on-surface-variant",
-  "select-none",
-  "group-data-[disabled]/menuitem:text-on-surface/38",
-]);
+export const menuItemDescriptionVariants = cva(
+  ["text-body-medium", "select-none", "group-data-[disabled]/menuitem:text-on-surface/38"],
+  {
+    variants: {
+      colorScheme: {
+        standard: ["text-on-surface-variant"],
+        vibrant: ["text-on-tertiary-container"],
+      },
+      menuStyle: {
+        baseline: [],
+        vertical: [
+          "group-data-[selected]/menuitem:text-on-tertiary-container",
+          "group-data-[open]/menuitem:text-on-tertiary-container",
+        ],
+      },
+    },
+    compoundVariants: [
+      // vertical + vibrant: selected/open description → on-tertiary
+      {
+        menuStyle: "vertical",
+        colorScheme: "vibrant",
+        class: [
+          "group-data-[selected]/menuitem:text-on-tertiary",
+          "group-data-[open]/menuitem:text-on-tertiary",
+        ],
+      },
+    ],
+    defaultVariants: {
+      colorScheme: "standard",
+      menuStyle: "baseline",
+    },
+  }
+);
 
 // ─── TYPE EXPORTS ─────────────────────────────────────────────────────────────
 
@@ -491,5 +620,9 @@ export type MenuPopoverVariants = VariantProps<typeof menuPopoverVariants>;
 export type MenuItemVariants = VariantProps<typeof menuItemVariants>;
 export type MenuItemHighlightVariants = VariantProps<typeof menuItemHighlightVariants>;
 export type MenuItemStateLayerVariants = VariantProps<typeof menuItemStateLayerVariants>;
+export type MenuItemFocusRingVariants = VariantProps<typeof menuItemFocusRingVariants>;
 export type MenuItemIconVariants = VariantProps<typeof menuItemIconVariants>;
 export type MenuSectionVariants = VariantProps<typeof menuSectionVariants>;
+export type MenuSectionHeaderVariants = VariantProps<typeof menuSectionHeaderVariants>;
+export type MenuItemTrailingTextVariants = VariantProps<typeof menuItemTrailingTextVariants>;
+export type MenuItemDescriptionVariants = VariantProps<typeof menuItemDescriptionVariants>;

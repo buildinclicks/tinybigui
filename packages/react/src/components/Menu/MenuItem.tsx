@@ -8,6 +8,7 @@ import {
   menuItemVariants,
   menuItemStateLayerVariants,
   menuItemHighlightVariants,
+  menuItemFocusRingVariants,
   menuItemIconVariants,
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
@@ -54,6 +55,10 @@ export function ChevronRightIcon(): JSX.Element {
 
 // ─── Density height maps ───────────────────────────────────────────────────────
 
+/**
+ * Baseline item heights per MD3 density spec.
+ * density 0 = 48dp, -1 = 44dp, -2 = 40dp, -3 = 36dp.
+ */
 const BASELINE_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
   0: "h-12",
   [-1]: "h-11",
@@ -61,12 +66,15 @@ const BASELINE_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
   [-3]: "h-9",
 };
 
-// MD3 Expressive vertical: Item = 44dp at density 0
+/**
+ * Vertical (Expressive) item heights per MD3 Expressive measurement spec.
+ * Matched to baseline heights (48/44/40/36dp) per the measurement reference.
+ */
 const VERTICAL_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
-  0: "h-11",
-  [-1]: "h-10",
-  [-2]: "h-9",
-  [-3]: "h-8",
+  0: "h-12",
+  [-1]: "h-11",
+  [-2]: "h-10",
+  [-3]: "h-9",
 };
 
 // ─── MenuItem ─────────────────────────────────────────────────────────────────
@@ -74,14 +82,17 @@ const VERTICAL_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
 /**
  * MD3 styled MenuItem component (Layer 3).
  *
- * All MD3 styles are applied directly to the `<li role="menuitem">` element via
- * RAC's render-prop className. React Aria automatically sets data-hovered,
- * data-pressed, data-focus-visible, data-selected, and data-disabled on the
- * element — these are consumed by group-data-[x]/menuitem selectors in the
- * slot variants (state-layer, icon, label, trailing text, description).
+ * Slot architecture (mirrors Button/Switch):
+ *   root (group/menuitem)        — layout, cursor, color, density height
+ *   highlight (z-0)              — selected/active background fill
+ *   stateLayer (z-[1])           — hover/press opacity overlay
+ *   focusRing (z-[2])            — keyboard focus outline (inset, not on state-layer)
+ *   ripple (z-[3])               — press ripple feedback
+ *   content (z-10)               — icon, label, trailing text/icon, description
  *
- * The root carries `group/menuitem` so all child slots can read the item's
- * interaction state without prop drilling.
+ * All interaction/selection styles are driven by data-* attributes that RAC
+ * MenuItem emits natively (data-hovered, data-pressed, data-focus-visible,
+ * data-selected, data-disabled, data-open) consumed via group-data selectors.
  *
  * @example
  * ```tsx
@@ -118,8 +129,6 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
   const { ripples, onMouseDown } = useRipple({ disabled: disableRipple });
 
   // className rendered on the <li role="menuitem"> via RAC's render-prop form.
-  // We only need the render-prop to read isSelected for the checkmark slot —
-  // all state-driven styling is handled by data-* attributes + group-data selectors.
   const computeClassName = ({ isSelected }: MenuItemRenderProps): string =>
     cn(
       menuItemVariants({ colorScheme, menuStyle }),
@@ -127,9 +136,6 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
       "group/menuitem",
       // Height: auto when description is present (multi-line), otherwise density
       description ? "min-h-12 py-2 h-auto items-start" : heightClass,
-      // Store isSelected on dataset so the render-prop return value is used for
-      // the checkmark slot below — actual selection styling comes from RAC's
-      // own data-selected attribute that it emits automatically.
       className,
       // Silence the isSelected lint — value consumed in render-prop below
       isSelected ? "" : ""
@@ -144,38 +150,47 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
     >
       {({ isSelected }: MenuItemRenderProps) => (
         <>
-          {/* ── Highlight layer (selected background) ─────────────────── */}
-          {/* Sits at z-0, below state layer and content. Geometry is
-              menuStyle-aware: baseline=full-bleed, vertical=inset-1 rounded-lg */}
+          {/* ── Highlight layer (selected/active background) ───────────────── */}
+          {/* z-0, full-bleed inset-0 rounded-[inherit] so it respects the
+              item's current segment corner radius (inner 4dp or outer 16dp). */}
           <span
             aria-hidden="true"
             data-testid="menuitem-highlight"
             className={menuItemHighlightVariants({ colorScheme, menuStyle })}
           />
 
-          {/* ── State layer slot ──────────────────────────────────────── */}
-          {/* z-[1]: above highlight, below content. Opacity driven by
-              group-data-[hovered/pressed/focus-visible]/menuitem. */}
+          {/* ── State layer slot ──────────────────────────────────────────── */}
+          {/* z-[1]: above highlight, below focus ring and content.
+              Covers hover (8%) and press (10%) but NOT focus-visible
+              — focus is expressed via the dedicated focus-ring slot below. */}
           <span
             aria-hidden="true"
             className={menuItemStateLayerVariants({ colorScheme, menuStyle })}
           />
 
-          {/* ── Ripple container ──────────────────────────────────────── */}
+          {/* ── Focus ring slot ───────────────────────────────────────────── */}
+          {/* z-[2]: above state layer. Keyboard-focus outline, inset 2dp,
+              inherits item corner radius. Opacity 0→100 on focus-visible. */}
+          <span
+            aria-hidden="true"
+            data-testid="menuitem-focus-ring"
+            className={menuItemFocusRingVariants()}
+          />
+
+          {/* ── Ripple container ──────────────────────────────────────────── */}
+          {/* z-[3]: above focus ring. Full-bleed, inherits item corners so
+              the ripple clips to the segment card shape. */}
           {!disableRipple && (
             <span
               className={cn(
-                "pointer-events-none absolute z-[2] overflow-hidden",
-                menuStyle === "vertical"
-                  ? "inset-x-1 inset-y-0 rounded-md"
-                  : "inset-0 rounded-[inherit]"
+                "pointer-events-none absolute inset-0 z-[3] overflow-hidden rounded-[inherit]"
               )}
             >
               {ripples}
             </span>
           )}
 
-          {/* ── Leading icon or checkmark slot ────────────────────────── */}
+          {/* ── Leading icon or checkmark slot ────────────────────────────── */}
           {(leadingIcon != null || isSelectionMenu) && (
             <span className={menuItemIconVariants({ colorScheme, menuStyle })} aria-hidden="true">
               {isSelectionMenu && leadingIcon == null ? (
@@ -188,13 +203,15 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
             </span>
           )}
 
-          {/* ── Text content area ─────────────────────────────────────── */}
+          {/* ── Text content area ─────────────────────────────────────────── */}
           {description != null ? (
             <span className="relative z-10 flex min-w-0 flex-1 flex-col">
               <span className="text-label-large group-data-[disabled]/menuitem:text-on-surface/38">
                 {children}
               </span>
-              <span className={menuItemDescriptionVariants()}>{description}</span>
+              <span className={menuItemDescriptionVariants({ colorScheme, menuStyle })}>
+                {description}
+              </span>
             </span>
           ) : (
             <span className="text-label-large group-data-[disabled]/menuitem:text-on-surface/38 relative z-10 min-w-0 flex-1">
@@ -202,10 +219,10 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
             </span>
           )}
 
-          {/* ── Badge slot ────────────────────────────────────────────── */}
+          {/* ── Badge slot ────────────────────────────────────────────────── */}
           {badge != null && <span className="relative z-10 shrink-0">{badge}</span>}
 
-          {/* ── Trailing icon ─────────────────────────────────────────── */}
+          {/* ── Trailing icon ─────────────────────────────────────────────── */}
           {trailingIcon != null && trailingText == null && (
             <span
               className={cn(menuItemIconVariants({ colorScheme, menuStyle }), "ml-auto")}
@@ -215,10 +232,13 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
             </span>
           )}
 
-          {/* ── Trailing text (keyboard shortcut) ─────────────────────── */}
+          {/* ── Trailing text (keyboard shortcut) ─────────────────────────── */}
           {trailingText != null && trailingIcon == null && (
             <span
-              className={cn(menuItemTrailingTextVariants(), "relative z-10")}
+              className={cn(
+                menuItemTrailingTextVariants({ colorScheme, menuStyle }),
+                "relative z-10"
+              )}
               aria-keyshortcuts={trailingText}
             >
               {trailingText}

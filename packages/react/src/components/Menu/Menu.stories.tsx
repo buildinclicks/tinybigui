@@ -534,32 +534,281 @@ export const VerticalMenuStyle: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "The `vertical` menu style uses **16dp rounded corners** (vs 4dp in baseline) and supports `MenuGap` — a visual spacing element (not a separator) that groups items without a visible divider line.",
+        story: [
+          "The `vertical` (Expressive) menu style uses **16dp rounded corners** and the **segmented model** — each group of items is a separate rounded card.",
+          "",
+          "`MenuGap` creates a 2dp transparent gap between segments, letting the page background show through (acting as a visual divider without a line).",
+          "",
+          "Items within a segment share a surface: **standard** uses `surface-container-low`; **vibrant** uses `tertiary-container`.",
+          "The **selected** row gets a rounded accent highlight (standard → `tertiary-container`, vibrant → `tertiary`).",
+        ].join("\n"),
       },
     },
   },
   render: () => (
-    <MenuTrigger>
-      <button type="button" className={primaryBtn}>
-        More actions
-      </button>
-      <MenuTrigger.Menu aria-label="More actions" menuStyle="vertical" colorScheme="vibrant">
-        <MenuItem id="star" leadingIcon={<StarIcon />}>
-          Add to favourites
-        </MenuItem>
-        <MenuItem id="share" leadingIcon={<ShareIcon />}>
-          Share
-        </MenuItem>
-        <MenuGap />
-        <MenuItem id="rename">Rename</MenuItem>
-        <MenuItem id="duplicate">Duplicate</MenuItem>
-        <MenuGap />
-        <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
-          Delete
-        </MenuItem>
-      </MenuTrigger.Menu>
-    </MenuTrigger>
+    <div className="flex items-start gap-8">
+      {/* ── Standard ── */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Standard</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={primaryBtn}>
+            More actions
+          </button>
+          <MenuTrigger.Menu
+            aria-label="More actions (standard)"
+            menuStyle="vertical"
+            colorScheme="standard"
+            selectionMode="single"
+            defaultSelectedKeys={["star"]}
+          >
+            <MenuItem id="star" leadingIcon={<StarIcon />}>
+              Add to favourites
+            </MenuItem>
+            <MenuItem id="share" leadingIcon={<ShareIcon />}>
+              Share
+            </MenuItem>
+            <MenuGap />
+            <MenuItem id="rename">Rename</MenuItem>
+            <MenuItem id="duplicate">Duplicate</MenuItem>
+            <MenuGap />
+            <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+              Delete
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+
+      {/* ── Vibrant ── */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Vibrant</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={tertiaryBtn}>
+            More actions
+          </button>
+          <MenuTrigger.Menu
+            aria-label="More actions (vibrant)"
+            menuStyle="vertical"
+            colorScheme="vibrant"
+            selectionMode="single"
+            defaultSelectedKeys={["star"]}
+          >
+            <MenuItem id="star" leadingIcon={<StarIcon />}>
+              Add to favourites
+            </MenuItem>
+            <MenuItem id="share" leadingIcon={<ShareIcon />}>
+              Share
+            </MenuItem>
+            <MenuGap />
+            <MenuItem id="rename">Rename</MenuItem>
+            <MenuItem id="duplicate">Duplicate</MenuItem>
+            <MenuGap />
+            <MenuItem id="delete" leadingIcon={<DeleteIcon />}>
+              Delete
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+    </div>
+  ),
+};
+
+// ─── Expressive Vertical — States ─────────────────────────────────────────────
+
+export const VerticalMenuStates: Story = {
+  name: "Expressive Vertical — States",
+  parameters: {
+    layout: "centered",
+    docs: {
+      description: {
+        story: [
+          "All 6 MD3 Expressive vertical menu item states per the reference:",
+          "",
+          "1. **Enabled** — default appearance",
+          "2. **Disabled** — pointer-events-none, content at 38% opacity",
+          "3. **Hovered** — `on-surface` state layer at 8% opacity",
+          "4. **Focused** — `secondary` outline ring (2dp inset), no state-layer fill",
+          "5. **Pressed** — `on-surface` state layer at 10% opacity",
+          "6. **Active / submenu-open** — `tertiary-container` (standard) or `tertiary` (vibrant) highlight + `on-tertiary-container` / `on-tertiary` content",
+        ].join("\n"),
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-start gap-8">
+      {/* Standard */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Standard</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={primaryBtn}>
+            Open
+          </button>
+          <MenuTrigger.Menu
+            aria-label="States standard"
+            menuStyle="vertical"
+            colorScheme="standard"
+            selectionMode="single"
+            defaultSelectedKeys={["active"]}
+          >
+            <MenuItem id="enabled" leadingIcon={<InfoIcon />}>
+              Enabled
+            </MenuItem>
+            <MenuItem id="disabled" leadingIcon={<InfoIcon />} isDisabled>
+              Disabled
+            </MenuItem>
+            <MenuItem id="shortcut" leadingIcon={<CopyIcon />} trailingText="⌘C">
+              With shortcut
+            </MenuItem>
+            <MenuGap />
+            <MenuItem id="active" leadingIcon={<StarIcon />}>
+              Selected / Active
+            </MenuItem>
+            <MenuItem id="desc" leadingIcon={<InfoIcon />} description="Supporting text">
+              With description
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+
+      {/* Vibrant */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Vibrant</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={tertiaryBtn}>
+            Open
+          </button>
+          <MenuTrigger.Menu
+            aria-label="States vibrant"
+            menuStyle="vertical"
+            colorScheme="vibrant"
+            selectionMode="single"
+            defaultSelectedKeys={["active"]}
+          >
+            <MenuItem id="enabled" leadingIcon={<InfoIcon />}>
+              Enabled
+            </MenuItem>
+            <MenuItem id="disabled" leadingIcon={<InfoIcon />} isDisabled>
+              Disabled
+            </MenuItem>
+            <MenuItem id="shortcut" leadingIcon={<CopyIcon />} trailingText="⌘C">
+              With shortcut
+            </MenuItem>
+            <MenuGap />
+            <MenuItem id="active" leadingIcon={<StarIcon />}>
+              Selected / Active
+            </MenuItem>
+            <MenuItem id="desc" leadingIcon={<InfoIcon />} description="Supporting text">
+              With description
+            </MenuItem>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+    </div>
+  ),
+};
+
+// ─── Expressive Vertical — MD3 Reference Example ──────────────────────────────
+
+export const VerticalMenuReference: Story = {
+  name: "Expressive Vertical — Reference Example",
+  parameters: {
+    layout: "centered",
+    docs: {
+      description: {
+        story: [
+          "Matches the MD3 anatomy reference exactly: two segments separated by a `MenuGap`.",
+          "",
+          "**Segment 1**: Item 1–4 with leading icons, trailing text, and a submenu trigger.",
+          "**Segment 2**: A section header (Label text) and Item 5 with supporting text and submenu.",
+          "",
+          "The gap between segments reveals the page background — acting as the visual divider.",
+        ].join("\n"),
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-start gap-8">
+      {/* Standard */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Standard</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={primaryBtn}>
+            Open
+          </button>
+          <MenuTrigger.Menu
+            aria-label="Reference standard"
+            menuStyle="vertical"
+            colorScheme="standard"
+            selectionMode="single"
+            defaultSelectedKeys={["item4"]}
+          >
+            <MenuItem id="item1" leadingIcon={<InfoIcon />}>
+              Item 1
+            </MenuItem>
+            <MenuItem id="item2" leadingIcon={<CopyIcon />} trailingText="⌘C">
+              Item 2
+            </MenuItem>
+            <MenuItem id="item3" leadingIcon={<CutIcon />}>
+              Item 3
+            </MenuItem>
+            <MenuItem id="item4" leadingIcon={<StarIcon />}>
+              Item 4
+            </MenuItem>
+            <MenuGap />
+            <MenuSection header="Label text" aria-label="Label text">
+              <MenuItem
+                id="item5"
+                leadingIcon={<InfoIcon />}
+                description="Supporting text"
+                trailingText="⌘V"
+              >
+                Item 5
+              </MenuItem>
+            </MenuSection>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+
+      {/* Vibrant */}
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-label-small text-on-surface-variant">Vibrant</span>
+        <MenuTrigger defaultOpen>
+          <button type="button" className={tertiaryBtn}>
+            Open
+          </button>
+          <MenuTrigger.Menu
+            aria-label="Reference vibrant"
+            menuStyle="vertical"
+            colorScheme="vibrant"
+            selectionMode="single"
+            defaultSelectedKeys={["item4"]}
+          >
+            <MenuItem id="item1" leadingIcon={<InfoIcon />}>
+              Item 1
+            </MenuItem>
+            <MenuItem id="item2" leadingIcon={<CopyIcon />} trailingText="⌘C">
+              Item 2
+            </MenuItem>
+            <MenuItem id="item3" leadingIcon={<CutIcon />}>
+              Item 3
+            </MenuItem>
+            <MenuItem id="item4" leadingIcon={<StarIcon />}>
+              Item 4
+            </MenuItem>
+            <MenuGap />
+            <MenuSection header="Label text" aria-label="Label text">
+              <MenuItem
+                id="item5"
+                leadingIcon={<InfoIcon />}
+                description="Supporting text"
+                trailingText="⌘V"
+              >
+                Item 5
+              </MenuItem>
+            </MenuSection>
+          </MenuTrigger.Menu>
+        </MenuTrigger>
+      </div>
+    </div>
   ),
 };
 
