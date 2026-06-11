@@ -6,6 +6,7 @@ import { axe } from "vitest-axe";
 import { Drawer } from "./Drawer";
 import { DrawerItem } from "./DrawerItem";
 import { DrawerSection } from "./DrawerSection";
+import { DrawerHeadline } from "./DrawerHeadline";
 import { HeadlessDrawer, HeadlessDrawerItem } from "./DrawerHeadless";
 
 // ─── Test Icon Mocks ───────────────────────────────────────────────────────────
@@ -78,11 +79,16 @@ describe("Drawer", () => {
       expect(nav.className).not.toContain("-translate-x-full");
     });
 
-    test("calls onOpenChange when standard drawer is toggled programmatically", () => {
-      const onOpenChange = vi.fn();
-      renderStandardDrawer({ onOpenChange });
-      // onOpenChange should not be called on initial render
-      expect(onOpenChange).not.toHaveBeenCalled();
+    test("applies correct surface token class", () => {
+      renderStandardDrawer();
+      const nav = screen.getByRole("navigation");
+      expect(nav.className).toContain("bg-surface-container-low");
+    });
+
+    test("applies correct corner class (rounded-r-lg = 16dp MD3 large)", () => {
+      renderStandardDrawer();
+      const nav = screen.getByRole("navigation");
+      expect(nav.className).toContain("rounded-r-lg");
     });
 
     test("accepts custom className", () => {
@@ -135,15 +141,16 @@ describe("Drawer", () => {
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
-    test("renders nav landmark wrapping the dialog", () => {
+    test("modal uses bg-surface-container-low (aligned with standard)", () => {
       renderModalDrawer();
-      expect(screen.getByRole("navigation")).toBeInTheDocument();
-      expect(screen.getByRole("dialog")).toBeInTheDocument();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toContain("bg-surface-container-low");
     });
 
-    test("renders children inside dialog", () => {
+    test("modal adds shadow-elevation-1 for separation", () => {
       renderModalDrawer();
-      expect(screen.getByText("Home")).toBeInTheDocument();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toContain("shadow-elevation-1");
     });
   });
 
@@ -167,6 +174,41 @@ describe("Drawer", () => {
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
+  });
+});
+
+// ─── DrawerHeadline ───────────────────────────────────────────────────────────
+
+describe("DrawerHeadline", () => {
+  test("renders headline text", () => {
+    render(<DrawerHeadline>Mail</DrawerHeadline>);
+    expect(screen.getByText("Mail")).toBeInTheDocument();
+  });
+
+  test("accepts custom className", () => {
+    render(<DrawerHeadline className="custom-headline">Mail</DrawerHeadline>);
+    expect(screen.getByText("Mail")).toHaveClass("custom-headline");
+  });
+
+  test("applies MD3 typography class (text-title-small)", () => {
+    render(<DrawerHeadline>Mail</DrawerHeadline>);
+    expect(screen.getByText("Mail").className).toContain("text-title-small");
+  });
+
+  test("applies MD3 color class (text-on-surface-variant)", () => {
+    render(<DrawerHeadline>Mail</DrawerHeadline>);
+    expect(screen.getByText("Mail").className).toContain("text-on-surface-variant");
+  });
+
+  test("passes axe audit inside a drawer", async () => {
+    const { container } = render(
+      <Drawer variant="standard" open aria-label="App navigation">
+        <DrawerHeadline>Mail</DrawerHeadline>
+        <DrawerItem label="Home" isActive />
+      </Drawer>
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 });
 
@@ -197,19 +239,50 @@ describe("DrawerItem", () => {
       expect(screen.getByTestId("home-icon")).toBeInTheDocument();
     });
 
-    test("renders badge content when provided", () => {
-      render(<DrawerItem label="Inbox" badge={<span data-testid="badge">3</span>} />);
-      expect(screen.getByTestId("badge")).toBeInTheDocument();
-    });
-
-    test("renders secondary text when provided", () => {
-      render(<DrawerItem label="Profile" secondaryText="Edit your profile" />);
-      expect(screen.getByText("Edit your profile")).toBeInTheDocument();
-    });
-
     test("accepts custom className", () => {
       render(<DrawerItem label="Home" className="custom-item" />);
       expect(screen.getByRole("button")).toHaveClass("custom-item");
+    });
+
+    test("applies rounded-full to item (pill shape)", () => {
+      render(<DrawerItem label="Home" />);
+      expect(screen.getByRole("button").className).toContain("rounded-full");
+    });
+
+    test("applies h-14 to item (56dp height per MD3 spec)", () => {
+      render(<DrawerItem label="Home" />);
+      expect(screen.getByRole("button").className).toContain("h-14");
+    });
+  });
+
+  // ── Badge ───────────────────────────────────────────────────────────────────
+
+  describe("Badge", () => {
+    test("renders numeric badge", () => {
+      render(<DrawerItem label="Inbox" badge={24} />);
+      expect(screen.getByText("24")).toBeInTheDocument();
+    });
+
+    test("renders string badge", () => {
+      render(<DrawerItem label="Beta" badge="NEW" />);
+      expect(screen.getByText("NEW")).toBeInTheDocument();
+    });
+
+    test("badge has role='status' with numeric aria-label", () => {
+      render(<DrawerItem label="Inbox" badge={5} />);
+      const badge = screen.getByRole("status");
+      expect(badge).toHaveAttribute("aria-label", "5 notifications");
+    });
+
+    test("badge has role='status' with string aria-label", () => {
+      render(<DrawerItem label="Beta" badge="NEW" />);
+      const badge = screen.getByRole("status");
+      expect(badge).toHaveAttribute("aria-label", "NEW");
+    });
+
+    test("does NOT render badge when badge is undefined", () => {
+      render(<DrawerItem label="Home" />);
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
     });
   });
 
@@ -225,6 +298,54 @@ describe("DrawerItem", () => {
       render(<DrawerItem label="Home" />);
       expect(screen.getByRole("button")).not.toHaveAttribute("aria-current");
     });
+
+    test("sets data-active on the root when isActive=true", () => {
+      render(<DrawerItem label="Home" isActive />);
+      expect(screen.getByRole("button")).toHaveAttribute("data-active", "");
+    });
+
+    test("does NOT set data-active when isActive=false", () => {
+      render(<DrawerItem label="Home" />);
+      expect(screen.getByRole("button")).not.toHaveAttribute("data-active");
+    });
+
+    test("active item has group/draweritem class for slot selectors", () => {
+      render(<DrawerItem label="Home" isActive />);
+      expect(screen.getByRole("button").className).toContain("group/draweritem");
+    });
+  });
+
+  // ── Slots ──────────────────────────────────────────────────────────────────
+
+  describe("Slot architecture", () => {
+    test("renders active indicator slot", () => {
+      render(<DrawerItem label="Home" />);
+      const item = screen.getByRole("button");
+      const slots = item.querySelectorAll('[aria-hidden="true"]');
+      // At least the active indicator, state layer, focus ring spans exist
+      expect(slots.length).toBeGreaterThanOrEqual(3);
+    });
+
+    test("active indicator has secondary-container class", () => {
+      render(<DrawerItem label="Home" isActive />);
+      const item = screen.getByRole("button");
+      const indicator = item.querySelector(".bg-secondary-container");
+      expect(indicator).not.toBeNull();
+    });
+
+    test("state layer has on-surface-variant class for inactive item", () => {
+      render(<DrawerItem label="Home" />);
+      const item = screen.getByRole("button");
+      const stateLayer = item.querySelector(".bg-on-surface-variant");
+      expect(stateLayer).not.toBeNull();
+    });
+
+    test("focus ring has outline-secondary class", () => {
+      render(<DrawerItem label="Home" />);
+      const item = screen.getByRole("button");
+      const focusRing = item.querySelector(".outline-secondary");
+      expect(focusRing).not.toBeNull();
+    });
   });
 
   // ── Disabled State ─────────────────────────────────────────────────────────
@@ -239,12 +360,14 @@ describe("DrawerItem", () => {
       expect(onPress).not.toHaveBeenCalled();
     });
 
-    test("is not accessible when disabled", () => {
+    test("sets disabled attribute when disabled", () => {
       render(<DrawerItem label="Home" isDisabled />);
-      // React Aria sets the native `disabled` attribute on <button> elements
-      // (or aria-disabled for non-button elements)
-      const item = screen.getByRole("button");
-      expect(item).toBeDisabled();
+      expect(screen.getByRole("button")).toBeDisabled();
+    });
+
+    test("sets data-disabled attribute when disabled", () => {
+      render(<DrawerItem label="Home" isDisabled />);
+      expect(screen.getByRole("button")).toHaveAttribute("data-disabled", "");
     });
   });
 
@@ -276,6 +399,10 @@ describe("DrawerItem", () => {
       await user.keyboard(" ");
       expect(onPress).toHaveBeenCalledTimes(1);
     });
+
+    // Note: data-hovered tests are omitted because react-aria's useHover
+    // relies on pointer events that JSDOM does not support. Hover state is
+    // verified visually in Storybook and is covered by react-aria's own tests.
   });
 
   // ── Accessibility ──────────────────────────────────────────────────────────
@@ -301,6 +428,16 @@ describe("DrawerItem", () => {
 
     test("disabled item passes axe audit", async () => {
       const { container } = render(<DrawerItem label="Home" isDisabled />);
+      const results = await axe(container);
+      expect(results).toHaveNoViolations();
+    });
+
+    test("item with badge passes axe audit", async () => {
+      const { container } = render(
+        <nav aria-label="test">
+          <DrawerItem label="Inbox" badge={24} />
+        </nav>
+      );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
@@ -334,7 +471,7 @@ describe("DrawerSection", () => {
         <DrawerItem label="Profile" />
       </DrawerSection>
     );
-    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+    expect(screen.queryByText("Account")).not.toBeInTheDocument();
   });
 
   test("renders divider when showDivider=true", () => {
@@ -372,23 +509,28 @@ describe("DrawerSection", () => {
 // ─── Full Drawer Composition ──────────────────────────────────────────────────
 
 describe("Drawer composition", () => {
-  test("renders standard drawer with sections and items", () => {
+  test("renders standard drawer with headline, sections, and items", () => {
     render(
       <Drawer variant="standard" open aria-label="App navigation">
-        <DrawerItem icon={<HomeIcon />} label="Home" isActive />
-        <DrawerSection header="Account" showDivider>
-          <DrawerItem icon={<SettingsIcon />} label="Settings" />
+        <DrawerHeadline>Mail</DrawerHeadline>
+        <DrawerItem icon={<HomeIcon />} label="Inbox" isActive badge={24} />
+        <DrawerItem icon={<SettingsIcon />} label="Outbox" />
+        <DrawerSection header="Labels" showDivider>
+          <DrawerItem label="Promotions" />
         </DrawerSection>
       </Drawer>
     );
-    expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Account")).toBeInTheDocument();
-    expect(screen.getByText("Settings")).toBeInTheDocument();
+    expect(screen.getByText("Mail")).toBeInTheDocument();
+    expect(screen.getByText("Inbox")).toBeInTheDocument();
+    expect(screen.getByText("24")).toBeInTheDocument();
+    expect(screen.getByText("Labels")).toBeInTheDocument();
+    expect(screen.getByText("Promotions")).toBeInTheDocument();
   });
 
   test("standard drawer with sections passes axe audit", async () => {
     const { container } = render(
       <Drawer variant="standard" open aria-label="App navigation">
+        <DrawerHeadline>Mail</DrawerHeadline>
         <DrawerItem icon={<HomeIcon />} label="Home" isActive />
         <DrawerSection header="Account" showDivider>
           <DrawerItem icon={<SettingsIcon />} label="Settings" />
@@ -399,12 +541,12 @@ describe("Drawer composition", () => {
     expect(results).toHaveNoViolations();
   });
 
-  test("renders modal drawer with sections and items", () => {
+  test("renders modal drawer with items and badge", () => {
     render(
       <Drawer variant="modal" open aria-label="App navigation">
         <DrawerItem icon={<HomeIcon />} label="Home" isActive />
         <DrawerSection header="More" showDivider>
-          <DrawerItem icon={<InboxIcon />} label="Inbox" badge={<span>5</span>} />
+          <DrawerItem icon={<InboxIcon />} label="Inbox" badge={5} />
         </DrawerSection>
       </Drawer>
     );
@@ -490,7 +632,7 @@ describe("HeadlessDrawerItem", () => {
   });
 });
 
-// ─── Enhancement Tests ────────────────────────────────────────────────────────
+// ─── DrawerSection — section dividers ────────────────────────────────────────
 
 describe("DrawerSection — section dividers", () => {
   test("renders Divider between two adjacent sections", () => {
@@ -534,34 +676,9 @@ describe("DrawerSection — section dividers", () => {
   });
 });
 
-describe("DrawerItem — Badge support", () => {
-  test("renders Badge with count when badge config has count", () => {
-    render(<DrawerItem label="Inbox" badge={{ count: 3 }} />);
-    expect(screen.getByText("3")).toBeInTheDocument();
-  });
+// ─── Motion classes ───────────────────────────────────────────────────────────
 
-  test("renders Badge with error color role (MD3 spec) when badge config is provided", () => {
-    render(<DrawerItem label="Inbox" badge={{ count: 1 }} />);
-    const badge = screen.getByRole("status");
-    expect(badge).toHaveClass("bg-error");
-  });
-});
-
-describe("DrawerItem — active indicator", () => {
-  test("active indicator has rounded-full class", () => {
-    render(<DrawerItem label="Home" isActive />);
-    const item = screen.getByRole("button");
-    expect(item.className).toContain("rounded-full");
-  });
-
-  test("active indicator has correct width token class", () => {
-    render(<DrawerItem label="Home" isActive />);
-    const item = screen.getByRole("button");
-    expect(item.className).toContain("after:max-w-[336px]");
-  });
-});
-
-describe("Modal variant — scrim animation", () => {
+describe("Motion tokens", () => {
   test("scrim has transition-opacity class", () => {
     renderModalDrawer();
     const scrim = screen.getByTestId("drawer-scrim");
@@ -574,37 +691,17 @@ describe("Modal variant — scrim animation", () => {
     expect(scrim.className).toContain("duration-short4");
     expect(scrim.className).toContain("ease-standard");
   });
-});
 
-describe("Drawer — iconOnly mode", () => {
-  test("iconOnly applies w-20 to the drawer", () => {
-    render(
-      <Drawer variant="standard" open iconOnly aria-label="Nav">
-        <DrawerItem icon={<HomeIcon />} label="Home" />
-      </Drawer>
-    );
+  test("open drawer uses emphasized-decelerate easing", () => {
+    renderStandardDrawer({ open: true });
     const nav = screen.getByRole("navigation");
-    expect(nav.className).toContain("w-20");
+    expect(nav.className).toContain("ease-emphasized-decelerate");
   });
 
-  test("DrawerItem in iconOnly mode hides label text", () => {
-    render(
-      <Drawer variant="standard" open iconOnly aria-label="Nav">
-        <DrawerItem icon={<HomeIcon />} label="Home" />
-      </Drawer>
-    );
-    const label = screen.getByText("Home");
-    expect(label.closest("span")?.parentElement?.className).toContain("hidden");
-  });
-
-  test("DrawerItem in iconOnly mode has title attribute", () => {
-    render(
-      <Drawer variant="standard" open iconOnly aria-label="Nav">
-        <DrawerItem icon={<HomeIcon />} label="Home" />
-      </Drawer>
-    );
-    const item = screen.getByRole("button");
-    expect(item).toHaveAttribute("title", "Home");
+  test("closed drawer uses emphasized-accelerate easing", () => {
+    renderStandardDrawer({ open: false });
+    const nav = screen.getByRole("navigation");
+    expect(nav.className).toContain("ease-emphasized-accelerate");
   });
 });
 

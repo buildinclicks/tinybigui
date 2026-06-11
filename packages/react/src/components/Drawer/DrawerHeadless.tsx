@@ -6,7 +6,6 @@ import {
   useDialog,
   useOverlay,
   usePreventScroll,
-  useFocusRing,
   useButton,
   useLink,
   FocusScope,
@@ -26,13 +25,6 @@ import type {
  * @internal
  */
 export const DrawerContext = createContext<DrawerContextValue | null>(null);
-
-/**
- * Icon-only mode context consumed by `DrawerItem` to hide labels
- * and apply `title` attributes.
- * @internal
- */
-export const DrawerIconOnlyContext = createContext<boolean>(false);
 
 /**
  * Hook to access DrawerContext inside drawer children.
@@ -59,10 +51,10 @@ function useDrawerContext(): DrawerContextValue {
  *   `<div role="dialog" aria-modal="true">` with scrim overlay
  *
  * React Aria hooks used:
- * - `useDialog` — `role="dialog"`, `aria-modal`, `aria-label` on modal panel
- * - `useOverlay` — dismiss on Escape key and outside click (modal)
- * - `usePreventScroll` — locks body scroll when modal is open
- * - `FocusScope` — focus trap + restoreFocus when modal closes
+ * - `useDialog`             — `role="dialog"`, `aria-modal`, `aria-label` on modal panel
+ * - `useOverlay`            — dismiss on Escape key and outside click (modal)
+ * - `usePreventScroll`      — locks body scroll when modal is open
+ * - `FocusScope`            — focus trap + restoreFocus when modal closes
  * - `useOverlayTriggerState` — open/close state management
  *
  * @example
@@ -84,12 +76,9 @@ export const HeadlessDrawer = forwardRef<HTMLElement, HeadlessDrawerProps>(
       className,
       scrimClassName,
       disableRipple = false,
-      iconOnly = false,
     },
     ref
   ) => {
-    // Manage open/close state with react-stately
-    // Use conditional spreading to satisfy exactOptionalPropertyTypes
     const state = useOverlayTriggerState({
       ...(open !== undefined ? { isOpen: open } : {}),
       ...(defaultOpen !== undefined ? { defaultOpen } : {}),
@@ -106,7 +95,6 @@ export const HeadlessDrawer = forwardRef<HTMLElement, HeadlessDrawerProps>(
       isOpen,
       close,
       disableRipple,
-      iconOnly,
     };
 
     if (variant === "modal") {
@@ -215,12 +203,15 @@ ModalDrawerPanel.displayName = "ModalDrawerPanel";
 /**
  * Headless Navigation Drawer Item (Layer 2).
  *
+ * Thin primitive — handles only behavior and ARIA semantics. All interaction
+ * state tracking (hover, focus-visible, pressed) and data-* attributes live
+ * in the styled layer (DrawerItem), mirroring the ButtonHeadless pattern.
+ *
  * Renders as:
  * - `<a>` using `useLink` when `href` is provided
  * - `<button>` using `useButton` when no `href`
  *
  * Applies `aria-current="page"` when `isActive` is true.
- * Uses `useFocusRing` for visible keyboard focus.
  *
  * @example
  * ```tsx
@@ -255,7 +246,6 @@ export const HeadlessDrawerItem = forwardRef<HTMLElement, HeadlessDrawerItemProp
     forwardedRef
   ) => {
     const internalRef = useRef<HTMLElement>(null);
-    const { isFocusVisible, focusProps } = useFocusRing();
 
     if (href) {
       // ── Link variant ──────────────────────────────────────────────────────
@@ -273,14 +263,12 @@ export const HeadlessDrawerItem = forwardRef<HTMLElement, HeadlessDrawerItemProp
 
       return (
         <a
-          {...mergeProps(linkProps, focusProps, { onMouseDown })}
+          {...mergeProps(linkProps, { onMouseDown })}
           ref={linkRef}
           href={href}
           className={className}
           title={title}
           aria-current={isActive ? "page" : undefined}
-          data-focus-visible={isFocusVisible || undefined}
-          data-active={isActive || undefined}
         >
           {children}
         </a>
@@ -308,13 +296,11 @@ export const HeadlessDrawerItem = forwardRef<HTMLElement, HeadlessDrawerItemProp
     return (
       <button
         type="button"
-        {...mergeProps(buttonProps, focusProps, { onMouseDown })}
+        {...mergeProps(buttonProps, { onMouseDown })}
         ref={buttonRef}
         className={className}
         title={title}
         aria-current={isActive ? "page" : undefined}
-        data-focus-visible={isFocusVisible || undefined}
-        data-active={isActive || undefined}
       >
         {children}
       </button>
