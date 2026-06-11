@@ -6,6 +6,7 @@ import { useHover, useFocusRing, mergeProps } from "react-aria";
 import { ButtonHeadless } from "./ButtonHeadless";
 import {
   buttonVariants,
+  buttonContainerVariants,
   buttonStateLayerVariants,
   buttonFocusRingVariants,
   buttonIconVariants,
@@ -219,6 +220,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps & Omit<ButtonVar
           className
         )}
       >
+        {/* Background container — owns the variant bg color; group-data-[disabled]/button
+            override applies here because this span is a real descendant of group/button */}
+        <span className={cn(buttonContainerVariants({ variant }))} aria-hidden="true" />
+
         {/* Ripple effect */}
         {ripples}
 

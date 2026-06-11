@@ -1,5 +1,70 @@
 # @tinybigui/react
 
+## 0.23.0
+
+### Minor Changes
+
+- 3308ff5: Add `MenuItemGroup` component — a sibling-aware grouping primitive for MD3 Expressive vertical menus.
+
+  `MenuItemGroup` wraps related `MenuItem` elements in a semantic `role="group"` block and automatically inserts a 2dp MD3 Expressive gap between consecutive sibling groups (`menuStyle="vertical"`), so no manual `<MenuGap />` placement is required. An `aria-label` is required on every group to satisfy the ARIA `group` accessible-name requirement (WCAG 2.1).
+
+  New exports from `@tinybigui/react`:
+  - `MenuItemGroup` component (Layer 3)
+  - `MenuItemGroupProps` type
+  - `menuItemGroupVariants` CVA function
+  - `MenuItemGroupVariants` type
+
+- 3308ff5: **Menu**: fix MD3 Expressive segmented vertical menu rendering
+
+  The vertical (`menuStyle="vertical"`) menu now correctly renders as the MD3 Expressive segmented model: groups of items form distinct rounded cards (16dp outer corners, 4dp inner corners) separated by transparent `MenuGap` spacers that reveal the page background — acting as visual dividers without a line.
+
+  ### Changes
+  - **Segmented corner rounding fixed** — uses adjacent-sibling CSS selectors relative to `[data-menu-gap]` elements (`[[data-menu-gap]+&]:rounded-t-lg`, `[&:has(+[data-menu-gap])]:rounded-b-lg`) so the top/bottom corners of each segment group are correctly rounded at 16dp while middle items use 4dp inner corners.
+  - **Full-bleed highlight and state layer** — both slots are now `inset-0 rounded-[inherit]` so they always fill the item and respect whichever corner radius the item currently has.
+  - **New focus-ring slot** — a dedicated `z-[2]` overlay with `outline-secondary` and `-outline-offset-2` renders the keyboard-focus indicator separately from the state layer, matching the MD3 Expressive reference state grid.
+  - **Exact color token mapping applied**:
+    - Standard: item bg `surface-container-low`; selected/active highlight `tertiary-container`; content `on-tertiary-container`
+    - Vibrant: item bg `tertiary-container`; selected/active highlight `tertiary`; content `on-tertiary`
+  - **Scheme-aware text colors** — trailing text, description (supporting text), and section headers now receive `colorScheme` from context and use the correct token (`on-surface-variant` / `on-tertiary-container`).
+  - **Icon size corrected** — vertical leading icons use 20dp (`h-5 w-5`) per `SegmentedMenuTokens.ItemLeadingIconSize`.
+  - **Vertical item height corrected** — density 0 → 48dp (`h-12`), -1 → 44dp (`h-11`), -2 → 40dp (`h-10`), -3 → 36dp (`h-9`).
+  - **`menuItemFocusRingVariants` exported** from `@tinybigui/react` for advanced consumers.
+  - **Storybook** — Expressive Vertical Menu story shows standard + vibrant side-by-side with a selected item; new _States_ story covers all 6 MD3 interaction states; new _Reference Example_ story matches the MD3 anatomy two-segment layout.
+
+### Patch Changes
+
+- 3308ff5: fix(button): move container background to child slot so disabled state overrides apply
+
+  Tailwind `group-data-[disabled]/button:` generates a descendant combinator selector, so it cannot target the root `<button>` group host directly. Background color now lives on an absolutely-positioned `buttonContainerVariants` child span, matching the Switch track pattern and ensuring `group-data-[disabled]/button:bg-on-surface/12` wins over variant backgrounds. Elevation overrides on the root use self-targeting `data-[disabled]:` selectors for the same reason.
+
+- 3308ff5: fix(menu): align Menu styling with component-variants.mdc slot architecture
+  - Replace hardcoded `menu-enter`/`menu-exit` animations with `animate-md-scale-in`/`animate-md-scale-out` composite utilities (350ms expressive spring enter, 200ms emphasized-accelerate exit)
+  - Remove `isDisabled`/`isSelected` CVA variant keys from `menuItemVariants`; interaction states are now driven by React Aria's native `data-hovered`, `data-pressed`, `data-focus-visible`, `data-selected`, `data-disabled` attributes via `group-data-[x]/menuitem` selectors
+  - Add dedicated `menuItemStateLayerVariants` slot with hover 8% / focus+press 10% opacities using MD3 spring tokens (no more `before:` pseudo-element on the root)
+  - Add `menuItemIconVariants` slot so leading/trailing icons recolor on selection in vertical/vibrant menus
+  - Fix disabled treatment: per-slot `text-on-surface/38` instead of whole-item `opacity-38`
+  - Update item typography: Body Large → Label Large per MD3 menu spec
+  - Fix state-layer color transition to `duration-spring-standard-fast-effects ease-spring-standard-fast-effects`
+
+  fix(menu): fire open/close motion on popover and inset expressive highlight
+  - Add `menuPopoverVariants` CVA and apply to all three React Aria `<Popover>` elements (main trigger, submenu, context menu); RAC emits `data-entering`/`data-exiting`/`data-placement` on the Popover, not the inner RACMenu, so animation classes must live there
+  - Strip dead `will-change`, `data-[entering]`, `data-[exiting]`, `origin-*`, and `motion-reduce:` classes from `menuContainerVariants` (those now belong exclusively to `menuPopoverVariants`)
+  - Add `menuItemHighlightVariants` selected-background layer: `inset-0` (baseline) / `inset-1 rounded-lg` (vertical) — creates the inset, pill-shaped MD3 Expressive highlight matching the spec reference
+  - Update `menuItemStateLayerVariants` geometry to be menuStyle-aware: baseline `inset-0 rounded-[inherit]`, vertical `inset-1 rounded-lg`
+  - Remove `data-[selected]:bg-*` from `menuItemVariants` root; background now lives exclusively on the highlight layer
+  - Render highlight → state layer → ripple → content DOM order in `MenuItem.tsx`; ripple container geometry also respects menuStyle
+
+  fix(menu): align expressive vertical menu gap and spacing to MD3 segmented spec
+  - `menuContainerVariants` vertical: transparent background (was `bg-surface-container-low`) — the container is now a clear overlay; group surface color moves onto individual items
+  - `menuItemVariants` vertical: each item carries its own group surface (`bg-surface-container-low` / `bg-tertiary-container` vibrant) and CSS sibling selectors on `[data-menu-gap]` produce segmented corner rounding (leading group 16/8dp, trailing group 8/16dp, middle group 8/8dp), matching the MD3 Expressive segmented-group model (`SegmentedMenuTokens`)
+  - `MenuGap`: height reduced from `h-2` (8dp) to `h-0.5` (2dp) matching `SegmentedMenuTokens.SegmentedGap = 2dp`; `data-menu-gap` attribute added to enable CSS sibling selectors for segmented rounding on adjacent items
+  - `MenuItem` vertical height map: default density 0 = `h-11` (44dp) instead of `h-12` (48dp), matching `SegmentedMenuTokens.Item = 44dp`; density steps -1/-2/-3 adjusted accordingly (h-10/h-9/h-8)
+  - `menuItemIconVariants` vertical: icon size `h-5 w-5` (20dp) matching `SegmentedMenuTokens.ItemLeadingIconSize = 20dp`; baseline stays `h-6 w-6` (24dp)
+  - `menuItemHighlightVariants` vertical: `inset-x-1 inset-y-0 rounded-md` (horizontal-only 4dp inset, 12dp CornerMedium per `ItemSelectedShape`) — replaces `inset-1 rounded-lg`; selection no longer spans full width but fills item height eliminating vertical detachment
+  - `menuItemStateLayerVariants` vertical: geometry updated to match highlight layer: `inset-x-1 inset-y-0 rounded-md`
+  - `menuDividerVariants`: `my-0.5 mx-3` (2dp vertical, 12dp horizontal inset) for consistency with gap and vertical layout
+  - All changes are vertical-only; baseline menu visuals, public API, and props are unchanged
+
 ## 0.22.0
 
 ### Minor Changes

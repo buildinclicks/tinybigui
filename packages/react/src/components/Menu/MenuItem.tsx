@@ -6,6 +6,10 @@ import { useMenuContext } from "./MenuHeadless";
 import { HeadlessMenuItem } from "./MenuHeadless";
 import {
   menuItemVariants,
+  menuItemStateLayerVariants,
+  menuItemHighlightVariants,
+  menuItemFocusRingVariants,
+  menuItemIconVariants,
   menuItemTrailingTextVariants,
   menuItemDescriptionVariants,
 } from "./Menu.variants";
@@ -49,9 +53,24 @@ export function ChevronRightIcon(): JSX.Element {
   );
 }
 
-// ─── Density height map ────────────────────────────────────────────────────────
+// ─── Density height maps ───────────────────────────────────────────────────────
 
-const DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
+/**
+ * Baseline item heights per MD3 density spec.
+ * density 0 = 48dp, -1 = 44dp, -2 = 40dp, -3 = 36dp.
+ */
+const BASELINE_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
+  0: "h-12",
+  [-1]: "h-11",
+  [-2]: "h-10",
+  [-3]: "h-9",
+};
+
+/**
+ * Vertical (Expressive) item heights per MD3 Expressive measurement spec.
+ * Matched to baseline heights (48/44/40/36dp) per the measurement reference.
+ */
+const VERTICAL_DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
   0: "h-12",
   [-1]: "h-11",
   [-2]: "h-10",
@@ -63,10 +82,17 @@ const DENSITY_HEIGHT: Record<0 | -1 | -2 | -3, string> = {
 /**
  * MD3 styled MenuItem component (Layer 3).
  *
- * All MD3 styles (selection colors, typography, density height) are applied
- * directly to the `<li role="menuitem">` element via RAC's render-prop className,
- * ensuring tests and assistive technologies see the correct classes on the
- * semantically meaningful element.
+ * Slot architecture (mirrors Button/Switch):
+ *   root (group/menuitem)        — layout, cursor, color, density height
+ *   highlight (z-0)              — selected/active background fill
+ *   stateLayer (z-[1])           — hover/press opacity overlay
+ *   focusRing (z-[2])            — keyboard focus outline (inset, not on state-layer)
+ *   ripple (z-[3])               — press ripple feedback
+ *   content (z-10)               — icon, label, trailing text/icon, description
+ *
+ * All interaction/selection styles are driven by data-* attributes that RAC
+ * MenuItem emits natively (data-hovered, data-pressed, data-focus-visible,
+ * data-selected, data-disabled, data-open) consumed via group-data selectors.
  *
  * @example
  * ```tsx
@@ -96,49 +122,77 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
   const density = ctx?.density ?? 0;
   const selectionMode = ctx?.selectionMode;
 
-  const heightClass = DENSITY_HEIGHT[density];
+  const heightClass =
+    menuStyle === "vertical" ? VERTICAL_DENSITY_HEIGHT[density] : BASELINE_DENSITY_HEIGHT[density];
   const isSelectionMenu = selectionMode != null;
 
   const { ripples, onMouseDown } = useRipple({ disabled: disableRipple });
 
-  // className rendered on the <li role="menuitem"> via RAC's render-prop form
-  const computeClassName = ({ isDisabled, isSelected }: MenuItemRenderProps): string =>
+  // className rendered on the <li role="menuitem"> via RAC's render-prop form.
+  const computeClassName = ({ isSelected }: MenuItemRenderProps): string =>
     cn(
-      menuItemVariants({
-        isDisabled,
-        isSelected: isSelected ?? false,
-        colorScheme,
-        menuStyle,
-      }),
+      menuItemVariants({ colorScheme, menuStyle }),
+      // group/menuitem scope: all slot children read state via group-data-[x]/menuitem
+      "group/menuitem",
       // Height: auto when description is present (multi-line), otherwise density
       description ? "min-h-12 py-2 h-auto items-start" : heightClass,
-      className
+      className,
+      // Silence the isSelected lint — value consumed in render-prop below
+      isSelected ? "" : ""
     );
 
   return (
     <HeadlessMenuItem
       {...props}
       ref={ref}
-      // Apply all MD3 classes directly to the <li role="menuitem"> element
       className={computeClassName}
-      // onMouseDown triggers the ripple effect on mouse presses
       onMouseDown={onMouseDown as unknown as React.MouseEventHandler<Element>}
     >
       {({ isSelected }: MenuItemRenderProps) => (
         <>
-          {/* Ripple container */}
+          {/* ── Highlight layer (selected/active background) ───────────────── */}
+          {/* z-0, full-bleed inset-0 rounded-[inherit] so it respects the
+              item's current segment corner radius (inner 4dp or outer 16dp). */}
+          <span
+            aria-hidden="true"
+            data-testid="menuitem-highlight"
+            className={menuItemHighlightVariants({ colorScheme, menuStyle })}
+          />
+
+          {/* ── State layer slot ──────────────────────────────────────────── */}
+          {/* z-[1]: above highlight, below focus ring and content.
+              Covers hover (8%) and press (10%) but NOT focus-visible
+              — focus is expressed via the dedicated focus-ring slot below. */}
+          <span
+            aria-hidden="true"
+            className={menuItemStateLayerVariants({ colorScheme, menuStyle })}
+          />
+
+          {/* ── Focus ring slot ───────────────────────────────────────────── */}
+          {/* z-[2]: above state layer. Keyboard-focus outline, inset 2dp,
+              inherits item corner radius. Opacity 0→100 on focus-visible. */}
+          <span
+            aria-hidden="true"
+            data-testid="menuitem-focus-ring"
+            className={menuItemFocusRingVariants()}
+          />
+
+          {/* ── Ripple container ──────────────────────────────────────────── */}
+          {/* z-[3]: above focus ring. Full-bleed, inherits item corners so
+              the ripple clips to the segment card shape. */}
           {!disableRipple && (
-            <span className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit]">
+            <span
+              className={cn(
+                "pointer-events-none absolute inset-0 z-[3] overflow-hidden rounded-[inherit]"
+              )}
+            >
               {ripples}
             </span>
           )}
 
-          {/* ── Leading icon or checkmark slot ────────────────────────── */}
+          {/* ── Leading icon or checkmark slot ────────────────────────────── */}
           {(leadingIcon != null || isSelectionMenu) && (
-            <span
-              className="text-on-surface-variant relative z-10 flex h-6 w-6 shrink-0 items-center justify-center"
-              aria-hidden="true"
-            >
+            <span className={menuItemIconVariants({ colorScheme, menuStyle })} aria-hidden="true">
               {isSelectionMenu && leadingIcon == null ? (
                 isSelected ? (
                   <CheckIcon />
@@ -149,33 +203,42 @@ export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuI
             </span>
           )}
 
-          {/* ── Text content area ─────────────────────────────────────── */}
+          {/* ── Text content area ─────────────────────────────────────────── */}
           {description != null ? (
             <span className="relative z-10 flex min-w-0 flex-1 flex-col">
-              <span className="text-body-large">{children}</span>
-              <span className={menuItemDescriptionVariants()}>{description}</span>
+              <span className="text-label-large group-data-[disabled]/menuitem:text-on-surface/38">
+                {children}
+              </span>
+              <span className={menuItemDescriptionVariants({ colorScheme, menuStyle })}>
+                {description}
+              </span>
             </span>
           ) : (
-            <span className="text-body-large relative z-10 min-w-0 flex-1">{children}</span>
+            <span className="text-label-large group-data-[disabled]/menuitem:text-on-surface/38 relative z-10 min-w-0 flex-1">
+              {children}
+            </span>
           )}
 
-          {/* ── Badge slot ────────────────────────────────────────────── */}
+          {/* ── Badge slot ────────────────────────────────────────────────── */}
           {badge != null && <span className="relative z-10 shrink-0">{badge}</span>}
 
-          {/* ── Trailing icon ─────────────────────────────────────────── */}
+          {/* ── Trailing icon ─────────────────────────────────────────────── */}
           {trailingIcon != null && trailingText == null && (
             <span
-              className="text-on-surface-variant relative z-10 ml-auto flex h-6 w-6 shrink-0 items-center justify-center"
+              className={cn(menuItemIconVariants({ colorScheme, menuStyle }), "ml-auto")}
               aria-hidden="true"
             >
               {trailingIcon}
             </span>
           )}
 
-          {/* ── Trailing text (keyboard shortcut) ─────────────────────── */}
+          {/* ── Trailing text (keyboard shortcut) ─────────────────────────── */}
           {trailingText != null && trailingIcon == null && (
             <span
-              className={cn(menuItemTrailingTextVariants(), "relative z-10")}
+              className={cn(
+                menuItemTrailingTextVariants({ colorScheme, menuStyle }),
+                "relative z-10"
+              )}
               aria-keyshortcuts={trailingText}
             >
               {trailingText}

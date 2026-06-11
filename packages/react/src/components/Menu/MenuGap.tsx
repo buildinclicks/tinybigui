@@ -37,7 +37,9 @@ const MenuGapItem = createLeafComponent<object, { className?: string }, HTMLDivE
     return (
       // Rendered directly — no filterDOMProps, no useSeparator.
       // aria-hidden="true" removes the element from the a11y tree entirely.
-      <div ref={ref} aria-hidden="true" className={cls} />
+      // data-menu-gap is a non-ARIA marker used by CSS sibling selectors in
+      // menuItemVariants to apply per-group corner rounding to adjacent items.
+      <div ref={ref} aria-hidden="true" data-menu-gap="" className={cls} />
     );
   }
 );
