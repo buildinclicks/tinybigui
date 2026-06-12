@@ -1,5 +1,70 @@
 # @tinybigui/react
 
+## 0.24.0
+
+### Minor Changes
+
+- b3f41d2: Refactor Navigation Drawer to MD3 slot-based "Variants-vs-States" architecture.
+
+  **Architectural Changes**
+  - `DrawerItem` now follows the slot pattern used by `Button` and `MenuItem`: the root element is `group/draweritem` and each visual part (active indicator, state layer, focus ring, ripple, icon, label, badge) is a discrete `<span>` slot whose appearance is driven by `group-data-[x]/draweritem` Tailwind selectors.
+  - Interaction states (hover, focus-visible, pressed) are owned by the styled layer via `useHover` / `useFocusRing` / press callbacks and emitted as `data-*` attributes through `getInteractionDataAttributes` — no CVA variants for states.
+  - All color/opacity slot transitions now use `duration-spring-standard-fast-effects ease-spring-standard-fast-effects` (effects tokens, no overshoot). Slide-in animation retains legacy navigation-level tokens (`duration-medium4 ease-emphasized-decelerate`).
+
+  **MD3 Spec Alignment**
+  - Container: `bg-surface-container-low` for both standard and modal variants; modal adds `shadow-elevation-1`.
+  - Corner radius corrected: `rounded-r-lg` (16dp, MD3 corner-large) — was `rounded-r-xl` (28dp).
+  - Item height: `h-14` (56dp); shape `rounded-full`; padding `pl-4 pr-6`; icon-to-label gap `gap-3` (12dp).
+  - Inactive content (icon / label / badge): `text-on-surface-variant`. Active: `bg-secondary-container` indicator, `text-on-secondary-container` content.
+  - State-layer colors: `bg-on-surface-variant` inactive / `bg-on-secondary-container` active; hover 8% / press 10% opacity.
+  - Scrim: `bg-scrim opacity-32`.
+  - Icon size corrected to 24dp (`h-6 w-6`).
+
+  **Breaking Changes**
+  - `iconOnly` prop removed from `Drawer` and `DrawerItem` (belongs to NavigationRail, not MD3 nav drawer). `DrawerIconOnlyContext` removed.
+  - `secondaryText` prop removed from `DrawerItem` (not in MD3 nav-drawer anatomy).
+  - `badge` prop type changed from `DrawerItemBadgeConfig | ReactNode` to `number | string`. The badge now renders as plain inline text colored by item state instead of an error-colored pill.
+  - `DrawerItemBadgeConfig` type removed.
+
+  **New Additions**
+  - `DrawerHeadline` component: MD3 anatomy element 2 — header text for the drawer (`text-title-small text-on-surface-variant`).
+  - `DrawerContext` exported (replaces the removed `DrawerIconOnlyContext`).
+  - All slot CVA functions exported: `drawerItemActiveIndicatorVariants`, `drawerItemStateLayerVariants`, `drawerItemFocusRingVariants`, `drawerItemIconVariants`, `drawerItemLabelVariants`, `drawerItemBadgeVariants`, `drawerHeadlineVariants`.
+
+### Patch Changes
+
+- b3f41d2: Close MD3 Navigation Drawer spec gaps: measurements, typography, motion, and states.
+
+  **Container / Measurements**
+  - Added `w-drawer` (360dp) class to `drawerVariants` — was accidentally absent despite the doc comment claiming it.
+  - Standard variant now has `rounded-none` (square trailing edge, flush with viewport). Modal variant retains `rounded-r-lg` (16dp trailing corner per MD3). Both previously used `rounded-r-lg`.
+  - Standard variant `z-50` stacking context added for correct overlay ordering.
+
+  **Motion (Standard)**
+  - Replaced legacy `duration-medium4 / ease-emphasized-decelerate / ease-emphasized-accelerate` slide tokens with `duration-spring-standard-default-spatial / ease-spring-standard-default-spatial` (spring, no overshoot) per md3-motion.mdc spatial navigation guidelines.
+  - Standard slide direction: `translate-x-0` (open) / `-translate-x-full` (closed) via CVA `open` variant.
+
+  **Motion (Modal — broken → fixed)**
+  - Modal drawer enter/exit animation was broken: `{isOpen && ...}` immediately unmounted the panel/scrim, preventing any exit animation from playing.
+  - Replaced with the library-standard animation state machine pattern (mirrors `BottomSheetHeadless` / `DialogHeadless`): `entering → visible → exiting → exited`.
+  - Modal panel now renders via `createPortal` to `document.body` with a portal gate that only unmounts after `animationState === "exited"`.
+  - Panel enter: `animate-md-slide-in-left` (spring-standard-default-spatial, 500ms). Exit: `animate-md-slide-out-left`. Applied via `drawerAnimationVariants` CVA + `getAnimationClassName` callback.
+  - Scrim fade: CSS `transition-opacity` from `opacity-0` → `opacity-32` on enter, reversed on exit. Applied via `drawerScrimAnimationVariants`.
+  - Both panel and scrim carry `data-animation-state` attribute for visual testing and potential CSS hooks.
+  - `useReducedMotion()` gate: all animations suppressed when `prefers-reduced-motion: reduce` is active; `transition-none` appended to standard variant.
+
+  **Typography**
+  - `text-label-large` and `text-title-small` Tailwind classes apply only font-size and line-height (known Tailwind v4 theme limitation). Added explicit `font-medium` (weight 500) and `tracking-[0.1px]` to: `DrawerItem` root, `DrawerItemBadge`, `DrawerHeadline`, and section headers — matching the MD3 Label Large / Title Small specification.
+
+  **States**
+  - Focus state now shows both the outline ring (`outline-secondary`, WCAG 2.4.7) and a 10% state layer (`group-data-[focus-visible]/draweritem:opacity-10`), matching MD3 focus spec and the BottomSheet handle reference implementation.
+  - Added explicit icon disabled color override: `group-data-[disabled]/draweritem:text-on-surface/38` on the icon slot (mirrors Menu icon pattern).
+
+  **Exports**
+  - Added: `drawerAnimationVariants`, `drawerScrimAnimationVariants`, `drawerScrimVariants`, `DrawerAnimationState`, `DrawerAnimationVariants`, `DrawerScrimAnimationVariants`, `DrawerScrimVariants`.
+  - Removed: dead `drawerDividerVariants` (DrawerSection uses the shared `Divider` component), `scrimVariants` (renamed to `drawerScrimVariants` to avoid collision with DatePicker's export of the same name).
+  - `HeadlessDrawerProps` extended with `getAnimationClassName` and `getScrimAnimationClassName` optional callbacks.
+
 ## 0.23.0
 
 ### Minor Changes

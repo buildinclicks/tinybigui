@@ -95,7 +95,7 @@ This is a monorepo containing multiple packages:
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
 | [`@tinybigui/react`](./packages/react)   | React components              | 0.24.0  | Released |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.24.0  | Released |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.23.0  | Released |
 
 ---
 
