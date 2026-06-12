@@ -2,6 +2,23 @@ import type { ReactNode } from "react";
 import type { AriaButtonProps, AriaDialogProps, AriaLinkOptions } from "react-aria";
 
 /**
+ * Animation lifecycle states for the modal drawer.
+ *
+ * Used by the animation state machine in `HeadlessDrawer` to drive
+ * enter/exit CSS animations without immediately unmounting the portal.
+ *
+ * ```
+ * entering → visible → exiting → exited
+ * ```
+ *
+ * - `entering` — panel is mounted but invisible (pre-animation frame)
+ * - `visible`  — entry animation fires (`animate-md-slide-in-left`)
+ * - `exiting`  — exit animation fires (`animate-md-slide-out-left`)
+ * - `exited`   — portal gate unmounts the element
+ */
+export type DrawerAnimationState = "entering" | "visible" | "exiting" | "exited";
+
+/**
  * Structural variant of the Navigation Drawer.
  *
  * - `standard` — inline `<nav>` landmark; no overlay or focus trap; supports
@@ -265,6 +282,33 @@ export interface HeadlessDrawerProps {
    * Additional CSS classes for the scrim element (modal variant only).
    */
   scrimClassName?: string;
+
+  /**
+   * Returns the animation CSS class string for a given `DrawerAnimationState`.
+   *
+   * Applied to the modal **panel** element. Provided by the styled `Drawer` layer
+   * via `drawerAnimationVariants`. Returns `""` when `useReducedMotion()` is true.
+   *
+   * @example
+   * ```ts
+   * getAnimationClassName={(state) => drawerAnimationVariants({ animationState: state })}
+   * ```
+   */
+  getAnimationClassName?: (state: DrawerAnimationState) => string;
+
+  /**
+   * Returns the animation CSS class string for the modal **scrim** element.
+   *
+   * Separate from `getAnimationClassName` so the scrim can fade while the panel
+   * slides. Provided via `drawerScrimAnimationVariants`. Returns `""` under
+   * reduced motion.
+   *
+   * @example
+   * ```ts
+   * getScrimAnimationClassName={(state) => drawerScrimAnimationVariants({ animationState: state })}
+   * ```
+   */
+  getScrimAnimationClassName?: (state: DrawerAnimationState) => string;
 
   /**
    * Disable ripple on all items.

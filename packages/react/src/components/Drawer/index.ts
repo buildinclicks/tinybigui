@@ -10,6 +10,8 @@ export { HeadlessDrawer, HeadlessDrawerItem, DrawerContext } from "./DrawerHeadl
 // CVA Variants
 export {
   drawerVariants,
+  drawerAnimationVariants,
+  drawerScrimAnimationVariants,
   drawerItemVariants,
   drawerItemActiveIndicatorVariants,
   drawerItemStateLayerVariants,
@@ -18,11 +20,12 @@ export {
   drawerItemLabelVariants,
   drawerItemBadgeVariants,
   drawerHeadlineVariants,
-  scrimVariants,
+  drawerScrimVariants,
   drawerSectionVariants,
   drawerSectionHeaderVariants,
-  drawerDividerVariants,
   type DrawerVariants,
+  type DrawerAnimationVariants,
+  type DrawerScrimAnimationVariants,
   type DrawerItemVariants,
   type DrawerItemActiveIndicatorVariants,
   type DrawerItemStateLayerVariants,
@@ -31,13 +34,14 @@ export {
   type DrawerItemLabelVariants,
   type DrawerItemBadgeVariants,
   type DrawerHeadlineVariants,
-  type ScrimVariants,
+  type DrawerScrimVariants,
   type DrawerSectionVariants,
 } from "./Drawer.variants";
 
 // Types
 export type {
   DrawerVariant,
+  DrawerAnimationState,
   DrawerProps,
   DrawerItemProps,
   DrawerHeadlineProps,

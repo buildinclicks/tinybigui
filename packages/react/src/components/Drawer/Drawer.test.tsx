@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, test, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { Drawer } from "./Drawer";
@@ -85,10 +85,28 @@ describe("Drawer", () => {
       expect(nav.className).toContain("bg-surface-container-low");
     });
 
-    test("applies correct corner class (rounded-r-lg = 16dp MD3 large)", () => {
+    // MD3 spec: standard variant has a square trailing edge — it is flush with
+    // the left viewport edge and the trailing corner is not exposed.
+    test("standard variant has squared trailing edge (rounded-none)", () => {
       renderStandardDrawer();
       const nav = screen.getByRole("navigation");
-      expect(nav.className).toContain("rounded-r-lg");
+      expect(nav.className).toContain("rounded-none");
+      expect(nav.className).not.toContain("rounded-r-lg");
+    });
+
+    // MD3 spec: Navigation Drawer width = 360dp
+    test("standard variant has w-drawer class (360dp width)", () => {
+      renderStandardDrawer();
+      const nav = screen.getByRole("navigation");
+      expect(nav.className).toContain("w-drawer");
+    });
+
+    // Spring-standard-spatial transition for the on-screen translate property
+    test("standard variant uses spring-standard-spatial transition classes", () => {
+      renderStandardDrawer({ open: true });
+      const nav = screen.getByRole("navigation");
+      expect(nav.className).toContain("ease-spring-standard-default-spatial");
+      expect(nav.className).toContain("duration-spring-standard-default-spatial");
     });
 
     test("accepts custom className", () => {
@@ -152,6 +170,49 @@ describe("Drawer", () => {
       const dialog = screen.getByRole("dialog");
       expect(dialog.className).toContain("shadow-elevation-1");
     });
+
+    // MD3 spec: modal variant exposes a 16dp trailing corner
+    test("modal variant has rounded-r-lg (16dp trailing corner)", () => {
+      renderModalDrawer();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toContain("rounded-r-lg");
+    });
+
+    // MD3 spec: Navigation Drawer width = 360dp
+    test("modal variant has w-drawer class (360dp width)", () => {
+      renderModalDrawer();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog.className).toContain("w-drawer");
+    });
+
+    // Animation state machine — panel gets data-animation-state attribute
+    test("modal panel has data-animation-state attribute when open", () => {
+      renderModalDrawer();
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveAttribute("data-animation-state");
+    });
+
+    // Scrim gets data-animation-state to drive the fade animation
+    test("scrim has data-animation-state attribute when modal is open", () => {
+      renderModalDrawer();
+      const scrim = screen.getByTestId("drawer-scrim");
+      expect(scrim).toHaveAttribute("data-animation-state");
+    });
+
+    // Scrim base styling: bg-scrim per MD3 spec callout 9.
+    // opacity-32 is applied via the animation variant in "visible" state
+    // to prevent tailwind-merge from conflicting with opacity-0 (entering state).
+    test("scrim has bg-scrim class", () => {
+      renderModalDrawer();
+      const scrim = screen.getByTestId("drawer-scrim");
+      expect(scrim.className).toContain("bg-scrim");
+    });
+
+    test("scrim has transition-opacity for MD3 fade animation", () => {
+      renderModalDrawer();
+      const scrim = screen.getByTestId("drawer-scrim");
+      expect(scrim.className).toContain("transition-opacity");
+    });
   });
 
   // ── Accessibility ─────────────────────────────────────────────────────────────
@@ -198,6 +259,17 @@ describe("DrawerHeadline", () => {
   test("applies MD3 color class (text-on-surface-variant)", () => {
     render(<DrawerHeadline>Mail</DrawerHeadline>);
     expect(screen.getByText("Mail").className).toContain("text-on-surface-variant");
+  });
+
+  // MD3 spec: Title Small = 14sp / 500 weight / 0.1px tracking
+  test("applies font-medium (500 weight) for MD3 Title Small", () => {
+    render(<DrawerHeadline>Mail</DrawerHeadline>);
+    expect(screen.getByText("Mail").className).toContain("font-medium");
+  });
+
+  test("applies tracking-[0.1px] for MD3 Title Small letter-spacing", () => {
+    render(<DrawerHeadline>Mail</DrawerHeadline>);
+    expect(screen.getByText("Mail").className).toContain("tracking-[0.1px]");
   });
 
   test("passes axe audit inside a drawer", async () => {
@@ -253,6 +325,17 @@ describe("DrawerItem", () => {
       render(<DrawerItem label="Home" />);
       expect(screen.getByRole("button").className).toContain("h-14");
     });
+
+    // MD3 spec: Label Large = 14sp / 500 weight / 0.1px tracking
+    test("applies font-medium (500 weight) on item root for Label Large", () => {
+      render(<DrawerItem label="Home" />);
+      expect(screen.getByRole("button").className).toContain("font-medium");
+    });
+
+    test("applies tracking-[0.1px] on item root for Label Large", () => {
+      render(<DrawerItem label="Home" />);
+      expect(screen.getByRole("button").className).toContain("tracking-[0.1px]");
+    });
   });
 
   // ── Badge ───────────────────────────────────────────────────────────────────
@@ -283,6 +366,19 @@ describe("DrawerItem", () => {
     test("does NOT render badge when badge is undefined", () => {
       render(<DrawerItem label="Home" />);
       expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    });
+
+    // MD3 spec: Badge label text uses Label Large typography
+    test("badge has font-medium class for Label Large weight", () => {
+      render(<DrawerItem label="Inbox" badge={24} />);
+      const badge = screen.getByRole("status");
+      expect(badge.className).toContain("font-medium");
+    });
+
+    test("badge has tracking-[0.1px] class for Label Large tracking", () => {
+      render(<DrawerItem label="Inbox" badge={24} />);
+      const badge = screen.getByRole("status");
+      expect(badge.className).toContain("tracking-[0.1px]");
     });
   });
 
@@ -346,6 +442,16 @@ describe("DrawerItem", () => {
       const focusRing = item.querySelector(".outline-secondary");
       expect(focusRing).not.toBeNull();
     });
+
+    // MD3 focus state: 10% state layer + outline ring simultaneously
+    test("state layer has MD3 focus-visible 10% opacity selector", () => {
+      render(<DrawerItem label="Home" />);
+      const item = screen.getByRole("button");
+      const stateLayer = item.querySelector(".bg-on-surface-variant");
+      expect(stateLayer).not.toBeNull();
+      // The focus-visible state layer class encodes the MD3 10% opacity on focus
+      expect(stateLayer!.className).toContain("group-data-[focus-visible]/draweritem:opacity-10");
+    });
   });
 
   // ── Disabled State ─────────────────────────────────────────────────────────
@@ -368,6 +474,15 @@ describe("DrawerItem", () => {
     test("sets data-disabled attribute when disabled", () => {
       render(<DrawerItem label="Home" isDisabled />);
       expect(screen.getByRole("button")).toHaveAttribute("data-disabled", "");
+    });
+
+    // MD3 spec: icon color switches to on-surface/38 when disabled
+    test("icon slot has explicit disabled color override class", () => {
+      render(<DrawerItem label="Home" icon={<HomeIcon />} isDisabled />);
+      const item = screen.getByRole("button");
+      const iconSlot = item.querySelector(".h-6.w-6");
+      expect(iconSlot).not.toBeNull();
+      expect(iconSlot!.className).toContain("group-data-[disabled]/draweritem:text-on-surface/38");
     });
   });
 
@@ -492,6 +607,27 @@ describe("DrawerSection", () => {
     expect(screen.queryByRole("separator")).not.toBeInTheDocument();
   });
 
+  // MD3 spec: Section header uses Title Small — 14sp / 500 / 0.1px tracking
+  test("section header has font-medium for MD3 Title Small weight", () => {
+    render(
+      <DrawerSection header="Account">
+        <DrawerItem label="Profile" />
+      </DrawerSection>
+    );
+    const header = screen.getByText("Account");
+    expect(header.className).toContain("font-medium");
+  });
+
+  test("section header has tracking-[0.1px] for MD3 Title Small tracking", () => {
+    render(
+      <DrawerSection header="Account">
+        <DrawerItem label="Profile" />
+      </DrawerSection>
+    );
+    const header = screen.getByText("Account");
+    expect(header.className).toContain("tracking-[0.1px]");
+  });
+
   test("passes axe audit", async () => {
     const { container } = render(
       <nav aria-label="test">
@@ -556,11 +692,11 @@ describe("Drawer composition", () => {
     expect(screen.getByText("5")).toBeInTheDocument();
   });
 
-  test("controlled modal drawer toggles correctly", async () => {
+  test("controlled modal drawer — dialog visible when open=true", async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
 
-    const { rerender } = render(
+    render(
       <Drawer variant="modal" open onOpenChange={onOpenChange} aria-label="App navigation">
         <DrawerItem label="Home" />
       </Drawer>
@@ -570,14 +706,45 @@ describe("Drawer composition", () => {
 
     await user.click(screen.getByTestId("drawer-scrim"));
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
 
-    rerender(
-      <Drawer variant="modal" open={false} onOpenChange={onOpenChange} aria-label="App navigation">
-        <DrawerItem label="Home" />
-      </Drawer>
-    );
+  // The exit animation state machine keeps the portal mounted during the exit
+  // animation. After rerender to open=false, the dialog stays in the "exiting"
+  // state and only disappears once the 500ms fallback timer fires.
+  test("controlled modal drawer — dialog removed after exit animation", () => {
+    vi.useFakeTimers();
+    try {
+      const { rerender } = render(
+        <Drawer variant="modal" open aria-label="App navigation">
+          <DrawerItem label="Home" />
+        </Drawer>
+      );
 
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      // Advance past the 0ms entering→visible timer so animationState = "visible"
+      act(() => {
+        vi.advanceTimersByTime(10);
+      });
+
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+      rerender(
+        <Drawer variant="modal" open={false} aria-label="App navigation">
+          <DrawerItem label="Home" />
+        </Drawer>
+      );
+
+      // Dialog still present — state machine is in "exiting"
+      expect(screen.queryByRole("dialog")).toBeInTheDocument();
+
+      // Advance past the 500ms exit fallback timer → state → "exited" → portal gate removes
+      act(() => {
+        vi.advanceTimersByTime(600);
+      });
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -676,32 +843,62 @@ describe("DrawerSection — section dividers", () => {
   });
 });
 
-// ─── Motion classes ───────────────────────────────────────────────────────────
+// ─── Motion tokens ────────────────────────────────────────────────────────────
 
-describe("Motion tokens", () => {
-  test("scrim has transition-opacity class", () => {
-    renderModalDrawer();
-    const scrim = screen.getByTestId("drawer-scrim");
-    expect(scrim.className).toContain("transition-opacity");
-  });
-
-  test("scrim has duration-short4 and ease-standard classes", () => {
-    renderModalDrawer();
-    const scrim = screen.getByTestId("drawer-scrim");
-    expect(scrim.className).toContain("duration-short4");
-    expect(scrim.className).toContain("ease-standard");
-  });
-
-  test("open drawer uses emphasized-decelerate easing", () => {
+describe("Motion tokens (MD3 spring-standard-spatial)", () => {
+  // Standard variant: translate-x driven by spring-standard-spatial tokens
+  test("standard variant open state uses translate-x-0", () => {
     renderStandardDrawer({ open: true });
     const nav = screen.getByRole("navigation");
-    expect(nav.className).toContain("ease-emphasized-decelerate");
+    expect(nav.className).toContain("translate-x-0");
   });
 
-  test("closed drawer uses emphasized-accelerate easing", () => {
+  test("standard variant closed state uses -translate-x-full", () => {
     renderStandardDrawer({ open: false });
     const nav = screen.getByRole("navigation");
-    expect(nav.className).toContain("ease-emphasized-accelerate");
+    expect(nav.className).toContain("-translate-x-full");
+  });
+
+  test("standard variant uses spring-standard-spatial ease", () => {
+    renderStandardDrawer({ open: true });
+    const nav = screen.getByRole("navigation");
+    expect(nav.className).toContain("ease-spring-standard-default-spatial");
+  });
+
+  test("standard variant uses spring-standard-spatial duration", () => {
+    renderStandardDrawer({ open: true });
+    const nav = screen.getByRole("navigation");
+    expect(nav.className).toContain("duration-spring-standard-default-spatial");
+  });
+
+  // Modal variant: animation classes applied via state machine + getAnimationClassName
+  test("modal panel has data-animation-state when open", () => {
+    renderModalDrawer();
+    const dialog = screen.getByRole("dialog");
+    // State is "entering" (before setTimeout fires) or "visible" (after)
+    const state = dialog.getAttribute("data-animation-state");
+    expect(["entering", "visible"]).toContain(state);
+  });
+
+  test("scrim has data-animation-state when modal is open", () => {
+    renderModalDrawer();
+    const scrim = screen.getByTestId("drawer-scrim");
+    const state = scrim.getAttribute("data-animation-state");
+    expect(["entering", "visible"]).toContain(state);
+  });
+
+  // Scrim styling
+  test("scrim has fixed positioning covering the viewport", () => {
+    renderModalDrawer();
+    const scrim = screen.getByTestId("drawer-scrim");
+    expect(scrim.className).toContain("fixed");
+    expect(scrim.className).toContain("inset-0");
+  });
+
+  test("scrim has z-40 (below drawer z-50)", () => {
+    renderModalDrawer();
+    const scrim = screen.getByTestId("drawer-scrim");
+    expect(scrim.className).toContain("z-40");
   });
 });
 
@@ -741,9 +938,7 @@ describe("Modal drawer focus management", () => {
     await user.keyboard("{Escape}");
 
     await waitFor(() => {
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(onOpenChange).toHaveBeenCalledWith(false);
     });
-
-    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });
