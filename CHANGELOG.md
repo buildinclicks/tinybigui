@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-06-12
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **NavigationDrawer** — MD3 slot-based variants-vs-states architecture refactor; new `DrawerHeadline` component; spring modal animation state machine with portal rendering; spec-accurate 360dp width, typography weights, focus state layer, and reduced-motion support; breaking API cleanup (`iconOnly`, `secondaryText`, `DrawerItemBadgeConfig` removed; `badge` simplified to `number | string`; `scrimVariants` renamed to `drawerScrimVariants`)
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.23.0] - 2026-06-11
 
 ### Changed

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Drawer } from "./Drawer";
 import { DrawerItem } from "./DrawerItem";
 import { DrawerSection } from "./DrawerSection";
+import { DrawerHeadline } from "./DrawerHeadline";
 import { HeadlessDrawer, HeadlessDrawerItem } from "./DrawerHeadless";
 
 // ─── Inline SVG Icons ─────────────────────────────────────────────────────────
@@ -19,15 +20,27 @@ const InboxIcon = (): JSX.Element => (
   </svg>
 );
 
+const OutboxIcon = (): JSX.Element => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3l4 4h-3v4h-2V10H8l4-4zm5 12H7v-2h10v2z" />
+  </svg>
+);
+
 const StarredIcon = (): JSX.Element => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
   </svg>
 );
 
-const SnoozedIcon = (): JSX.Element => (
+const TrashIcon = (): JSX.Element => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" />
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+  </svg>
+);
+
+const LabelIcon = (): JSX.Element => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z" />
   </svg>
 );
 
@@ -65,7 +78,7 @@ const meta: Meta<typeof Drawer> = {
     docs: {
       description: {
         component:
-          "Material Design 3 Navigation Drawer — provides access to destinations and app functionality. Supports Standard (inline) and Modal (overlay) variants.",
+          "Material Design 3 Navigation Drawer — provides access to destinations and app functionality. Supports Standard (inline) and Modal (overlay) variants. Slot architecture: activeIndicator / stateLayer / focusRing / ripple / icon / label / badge — all driven by data-* attributes on the group/draweritem root.",
       },
     },
   },
@@ -86,37 +99,35 @@ const meta: Meta<typeof Drawer> = {
 export default meta;
 type Story = StoryObj<typeof Drawer>;
 
-// ─── Standard variant ─────────────────────────────────────────────────────────
+// ─── Standard — Open ──────────────────────────────────────────────────────────
 
 export const StandardOpen: Story = {
   name: "Standard — Open",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Standard (inline) navigation drawer with `DrawerHeadline`, items, and a `DrawerSection`. Both inactive and active items follow MD3 slot architecture.",
+      },
+    },
+  },
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
-        <DrawerItem
-          icon={<InboxIcon />}
-          label="Inbox"
-          isActive
-          badge={<span className="text-label-medium text-on-surface-variant">24</span>}
-        />
-        <DrawerItem icon={<StarredIcon />} label="Starred" />
-        <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
-        <DrawerItem
-          icon={<DraftsIcon />}
-          label="Drafts"
-          badge={<span className="text-label-medium text-on-surface-variant">3</span>}
-        />
-        <DrawerSection header="More" showDivider>
-          <DrawerItem icon={<SettingsIcon />} label="Settings" />
-          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
+        <DrawerHeadline>Mail</DrawerHeadline>
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={24} />
+        <DrawerItem icon={<OutboxIcon />} label="Outbox" />
+        <DrawerItem icon={<StarredIcon />} label="Favorites" />
+        <DrawerItem icon={<TrashIcon />} label="Trash" />
+        <DrawerSection header="Labels" showDivider>
+          <DrawerItem icon={<LabelIcon />} label="Label" />
         </DrawerSection>
       </Drawer>
     </div>
   ),
 };
+
+// ─── Standard — Closed ────────────────────────────────────────────────────────
 
 export const StandardClosed: Story = {
   name: "Standard — Closed",
@@ -133,7 +144,46 @@ export const StandardClosed: Story = {
   ),
 };
 
-// ─── Standard controlled ──────────────────────────────────────────────────────
+// ─── States ───────────────────────────────────────────────────────────────────
+
+export const States: Story = {
+  name: "DrawerItem — All States",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The four interactive states from the MD3 spec reference grid: Enabled, Active (selected), Disabled, plus an item with badge. State layers and active indicator are driven by data-* attributes on the group/draweritem root. Hover and press transitions use spring-standard-fast-effects motion tokens.",
+      },
+    },
+  },
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <Drawer variant="standard" open aria-label="App navigation states">
+        <DrawerHeadline>Mail</DrawerHeadline>
+
+        {/* 1: Active — indicator + on-secondary-container content */}
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={24} />
+
+        {/* 2: Enabled (default) */}
+        <DrawerItem icon={<OutboxIcon />} label="Outbox" />
+
+        {/* 3: Enabled with badge */}
+        <DrawerItem icon={<StarredIcon />} label="Favorites" />
+
+        {/* 4: Disabled */}
+        <DrawerItem icon={<TrashIcon />} label="Trash" isDisabled />
+
+        <DrawerSection header="Labels" showDivider>
+          <DrawerItem icon={<LabelIcon />} label="Label" />
+          <DrawerItem icon={<LabelIcon />} label="Label" />
+          <DrawerItem icon={<LabelIcon />} label="Label" />
+        </DrawerSection>
+      </Drawer>
+    </div>
+  ),
+};
+
+// ─── Standard — Controlled toggle ────────────────────────────────────────────
 
 const StandardControlledDemo = (): JSX.Element => {
   const [open, setOpen] = useState(true);
@@ -154,9 +204,7 @@ const StandardControlledDemo = (): JSX.Element => {
       </div>
 
       <Drawer variant="standard" open={open} onOpenChange={setOpen} aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
+        <DrawerHeadline>Mail</DrawerHeadline>
         <DrawerItem
           icon={<InboxIcon />}
           label="Inbox"
@@ -214,14 +262,12 @@ const ModalOpenDemo = (): JSX.Element => {
       </div>
 
       <Drawer variant="modal" open={open} onOpenChange={setOpen} aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
+        <DrawerHeadline>Mail</DrawerHeadline>
         <DrawerItem
           icon={<InboxIcon />}
           label="Inbox"
           isActive={activeItem === "inbox"}
-          badge={<span className="text-label-medium text-on-surface-variant">24</span>}
+          badge={24}
           onPress={() => {
             setActiveItem("inbox");
             setOpen(false);
@@ -237,19 +283,10 @@ const ModalOpenDemo = (): JSX.Element => {
           }}
         />
         <DrawerItem
-          icon={<SnoozedIcon />}
-          label="Snoozed"
-          isActive={activeItem === "snoozed"}
-          onPress={() => {
-            setActiveItem("snoozed");
-            setOpen(false);
-          }}
-        />
-        <DrawerItem
           icon={<DraftsIcon />}
           label="Drafts"
           isActive={activeItem === "drafts"}
-          badge={<span className="text-label-medium text-on-surface-variant">3</span>}
+          badge={3}
           onPress={() => {
             setActiveItem("drafts");
             setOpen(false);
@@ -284,9 +321,7 @@ export const WithLinkItems: Story = {
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Navigation</span>
-        </div>
+        <DrawerHeadline>Navigation</DrawerHeadline>
         <DrawerItem href="/" icon={<HomeIcon />} label="Home" isActive />
         <DrawerItem href="/inbox" icon={<InboxIcon />} label="Inbox" />
         <DrawerSection header="Account" showDivider>
@@ -305,9 +340,7 @@ export const WithoutIcons: Story = {
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Documents</span>
-        </div>
+        <DrawerHeadline>Documents</DrawerHeadline>
         <DrawerItem label="Recent" isActive />
         <DrawerItem label="Shared with me" />
         <DrawerItem label="Starred" />
@@ -321,29 +354,6 @@ export const WithoutIcons: Story = {
   ),
 };
 
-// ─── With secondary text ──────────────────────────────────────────────────────
-
-export const WithSecondaryText: Story = {
-  name: "Standard — Secondary text",
-  render: () => (
-    <div className="bg-surface relative h-screen">
-      <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
-        <DrawerItem
-          icon={<InboxIcon />}
-          label="Inbox"
-          secondaryText="Your primary inbox"
-          isActive
-        />
-        <DrawerItem icon={<StarredIcon />} label="Starred" secondaryText="Saved for later" />
-        <DrawerItem icon={<DraftsIcon />} label="Drafts" secondaryText="3 unsent messages" />
-      </Drawer>
-    </div>
-  ),
-};
-
 // ─── Disabled items ───────────────────────────────────────────────────────────
 
 export const WithDisabledItems: Story = {
@@ -351,9 +361,7 @@ export const WithDisabledItems: Story = {
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
+        <DrawerHeadline>Mail</DrawerHeadline>
         <DrawerItem icon={<InboxIcon />} label="Inbox" isActive />
         <DrawerItem icon={<StarredIcon />} label="Starred" isDisabled />
         <DrawerItem icon={<DraftsIcon />} label="Drafts" />
@@ -373,23 +381,12 @@ export const MultipleSections: Story = {
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
+        <DrawerHeadline>Mail</DrawerHeadline>
         <DrawerSection>
-          <DrawerItem
-            icon={<InboxIcon />}
-            label="Inbox"
-            isActive
-            badge={<span className="text-label-medium text-on-surface-variant">24</span>}
-          />
-          <DrawerItem icon={<StarredIcon />} label="Starred" />
-          <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
-          <DrawerItem
-            icon={<DraftsIcon />}
-            label="Drafts"
-            badge={<span className="text-label-medium text-on-surface-variant">3</span>}
-          />
+          <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={24} />
+          <DrawerItem icon={<OutboxIcon />} label="Outbox" />
+          <DrawerItem icon={<StarredIcon />} label="Favorites" />
+          <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={3} />
         </DrawerSection>
         <DrawerSection header="Labels" showDivider>
           <DrawerItem label="Work" />
@@ -405,69 +402,55 @@ export const MultipleSections: Story = {
   ),
 };
 
-// ─── Badge config items ──────────────────────────────────────────────────────
+// ─── Badge items ──────────────────────────────────────────────────────────────
 
-export const WithBadgeConfig: Story = {
-  name: "Standard — Badge config (count)",
+export const WithBadgeItems: Story = {
+  name: "Standard — Badge label text",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MD3 anatomy element 5: trailing badge label text. Accepts a `number` (notification count) or `string` (arbitrary label). Color adapts to item state — `on-surface-variant` when inactive, `on-secondary-container` when active.",
+      },
+    },
+  },
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
-        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={{ count: 24 }} />
-        <DrawerItem icon={<StarredIcon />} label="Starred" />
-        <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={{ count: 3 }} />
+        <DrawerHeadline>Mail</DrawerHeadline>
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={24} />
+        <DrawerItem icon={<OutboxIcon />} label="Outbox" />
+        <DrawerItem icon={<StarredIcon />} label="Favorites" />
+        <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={3} />
         <DrawerSection header="More" showDivider>
           <DrawerItem icon={<SettingsIcon />} label="Settings" />
-          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
         </DrawerSection>
       </Drawer>
     </div>
   ),
 };
 
-// ─── Icon-only mode ──────────────────────────────────────────────────────────
-
-export const IconOnlyMode: Story = {
-  name: "Standard — Icon-only mode",
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Drawer with `iconOnly={true}` narrows to 80dp — a Navigation Rail prep step. Labels are hidden but each item receives a native browser `title` tooltip; hover an icon to see its label name. Active indicator, ripple, and disabled states all remain functional.",
-      },
-    },
-  },
-  render: () => (
-    <div className="bg-surface relative h-screen">
-      <Drawer variant="standard" open iconOnly aria-label="App navigation">
-        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive />
-        <DrawerItem icon={<StarredIcon />} label="Starred" />
-        <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
-        <DrawerItem icon={<DraftsIcon />} label="Drafts" />
-        <DrawerItem icon={<SettingsIcon />} label="Settings" />
-        <DrawerItem icon={<HelpIcon />} label="Help" />
-      </Drawer>
-    </div>
-  ),
-};
-
-// ─── Automatic section dividers ──────────────────────────────────────────────
+// ─── Auto section dividers ────────────────────────────────────────────────────
 
 export const AutoSectionDividers: Story = {
   name: "Standard — Auto section dividers (first suppressed)",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two `DrawerSection` components both with `showDivider`. The `Drawer` wrapper automatically suppresses the divider on the first section, so only the second section renders a `Divider` — matching the MD3 Navigation Drawer spec.",
+      },
+    },
+  },
   render: () => (
     <div className="bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
+        <DrawerHeadline>Mail</DrawerHeadline>
         <DrawerSection showDivider>
-          <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={{ count: 24 }} />
-          <DrawerItem icon={<StarredIcon />} label="Starred" />
-          <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
-          <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={{ count: 3 }} />
+          <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={24} />
+          <DrawerItem icon={<OutboxIcon />} label="Outbox" />
+          <DrawerItem icon={<StarredIcon />} label="Favorites" />
+          <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={3} />
         </DrawerSection>
         <DrawerSection header="Labels" showDivider>
           <DrawerItem label="Work" />
@@ -483,129 +466,7 @@ export const AutoSectionDividers: Story = {
   ),
 };
 
-// ─── Headless primitives ──────────────────────────────────────────────────────
-
-export const HeadlessPrimitive: Story = {
-  name: "Headless — Custom styling",
-  render: () => (
-    <div className="bg-surface relative h-screen">
-      <HeadlessDrawer
-        variant="standard"
-        open
-        aria-label="Custom navigation"
-        className="bg-surface-container-low fixed top-0 left-0 flex h-full w-64 flex-col gap-1 rounded-r-xl p-4"
-      >
-        <div className="pb-4">
-          <span className="text-headline-small text-on-surface font-medium">Custom Drawer</span>
-        </div>
-        <HeadlessDrawerItem
-          className="bg-secondary-container text-on-secondary-container text-label-large flex h-14 items-center gap-3 rounded-full px-4"
-          isActive
-        >
-          <HomeIcon />
-          Home
-        </HeadlessDrawerItem>
-        <HeadlessDrawerItem className="text-on-surface-variant text-label-large hover:bg-on-surface-variant/8 flex h-14 items-center gap-3 rounded-full px-4">
-          <InboxIcon />
-          Inbox
-        </HeadlessDrawerItem>
-      </HeadlessDrawer>
-    </div>
-  ),
-};
-
-// ─── WithSectionDividers ─────────────────────────────────────────────────────
-
-export const WithSectionDividers: Story = {
-  name: "Standard — Section dividers (auto-suppressed on first)",
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Two `DrawerSection` components both with `showDivider`. The `Drawer` wrapper automatically suppresses the divider on the first section, so only the second section renders the horizontal `Divider` — matching the MD3 Navigation Drawer spec for visual grouping.",
-      },
-    },
-  },
-  render: () => (
-    <div className="bg-surface relative h-screen">
-      <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
-        <DrawerSection showDivider>
-          <DrawerItem icon={<InboxIcon />} label="Inbox" isActive />
-          <DrawerItem icon={<StarredIcon />} label="Starred" />
-          <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
-          <DrawerItem icon={<DraftsIcon />} label="Drafts" />
-        </DrawerSection>
-        <DrawerSection header="More" showDivider>
-          <DrawerItem icon={<SettingsIcon />} label="Settings" />
-          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
-        </DrawerSection>
-      </Drawer>
-    </div>
-  ),
-};
-
-// ─── WithBadgeItems ───────────────────────────────────────────────────────────
-
-export const WithBadgeItems: Story = {
-  name: "Standard — Badge items (realistic counts)",
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "DrawerItem components using the `badge` prop with realistic email client counts: Inbox with 5 unread messages and Drafts with 12 unsent — demonstrating the MD3 trailing badge slot in a real-world context.",
-      },
-    },
-  },
-  render: () => (
-    <div className="bg-surface relative h-screen">
-      <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
-        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={{ count: 5 }} />
-        <DrawerItem icon={<StarredIcon />} label="Starred" />
-        <DrawerItem icon={<SnoozedIcon />} label="Snoozed" />
-        <DrawerItem icon={<DraftsIcon />} label="Drafts" badge={{ count: 12 }} />
-        <DrawerSection header="More" showDivider>
-          <DrawerItem icon={<SettingsIcon />} label="Settings" />
-          <DrawerItem icon={<HelpIcon />} label="Help & feedback" />
-        </DrawerSection>
-      </Drawer>
-    </div>
-  ),
-};
-
-// ─── ActiveIndicatorShowcase ──────────────────────────────────────────────────
-
-export const ActiveIndicatorShowcase: Story = {
-  name: "Standard — Active indicator pill",
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Highlights the MD3 active indicator: a 336dp-wide `rounded-full` pill rendered via CSS `after:` pseudo-element with `bg-secondary-container`. The active item receives `aria-current="page"` and `text-on-secondary-container` for accessible contrast against the surface.',
-      },
-    },
-  },
-  render: () => (
-    <div className="bg-surface relative h-screen">
-      <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Active Indicator</span>
-        </div>
-        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive />
-        <DrawerItem icon={<StarredIcon />} label="Starred" />
-        <DrawerItem icon={<DraftsIcon />} label="Drafts" />
-        <DrawerItem icon={<SettingsIcon />} label="Settings" />
-      </Drawer>
-    </div>
-  ),
-};
-
-// ─── ModalScrimAnimation ──────────────────────────────────────────────────────
+// ─── Modal — Scrim animation ──────────────────────────────────────────────────
 
 const ModalScrimAnimationDemo = (): JSX.Element => {
   const [open, setOpen] = useState(false);
@@ -627,12 +488,9 @@ const ModalScrimAnimationDemo = (): JSX.Element => {
       </div>
 
       <Drawer variant="modal" open={open} onOpenChange={setOpen} aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
+        <DrawerHeadline>Mail</DrawerHeadline>
         <DrawerItem icon={<InboxIcon />} label="Inbox" isActive onPress={() => setOpen(false)} />
         <DrawerItem icon={<StarredIcon />} label="Starred" onPress={() => setOpen(false)} />
-        <DrawerItem icon={<SnoozedIcon />} label="Snoozed" onPress={() => setOpen(false)} />
         <DrawerItem icon={<DraftsIcon />} label="Drafts" onPress={() => setOpen(false)} />
         <DrawerSection header="More" showDivider>
           <DrawerItem icon={<SettingsIcon />} label="Settings" onPress={() => setOpen(false)} />
@@ -649,11 +507,50 @@ export const ModalScrimAnimation: Story = {
     docs: {
       description: {
         story:
-          "Toggle the modal drawer open to observe the MD3 scrim fade-in: `bg-scrim` at `opacity-32` with `duration-short4 ease-standard` transition. The drawer panel slides in with `duration-medium4 ease-emphasized-decelerate`. Click the scrim or any nav item to close.",
+          "Toggle the modal drawer open to observe the MD3 scrim fade-in: `bg-scrim` at `opacity-32` with `duration-short4 ease-standard`. The drawer slides in with `duration-medium4 ease-emphasized-decelerate` (legacy navigation-level token). Click the scrim or any item to close.",
       },
     },
   },
   render: () => <ModalScrimAnimationDemo />,
+};
+
+// ─── Headless primitives ──────────────────────────────────────────────────────
+
+export const HeadlessPrimitive: Story = {
+  name: "Headless — Custom styling",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Using `HeadlessDrawer` and `HeadlessDrawerItem` directly for full styling control. The headless layer provides only behavior and ARIA semantics — no visual classes.",
+      },
+    },
+  },
+  render: () => (
+    <div className="bg-surface relative h-screen">
+      <HeadlessDrawer
+        variant="standard"
+        open
+        aria-label="Custom navigation"
+        className="bg-surface-container-low fixed top-0 left-0 flex h-full w-64 flex-col gap-1 rounded-r-lg p-4"
+      >
+        <div className="pb-4">
+          <span className="text-headline-small text-on-surface font-medium">Custom Drawer</span>
+        </div>
+        <HeadlessDrawerItem
+          className="bg-secondary-container text-on-secondary-container text-label-large flex h-14 items-center gap-3 rounded-full px-4"
+          isActive
+        >
+          <HomeIcon />
+          Home
+        </HeadlessDrawerItem>
+        <HeadlessDrawerItem className="text-on-surface-variant text-label-large hover:bg-on-surface-variant/8 flex h-14 items-center gap-3 rounded-full px-4">
+          <InboxIcon />
+          Inbox
+        </HeadlessDrawerItem>
+      </HeadlessDrawer>
+    </div>
+  ),
 };
 
 // ─── Dark mode ────────────────────────────────────────────────────────────────
@@ -662,19 +559,18 @@ export const DarkMode: Story = {
   name: "Standard — Dark mode",
   parameters: {
     backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Drawer in dark mode. All colors use MD3 role tokens (`bg-surface-container-low`, `text-on-surface-variant`, `bg-secondary-container`) that automatically adapt to the dark color scheme.",
+      },
+    },
   },
   render: () => (
     <div className="dark bg-surface relative h-screen">
       <Drawer variant="standard" open aria-label="App navigation">
-        <div className="px-4 pt-6 pb-4">
-          <span className="text-headline-small text-on-surface">Mail</span>
-        </div>
-        <DrawerItem
-          icon={<InboxIcon />}
-          label="Inbox"
-          isActive
-          badge={<span className="text-label-medium text-on-surface-variant">24</span>}
-        />
+        <DrawerHeadline>Mail</DrawerHeadline>
+        <DrawerItem icon={<InboxIcon />} label="Inbox" isActive badge={24} />
         <DrawerItem icon={<StarredIcon />} label="Starred" />
         <DrawerItem icon={<DraftsIcon />} label="Drafts" />
         <DrawerSection header="More" showDivider>
