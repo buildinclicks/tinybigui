@@ -111,7 +111,7 @@ export const buttonVariants = cva(
          * Elevation: always 0
          */
         outlined: [
-          "border border-outline text-primary",
+          "border border-outline-variant text-primary",
           // Disabled overrides
           "data-[disabled]:border-on-surface/12",
           "data-[disabled]:text-on-surface/38",

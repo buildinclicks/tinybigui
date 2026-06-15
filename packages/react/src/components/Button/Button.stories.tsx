@@ -245,10 +245,8 @@ export const Loading: Story = {
         </Button>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button loading icon={<IconAdd />}>
-          Creating
-        </Button>
-        <Button variant="outlined" loading icon={<IconFavorite />}>
+        <Button loading>Creating</Button>
+        <Button variant="outlined" loading>
           Liking
         </Button>
       </div>
