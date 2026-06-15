@@ -287,6 +287,51 @@ export interface MenuGapProps {
   className?: string;
 }
 
+// ─── MenuItemGroup ────────────────────────────────────────────────────────────
+
+/**
+ * Props for the `MenuItemGroup` component (styled Layer 3).
+ *
+ * Wraps related `MenuItem` elements in a semantic `role="group"` (via
+ * `HeadlessMenuSection`) and automatically inserts a 2dp MD3 Expressive gap
+ * before the group so that consecutive sibling groups are visually separated.
+ * The leading gap is hidden on the first group, so exactly N−1 gaps appear
+ * between N groups.
+ *
+ * The auto-gap behaviour is active only when `menuStyle="vertical"` — in a
+ * `baseline` menu the group still renders with its ARIA role, but no gap is
+ * injected (a dev warning is emitted instead).
+ *
+ * `aria-label` is required so the group has an accessible name per WCAG 2.1
+ * (ARIA `group` role requirement).
+ *
+ * @example
+ * ```tsx
+ * <MenuTrigger.Menu menuStyle="vertical" aria-label="Edit actions">
+ *   <MenuItemGroup aria-label="Clipboard">
+ *     <MenuItem id="cut">Cut</MenuItem>
+ *     <MenuItem id="copy">Copy</MenuItem>
+ *     <MenuItem id="paste">Paste</MenuItem>
+ *   </MenuItemGroup>
+ *   <MenuItemGroup aria-label="History">
+ *     <MenuItem id="undo">Undo</MenuItem>
+ *     <MenuItem id="redo">Redo</MenuItem>
+ *   </MenuItemGroup>
+ * </MenuTrigger.Menu>
+ * ```
+ */
+export interface MenuItemGroupProps {
+  /** Group content — typically `MenuItem` elements. */
+  children: ReactNode;
+  /**
+   * Accessible label for the group.
+   * Required so the ARIA `group` role has a visible name.
+   */
+  "aria-label": string;
+  /** Additional CSS classes merged onto the group container element. */
+  className?: string;
+}
+
 // ─── SubmenuTrigger ──────────────────────────────────────────────────────────
 
 /**

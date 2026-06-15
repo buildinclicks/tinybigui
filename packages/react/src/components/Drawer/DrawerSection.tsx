@@ -32,9 +32,9 @@ interface DrawerSectionInternalProps extends DrawerSectionProps {
  * @example
  * ```tsx
  * // Section with header and divider
- * <DrawerSection header="Account" showDivider>
- *   <DrawerItem icon={<ProfileIcon />} label="Profile" />
- *   <DrawerItem icon={<LogoutIcon />} label="Logout" />
+ * <DrawerSection header="Labels" showDivider>
+ *   <DrawerItem icon={<LabelIcon />} label="Promotions" />
+ *   <DrawerItem icon={<LabelIcon />} label="Social" />
  * </DrawerSection>
  *
  * // Section without header (just a visual group)

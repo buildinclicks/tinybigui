@@ -1,11 +1,17 @@
 "use client";
 
 import React, { forwardRef } from "react";
-import { HeadlessDrawer, DrawerIconOnlyContext } from "./DrawerHeadless";
+import { HeadlessDrawer } from "./DrawerHeadless";
 import { DrawerSection } from "./DrawerSection";
-import { drawerVariants, scrimVariants } from "./Drawer.variants";
+import {
+  drawerAnimationVariants,
+  drawerScrimAnimationVariants,
+  drawerVariants,
+  drawerScrimVariants,
+} from "./Drawer.variants";
 import { cn } from "../../utils/cn";
-import type { DrawerProps } from "./Drawer.types";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
+import type { DrawerAnimationState, DrawerProps } from "./Drawer.types";
 
 /**
  * Material Design 3 Navigation Drawer (Layer 3: Styled).
@@ -14,24 +20,24 @@ import type { DrawerProps } from "./Drawer.types";
  *
  * - **`standard`** — Inline `<nav>` landmark. Permanently visible or
  *   collapsible via controlled `open` prop. No overlay or focus trap.
- *   Surface: `bg-surface-container-low`.
+ *   Surface: `bg-surface-container-low`, no elevation, square trailing edge.
+ *   Slide motion: `transition-transform` + spring-standard-default-spatial
+ *   (500ms, no overshoot) driven by translate-x via `drawerVariants`.
  *
- * - **`modal`** — Overlay dialog with scrim backdrop, slide-in animation,
+ * - **`modal`** — Portal overlay with animation state machine, scrim backdrop,
  *   focus trap, and `Escape` to close.
- *   Surface: `bg-surface-container`, `shadow-elevation-1`.
+ *   Surface: `bg-surface-container-low` + `shadow-elevation-1`.
+ *   Shape: `rounded-r-lg` (16dp trailing corner per MD3).
+ *   Motion: `animate-md-slide-in-left` / `animate-md-slide-out-left` via
+ *   `drawerAnimationVariants` + `drawerScrimAnimationVariants`.
  *
  * Both variants:
  * - `role="navigation"` on the outer wrapper
- * - `rounded-r-xl` (28px per MD3 shape extra-large on right side only)
- * - Slide-in animation: `translate-x` driven by MD3 motion tokens
- * - `w-drawer` (360dp) or `w-20` (80dp) in `iconOnly` mode
+ * - `w-drawer` (360dp)
  *
- * Modal-only:
- * - `role="dialog"` + `aria-modal="true"` on the panel
- * - `FocusScope` containing focus + restoring on close
- * - `usePreventScroll` to lock body scroll
- * - Scrim: `bg-scrim opacity-32` — click closes drawer
- * - `Escape` key closes drawer
+ * Reduced motion: when `prefers-reduced-motion: reduce` is active, all
+ * animation classes are suppressed (`getAnimationClassName` returns `""`
+ * and `transition-none` is appended to the standard variant panel).
  *
  * @example
  * ```tsx
@@ -42,14 +48,15 @@ import type { DrawerProps } from "./Drawer.types";
  *   onOpenChange={setSidebarOpen}
  *   aria-label="App navigation"
  * >
+ *   <DrawerHeadline>Mail</DrawerHeadline>
  *   <DrawerItem icon={<HomeIcon />} label="Home" isActive />
  *   <DrawerSection header="Settings" showDivider>
  *     <DrawerItem icon={<SettingsIcon />} label="Preferences" />
  *   </DrawerSection>
  * </Drawer>
  *
- * // Icon-only mode (prep for NavigationRail)
- * <Drawer variant="standard" open iconOnly aria-label="App navigation">
+ * // Modal variant
+ * <Drawer variant="modal" open={open} onOpenChange={setOpen} aria-label="App navigation">
  *   <DrawerItem icon={<HomeIcon />} label="Home" isActive />
  * </Drawer>
  * ```
@@ -67,25 +74,45 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       children,
       className,
       disableRipple = false,
-      iconOnly = false,
       ...restProps
     },
     ref
   ) => {
     const isOpen = open ?? defaultOpen;
+    const reducedMotion = useReducedMotion();
+
+    // ── Panel class ───────────────────────────────────────────────────────────
 
     const drawerPanelClass = cn(
-      drawerVariants({
-        variant,
-        open: isOpen,
-        iconOnly,
-      }),
+      drawerVariants({ variant, open: isOpen }),
+      // Suppress spring transition when user has requested reduced motion
+      reducedMotion && "transition-none",
       className
     );
 
-    const scrimClass = scrimVariants();
+    // ── Scrim base class (modal only) ─────────────────────────────────────────
 
-    // Mark the first DrawerSection to suppress its divider
+    const scrimClass = drawerScrimVariants();
+
+    // ── Animation class callback (modal only) ─────────────────────────────────
+    //
+    // Reduced motion: return "" so no animation classes are applied.
+    // Normal: delegate to the CVA variants for panel and scrim independently.
+
+    const getAnimationClassName = reducedMotion
+      ? (_state: DrawerAnimationState): string => ""
+      : (state: DrawerAnimationState): string => drawerAnimationVariants({ animationState: state });
+
+    const getScrimAnimationClassName = reducedMotion
+      ? (_state: DrawerAnimationState): string => ""
+      : (state: DrawerAnimationState): string =>
+          drawerScrimAnimationVariants({ animationState: state });
+
+    // ── Children pre-processing ───────────────────────────────────────────────
+    //
+    // Mark the first DrawerSection to suppress its top divider so the drawer
+    // does not open with a stray rule between the headline and the first group.
+
     let foundFirstSection = false;
     const processedChildren = React.Children.map(children, (child) => {
       if (React.isValidElement(child) && child.type === DrawerSection) {
@@ -100,23 +127,22 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     });
 
     return (
-      <DrawerIconOnlyContext.Provider value={iconOnly}>
-        <HeadlessDrawer
-          ref={ref}
-          variant={variant}
-          {...(open !== undefined ? { open } : {})}
-          {...(defaultOpen !== undefined ? { defaultOpen } : {})}
-          {...(onOpenChange !== undefined ? { onOpenChange } : {})}
-          aria-label={ariaLabel}
-          className={drawerPanelClass}
-          scrimClassName={scrimClass}
-          disableRipple={disableRipple}
-          iconOnly={iconOnly}
-          {...restProps}
-        >
-          {processedChildren}
-        </HeadlessDrawer>
-      </DrawerIconOnlyContext.Provider>
+      <HeadlessDrawer
+        ref={ref}
+        variant={variant}
+        {...(open !== undefined ? { open } : {})}
+        {...(defaultOpen !== undefined ? { defaultOpen } : {})}
+        {...(onOpenChange !== undefined ? { onOpenChange } : {})}
+        aria-label={ariaLabel}
+        className={drawerPanelClass}
+        scrimClassName={scrimClass}
+        getAnimationClassName={getAnimationClassName}
+        getScrimAnimationClassName={getScrimAnimationClassName}
+        disableRipple={disableRipple}
+        {...restProps}
+      >
+        {processedChildren}
+      </HeadlessDrawer>
     );
   }
 );

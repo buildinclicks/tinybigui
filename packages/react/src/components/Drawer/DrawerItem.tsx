@@ -1,67 +1,50 @@
 "use client";
 
-import type React from "react";
-import { forwardRef, isValidElement, useContext } from "react";
-import { HeadlessDrawerItem, DrawerIconOnlyContext } from "./DrawerHeadless";
-import { badgeStaticVariants } from "../Badge/Badge.variants";
-import { drawerItemVariants } from "./Drawer.variants";
+import { forwardRef, useCallback, useState } from "react";
+import { useHover, useFocusRing, mergeProps } from "react-aria";
+import { HeadlessDrawerItem } from "./DrawerHeadless";
+import {
+  drawerItemVariants,
+  drawerItemActiveIndicatorVariants,
+  drawerItemStateLayerVariants,
+  drawerItemFocusRingVariants,
+  drawerItemIconVariants,
+  drawerItemLabelVariants,
+  drawerItemBadgeVariants,
+} from "./Drawer.variants";
 import { cn } from "../../utils/cn";
+import { getInteractionDataAttributes } from "../../utils/interactionStates";
 import { useRipple } from "../../hooks/useRipple";
-import type { DrawerItemProps, DrawerItemBadgeConfig } from "./Drawer.types";
-
-/**
- * Runtime type guard for the structured `DrawerItemBadgeConfig`.
- * Distinguishes config objects from React elements / primitives.
- */
-function isBadgeConfig(badge: unknown): badge is DrawerItemBadgeConfig {
-  return typeof badge === "object" && badge !== null && !isValidElement(badge) && "count" in badge;
-}
-
-/**
- * Derives the visible text for the trailing badge pill.
- * - No `count` → empty string (dot)
- * - `count` ≤ `max` → count as string
- * - `count` > `max` → `"${max}+"`
- */
-function getBadgeDisplayValue(count: number | undefined, max: number): string {
-  if (count === undefined) return "";
-  return count > max ? `${max}+` : count.toString();
-}
-
-/**
- * Derives the accessible label for the trailing badge pill.
- * - No `count` → `"New"`
- * - With `count` → `"${count} notifications"`
- */
-function getBadgeAriaLabel(count: number | undefined): string {
-  return count === undefined ? "New" : `${count} notifications`;
-}
+import type { DrawerItemProps } from "./Drawer.types";
 
 /**
  * Material Design 3 Navigation Drawer Item (Layer 3: Styled).
  *
- * Renders a navigation destination row following MD3 Navigation Drawer specs.
- * Uses `HeadlessDrawerItem` for behavior and accessibility, CVA for variants.
+ * Architecture: Variants vs States (component-variants.mdc)
+ * - Root is `group/draweritem` host; all slots read state via
+ *   `group-data-[x]/draweritem:` selectors.
+ * - Interaction states tracked in this styled layer via React Aria hooks
+ *   and emitted as `data-*` attributes on the root via `getInteractionDataAttributes`.
+ * - `data-active` is a content flag set explicitly (not via the shared helper).
+ *
+ * Slot z-order:
+ *   activeIndicator  z-0    — `bg-secondary-container` pill
+ *   stateLayer       z-[1]  — hover (8%) / press (10%) opacity overlay
+ *   focusRing        z-[2]  — keyboard focus outline (inset, `-outline-offset-2`)
+ *   ripple           z-[3]  — press ripple feedback
+ *   icon             z-10   — leading icon (24dp)
+ *   label            z-10   — label text
+ *   badge            z-10   — trailing badge text
  *
  * Renders as `<a>` when `href` is provided, `<button>` otherwise.
- *
- * Features:
- * - Active indicator: 336dp pill, `bg-secondary-container` / `text-on-secondary-container`
- * - `aria-current="page"` on active item
- * - Ripple effect on interaction
- * - Hover/focus/pressed state layers (MD3 spec: 8% / 12%)
- * - Optional leading icon (24dp slot)
- * - Optional trailing badge — `ReactNode` or `{ count }` config
- * - Icon-only mode: label hidden, `title` tooltip via `DrawerIconOnlyContext`
- * - Disabled state: `opacity-38`, non-interactive
  *
  * @example
  * ```tsx
  * // Active item with icon
  * <DrawerItem icon={<HomeIcon />} label="Home" isActive onPress={() => navigate('/')} />
  *
- * // Item with Badge config (uses MD3 error color role)
- * <DrawerItem label="Inbox" badge={{ count: 5 }} />
+ * // Item with badge count
+ * <DrawerItem label="Inbox" badge={24} />
  *
  * // Disabled
  * <DrawerItem label="Disabled Feature" isDisabled />
@@ -76,110 +59,103 @@ export const DrawerItem = forwardRef<HTMLElement, DrawerItemProps>(
       icon,
       label,
       badge,
-      secondaryText,
       isActive = false,
       isDisabled = false,
       disableRipple = false,
       className,
-      onPress,
-      onPressStart,
-      onPressEnd,
-      onPressChange,
-      onPressUp,
+      // All remaining props (onPress, onPressStart, onPressEnd, etc.) stay in
+      // restProps and are passed into mergeProps — mirrors the Button pattern.
       ...restProps
     },
     ref
   ) => {
-    const isItemDisabled = isDisabled;
-    const isIconOnly = useContext(DrawerIconOnlyContext);
+    // ── Interaction state tracking ─────────────────────────────────────────
+    const [isPressed, setIsPressed] = useState(false);
+    const handlePressStart = useCallback(() => setIsPressed(true), []);
+    const handlePressEnd = useCallback(() => setIsPressed(false), []);
 
+    const { isHovered, hoverProps } = useHover({ isDisabled });
+    const { isFocusVisible, focusProps } = useFocusRing();
+
+    // Ripple effect
     const { onMouseDown: handleRipple, ripples } = useRipple({
-      disabled: isItemDisabled || disableRipple,
+      disabled: isDisabled || disableRipple,
     });
 
-    const renderBadge = (): React.ReactElement | null => {
-      if (!badge) return null;
-
-      if (isBadgeConfig(badge)) {
-        // Drawer trailing badge: rendered as an inline static pill (not anchored/overlaid).
-        // Uses badgeStaticVariants so colors, sizing, and dot/invisible flags are identical
-        // to the anchored BadgeContent, but without the absolute translate positioning.
-        const max = 999;
-        const isDot = badge.count === undefined;
-        const displayValue = getBadgeDisplayValue(badge.count, max);
-        const ariaLabel = getBadgeAriaLabel(badge.count);
-
-        return (
-          <span className="relative z-10 ml-auto flex shrink-0 items-center pr-2">
-            <span
-              role="status"
-              aria-label={ariaLabel}
-              data-dot={isDot ? "" : undefined}
-              className={cn(badgeStaticVariants())}
-            >
-              {displayValue}
-            </span>
-          </span>
-        );
-      }
-
-      return (
-        <span className="relative z-10 ml-auto flex shrink-0 items-center pr-2" aria-hidden="true">
-          {badge}
-        </span>
-      );
-    };
+    // All event handlers merged in one call — mergeProps chains handlers so both
+    // the internal state-tracking callbacks and the caller's handlers fire.
+    // restProps is passed as the last argument so caller handlers run after ours.
+    const mergedInteractionProps = mergeProps(
+      hoverProps,
+      focusProps,
+      { onPressStart: handlePressStart, onPressEnd: handlePressEnd },
+      restProps
+    );
 
     return (
       <HeadlessDrawerItem
-        {...restProps}
+        {...mergedInteractionProps}
         ref={ref}
         {...(href !== undefined ? { href } : {})}
         isActive={isActive}
-        {...(isItemDisabled !== undefined ? { isDisabled: isItemDisabled } : {})}
-        {...(onPress !== undefined ? { onPress } : {})}
-        {...(onPressStart !== undefined ? { onPressStart } : {})}
-        {...(onPressEnd !== undefined ? { onPressEnd } : {})}
-        {...(onPressChange !== undefined ? { onPressChange } : {})}
-        {...(onPressUp !== undefined ? { onPressUp } : {})}
+        {...(isDisabled !== undefined ? { isDisabled } : {})}
         onMouseDown={handleRipple}
-        title={isIconOnly ? label : undefined}
+        // ── Interaction data attributes ──────────────────────────────────
+        {...getInteractionDataAttributes({
+          isHovered,
+          isFocusVisible,
+          isPressed,
+          isDisabled,
+        })}
+        // ── Content flag: active is structural, not an interaction state ─
+        data-active={isActive ? "" : undefined}
         className={cn(
-          drawerItemVariants({
-            isActive,
-            isDisabled: isItemDisabled,
-          }),
+          drawerItemVariants(),
+          // group/draweritem: enables group-data-[x]/draweritem selectors in all slots
+          "group/draweritem",
           className
         )}
       >
-        {/* Ripple effect */}
-        {ripples}
+        {/* ── Active indicator (z-0) ──────────────────────────────────────── */}
+        {/* secondary-container pill; opacity 0→1 driven by data-active on root */}
+        <span aria-hidden="true" className={drawerItemActiveIndicatorVariants()} />
 
-        {/* Leading icon slot (24dp) */}
+        {/* ── State layer (z-[1]) ─────────────────────────────────────────── */}
+        {/* Hover 8% / press 10%; color switches on data-active */}
+        <span aria-hidden="true" className={drawerItemStateLayerVariants()} />
+
+        {/* ── Focus ring (z-[2]) ──────────────────────────────────────────── */}
+        {/* Inset outline; opacity 0→100 on focus-visible */}
+        <span aria-hidden="true" className={drawerItemFocusRingVariants()} />
+
+        {/* ── Ripple container (z-[3]) ────────────────────────────────────── */}
+        <span
+          className="pointer-events-none absolute inset-0 z-[3] overflow-hidden rounded-[inherit]"
+          aria-hidden="true"
+        >
+          {ripples}
+        </span>
+
+        {/* ── Leading icon (z-10) ─────────────────────────────────────────── */}
         {icon && (
-          <span
-            className="relative z-10 flex shrink-0 items-center justify-center"
-            aria-hidden="true"
-          >
+          <span aria-hidden="true" className={drawerItemIconVariants()}>
             {icon}
           </span>
         )}
 
-        {/* Label and optional secondary text */}
-        <span
-          className={cn(
-            "relative z-10 flex min-w-0 flex-1 flex-col text-left",
-            isIconOnly && "hidden"
-          )}
-        >
-          <span className="truncate">{label}</span>
-          {secondaryText && (
-            <span className="text-body-small truncate opacity-70">{secondaryText}</span>
-          )}
-        </span>
+        {/* ── Label (z-10) ────────────────────────────────────────────────── */}
+        <span className={drawerItemLabelVariants()}>{label}</span>
 
-        {/* Trailing badge */}
-        {!isIconOnly && renderBadge()}
+        {/* ── Trailing badge text (z-10) ──────────────────────────────────── */}
+        {badge !== undefined && badge !== null && (
+          <span
+            role="status"
+            aria-label={typeof badge === "number" ? `${badge} notifications` : String(badge)}
+            className={drawerItemBadgeVariants()}
+          >
+            {badge}
+          </span>
+        )}
       </HeadlessDrawerItem>
     );
   }

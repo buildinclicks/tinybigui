@@ -12,7 +12,7 @@ A modern, accessible React component library implementing Google's Material Desi
 
 ## ✅ Status
 
-> **Latest Release: v0.22.0** (2026-06-10)
+> **Latest Release: v0.24.0** (2026-06-12)
 >
 > **29 MD3 components** published to npm with full TypeScript support and WCAG 2.1 AA accessibility.
 >
@@ -149,24 +149,24 @@ See [THEMING.md](./THEMING.md) for the full customization guide.
 
 ### Phase 2: Navigation ✅
 
-| Component          | Status | Description                                                             |
-| ------------------ | ------ | ----------------------------------------------------------------------- |
-| `AppBar`           | ✅     | M3 expressive flexible slot architecture, subtitle growth (v0.10.0)     |
-| `Tabs`             | ✅     | MD3 expressive variants-vs-states, content-width indicator (v0.11.2)    |
-| `NavigationDrawer` | ✅     | Modal and standard navigation drawer                                    |
-| `NavigationBar`    | ✅     | Bottom navigation with badges                                           |
-| `Search`           | ✅     | MD3 expressive variants-vs-states architecture, per-slot CVAs (v0.18.0) |
+| Component          | Status | Description                                                                                        |
+| ------------------ | ------ | -------------------------------------------------------------------------------------------------- |
+| `AppBar`           | ✅     | M3 expressive flexible slot architecture, subtitle growth (v0.10.0)                                |
+| `Tabs`             | ✅     | MD3 expressive variants-vs-states, content-width indicator (v0.11.2)                               |
+| `NavigationDrawer` | ✅     | MD3 slot-based variants-vs-states architecture, `DrawerHeadline`, spring modal animation (v0.24.0) |
+| `NavigationBar`    | ✅     | Bottom navigation with badges                                                                      |
+| `Search`           | ✅     | MD3 expressive variants-vs-states architecture, per-slot CVAs (v0.18.0)                            |
 
 ### Phase 3: Feedback ✅
 
-| Component     | Status | Description                                                                         |
-| ------------- | ------ | ----------------------------------------------------------------------------------- |
-| `Dialog`      | ✅     | MD3 expressive motion, hero icon, scroll dividers, reduced-motion support (v0.22.0) |
-| `Snackbar`    | ✅     | MD3 slot-based architecture, inverse-surface state layers, spring motion (v0.20.0)  |
-| `Menu`        | ✅     | Dropdown, context menu, submenus                                                    |
-| `Progress`    | ✅     | MD3 expressive slot CVA, colorful tokens, wavy shape, thick track (v0.16.0)         |
-| `BottomSheet` | ✅     | MD3 expressive handle, variants-vs-states architecture (v0.11.0)                    |
-| `Tooltip`     | ✅     | Slot-based MD3 styling, reduced-motion guard, rich tooltip token fixes (v0.21.1)    |
+| Component     | Status | Description                                                                                |
+| ------------- | ------ | ------------------------------------------------------------------------------------------ |
+| `Dialog`      | ✅     | MD3 expressive motion, hero icon, scroll dividers, reduced-motion support (v0.22.0)        |
+| `Snackbar`    | ✅     | MD3 slot-based architecture, inverse-surface state layers, spring motion (v0.20.0)         |
+| `Menu`        | ✅     | MD3 expressive vertical segmented menus, `MenuItemGroup`, context menu, submenus (v0.23.0) |
+| `Progress`    | ✅     | MD3 expressive slot CVA, colorful tokens, wavy shape, thick track (v0.16.0)                |
+| `BottomSheet` | ✅     | MD3 expressive handle, variants-vs-states architecture (v0.11.0)                           |
+| `Tooltip`     | ✅     | Slot-based MD3 styling, reduced-motion guard, rich tooltip token fixes (v0.21.1)           |
 
 ### Phase 4: Data Display ✅
 

@@ -4,9 +4,9 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.22.0 (released 2026-06-10)  
-**Next Release:** v0.23.0  
-**Status:** 29 components published to NPM; 2,158 tests passing
+**Current Version:** v0.24.0 (released 2026-06-12)  
+**Next Release:** v0.25.0  
+**Status:** 29 components published to NPM; 2,256 tests passing
 
 ## Release Timeline
 
@@ -40,6 +40,8 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.21.0 | —       | SplitButton MD3 expressive refactor — variants-vs-states architecture, 5-size scale, elevated variant, inner-corner shape morphing, spring motion                | Released 2026-06-10 |
 | v0.21.1 | —       | Tooltip MD3 slot-based styling refactor — 3-state animation variant, rich tooltip token fixes, reduced-motion unmount guard, 9 new tests                         | Released 2026-06-10 |
 | v0.22.0 | —       | Dialog MD3 expressive refactor — composite `animate-md-*` motion, hero icon slot, scroll dividers, reduced-motion support, architecture alignment                | Released 2026-06-10 |
+| v0.23.0 | —       | Menu MD3 expressive refactor — segmented vertical menus, `MenuItemGroup`, slot architecture; Button disabled container fix; `--opacity-*` token percentage fix   | Released 2026-06-11 |
+| v0.24.0 | —       | NavigationDrawer MD3 slot-based refactor — `DrawerHeadline`, spring modal animation, spec-accurate measurements/typography/motion; breaking API cleanup          | Released 2026-06-12 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                                 | Planned             |
 
 ## Completed Work
@@ -105,7 +107,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 - [x] Tailwind CSS v4 integration with MD3 tokens
 - [x] React Aria accessibility primitives
 - [x] CVA variant management with variants-vs-states architecture
-- [x] Vitest + React Testing Library (2,158 tests)
+- [x] Vitest + React Testing Library (2,256 tests)
 - [x] Storybook 10 documentation
 - [x] ESLint + Prettier configuration
 - [x] Husky + Commitlint for commit standards

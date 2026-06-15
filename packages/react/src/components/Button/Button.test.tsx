@@ -46,7 +46,10 @@ describe("Button", () => {
     test("renders filled variant (default)", () => {
       render(<Button variant="filled">Filled</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary", "text-on-primary");
+      expect(button).toHaveClass("text-on-primary");
+      // background lives on the buttonContainerVariants child span (not the root)
+      const bgContainer = button.querySelector('span[aria-hidden="true"]');
+      expect(bgContainer).toHaveClass("bg-primary");
     });
 
     test("renders outlined variant", () => {
@@ -58,19 +61,28 @@ describe("Button", () => {
     test("renders tonal variant", () => {
       render(<Button variant="tonal">Tonal</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-secondary-container", "text-on-secondary-container");
+      expect(button).toHaveClass("text-on-secondary-container");
+      // background lives on the buttonContainerVariants child span (not the root)
+      const bgContainer = button.querySelector('span[aria-hidden="true"]');
+      expect(bgContainer).toHaveClass("bg-secondary-container");
     });
 
     test("renders elevated variant", () => {
       render(<Button variant="elevated">Elevated</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-surface-container-low", "shadow-elevation-1");
+      expect(button).toHaveClass("shadow-elevation-1");
+      // background lives on the buttonContainerVariants child span (not the root)
+      const bgContainer = button.querySelector('span[aria-hidden="true"]');
+      expect(bgContainer).toHaveClass("bg-surface-container-low");
     });
 
     test("renders text variant", () => {
       render(<Button variant="text">Text</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-transparent", "text-primary");
+      expect(button).toHaveClass("text-primary");
+      // background lives on the buttonContainerVariants child span (not the root)
+      const bgContainer = button.querySelector('span[aria-hidden="true"]');
+      expect(bgContainer).toHaveClass("bg-transparent");
     });
 
     test("sets data-variant attribute", () => {
@@ -203,6 +215,50 @@ describe("Button", () => {
     test("does not set data-disabled when enabled", () => {
       render(<Button>Enabled</Button>);
       expect(screen.getByRole("button")).not.toHaveAttribute("data-disabled");
+    });
+
+    test("disabled filled button has MD3 disabled container class", () => {
+      render(
+        <Button variant="filled" isDisabled>
+          Disabled
+        </Button>
+      );
+      const button = screen.getByRole("button");
+      // disabled container bg is on the buttonContainerVariants child span
+      // using group-data descendant selector (same pattern as Switch track)
+      const bgContainer = button.querySelector('span[aria-hidden="true"]');
+      expect(bgContainer).toHaveClass("group-data-[disabled]/button:bg-on-surface/12");
+    });
+
+    test("disabled outlined button has MD3 disabled border class", () => {
+      render(
+        <Button variant="outlined" isDisabled>
+          Disabled
+        </Button>
+      );
+      expect(screen.getByRole("button")).toHaveClass("data-[disabled]:border-on-surface/12");
+    });
+
+    test("disabled elevated button has MD3 disabled shadow-none class", () => {
+      render(
+        <Button variant="elevated" isDisabled>
+          Disabled
+        </Button>
+      );
+      expect(screen.getByRole("button")).toHaveClass("data-[disabled]:shadow-none");
+    });
+
+    test("disabled button has MD3 disabled text class across all variants", () => {
+      const variants = ["filled", "outlined", "tonal", "elevated", "text"] as const;
+      variants.forEach((variant) => {
+        const { unmount } = render(
+          <Button variant={variant} isDisabled>
+            {variant}
+          </Button>
+        );
+        expect(screen.getByRole("button")).toHaveClass("data-[disabled]:text-on-surface/38");
+        unmount();
+      });
     });
 
     test("loading button is also disabled", () => {
