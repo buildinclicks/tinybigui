@@ -1,5 +1,13 @@
 # @tinybigui/react
 
+## 0.24.3
+
+### Patch Changes
+
+- 9ae0cbb: **Checkbox:** fix margin and layout alignment for checkbox variants
+
+  Adjust root negative margin, control padding, and label spacing to match MD3 touch-target and label alignment spec.
+
 ## 0.24.1
 
 ### Patch Changes
