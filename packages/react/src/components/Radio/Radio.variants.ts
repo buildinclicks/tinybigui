@@ -48,7 +48,7 @@ import { cva, type VariantProps } from "class-variance-authority";
  * don't need to handle cursor separately.
  */
 export const radioRootVariants = cva([
-  "relative inline-flex items-center cursor-pointer select-none -ml-3.75",
+  "relative inline-flex items-center cursor-pointer select-none",
   // Disabled state — self-targeting so children inherit via group
   "data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none",
   "data-[disabled]:opacity-38",
@@ -62,7 +62,7 @@ export const radioRootVariants = cva([
  */
 export const radioControlVariants = cva([
   "relative flex items-center justify-center flex-shrink-0",
-  "size-10 m-1", // 40dp touch target (MD3 spec)
+  "size-10", // 40dp touch target (MD3 spec)
 ]);
 
 // ─── FOCUS RING ───────────────────────────────────────────────────────────────
@@ -110,7 +110,7 @@ export const radioStateLayerVariants = cva([
   // Selected state-layer color
   "group-data-[selected]/radio:bg-primary",
   // Error state-layer color (overrides selected via cascade position)
-  "group-data-[invalid]/radio:bg-error",
+  "group-data-[invalid]/radio:!bg-error",
   // Interaction opacities (MD3: hover 8%, focus/pressed 10%)
   "group-data-[hovered]/radio:opacity-8",
   "group-data-[focus-visible]/radio:opacity-10",
@@ -169,7 +169,7 @@ export const radioDotVariants = cva([
  * Text label next to the radio control.
  * Disabled opacity is inherited from root's data-[disabled]:opacity-38.
  */
-export const radioLabelVariants = cva(["text-body-medium text-on-surface select-none"]);
+export const radioLabelVariants = cva(["text-body-medium text-on-surface select-none ml-4"]);
 
 // ─── GROUP ────────────────────────────────────────────────────────────────────
 
