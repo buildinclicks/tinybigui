@@ -1,5 +1,13 @@
 # @tinybigui/react
 
+## 0.24.4
+
+### Patch Changes
+
+- f02378a: Radio: fix error variant state layer and ring colors
+
+  Use important modifiers on invalid state styles so error colors correctly override selected state in the ring and state layer.
+
 ## 0.24.3
 
 ### Patch Changes
