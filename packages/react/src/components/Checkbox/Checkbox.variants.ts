@@ -35,7 +35,7 @@ import { cva, type VariantProps } from "class-variance-authority";
  * the cursor/pointer restriction. Opacity is applied here at 38% when disabled.
  */
 export const checkboxRootVariants = cva([
-  "relative inline-flex items-center cursor-pointer select-none",
+  "relative inline-flex items-center cursor-pointer select-none -ml-3.75",
   "data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none",
   "data-[disabled]:opacity-38",
 ]);
@@ -50,7 +50,7 @@ export const checkboxRootVariants = cva([
  */
 export const checkboxControlVariants = cva([
   "relative flex items-center justify-center flex-shrink-0",
-  "w-10 h-10 rounded-full",
+  "w-10 h-10 rounded-full m-1",
   "overflow-hidden",
 ]);
 
@@ -186,7 +186,7 @@ export const checkboxIconVariants = cva([
  * Text label next to the control.
  * Disabled opacity is inherited from the root's data-[disabled]:opacity-38.
  */
-export const checkboxLabelVariants = cva(["text-body-large text-on-surface select-none ml-4"]);
+export const checkboxLabelVariants = cva(["text-body-large text-on-surface select-none"]);
 
 // ─── EXPORTED TYPES ───────────────────────────────────────────────────────────
 
