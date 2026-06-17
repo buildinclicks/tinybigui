@@ -55,7 +55,7 @@ describe("Button", () => {
     test("renders outlined variant", () => {
       render(<Button variant="outlined">Outlined</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("border", "border-outline", "text-primary");
+      expect(button).toHaveClass("border", "border-outline-variant", "text-primary");
     });
 
     test("renders tonal variant", () => {
@@ -249,14 +249,35 @@ describe("Button", () => {
     });
 
     test("disabled button has MD3 disabled text class across all variants", () => {
-      const variants = ["filled", "outlined", "tonal", "elevated", "text"] as const;
-      variants.forEach((variant) => {
+      const variants = [
+        {
+          variant: "filled" as const,
+          disabledTextClass: "group-data-[disabled]/button:text-on-surface/38",
+        },
+        {
+          variant: "outlined" as const,
+          disabledTextClass: "data-[disabled]:text-on-surface/38",
+        },
+        {
+          variant: "tonal" as const,
+          disabledTextClass: "data-[disabled]:text-on-surface/38",
+        },
+        {
+          variant: "elevated" as const,
+          disabledTextClass: "data-[disabled]:text-on-surface/38",
+        },
+        {
+          variant: "text" as const,
+          disabledTextClass: "data-[disabled]:text-on-surface/38",
+        },
+      ];
+      variants.forEach(({ variant, disabledTextClass }) => {
         const { unmount } = render(
           <Button variant={variant} isDisabled>
             {variant}
           </Button>
         );
-        expect(screen.getByRole("button")).toHaveClass("data-[disabled]:text-on-surface/38");
+        expect(screen.getByRole("button")).toHaveClass(disabledTextClass);
         unmount();
       });
     });

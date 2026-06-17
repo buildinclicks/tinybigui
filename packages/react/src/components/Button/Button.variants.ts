@@ -97,12 +97,12 @@ export const buttonVariants = cva(
           "data-[hovered]:shadow-elevation-1",
           // Focus/pressed: shadow must explicitly return to level-0
           // (doubled attribute selector → higher specificity than hover)
-          "data-[focus-visible]:data-[focus-visible]:shadow-none",
-          "data-[pressed]:data-[pressed]:data-[pressed]:shadow-none",
-          // Disabled overrides — root owns text color + shadow only;
-          // disabled bg override lives on buttonContainerVariants (filled variant)
-          "data-[disabled]:text-on-surface/38",
-          "data-[disabled]:shadow-none",
+          "group-data-[focus-visible]/button:shadow-none",
+          "group-data-[pressed]/button:shadow-none",
+          // Disabled overrides
+          "group-data-[disabled]/button:bg-on-surface/12",
+          "group-data-[disabled]/button:text-on-surface/38",
+          "group-data-[disabled]/button:shadow-none",
         ],
 
         /**
@@ -111,7 +111,7 @@ export const buttonVariants = cva(
          * Elevation: always 0
          */
         outlined: [
-          "border border-outline text-primary",
+          "bg-transparent border border-outline-variant text-primary",
           // Disabled overrides
           "data-[disabled]:border-on-surface/12",
           "data-[disabled]:text-on-surface/38",
@@ -127,8 +127,8 @@ export const buttonVariants = cva(
           // Hover: gains level-1 elevation (same as filled)
           "data-[hovered]:shadow-elevation-1",
           // Focus/pressed: return to level-0
-          "data-[focus-visible]:data-[focus-visible]:shadow-none",
-          "data-[pressed]:data-[pressed]:data-[pressed]:shadow-none",
+          "group-data-[focus-visible]/button:shadow-none",
+          "group-data-[pressed]/button:shadow-none",
           // Disabled overrides
           "data-[disabled]:text-on-surface/38",
           "data-[disabled]:shadow-none",
@@ -145,8 +145,8 @@ export const buttonVariants = cva(
           "data-[hovered]:shadow-elevation-2",
           // Focus/pressed: return to base level-1
           // (doubled selector wins over single hover selector at same cascade position)
-          "data-[focus-visible]:data-[focus-visible]:shadow-elevation-1",
-          "data-[pressed]:data-[pressed]:data-[pressed]:shadow-elevation-1",
+          "group-data-[focus-visible]/button:shadow-elevation-1",
+          "group-data-[pressed]/button:shadow-elevation-1",
           // Disabled overrides
           "data-[disabled]:text-on-surface/38",
           "data-[disabled]:shadow-none",
@@ -274,11 +274,11 @@ export const buttonStateLayerVariants = cva(
     // Effects transition for opacity — standard spring, no overshoot
     "transition-opacity duration-spring-standard-fast-effects ease-spring-standard-fast-effects",
     // Hover: 8%
-    "group-data-[hovered]/button:opacity-8",
+    "group-data-[hovered]/button:opacity-[0.08]",
     // Focus: 10%
     "group-data-[focus-visible]/button:opacity-10",
     // Pressed: 10%, doubled selector wins over hover
-    "group-data-[pressed]/button:group-data-[pressed]/button:opacity-10",
+    "group-data-[pressed]/button:opacity-10",
     // No state layer when disabled
     "group-data-[disabled]/button:hidden",
   ],
