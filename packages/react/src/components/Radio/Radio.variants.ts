@@ -110,7 +110,7 @@ export const radioStateLayerVariants = cva([
   // Selected state-layer color
   "group-data-[selected]/radio:bg-primary",
   // Error state-layer color (overrides selected via cascade position)
-  "group-data-[invalid]/radio:bg-error",
+  "group-data-[invalid]/radio:!bg-error",
   // Interaction opacities (MD3: hover 8%, focus/pressed 10%)
   "group-data-[hovered]/radio:opacity-8",
   "group-data-[focus-visible]/radio:opacity-10",
@@ -135,7 +135,7 @@ export const radioRingVariants = cva([
   // Selected — border becomes primary
   "group-data-[selected]/radio:border-primary",
   // Error — placed after selected so it overrides by cascade order
-  "group-data-[invalid]/radio:border-error",
+  "group-data-[invalid]/radio:!border-error",
   // Disabled — on-surface/38 opacity value
   "group-data-[disabled]/radio:border-on-surface/38",
 ]);
