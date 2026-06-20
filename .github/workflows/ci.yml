@@ -141,11 +141,45 @@ jobs:
           fi
           echo "✅ All dist directories exist"
 
-  # Job 5: All Checks Passed (Required status check)
+  # Job 5: Storybook Static Build
+  storybook:
+    name: Build Storybook
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v6
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 📚 Build Storybook
+        run: pnpm --filter @tinybigui/react build-storybook
+
+      - name: 📦 Check storybook-static output
+        run: |
+          if [ ! -d "packages/react/storybook-static" ]; then
+            echo "❌ Storybook static output not generated"
+            exit 1
+          fi
+          echo "✅ Storybook static output exists"
+
+  # Job 6: All Checks Passed (Required status check)
   all-checks:
     name: All Checks Passed
     runs-on: ubuntu-latest
-    needs: [quality, typecheck, test, build]
+    needs: [quality, typecheck, test, build, storybook]
     if: always()
     
     steps:
@@ -165,6 +199,10 @@ jobs:
           fi
           if [ "${{ needs.build.result }}" != "success" ]; then
             echo "❌ Build failed"
+            exit 1
+          fi
+          if [ "${{ needs.storybook.result }}" != "success" ]; then
+            echo "❌ Storybook build failed"
             exit 1
           fi
           echo "✅ All checks passed!"
