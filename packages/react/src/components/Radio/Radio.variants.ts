@@ -110,7 +110,7 @@ export const radioStateLayerVariants = cva([
   // Selected state-layer color
   "group-data-[selected]/radio:bg-primary",
   // Error state-layer color (overrides selected via cascade position)
-  "group-data-[invalid]/radio:bg-error",
+  "group-data-[invalid]/radio:!bg-error",
   // Interaction opacities (MD3: hover 8%, focus/pressed 10%)
   "group-data-[hovered]/radio:opacity-8",
   "group-data-[focus-visible]/radio:opacity-10",
