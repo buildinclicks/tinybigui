@@ -1,5 +1,3 @@
-"use client";
-
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { CalendarDate } from "@internationalized/date";
