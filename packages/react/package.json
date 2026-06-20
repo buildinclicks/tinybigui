@@ -1,6 +1,6 @@
 {
   "name": "@tinybigui/react",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "description": "Material Design 3 React components built with Tailwind CSS",
   "keywords": [
     "react",
@@ -56,7 +56,7 @@
     "test:watch": "vitest",
     "clean": "rm -rf dist",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "pnpm --filter @tinybigui/tokens build && storybook build",
     "chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
   "dependencies": {

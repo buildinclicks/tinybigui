@@ -1,5 +1,11 @@
 # @tinybigui/react
 
+## 0.24.5
+
+### Patch Changes
+
+- Radio: adjust margin and layout for radio variants to match MD3 touch-target and label alignment spec.
+
 ## 0.24.4
 
 ### Patch Changes
