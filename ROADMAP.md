@@ -4,7 +4,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.24.0 (released 2026-06-12)  
+**Current Version:** v0.24.5 (released 2026-06-20)  
 **Next Release:** v0.25.0  
 **Status:** 29 components published to NPM; 2,256 tests passing
 
@@ -42,6 +42,11 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.22.0 | —       | Dialog MD3 expressive refactor — composite `animate-md-*` motion, hero icon slot, scroll dividers, reduced-motion support, architecture alignment                | Released 2026-06-10 |
 | v0.23.0 | —       | Menu MD3 expressive refactor — segmented vertical menus, `MenuItemGroup`, slot architecture; Button disabled container fix; `--opacity-*` token percentage fix   | Released 2026-06-11 |
 | v0.24.0 | —       | NavigationDrawer MD3 slot-based refactor — `DrawerHeadline`, spring modal animation, spec-accurate measurements/typography/motion; breaking API cleanup          | Released 2026-06-12 |
+| v0.24.1 | —       | Button loading usage fix, outlined variant styling, disabled state selector corrections                                                                          | Released 2026-06-17 |
+| v0.24.2 | —       | Tokens `neutral90` palette hex correction (`#e6e0e9` per MD3 spec) for surface and on-surface consistency                                                        | Released 2026-06-17 |
+| v0.24.3 | —       | Checkbox margin and layout alignment for MD3 touch-target and label spacing                                                                                      | Released 2026-06-17 |
+| v0.24.4 | —       | Radio error variant state layer and ring color overrides for invalid selected state                                                                              | Released 2026-06-17 |
+| v0.24.5 | —       | Radio margin and layout alignment for MD3 touch-target and label spacing; Storybook static export builds tokens before deploy                                    | Released 2026-06-20 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                                 | Planned             |
 
 ## Completed Work

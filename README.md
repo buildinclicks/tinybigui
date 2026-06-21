@@ -29,7 +29,7 @@
 
 ## ⚙️ Development Status
 
-> **Latest Release: v0.24.0** (2026-06-12)
+> **Latest Release: v0.24.5** (2026-06-20)
 >
 > **29 MD3 components** shipped across buttons, forms, navigation, feedback, and data display — all published to npm with **2,256 tests** passing.
 >
@@ -94,8 +94,8 @@ This is a monorepo containing multiple packages:
 
 | Package                                  | Description                   | Version | Status   |
 | ---------------------------------------- | ----------------------------- | ------- | -------- |
-| [`@tinybigui/react`](./packages/react)   | React components              | 0.24.0  | Released |
-| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.23.0  | Released |
+| [`@tinybigui/react`](./packages/react)   | React components              | 0.24.5  | Released |
+| [`@tinybigui/tokens`](./packages/tokens) | Design tokens (CSS variables) | 0.24.2  | Released |
 
 ---
 

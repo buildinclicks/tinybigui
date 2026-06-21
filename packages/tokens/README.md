@@ -12,7 +12,7 @@ A comprehensive collection of Material Design 3 design tokens implemented as CSS
 
 ## ✅ Status
 
-> **Latest Release: v0.23.0** (2026-06-11)
+> **Latest Release: v0.24.2** (2026-06-17)
 >
 > Modular MD3 design tokens published to npm — use standalone imports (`color.css`, `motion.css`, `theme.css`, etc.) or the combined `tokens.css`.
 >
