@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.6] - 2026-06-21
+
+### Changed
+
+#### `@tinybigui/react`
+
+- Documentation sync — README, ROADMAP, and CHANGELOG updated to reflect v0.24.1–v0.24.5 patch releases
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.24.5] - 2026-06-20
 
 ### Changed
