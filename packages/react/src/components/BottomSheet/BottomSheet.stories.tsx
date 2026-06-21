@@ -11,7 +11,7 @@ import { ListItem } from "../List/ListItem";
 const SnapIndexIndicator = (): JSX.Element => {
   const { currentSnapIndex, snapPoints } = useBottomSheetContext();
   return (
-    <p className="text-label-medium text-on-surface-variant px-4 pb-2">
+    <p className="text-label-medium text-on-surface-variant px-6 pb-2">
       Snap:{" "}
       <span className="text-on-surface font-medium">
         {currentSnapIndex + 1} of {snapPoints.length}
@@ -77,7 +77,7 @@ const ModalDemo = (): JSX.Element => {
         snapPoints={["50%"]}
         aria-label="Share options"
       >
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-4">
           <h2 className="text-title-medium text-on-surface mb-2">Share</h2>
           <List>
             <ListItem headline="Copy link" />
@@ -133,7 +133,7 @@ export const StandardBottomSheet: Story = {
         snapPoints={["30%", "60%"]}
         aria-label="Now playing"
       >
-        <div className="flex flex-col gap-3 px-4 pb-6">
+        <div className="flex flex-col gap-3 px-6 pb-6">
           <div>
             <p className="text-title-medium text-on-surface">Midnight Drive</p>
             <p className="text-body-medium text-on-surface-variant">The Coastal Waves</p>
@@ -175,7 +175,7 @@ const WithSnapPointsDemo = (): JSX.Element => {
         aria-label="Filter options"
       >
         <SnapIndexIndicator />
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-4">
           <h2 className="text-title-medium text-on-surface mb-3">Filters</h2>
           <div className="flex flex-col gap-3">
             {["Price", "Rating", "Distance", "Category", "Availability"].map((label) => (
@@ -223,7 +223,7 @@ const SingleSnapPointDemo = (): JSX.Element => {
         snapPoints={["60%"]}
         aria-label="Details"
       >
-        <div className="px-4 pb-6">
+        <div className="px-6 pb-6">
           <h2 className="text-title-large text-on-surface">Bluetooth Speaker Pro</h2>
           <p className="text-label-large text-primary mt-1">$129.99</p>
           <p className="text-body-medium text-on-surface-variant mt-3">
@@ -291,7 +291,7 @@ const WithContentDemo = (): JSX.Element => {
         snapPoints={["40%", "75%"]}
         aria-label="Recent files"
       >
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-4">
           <h2 className="text-title-medium text-on-surface mb-2">Recent files</h2>
         </div>
         <div className="overflow-y-auto">
@@ -348,7 +348,7 @@ const WithFormDemo = (): JSX.Element => {
         snapPoints={["70%"]}
         aria-label="Add new address"
       >
-        <div className="px-4 pb-6">
+        <div className="px-6 pb-6">
           <h2 className="text-title-medium text-on-surface mb-4">Add new address</h2>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <label className="flex flex-col gap-1">
@@ -427,7 +427,7 @@ const ControlledOpenDemo = (): JSX.Element => {
         Close
       </Button>
       <BottomSheet variant="modal" open={open} onOpenChange={setOpen} aria-label="Notifications">
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-4">
           <h2 className="text-title-medium text-on-surface mb-3">Notifications</h2>
           <List>
             <ListItem
@@ -481,7 +481,7 @@ const ScrimDismissDemo = (): JSX.Element => {
         snapPoints={["50%"]}
         aria-label="Settings"
       >
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-4">
           <p className="text-label-large text-primary mb-4">
             Click the shaded area above to dismiss
           </p>
@@ -528,7 +528,7 @@ const ResponsiveLayoutDemo = (): JSX.Element => {
         snapPoints={["50%"]}
         aria-label="Options"
       >
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-4">
           <p className="text-body-medium text-on-surface-variant mb-4">
             On this viewport, the sheet should show side margins and rounded corners. Resize the
             window to below 640px to see full-width behavior with square corners at the sides.
@@ -597,7 +597,7 @@ const PlaygroundDemo = ({
         snapPoints={snapPoints ?? ["50%"]}
         aria-label={ariaLabel ?? "Playground sheet"}
       >
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-4">
           <h2 className="text-title-medium text-on-surface mb-3">Playground</h2>
           <List>
             <ListItem headline="Option one" supportingText="Configure via the controls panel" />
