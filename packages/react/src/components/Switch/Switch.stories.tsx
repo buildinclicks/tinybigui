@@ -257,7 +257,7 @@ export const FormIntegration: Story = {
     };
 
     return (
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex items-center gap-4">
         <Switch name="darkMode" value="enabled" defaultSelected>
           Dark mode
         </Switch>
@@ -284,7 +284,7 @@ export const AllStates: Story = {
       <div className="space-y-6">
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Basic States</h3>
-          <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Switch>Off (default)</Switch>
             <Switch defaultSelected>On</Switch>
           </div>
@@ -292,7 +292,7 @@ export const AllStates: Story = {
 
         <div className="space-y-2">
           <h3 className="text-lg font-medium">With Icons</h3>
-          <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Switch icon={<IconClose />} selectedIcon={<IconCheck />}>
               Toggle with icons
             </Switch>
@@ -304,7 +304,7 @@ export const AllStates: Story = {
 
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Disabled States</h3>
-          <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Switch isDisabled>Disabled (off)</Switch>
             <Switch isDisabled defaultSelected>
               Disabled (on)
@@ -314,7 +314,7 @@ export const AllStates: Story = {
 
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Read-only States</h3>
-          <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Switch isReadOnly>Read-only (off)</Switch>
             <Switch isReadOnly defaultSelected>
               Read-only (on)
@@ -324,7 +324,7 @@ export const AllStates: Story = {
 
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Without Labels</h3>
-          <div className="space-y-2">
+          <div className="flex items-center gap-4">
             <Switch aria-label="Toggle option 1" />
             <Switch aria-label="Toggle option 2" defaultSelected />
           </div>
@@ -356,7 +356,7 @@ export const Playground: Story = {
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Device Settings</h3>
-        <div className="space-y-3">
+        <div className="flex items-center gap-4">
           <Switch
             isSelected={settings.bluetooth}
             onChange={updateSetting("bluetooth")}
