@@ -1,5 +1,11 @@
 # @tinybigui/react
 
+## 0.24.6
+
+### Patch Changes
+
+- e361426: docs: sync package and root READMEs, ROADMAP, and CHANGELOG for v0.24.5 release notes
+
 ## 0.24.5
 
 ### Patch Changes
