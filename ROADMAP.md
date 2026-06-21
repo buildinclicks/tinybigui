@@ -4,7 +4,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 
 ## Current Status
 
-**Current Version:** v0.24.5 (released 2026-06-20)  
+**Current Version:** v0.24.6 (released 2026-06-21)  
 **Next Release:** v0.25.0  
 **Status:** 29 components published to NPM; 2,256 tests passing
 
@@ -47,6 +47,7 @@ This document outlines the development roadmap for TinyBigUI, a Material Design 
 | v0.24.3 | —       | Checkbox margin and layout alignment for MD3 touch-target and label spacing                                                                                      | Released 2026-06-17 |
 | v0.24.4 | —       | Radio error variant state layer and ring color overrides for invalid selected state                                                                              | Released 2026-06-17 |
 | v0.24.5 | —       | Radio margin and layout alignment for MD3 touch-target and label spacing; Storybook static export builds tokens before deploy                                    | Released 2026-06-20 |
+| v0.24.6 | —       | Documentation sync — README, ROADMAP, and CHANGELOG updated to reflect v0.24.1–v0.24.5 patch releases                                                            | Released 2026-06-21 |
 | v1.0.0  | Stable  | API frozen, documentation site, migration guides                                                                                                                 | Planned             |
 
 ## Completed Work
