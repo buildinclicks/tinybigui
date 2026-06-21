@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.5] - 2026-06-20
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Radio** — margin and layout alignment for MD3 touch-target and label spacing
+- **Storybook** — build tokens package before static Storybook export for Vercel deploy
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
+## [0.24.4] - 2026-06-17
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Radio** — error variant state layer and ring colors; invalid styles now override selected state in ring and state layer
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
+## [0.24.3] - 2026-06-17
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Checkbox** — margin and layout alignment for MD3 touch-target and label spacing
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
+## [0.24.2] - 2026-06-17
+
+### Changed
+
+#### `@tinybigui/tokens`
+
+- **`--md-ref-palette-neutral90`** — hex corrected from `#e6e1e5` to `#e6e0e9` per MD3 spec for `on-surface`, `inverse-surface`, and `surface-container-highest` consistency
+
+> See [packages/tokens/CHANGELOG.md](./packages/tokens/CHANGELOG.md) for full release notes.
+
+## [0.24.1] - 2026-06-17
+
+### Changed
+
+#### `@tinybigui/react`
+
+- **Button** — loading usage fix, outlined variant styling (`border-outline-variant`, `bg-transparent`), and disabled state `group-data-[disabled]/button` selectors
+
+> See [packages/react/CHANGELOG.md](./packages/react/CHANGELOG.md) for full release notes.
+
 ## [0.24.0] - 2026-06-12
 
 ### Changed
