@@ -171,9 +171,9 @@ export const buttonVariants = cva(
        * Text variant uses reduced padding: small=12dp, medium=12dp
        */
       size: {
-        small: "h-8 px-4 gap-1 text-label-medium tracking-[0.1px]",
-        medium: "h-10 px-6 gap-2 text-label-large tracking-[0.1px]",
-        large: "h-14 px-8 gap-2 text-title-medium",
+        small: "h-10 px-4 gap-1 text-label-large",
+        medium: "h-14 px-6 gap-2 text-title-medium",
+        large: "h-24 px-12 gap-3 text-title-large",
       },
 
       /**
