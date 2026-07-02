@@ -40,7 +40,8 @@ describe("Divider", () => {
     test("applies horizontal size class for horizontal orientation", () => {
       render(<Divider />);
       const el = screen.getByRole("separator");
-      expect(el).toHaveClass("w-full");
+      expect(el).toHaveClass("h-[var(--md-divider-thickness)]");
+      expect(el).not.toHaveClass("w-full");
     });
 
     test("applies vertical size class for vertical orientation", () => {
