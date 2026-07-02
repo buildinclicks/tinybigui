@@ -1,5 +1,11 @@
 # @tinybigui/react
 
+## 0.24.8
+
+### Patch Changes
+
+- Improve Tooltip typography with letter-spacing and medium font weight on rich tooltip titles.
+
 ## 0.24.7
 
 ### Patch Changes
