@@ -1,5 +1,11 @@
 # @tinybigui/react
 
+## 0.24.7
+
+### Patch Changes
+
+- a0632c6: Remove forced full-width styling from horizontal dividers so they respect container layout.
+
 ## 0.24.6
 
 ### Patch Changes
