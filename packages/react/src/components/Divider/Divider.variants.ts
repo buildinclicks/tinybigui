@@ -50,7 +50,7 @@ export const dividerVariants = cva(
        *              inline size is --md-divider-thickness
        */
       orientation: {
-        horizontal: "w-full h-[var(--md-divider-thickness)]",
+        horizontal: "h-[var(--md-divider-thickness)]",
         vertical: "self-stretch h-auto w-[var(--md-divider-thickness)]",
       },
 
