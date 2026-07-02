@@ -77,7 +77,7 @@ export const tooltipVariants = cva(
   [
     "z-50 inline-flex items-center w-fit",
     "min-h-6 rounded-xs px-2 py-1",
-    "text-body-small bg-inverse-surface text-inverse-on-surface",
+    "text-body-small tracking-[0.4px] bg-inverse-surface text-inverse-on-surface",
     "max-w-50",
   ],
   {
@@ -156,7 +156,9 @@ export const richTooltipVariants = cva(
  * - `text-on-surface-variant`— MD3 rich-tooltip subhead colour role
  * - `mb-1`                   — 4dp gap below title (before supporting text)
  */
-export const richTooltipTitleVariants = cva(["text-title-small text-on-surface-variant mb-1"]);
+export const richTooltipTitleVariants = cva([
+  "text-title-small font-medium text-on-surface-variant mb-1",
+]);
 
 /**
  * Rich tooltip supporting text body.
